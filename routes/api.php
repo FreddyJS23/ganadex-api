@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\GanadoController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -16,5 +18,6 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->group(function(){
 
     Route::apiResource('/ganado',GanadoController::class);
+    Route::apiResource('usuario',UserController::class)->only(['show','update','destroy']);
 
 });
