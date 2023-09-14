@@ -22,6 +22,10 @@ class GanadoResource extends JsonResource
             'sexo'=>$this->sexo,
             'tipo'=>$this->tipo->tipo,
             'fecha_nacimiento'=>$this->fecha_nacimiento,
+            'peso_nacimiento'=>$this->peso->peso_nacimiento,
+            'peso_destete'=>$this->peso->peso_destete,
+            'peso_2year'=>$this->peso->peso_2year,
+            'peso_actual'=>$this->peso->peso_actual,
         ];
     }
 }

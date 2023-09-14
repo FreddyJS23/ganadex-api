@@ -40,4 +40,14 @@ public function toro(): HasOne
     return $this->hasOne(Toro::class);
 }
 
+/**
+ * Get the peso associated with the Ganado
+ *
+ * @return \Illuminate\Database\Eloquent\Relations\HasOne
+ */
+public function peso(): HasOne
+{
+    return $this->hasOne(Peso::class);
+}
+
 }

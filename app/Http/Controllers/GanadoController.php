@@ -27,10 +27,13 @@ class GanadoController extends Controller
     public function store(StoreGanadoRequest $request) :JsonResponse
     {
       $ganado=new Ganado;
-      $ganado->fill($request->all());
+      $ganado->fill($request->except([ 'peso_nacimiento', 'peso_destete','peso_2year','peso_actual']));
       $ganado->user_id=Auth::id();
       $ganado->save();
-        return response()->json(['ganado'=>new GanadoResource($ganado)],201);
+      
+      $ganado->peso()->create($request->only([ 'peso_nacimiento', 'peso_destete','peso_2year','peso_actual']));
+     
+      return response()->json(['ganado'=>new GanadoResource($ganado)],201);
     }
 
     /**
@@ -46,8 +49,9 @@ class GanadoController extends Controller
      */
     public function update(UpdateGanadoRequest $request, Ganado $ganado)
     {
-        $ganado->fill($request->all())->save();
-        
+        $ganado->fill($request->except([ 'peso_nacimiento', 'peso_destete','peso_2year','peso_actual']))->save();
+        $ganado->peso->fill($request->only([ 'peso_nacimiento', 'peso_destete','peso_2year','peso_actual']))->save();
+       
         return response()->json(['ganado'=>new GanadoResource($ganado)],200);
     }
 
