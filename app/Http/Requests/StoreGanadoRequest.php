@@ -27,7 +27,7 @@ class StoreGanadoRequest extends FormRequest
             'origen'=>'min:3,|max:255',
             'sexo'=>'required|in:H,M',
             'tipo_id'=>'required|exists:ganado_tipos,id',
-            'fecha_nacimiento'=>',date_format:Y-m-d'
+            'fecha_nacimiento'=>'date_format:Y-m-d'
         ];
     }
 }
