@@ -5,8 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-
-
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Ganado extends Model
 {
@@ -30,4 +29,15 @@ public function tipo(): BelongsTo
 {
     return $this->belongsTo(GanadoTipo::class);
 }
+
+/**
+ * Get the toro associated with the Ganado
+ *
+ * @return \Illuminate\Database\Eloquent\Relations\HasOne
+ */
+public function toro(): HasOne
+{
+    return $this->hasOne(Toro::class);
+}
+
 }
