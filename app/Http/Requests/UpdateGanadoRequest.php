@@ -22,8 +22,8 @@ class UpdateGanadoRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nombre'=>'required|min:3|max:255|unique:ganados,nombre',
-            'numero'=>'numeric|digits_between:1,32767|unique:ganados,numero',
+            'nombre'=>'required|min:3|max:255',Rule::unique('ganados')->ignore(Auth::id()),
+            'numero'=>'numeric|digits_between:1,32767',Rule::unique('ganados')->ignore(Auth::id()),
             'origen'=>'min:3,|max:255',
             'sexo'=>'required|in:H,M',
             'tipo_id'=>'required|exists:ganado_tipos,id',
