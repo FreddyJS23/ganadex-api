@@ -26,6 +26,7 @@ class UpdateGanadoRequest extends FormRequest
             'numero'=>'numeric|digits_between:1,32767|unique:ganados,numero',
             'origen'=>'min:3,|max:255',
             'sexo'=>'required|in:H,M',
+            'tipo_id'=>'required|exists:ganado_tipos,id',
             'fecha_nacimiento'=>',date_format:Y-m-d'
         ];
     }
