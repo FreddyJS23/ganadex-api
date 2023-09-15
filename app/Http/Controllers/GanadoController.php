@@ -34,6 +34,7 @@ class GanadoController extends Controller
       $ganado->save();
       
       $ganado->peso()->create($request->only($this->peso));
+      $ganado->estado()->create($request->only($this->estado));
      
       return response()->json(['ganado'=>new GanadoResource($ganado)],201);
     }
@@ -53,6 +54,7 @@ class GanadoController extends Controller
     {
         $ganado->fill($request->except($this->peso + $this->estado))->save();
         $ganado->peso->fill($request->only($this->peso))->save();
+        $ganado->estado->fill($request->only($this->estado))->save();
        
         return response()->json(['ganado'=>new GanadoResource($ganado)],200);
     }

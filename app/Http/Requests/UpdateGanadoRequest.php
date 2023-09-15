@@ -34,6 +34,9 @@ class UpdateGanadoRequest extends FormRequest
             'peso_destete'=>'max:10|regex:/^\d+(\.\d+)?KG$/',
             'peso_2year'=>'max:10|regex:/^\d+(\.\d+)?KG$/',
             'peso_actual'=>'max:10|regex:/^\d+(\.\d+)?KG$/', 
+            'estado'=>'in:fallecido,sano,pendiente_revision,pendiente_servicio,prenada',
+            'fecha_defuncion'=>'date_format:Y-m-d',
+            'causa_defuncion'=>'max:255', 
         ];
     }
 }

@@ -26,6 +26,9 @@ class GanadoResource extends JsonResource
             'peso_destete'=>$this->peso->peso_destete,
             'peso_2year'=>$this->peso->peso_2year,
             'peso_actual'=>$this->peso->peso_actual,
+            'estado'=>$this->estado->estado,
+            'fecha_defuncion'=>$this->estado->fecha_defuncion,
+            'causa_defuncion'=>$this->estado->causa_defuncion,
         ];
     }
 }

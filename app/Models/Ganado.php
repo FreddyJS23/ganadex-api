@@ -49,5 +49,14 @@ public function peso(): HasOne
 {
     return $this->hasOne(Peso::class);
 }
+/**
+ * Get the estado associated with the Ganado
+ *
+ * @return \Illuminate\Database\Eloquent\Relations\HasOne
+ */
+public function estado(): HasOne
+{
+    return $this->hasOne(Estado::class);
+}
 
 }
