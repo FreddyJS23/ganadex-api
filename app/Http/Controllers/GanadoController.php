@@ -13,6 +13,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class GanadoController extends Controller
 {
+        public array $estado=['estado','fecha_defuncion','causa_defuncion'];
+        public array $peso=['peso_nacimiento', 'peso_destete','peso_2year','peso_actual'];
     /**
      * Display a listing of the resource.
      */
@@ -27,11 +29,11 @@ class GanadoController extends Controller
     public function store(StoreGanadoRequest $request) :JsonResponse
     {
       $ganado=new Ganado;
-      $ganado->fill($request->except([ 'peso_nacimiento', 'peso_destete','peso_2year','peso_actual']));
+      $ganado->fill($request->except($this->estado + $this->peso));
       $ganado->user_id=Auth::id();
       $ganado->save();
       
-      $ganado->peso()->create($request->only([ 'peso_nacimiento', 'peso_destete','peso_2year','peso_actual']));
+      $ganado->peso()->create($request->only($this->peso));
      
       return response()->json(['ganado'=>new GanadoResource($ganado)],201);
     }
@@ -49,8 +51,8 @@ class GanadoController extends Controller
      */
     public function update(UpdateGanadoRequest $request, Ganado $ganado)
     {
-        $ganado->fill($request->except([ 'peso_nacimiento', 'peso_destete','peso_2year','peso_actual']))->save();
-        $ganado->peso->fill($request->only([ 'peso_nacimiento', 'peso_destete','peso_2year','peso_actual']))->save();
+        $ganado->fill($request->except($this->peso + $this->estado))->save();
+        $ganado->peso->fill($request->only($this->peso))->save();
        
         return response()->json(['ganado'=>new GanadoResource($ganado)],200);
     }
