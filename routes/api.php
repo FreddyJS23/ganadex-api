@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthLogin;
 use App\Http\Controllers\GanadoController;
+use App\Http\Controllers\RevisionController;
 use App\Http\Controllers\ToroController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -24,6 +25,7 @@ Route::middleware('auth:sanctum')->group(function(){
     
     Route::apiResource('/toro',ToroController::class);
     Route::apiResource('/ganado',GanadoController::class);
+    Route::apiResource('/ganado/{ganado}/revision',RevisionController::class);
     Route::apiResource('usuario',UserController::class)->only(['show','update','destroy']);
 
 });

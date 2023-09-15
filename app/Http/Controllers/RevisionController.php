@@ -1,0 +1,63 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Requests\StoreRevisionRequest;
+use App\Http\Requests\UpdateRevisionRequest;
+use App\Http\Resources\RevisionCollection;
+use App\Http\Resources\RevisionResource;
+use App\Models\Ganado;
+use App\Models\Revision;
+use DateTime;
+
+class RevisionController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index(Ganado $ganado)
+    {
+        return new RevisionCollection(Revision::whereBelongsTo($ganado)->get());
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(StoreRevisionRequest $request, Ganado $ganado)
+    {
+        $fecha=new DateTime();
+        $revision= new Revision;
+        $revision->fill($request->all());
+        $revision->fecha=$fecha->format('Y-m-d');
+        $revision->ganado()->associate($ganado)->save();
+
+        return response()->json(['revision'=>new RevisionResource($revision)],201);
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(Ganado $ganado,Revision $revision)
+    {
+        return response()->json(['revision'=>new RevisionResource($revision)]);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(UpdateRevisionRequest $request,Ganado $ganado, Revision $revision)
+    {
+        $revision->fill($request->all());
+        $revision->save();
+
+        return response()->json(['revision'=>new RevisionResource($revision)],200);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Ganado $ganado, Revision $revision)
+    {
+        return  response()->json(['revisionID' => Revision::destroy($revision->id) ?  $revision->id : ''], 200);
+    }
+}
