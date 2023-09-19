@@ -18,9 +18,9 @@ class UserPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, User $model): bool
+    public function view(User $usuario, User $model): bool
     {
-        return $user->id === $model->id;
+        return $usuario->id === $model->id;
     }
 
     /**
@@ -34,17 +34,17 @@ class UserPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, User $model): bool
+    public function update(User $usuario, User $model): bool
     {
-        return $user->id === $model->id;
+        return $usuario->id === $model->id;
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, User $model): bool
+    public function delete(User $usuario, User $model): bool
     {
-        return $user->id === $model->id;
+        return $usuario->id === $model->id;
     }
 
     /**
