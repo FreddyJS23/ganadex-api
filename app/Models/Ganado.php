@@ -69,5 +69,18 @@ public function revision(): HasMany
 {
     return $this->hasMany(Revision::class);
 }
+    public function servicioReciente(): HasOne
+    {
+        return $this->hasOne(Servicio::class)->latestOfMany();
+    }
 
+    /**
+     * Get all of the comments for the Parto
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function parto(): HasMany
+    {
+        return $this->hasMany(Parto::class, 'foreign_key', 'local_key');
+    }
 }
