@@ -21,54 +21,60 @@ class Ganado extends Model
         'fecha_nacimiento',
     ];
 
-/**
- * Get the tipo that owns the Ganado
- *
- * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
- */
-public function tipo(): BelongsTo
-{
-    return $this->belongsTo(GanadoTipo::class);
-}
+    /**
+     * Get the tipo that owns the Ganado
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function tipo(): BelongsTo
+    {
+        return $this->belongsTo(GanadoTipo::class);
+    }
 
-/**
- * Get the toro associated with the Ganado
- *
- * @return \Illuminate\Database\Eloquent\Relations\HasOne
- */
-public function toro(): HasOne
-{
-    return $this->hasOne(Toro::class);
-}
+    /**
+     * Get the toro associated with the Ganado
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function toro(): HasOne
+    {
+        return $this->hasOne(Toro::class);
+    }
 
-/**
- * Get the peso associated with the Ganado
- *
- * @return \Illuminate\Database\Eloquent\Relations\HasOne
- */
-public function peso(): HasOne
-{
-    return $this->hasOne(Peso::class);
-}
-/**
- * Get the estado associated with the Ganado
- *
- * @return \Illuminate\Database\Eloquent\Relations\HasOne
- */
-public function estado(): HasOne
-{
-    return $this->hasOne(Estado::class);
-}
+    /**
+     * Get the peso associated with the Ganado
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function peso(): HasOne
+    {
+        return $this->hasOne(Peso::class);
+    }
+    /**
+     * Get the estado associated with the Ganado
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function estado(): HasOne
+    {
+        return $this->hasOne(Estado::class);
+    }
 
-/**
- * Get all of the revision for the Ganado
- *
- * @return \Illuminate\Database\Eloquent\Relations\HasMany
- */
-public function revision(): HasMany
-{
-    return $this->hasMany(Revision::class);
-}
+    /**
+     * Get all of the revision for the Ganado
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function revision(): HasMany
+    {
+        return $this->hasMany(Revision::class);
+    }
+ 
+    /**
+     * Get the ganado most recent servicio
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
     public function servicioReciente(): HasOne
     {
         return $this->hasOne(Servicio::class)->latestOfMany();
