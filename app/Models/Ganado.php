@@ -87,7 +87,8 @@ class Ganado extends Model
      */
     public function parto(): HasMany
     {
-        return $this->hasMany(Parto::class, 'foreign_key', 'local_key');
+        return $this->hasMany(Parto::class);
+    }
 
     /**
      * Get all of the pesajes_leche for the Ganado
