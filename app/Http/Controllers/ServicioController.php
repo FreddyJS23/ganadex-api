@@ -12,6 +12,11 @@ use DateTime;
 
 class ServicioController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(Servicio::class,'servicio');
+    }   
+    
     /**
      * Display a listing of the resource.
      */

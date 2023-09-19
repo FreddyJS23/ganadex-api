@@ -12,6 +12,11 @@ use DateTime;
 
 class RevisionController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(Revision::class,'revision');
+    }   
+    
     /**
      * Display a listing of the resource.
      */

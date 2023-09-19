@@ -15,6 +15,11 @@ use function Laravel\Prompts\select;
 
 class ToroController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(Toro::class,'toro');
+    }   
+    
     /**
      * Display a listing of the resource.
      */

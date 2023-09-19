@@ -13,8 +13,14 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class GanadoController extends Controller
 {
-        public array $estado=['estado','fecha_defuncion','causa_defuncion'];
-        public array $peso=['peso_nacimiento', 'peso_destete','peso_2year','peso_actual'];
+    public function __construct()
+    {
+        $this->authorizeResource(Ganado::class,'ganado');
+    }   
+    
+    
+    public array $estado=['estado','fecha_defuncion','causa_defuncion'];
+    public array $peso=['peso_nacimiento', 'peso_destete','peso_2year','peso_actual'];
     /**
      * Display a listing of the resource.
      */
