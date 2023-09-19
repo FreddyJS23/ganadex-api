@@ -25,7 +25,7 @@ class UpdateToroRequest extends FormRequest
     {
         return [
             'nombre'=>'required|min:3|max:255',Rule::unique('ganados')->ignore(Auth::id()),
-            'numero'=>'numeric|digits_between:1,32767',Rule::unique('ganados')->ignore(Auth::id()),
+            'numero'=>'required|numeric|digits_between:1,32767',Rule::unique('ganados')->ignore(Auth::id()),
             'origen'=>'min:3,|max:255',
             'fecha_nacimiento'=>'date_format:Y-m-d'
         ];
