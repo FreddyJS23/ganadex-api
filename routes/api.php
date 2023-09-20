@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthLogin;
 use App\Http\Controllers\GanadoController;
+use App\Http\Controllers\InsumoController;
 use App\Http\Controllers\LecheController;
 use App\Http\Controllers\PartoController;
 use App\Http\Controllers\RevisionController;
@@ -28,6 +29,7 @@ Route::middleware('auth:sanctum')->group(function(){
     
     Route::apiResource('/toro',ToroController::class);
     Route::apiResource('/ganado',GanadoController::class);
+    Route::apiResource('/insumo',InsumoController::class);
     Route::apiResource('/ganado/{ganado}/revision',RevisionController::class);
     Route::apiResource('/ganado/{ganado}/servicio',ServicioController::class);
     Route::apiResource('/ganado/{ganado}/parto',PartoController::class);
