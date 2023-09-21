@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthLogin;
+use App\Http\Controllers\ConfiguracionController;
 use App\Http\Controllers\GanadoController;
 use App\Http\Controllers\InsumoController;
 use App\Http\Controllers\LecheController;
@@ -32,6 +33,7 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::apiResource('/ganado',GanadoController::class);
     Route::apiResource('/insumo',InsumoController::class);
     Route::apiResource('/personal',PersonalController::class);
+    Route::apiResource('/configuracion',ConfiguracionController::class)->only(['index','store','update']);
     Route::apiResource('/ganado/{ganado}/revision',RevisionController::class);
     Route::apiResource('/ganado/{ganado}/servicio',ServicioController::class);
     Route::apiResource('/ganado/{ganado}/parto',PartoController::class);
