@@ -10,6 +10,7 @@ use App\Http\Controllers\PersonalController;
 use App\Http\Controllers\RevisionController;
 use App\Http\Controllers\ServicioController;
 use App\Http\Controllers\ToroController;
+use App\Http\Controllers\TotalGanadoTipo;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -39,5 +40,8 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::apiResource('/ganado/{ganado}/parto',PartoController::class);
     Route::apiResource('/ganado/{ganado}/pesaje_leche',LecheController::class);
     Route::apiResource('usuario',UserController::class)->only(['show','update','destroy']);
+
+   //rutas peticiones de datos
+   Route::get('/total_ganado_tipo',TotalGanadoTipo::class);
 
 });
