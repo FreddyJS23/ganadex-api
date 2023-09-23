@@ -2,9 +2,11 @@
 
 namespace App\Providers;
 
+use App\Events\NaceMacho;
 use App\Events\PartoHecho;
 use App\Events\RevisionPrenada;
 use App\Events\ServicioHecho;
+use App\Listeners\CaparBecerro;
 use App\Listeners\EstadoGestacion;
 use App\Listeners\RevisionPosParto;
 use App\Listeners\RevisionServicio;
@@ -14,6 +16,9 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
+
+
+
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -29,6 +34,7 @@ class EventServiceProvider extends ServiceProvider
         ServicioHecho::class => [RevisionServicio::class,],
         RevisionPrenada::class => [EstadoGestacion::class, Secado::class,],
         PartoHecho::class => [RevisionPosParto::class,EstadoPosParto::class],
+        NaceMacho::class => [CaparBecerro::class,],
     ];
 
     /**
