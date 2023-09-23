@@ -22,4 +22,13 @@ class NovillaAMontar extends Controller
         
         return new NovillaAMontarCollection($novillasAmontar);
     }
+
+    public function total()
+    {
+        $novillasAmontar = Peso::whereHas('ganado', function (Builder $query) {
+            $query->where('user_id', Auth::id());
+        })->where('peso_actual', '>=', 200)->count();
+        
+        return response()->json(['cantidad_vacas_para_servir'=>$novillasAmontar],200);
+    }
 }

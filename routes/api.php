@@ -49,4 +49,5 @@ Route::middleware('auth:sanctum')->group(function(){
 
 
      Route::get('/vacas_gestacion',VacasEnGestacion::class);
+     Route::get('/cantidad_novillas_montar',[NovillaAMontar::class,'total']);
 });
