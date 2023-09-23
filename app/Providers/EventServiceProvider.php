@@ -2,8 +2,11 @@
 
 namespace App\Providers;
 
+use App\Events\RevisionPrenada;
 use App\Events\ServicioHecho;
+use App\Listeners\EstadoGestacion;
 use App\Listeners\RevisionServicio;
+use App\Listeners\Secado;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -21,6 +24,7 @@ class EventServiceProvider extends ServiceProvider
             SendEmailVerificationNotification::class,
         ],
         ServicioHecho::class => [RevisionServicio::class,],
+        RevisionPrenada::class => [EstadoGestacion::class, Secado::class,],
     ];
 
     /**
