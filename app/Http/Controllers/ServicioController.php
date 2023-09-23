@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ServicioHecho;
 use App\Http\Requests\StoreServicioRequest;
 use App\Http\Requests\UpdateServicioRequest;
 use App\Http\Resources\ServicioCollection;
@@ -37,6 +38,8 @@ class ServicioController extends Controller
         $servicio->fecha=$fecha->format('Y-m-d');
         $servicio->ganado()->associate($ganado);
         $servicio->toro()->associate($toro)->save();
+
+        ServicioHecho::dispatch($servicio);
     
         return response()->json(['servicio'=>new ServicioResource($servicio)],201);
     }

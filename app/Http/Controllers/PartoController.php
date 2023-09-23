@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NaceMacho;
+use App\Events\PartoHecho;
 use App\Http\Requests\StorePartoRequest;
 use App\Http\Requests\UpdatePartoRequest;
 use App\Http\Resources\PartoCollection;
@@ -53,7 +55,10 @@ class PartoController extends Controller
         $peso_nacimiento->ganado()->associate($cria)->save();
         
         $parto->ganado_cria()->associate($cria)->save();
-        
+
+        PartoHecho::dispatch($parto);
+        NaceMacho::dispatchIf($cria->sexo == "M",$cria);
+
         return response()->json(['parto'=>new PartoResource($parto)],201);
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\RevisionPrenada;
 use App\Http\Requests\StoreRevisionRequest;
 use App\Http\Requests\UpdateRevisionRequest;
 use App\Http\Resources\RevisionCollection;
@@ -36,6 +37,10 @@ class RevisionController extends Controller
         $revision->fecha=$fecha->format('Y-m-d');
         $revision->ganado()->associate($ganado)->save();
 
+        
+         RevisionPrenada::dispatchIf($revision->diagnostico == 'prenada',$revision);
+         
+       
         return response()->json(['revision'=>new RevisionResource($revision)],201);
     }
 
