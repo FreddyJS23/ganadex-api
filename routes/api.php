@@ -43,11 +43,11 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::apiResource('/ganado/{ganado}/pesaje_leche',LecheController::class);
     Route::apiResource('usuario',UserController::class)->only(['show','update','destroy']);
 
-   //rutas peticiones de datos
-   Route::get('/total_ganado_tipo',TotalGanadoTipo::class);
-   Route::get('/novillas_montar',NovillaAMontar::class);
-
-
+   //rutas peticiones de datos dashboard
+     Route::get('/total_ganado_tipo',TotalGanadoTipo::class);
      Route::get('/vacas_gestacion',VacasEnGestacion::class);
      Route::get('/cantidad_novillas_montar',[NovillaAMontar::class,'total']);
+    
+    //rutas peticiones datos para rellanr formularios
+     Route::get('/novillas_montar',NovillaAMontar::class);
 });
