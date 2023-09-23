@@ -13,6 +13,7 @@ use App\Http\Controllers\ServicioController;
 use App\Http\Controllers\ToroController;
 use App\Http\Controllers\TotalGanadoTipo;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\VacasEnGestacion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -47,4 +48,5 @@ Route::middleware('auth:sanctum')->group(function(){
    Route::get('/novillas_montar',NovillaAMontar::class);
 
 
+     Route::get('/vacas_gestacion',VacasEnGestacion::class);
 });
