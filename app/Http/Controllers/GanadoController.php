@@ -41,6 +41,7 @@ class GanadoController extends Controller
       
       $ganado->peso()->create($request->only($this->peso));
       $ganado->estado()->create($request->only($this->estado));
+      $ganado->evento()->create();  
      
       return response()->json(['ganado'=>new GanadoResource($ganado)],201);
     }

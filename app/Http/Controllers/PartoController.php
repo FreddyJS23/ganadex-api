@@ -46,6 +46,7 @@ class PartoController extends Controller
         $cria->origen='local';
         $cria->user_id=Auth::id();
         $cria->save();
+        $cria->evento()->create(); 
         $estado=new Estado(['estado'=>'sano']);
         $estado->ganado()->associate($cria)->save();
         $peso_nacimiento=new Peso($request->only(['peso_nacimiento']));

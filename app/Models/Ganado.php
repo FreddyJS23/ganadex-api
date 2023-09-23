@@ -109,4 +109,14 @@ class Ganado extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    /**
+     * Get the evento associated with the Ganado
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function evento(): HasOne
+    {
+        return $this->hasOne(Evento::class);
+    }
 }
