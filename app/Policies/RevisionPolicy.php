@@ -7,7 +7,7 @@ use App\Models\Revision;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
-class RevsionPolicy
+class RevisionPolicy
 {
     /**
      * Determine whether the user can view any models.
