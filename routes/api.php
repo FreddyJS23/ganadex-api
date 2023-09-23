@@ -5,6 +5,7 @@ use App\Http\Controllers\ConfiguracionController;
 use App\Http\Controllers\GanadoController;
 use App\Http\Controllers\InsumoController;
 use App\Http\Controllers\LecheController;
+use App\Http\Controllers\NovillaAMontar;
 use App\Http\Controllers\PartoController;
 use App\Http\Controllers\PersonalController;
 use App\Http\Controllers\RevisionController;
@@ -43,5 +44,7 @@ Route::middleware('auth:sanctum')->group(function(){
 
    //rutas peticiones de datos
    Route::get('/total_ganado_tipo',TotalGanadoTipo::class);
+   Route::get('/novillas_montar',NovillaAMontar::class);
+
 
 });
