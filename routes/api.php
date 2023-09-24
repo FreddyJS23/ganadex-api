@@ -11,6 +11,7 @@ use App\Http\Controllers\PersonalController;
 use App\Http\Controllers\RevisionController;
 use App\Http\Controllers\ServicioController;
 use App\Http\Controllers\ToroController;
+use App\Http\Controllers\TotalGanadoPendienteRevision;
 use App\Http\Controllers\TotalGanadoTipo;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VacasEnGestacion;
@@ -46,6 +47,7 @@ Route::middleware('auth:sanctum')->group(function(){
    //rutas peticiones de datos dashboard
      Route::get('/total_ganado_tipo',TotalGanadoTipo::class);
      Route::get('/vacas_gestacion',VacasEnGestacion::class);
+     Route::get('/ganado_pendiente_revision',TotalGanadoPendienteRevision::class);
      Route::get('/cantidad_novillas_montar',[NovillaAMontar::class,'total']);
     
     //rutas peticiones datos para rellanr formularios
