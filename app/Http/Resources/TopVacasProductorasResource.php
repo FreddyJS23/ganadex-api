@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class LecheResource extends JsonResource
+class TopVacasProductorasResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -15,9 +15,8 @@ class LecheResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'=>$this->id,
-            'pesaje'=>$this->peso_leche . "KG",
-            'fecha'=>$this->fecha
+            'numero'=>$this->ganado->numero,
+            'peso_leche'=>$this->peso_leche . "KG"
         ];
     }
 }

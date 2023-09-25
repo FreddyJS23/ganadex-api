@@ -10,6 +10,7 @@ use App\Http\Controllers\PartoController;
 use App\Http\Controllers\PersonalController;
 use App\Http\Controllers\RevisionController;
 use App\Http\Controllers\ServicioController;
+use App\Http\Controllers\TopVacasProductoras;
 use App\Http\Controllers\ToroController;
 use App\Http\Controllers\TotalGanadoPendienteRevision;
 use App\Http\Controllers\TotalGanadoTipo;
@@ -49,6 +50,7 @@ Route::middleware('auth:sanctum')->group(function(){
      Route::get('/total_ganado_tipo',TotalGanadoTipo::class);
      Route::get('/total_personal',TotalPersonal::class);
      Route::get('/vacas_gestacion',VacasEnGestacion::class);
+     Route::get('/vacas_productoras',TopVacasProductoras::class);
      Route::get('/ganado_pendiente_revision',TotalGanadoPendienteRevision::class);
      Route::get('/cantidad_novillas_montar',[NovillaAMontar::class,'total']);
     

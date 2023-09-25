@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('leches', function (Blueprint $table) {
             $table->id();
-            $table->string('peso_leche');
+            $table->integer('peso_leche');
             $table->date('fecha');
             $table->foreignId('ganado_id')->constrained()->cascadeOnDelete();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
