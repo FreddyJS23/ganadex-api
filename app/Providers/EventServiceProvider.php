@@ -12,6 +12,7 @@ use App\Listeners\RevisionPosParto;
 use App\Listeners\RevisionServicio;
 use App\Listeners\Secado;
 use App\Listeners\EstadoPosParto;
+use App\Listeners\CambiaAvaca;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -33,7 +34,7 @@ class EventServiceProvider extends ServiceProvider
         ],
         ServicioHecho::class => [RevisionServicio::class,],
         RevisionPrenada::class => [EstadoGestacion::class, Secado::class,],
-        PartoHecho::class => [RevisionPosParto::class,EstadoPosParto::class],
+        PartoHecho::class => [RevisionPosParto::class,EstadoPosParto::class,CambiaAVaca::class],
         NaceMacho::class => [CaparBecerro::class,],
     ];
 
