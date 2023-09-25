@@ -5,6 +5,7 @@ use App\Http\Controllers\ConfiguracionController;
 use App\Http\Controllers\GanadoController;
 use App\Http\Controllers\InsumoController;
 use App\Http\Controllers\LecheController;
+use App\Http\Controllers\MayorCantidadInsumo;
 use App\Http\Controllers\MenorCantidadInsumo;
 use App\Http\Controllers\NovillaAMontar;
 use App\Http\Controllers\PartoController;
@@ -57,6 +58,7 @@ Route::middleware('auth:sanctum')->group(function(){
      Route::get('/ganado_pendiente_revision',TotalGanadoPendienteRevision::class);
      Route::get('/cantidad_novillas_montar',[NovillaAMontar::class,'total']);
      Route::get('/menor_insumo',MenorCantidadInsumo::class);
+     Route::get('/mayor_insumo',MayorCantidadInsumo::class);
     
     //rutas peticiones datos para rellanr formularios
      Route::get('/novillas_montar',NovillaAMontar::class);
