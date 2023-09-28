@@ -6,6 +6,7 @@ use App\Http\Controllers\ConfiguracionController;
 use App\Http\Controllers\GanadoController;
 use App\Http\Controllers\InsumoController;
 use App\Http\Controllers\LecheController;
+use App\Http\Controllers\Logout;
 use App\Http\Controllers\MayorCantidadInsumo;
 use App\Http\Controllers\MenorCantidadInsumo;
 use App\Http\Controllers\NovillaAMontar;
@@ -39,6 +40,8 @@ Route::post('register',[UserController::class,'store']);
 
 Route::middleware('auth:sanctum')->group(function(){
     
+    Route::get('/logout',Logout::class);
+  
     Route::apiResource('/toro',ToroController::class);
     Route::apiResource('/ganado',GanadoController::class);
     Route::apiResource('/insumo',InsumoController::class);
