@@ -17,7 +17,13 @@ class GanadoFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'nombre'=>fake()->unique()->firstName(),
+            'numero'=>fake()->unique()->numberBetween($int=0,$int=32767),
+            'origen'=>fake()->randomElement(['local','externo']),
+            'sexo'=>fake()->randomElement(['H','M']),
+            'tipo_id'=>4,
+            'fecha_nacimiento'=>fake()->date(),
+            
         ];
     }
 }
