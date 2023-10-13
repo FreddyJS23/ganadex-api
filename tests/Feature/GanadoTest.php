@@ -44,7 +44,8 @@ class GanadoTest extends TestCase
     {
         return Ganado::factory()
             ->count($this->cantidad_ganado)
-            ->hasPeso(1)->hasEvento(1)
+            ->hasPeso(1)
+            ->hasEvento(1)
             ->hasEstado(1)
             ->for($this->user)
             ->create();
