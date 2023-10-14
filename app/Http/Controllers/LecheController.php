@@ -64,6 +64,6 @@ class LecheController extends Controller
      */
     public function destroy(Ganado $ganado,Leche $pesaje_leche)
     {
-        return  response()->json(['servicioID' => Leche::destroy($pesaje_leche->id) ?  $pesaje_leche->id : ''], 200);
+        return  response()->json(['pesajeLecheID' => Leche::destroy($pesaje_leche->id) ?  $pesaje_leche->id : ''], 200);
     }
 }
