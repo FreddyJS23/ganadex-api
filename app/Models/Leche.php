@@ -23,4 +23,14 @@ class Leche extends Model
     {
         return $this->belongsTo(Ganado::class);
     }
+
+    /**
+     * Get the user that owns the Leche
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 }
