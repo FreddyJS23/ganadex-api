@@ -49,7 +49,7 @@ class PersonalController extends Controller
     {
         $personal->fill($request->all())->save();
     
-        return response()->json(['personal'=> new PersonalResource($personal)],201);
+        return response()->json(['personal'=> new PersonalResource($personal)],200);
     }
 
     /**
