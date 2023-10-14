@@ -20,9 +20,9 @@ class RevisionPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Ganado $ganado): bool
+    public function view(User $user, Revision $revision): bool
     {
-        return $user->id === $ganado->user_id;
+        return $user->id === $revision->ganado->user_id;
     }
 
     /**
@@ -36,17 +36,17 @@ class RevisionPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Ganado $ganado): bool
+    public function update(User $user, Revision $revision): bool
     {
-        return $user->id === $ganado->user_id;
+        return $user->id === $revision->ganado->user_id;
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Ganado $ganado): bool
+    public function delete(User $user, Revision $revision): bool
     {
-        return $user->id === $ganado->user_id;
+        return $user->id === $revision->ganado->user_id;
     }
 
     /**
