@@ -53,7 +53,7 @@ class InsumoController extends Controller
         $insumo->fill($request->all());
         $insumo->save();
         
-        return response()->json(['insumo'=>new InsumoResource($insumo)],201);
+        return response()->json(['insumo'=>new InsumoResource($insumo)],200);
     }
 
     /**
