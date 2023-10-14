@@ -29,9 +29,9 @@ class UserController extends Controller
     public function store(StoreUserRequest $request)
     {
         $user= new User;
-        $user->password=hash::make($request->clave);
+        $user->password=hash::make($request->password);
         $user->role_id=1;
-        $user->fill($request->except('clave'));
+        $user->fill($request->except('password'));
         $user->save();
        
         return response()->json(['message'=>'usuario creado'],201);
@@ -50,7 +50,7 @@ class UserController extends Controller
      */
     public function update(UpdateUserRequest $request, User $user)
     {
-        $user->clave = Hash::make($request->clave);
+        $user->password = Hash::make($request->password);
         $user->fill($request->all())->save();
 
         return  response()->json(['user' => new UserResource($user)], 200);
