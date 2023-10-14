@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('observacion');
             $table->foreignId('toro_id')->constrained();
             $table->foreignId('ganado_id')->constrained();
-            $table->foreignId('ganado_cria_id')->constrained(table:'ganados',indexName:'ganado_cria_id');
+            $table->foreignId('ganado_cria_id')->constrained(table:'ganados',indexName:'ganado_cria_id')->cascadeOnDelete();
             $table->timestamps();
         });
     }
