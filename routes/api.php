@@ -36,7 +36,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 Route::post('login',AuthLogin::class);
-Route::post('register',[UserController::class,'store']);
+Route::post('register',[UserController::class,'store'])->name('usuario.store');
 
 Route::middleware('auth:sanctum')->group(function(){
     
