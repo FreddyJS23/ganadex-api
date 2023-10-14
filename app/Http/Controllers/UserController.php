@@ -12,7 +12,7 @@ class UserController extends Controller
 {
     public function __construct()
     {
-        $this->authorizeResource(User::class,'usuario');
+        $this->authorizeResource(User::class,'user');
     }   
     
     /**

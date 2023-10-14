@@ -51,7 +51,7 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::apiResource('/ganado/{ganado}/servicio',ServicioController::class);
     Route::apiResource('/ganado/{ganado}/parto',PartoController::class);
     Route::apiResource('/ganado/{ganado}/pesaje_leche',LecheController::class);
-    Route::apiResource('usuario',UserController::class)->only(['show','update','destroy']);
+    Route::apiResource('usuario',UserController::class)->only(['show','update','destroy'])->parameters(['usuario'=>'user']);
 
    //rutas peticiones de datos dashboard
      Route::get('/total_ganado_tipo',TotalGanadoTipo::class);
