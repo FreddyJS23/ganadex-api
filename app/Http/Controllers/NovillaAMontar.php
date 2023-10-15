@@ -18,7 +18,7 @@ class NovillaAMontar extends Controller
     {
         $novillasAmontar = Peso::whereHas('ganado', function (Builder $query) {
             $query->where('user_id', Auth::id());
-        })->where('peso_actual', '>=', 200)->get();
+        })->where('peso_actual', '>=', 330)->get();
         
         return new NovillaAMontarCollection($novillasAmontar);
     }
