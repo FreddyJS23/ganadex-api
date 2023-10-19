@@ -6,6 +6,9 @@ use App\Http\Requests\StoreGanadoRequest;
 use App\Http\Requests\UpdateGanadoRequest;
 use App\Http\Resources\GanadoCollection;
 use App\Http\Resources\GanadoResource;
+use App\Http\Resources\PartoResource;
+use App\Http\Resources\RevisionResource;
+use App\Http\Resources\ServicioResource;
 use App\Models\Ganado;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Facades\Auth;
@@ -51,7 +54,22 @@ class GanadoController extends Controller
      */
     public function show(Ganado $ganado)
     {
-        return response()->json(['ganado'=>new GanadoResource($ganado)],200);
+        $ultimaRevision = $ganado->revisionReciente;
+        $ultimoServicio = $ganado->servicioReciente;
+        $ultimoParto = $ganado->partoReciente;
+        $ganado->loadCount('servicios')->loadCount('revision')->loadCount('parto');
+      
+    
+        return response()->json([
+            'ganado'=>new GanadoResource($ganado),
+            'servicio_reciente'=>$ultimoServicio ? new ServicioResource($ultimoServicio) : null,
+            'total_servicios'=>$ganado->servicios_count,
+            'revision_reciente'=> $ultimaRevision ? new RevisionResource($ultimaRevision) : null,
+            'total_revisiones'=>$ganado->revision_count,
+            'parto_reciente'=> $ultimoParto ? new PartoResource($ultimoParto) : null,
+            'total_partos'=>$ganado->parto_count,
+        
+        ],200);
     }
 
     /**
