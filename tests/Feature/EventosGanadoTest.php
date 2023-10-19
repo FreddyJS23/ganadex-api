@@ -80,7 +80,10 @@ class EventosGanadoTest extends TestCase
         $response = $this->actingAs($this->user)->getJson(sprintf('api/ganado/%s', $this->ganado->id));
 
         $response->assertStatus(200)->assertJson(
-            fn (AssertableJson $json) => $json->whereType('ganado.prox_revision', 'string')
+            fn (AssertableJson $json) => $json->whereAllType([
+            'ganado.prox_revision'=>'string',
+            'servicio_reciente'=>'array',
+            'total_servicios'=>'integer'])->etc()
         );
     }
 
@@ -104,12 +107,14 @@ class EventosGanadoTest extends TestCase
             fn (AssertableJson $json) => $json->whereAllType(
                 [
                     'ganado.prox_parto' => 'string',
-                    'ganado.prox_secado' => 'string'
+                    'ganado.prox_secado' => 'string',
+                    'revision_reciente' => 'array',
+                    'total_revisiones' => 'integer',
                 ]
             )->where(
                 'ganado.estado',
                 fn (string $estado) => Str::containsAll($estado, ['gestacion', 'pendiente_secar'])
-            )
+            )->etc()
         );
     }
 
@@ -131,12 +136,18 @@ class EventosGanadoTest extends TestCase
         $response = $this->actingAs($this->user)->getJson(sprintf('api/ganado/%s', $this->ganado->id));
 
         $response->assertStatus(200)->assertJson(
-            fn (AssertableJson $json) => $json->whereAllType(
-                ['ganado.prox_revision' => 'string']
+            fn (AssertableJson $json) => $json->whereAllType([
+                'ganado.prox_revision' => 'string',
+                'servicio_reciente' => 'array',
+                'total_servicios' => 'integer',
+                'parto_reciente'=>'array',
+                'parto_reciente.cria'=>'array',
+                'total_partos' => 'integer',
+                ]
             )->where(
                 'ganado.estado',
                 fn (string $estado) => Str::containsAll($estado, ['lactancia'])
-            )->where('ganado.tipo', 'adulto')
+            )->where('ganado.tipo', 'adulto')->etc()
         );
     }
 
@@ -163,7 +174,7 @@ class EventosGanadoTest extends TestCase
                 ->where(
                     'ganado.estado',
                     fn (string $estado) => Str::containsAll($estado, ['pendiente_capar'])
-                )
+                )->etc()
         );
     }
 }
