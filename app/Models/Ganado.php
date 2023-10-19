@@ -79,6 +79,35 @@ class Ganado extends Model
     {
         return $this->hasOne(Servicio::class)->latestOfMany();
     }
+    /**
+     * Get the ganado most recent paro
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function partoReciente(): HasOne
+    {
+        return $this->hasOne(Parto::class)->latestOfMany();
+    }
+    /**
+     * Get the ganado most recent revision
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function revisionReciente(): HasOne
+    {
+        return $this->hasOne(Revision::class)->latestOfMany();
+    }
+
+
+    /**
+     * Get all of the servicios for the Ganado
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function servicios(): HasMany
+    {
+        return $this->hasMany(Servicio::class);
+    }
 
     /**
      * Get all of the comments for the Parto
