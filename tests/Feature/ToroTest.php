@@ -85,7 +85,6 @@ class ToroTest extends TestCase
     public function test_obtener_toros(): void
     {
         $this->generarToros();
-        //dd($this->generarToros());
 
         $response = $this->actingAs($this->user)->getJson('api/toro');
         $response->assertStatus(200)
