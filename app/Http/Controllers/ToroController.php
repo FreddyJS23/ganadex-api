@@ -17,15 +17,15 @@ class ToroController extends Controller
 {
     public function __construct()
     {
-        $this->authorizeResource(Toro::class,'toro');
-    }   
-    
+        $this->authorizeResource(Toro::class, 'toro');
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return new ToroCollection(Toro::all()->where('user_id',Auth::id()));
+        return new ToroCollection(Toro::all()->where('user_id', Auth::id()));
     }
 
 
@@ -34,17 +34,17 @@ class ToroController extends Controller
      */
     public function store(StoreToroRequest $request)
     {
-        $ganado=new Ganado($request->all());   
-        $ganado->user_id=Auth::id();
-        $ganado->tipo_id=GanadoTipo::where('tipo','adulto')->first()->id;
-        $ganado->sexo="M";
+        $ganado = new Ganado($request->all());
+        $ganado->user_id = Auth::id();
+        $ganado->tipo_id = GanadoTipo::where('tipo', 'adulto')->first()->id;
+        $ganado->sexo = "M";
         $ganado->save();
-        
-        $toro=new Toro;
-        $toro->user_id=Auth::id();
+
+        $toro = new Toro;
+        $toro->user_id = Auth::id();
         $toro->ganado()->associate($ganado)->save();
 
-        return response()->json(['toro'=> new ToroResource($toro)],201);
+        return response()->json(['toro' => new ToroResource($toro)], 201);
     }
 
     /**
@@ -63,16 +63,16 @@ class ToroController extends Controller
         ], 200);
     }
 
- 
+
     /**
      * Update the specified resource in storage.
      */
     public function update(UpdateToroRequest $request, Toro $toro)
     {
-    
+
         $toro->ganado->fill($request->all())->save();
-    
-        return response()->json(['toro'=> new ToroResource($toro)],200);
+
+        return response()->json(['toro' => new ToroResource($toro)], 200);
     }
 
     /**
