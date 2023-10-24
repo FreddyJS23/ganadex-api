@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Toro extends Model
 {
@@ -28,6 +29,25 @@ class Toro extends Model
         return $this->belongsTo(Ganado::class);
     }
 
+ /**
+  * Get all of the servicios for the Toro
+  *
+  * @return \Illuminate\Database\Eloquent\Relations\HasMany
+  */
+ public function servicios(): HasMany
+ {
+     return $this->hasMany(Servicio::class);
+ }
+ 
+ /**
+  * Get all of the partos for the Toro
+  *
+  * @return \Illuminate\Database\Eloquent\Relations\HasMany
+  */
+ public function padreEnpartos(): HasMany
+ {
+     return $this->hasMany(Parto::class);
+ }
     /**
      * Get the user that owns the Toro
      *
