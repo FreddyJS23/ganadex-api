@@ -58,8 +58,8 @@ class GanadoController extends Controller
         $ultimoServicio = $ganado->servicioReciente;
         $ultimoParto = $ganado->partoReciente;
         $ganado->loadCount('servicios')->loadCount('revision')->loadCount('parto');
-      
-    
+        $efectividad=fn(int $resultadoAlcanzado,int $resultadoPrevisto)=>$resultadoAlcanzado * 100 / $resultadoPrevisto;  
+
         return response()->json([
             'ganado'=>new GanadoResource($ganado),
             'servicio_reciente'=>$ultimoServicio ? new ServicioResource($ultimoServicio) : null,
@@ -68,7 +68,7 @@ class GanadoController extends Controller
             'total_revisiones'=>$ganado->revision_count,
             'parto_reciente'=> $ultimoParto ? new PartoResource($ultimoParto) : null,
             'total_partos'=>$ganado->parto_count,
-        
+            'efectividad'=>$ganado->parto_count ? round($efectividad($ganado->parto_count, $ganado->servicios_count),2) : null
         ],200);
     }
 
