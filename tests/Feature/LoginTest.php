@@ -3,8 +3,6 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
 
@@ -26,12 +24,19 @@ class LoginTest extends TestCase
      */
     public function test_logear_usuario(): void
     {
-        $response = $this->postJson('api/login', ['usuario' =>'admin', 'password' =>'admin']);
 
-        $response->assertStatus(200)->assertJson(fn (AssertableJson $json) => 
+        $response = $this->withHeader('origin', config('app.url'))->postJson('api/login', [
+            'usuario' => 'admin',
+            'password' => 'admin',
+
+        ]);
+
+
+        $response->assertStatus(200)->assertJson(fn (AssertableJson $json) =>
         $json->whereAllType([
-            'login.id' => 'integer', 
-            'login.usuario' => 'string', 
-            'login.token' => 'string']));
+            'login.id' => 'integer',
+            'login.usuario' => 'string',
+            'login.token' => 'string'
+        ]));
     }
 }
