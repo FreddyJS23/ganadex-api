@@ -26,7 +26,7 @@ class StorePartoRequest extends FormRequest
         return [
             'observacion'=>'required|min:3|max:255',
             'nombre'=>'required|min:3|max:255|unique:ganados,nombre',
-            'numero'=>'numeric|digits_between:1,32767|unique:ganados,numero',
+            'numero'=>'numeric|between:1,32767|unique:ganados,numero',
             'sexo'=>'required|in:H,M',
             'peso_nacimiento'=>'required|max:10|regex:/^\d+(\.\d+)?KG$/',
             

@@ -23,7 +23,7 @@ class StoreGanadoRequest extends FormRequest
     {
         return [
             'nombre'=>'required|min:3|max:255|unique:ganados,nombre',
-            'numero'=>'numeric|digits_between:1,32767|unique:ganados,numero',
+            'numero'=>'numeric|between:1,32767|unique:ganados,numero',
             'origen'=>'min:3,|max:255',
             'sexo'=>'required|in:H,M',
             'tipo_id'=>'required|exists:ganado_tipos,id',
@@ -33,8 +33,8 @@ class StoreGanadoRequest extends FormRequest
             'peso_2year'=>'max:10|regex:/^\d+(\.\d+)?KG$/',
             'peso_actual'=>'max:10|regex:/^\d+(\.\d+)?KG$/',
             'estado'=>'in:fallecido,sano,pendiente_revision,pendiente_servicio,prenada',
-            'fecha_defuncion'=>'date_format:Y-m-d',
-            'causa_defuncion'=>'max:255', 
+            'fecha_defuncion'=>'date_format:Y-m-d|nullable',
+            'causa_defuncion'=>'max:255|nullable', 
         ];
     }
 }

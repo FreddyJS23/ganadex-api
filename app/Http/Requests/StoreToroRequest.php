@@ -23,7 +23,7 @@ class StoreToroRequest extends FormRequest
     {
         return [
             'nombre'=>'required|min:3|max:255|unique:ganados,nombre',
-            'numero'=>'required|numeric|digits_between:1,32767|unique:ganados,numero',
+            'numero'=>'required|numeric|between:1,32767|unique:ganados,numero',
             'origen'=>'min:3,|max:255',
             'fecha_nacimiento'=>'date_format:Y-m-d'
         ];

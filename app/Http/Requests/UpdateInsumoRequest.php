@@ -25,7 +25,7 @@ class UpdateInsumoRequest extends FormRequest
     {
         return [
             'insumo'=>['required','string',Rule::unique('insumos')->ignore(Auth::id(),'user_id')],
-            'cantidad'=>'required|numeric|digits_between:1,32767',
+            'cantidad'=>'required|numeric|between:1,999',
             'precio'=>'required|numeric'
         ];
     }
