@@ -23,7 +23,7 @@ use App\Http\Controllers\TotalGanadoTipo;
 use App\Http\Controllers\TotalPersonal;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VacasEnGestacion;
-use Illuminate\Http\Request;
+use App\Http\Controllers\VentaController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -42,8 +42,9 @@ Route::post('register',[UserController::class,'store'])->name('usuario.store');
 Route::middleware('auth:sanctum')->group(function(){
     
     Route::get('/logout',Logout::class);
-  
+
     Route::apiResource('/comprador',CompradorController::class);
+    Route::apiResource('/ventas',VentaController::class);
     Route::apiResource('/toro',ToroController::class);
     Route::apiResource('/ganado',GanadoController::class);
     Route::apiResource('/insumo',InsumoController::class);
