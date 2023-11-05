@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthLogin;
 use App\Http\Controllers\BalanceAnualLeche;
+use App\Http\Controllers\CompradorController;
 use App\Http\Controllers\ConfiguracionController;
 use App\Http\Controllers\GanadoController;
 use App\Http\Controllers\InsumoController;
@@ -42,6 +43,7 @@ Route::middleware('auth:sanctum')->group(function(){
     
     Route::get('/logout',Logout::class);
   
+    Route::apiResource('/comprador',CompradorController::class);
     Route::apiResource('/toro',ToroController::class);
     Route::apiResource('/ganado',GanadoController::class);
     Route::apiResource('/insumo',InsumoController::class);
