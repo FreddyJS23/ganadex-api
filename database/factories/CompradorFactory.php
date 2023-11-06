@@ -17,7 +17,7 @@ class CompradorFactory extends Factory
     public function definition(): array
     {
         return [
-            'nombre'=>fake()->firstName()
+            'nombre'=>fake()->unique()->firstName()
         ];
     }
 }
