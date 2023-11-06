@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
 
 class UserTest extends TestCase
@@ -80,6 +81,27 @@ class UserTest extends TestCase
 
         $response->assertStatus(200)->assertJson(['user' => true]);
     }
+
+    public function test_actualizar_usuario_con_otro_existente_repitiendo_campos_unicos(): void
+    {
+        $usuarioExistente = User::factory()->create(['usuario' => 'test']);
+
+        $response = $this->actingAs($this->user)->putJson(sprintf('api/usuario/%s', $this->user->id), $this->usuario);
+
+        $response->assertStatus(422)->assertJson(fn (AssertableJson $json) =>
+        $json->hasAll(['errors.usuario'])
+        ->etc());
+    }
+
+    public function test_actualizar_usuario_conservando_campos_unicos(): void
+    {
+        $otroUsuario= User::factory()->create(['usuario' => 'test']);
+
+        $response = $this->actingAs($otroUsuario)->putJson(sprintf('api/usuario/%s', $otroUsuario->id), $this->usuario);
+
+        $response->assertStatus(200);
+    }
+
 
     public function test_eliminar_usuario(): void
     {
