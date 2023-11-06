@@ -136,6 +136,7 @@ class GanadoTest extends TestCase
 
         $response->assertStatus(200)->assertJson(['ganado' => true]);
     }
+    
     public function test_actualizar_cabeza_ganado(): void
     {
         $cabezasGanado = $this->generarGanado();
@@ -143,6 +144,34 @@ class GanadoTest extends TestCase
         $idGanadoEditar = $cabezasGanado[$idRandom]->id;
 
         $response = $this->actingAs($this->user)->putJson(sprintf('api/ganado/%s', $idGanadoEditar), $this->cabeza_ganado);
+
+        $response->assertStatus(200)->assertJson(['ganado' => true]);
+    }
+
+    public function test_actualizar_cabeza_ganado_con_otro_existente_repitiendo_campos_unicos(): void
+    {
+       Ganado::factory()->hasPeso(1)
+            ->hasEvento(1)
+            ->hasEstado(1)->for($this->user)->create(['nombre' => 'test','numero'=>392]);
+
+        $cabezasGanado = $this->generarGanado();
+        $idRandom = rand(0, $this->cantidad_ganado - 1);
+        $idGanadoEditar = $cabezasGanado[$idRandom]->id;
+
+        $response = $this->actingAs($this->user)->putJson(sprintf('api/ganado/%s', $idGanadoEditar), $this->cabeza_ganado);
+
+        $response->assertStatus(422)->assertJson(fn (AssertableJson $json) =>
+        $json->hasAll(['errors.nombre','errors.numero'])
+        ->etc());
+    }
+    
+    public function test_actualizar_cabeza_ganado_sin_modificar_campos_unicos(): void
+    {
+        $ganado=Ganado::factory()->hasPeso(1)
+            ->hasEvento(1)
+            ->hasEstado(1)->for($this->user)->create(['nombre' => 'test','numero'=>392]);
+
+        $response = $this->actingAs($this->user)->putJson(sprintf('api/ganado/%s', $ganado->id), $this->cabeza_ganado);
 
         $response->assertStatus(200)->assertJson(['ganado' => true]);
     }
