@@ -108,6 +108,7 @@ class PersonalTest extends TestCase
 
         $response->assertStatus(200)->assertJson(['personal' => true]);
     }
+   
     public function test_actualizar_personal(): void
     {
         $personals = $this->generarPersonal();
@@ -118,6 +119,31 @@ class PersonalTest extends TestCase
 
         $response->assertStatus(200)->assertJson(['personal' => true]);
     }
+
+    public function test_actualizar_personal_con_otro_existente_repitiendo_campos_unicos(): void
+    {
+        $personalExistente = Personal::factory()->for($this->user)->create(['ci' => 28472738 ]);
+
+        $personal = $this->generarPersonal();
+        $idRandom = rand(0, $this->cantidad_personal - 1);
+        $idPersonalEditar = $personal[$idRandom]->id;
+
+        $response = $this->actingAs($this->user)->putJson(sprintf('api/personal/%s', $idPersonalEditar), $this->personal);
+
+        $response->assertStatus(422)->assertJson(fn (AssertableJson $json) =>
+        $json->hasAll(['errors.ci'])
+        ->etc());
+    }
+
+    public function test_actualizar_personal_conservando_campos_unicos(): void
+    {
+        $personalExistente = Personal::factory()->for($this->user)->create(['ci' => 28472738]);
+
+        $response = $this->actingAs($this->user)->putJson(sprintf('api/personal/%s', $personalExistente->id), $this->personal);
+
+        $response->assertStatus(200);
+    }
+
 
     public function test_eliminar_personal(): void
     {
