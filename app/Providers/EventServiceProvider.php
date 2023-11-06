@@ -6,7 +6,9 @@ use App\Events\NaceMacho;
 use App\Events\PartoHecho;
 use App\Events\RevisionPrenada;
 use App\Events\ServicioHecho;
+use App\Events\VentaGanado;
 use App\Listeners\CaparBecerro;
+use App\Listeners\EstadoPosVenta;
 use App\Listeners\EstadoGestacion;
 use App\Listeners\RevisionPosParto;
 use App\Listeners\RevisionServicio;
@@ -38,7 +40,8 @@ class EventServiceProvider extends ServiceProvider
         RevisionPrenada::class => [EstadoGestacion::class, Secado::class,],
         PartoHecho::class => [RevisionPosParto::class,EstadoPosParto::class,CambiaAVaca::class],
         NaceMacho::class => [CaparBecerro::class,],
-        Login::class=>[VerificarEdadGanado::class]
+        Login::class=>[VerificarEdadGanado::class],
+        VentaGanado::class=>[EstadoPosVenta::class],
     ];
 
     /**

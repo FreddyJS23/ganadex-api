@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\VentaGanado;
 use App\Http\Requests\StoreVentaRequest;
 use App\Http\Requests\UpdateVentaRequest;
 use App\Http\Resources\VentaCollection;
@@ -35,6 +36,8 @@ class VentaController extends Controller
         $venta->user_id = Auth::id();
         $venta->fecha = Carbon::now()->format('Y-m-d');
         $venta->save();
+
+        VentaGanado::dispatch($venta);
 
         return response()->json(['venta' => new VentaResource($venta)], 201);
     }
