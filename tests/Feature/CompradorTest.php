@@ -11,7 +11,7 @@ use Tests\TestCase;
 
 class CompradorTest extends TestCase
 {
-     use RefreshDatabase;
+    use RefreshDatabase;
 
     private array $comprador = [
         'nombre' => 'test',
@@ -48,7 +48,7 @@ class CompradorTest extends TestCase
             'caso de insertar datos erróneos' => [
                 [
                     'nombre' => 'te',
-                   
+
                 ], ['nombre']
             ],
             'caso de no insertar datos requeridos' => [
@@ -97,6 +97,30 @@ class CompradorTest extends TestCase
         $idCompradorEditar = $comprador[$idRandom]->id;
 
         $response = $this->actingAs($this->user)->putJson(sprintf('api/comprador/%s', $idCompradorEditar), $this->comprador);
+
+        $response->assertStatus(200);
+    }
+   
+    public function test_actualizar_comprador_con_otro_existente_repitiendo_campos_unicos(): void
+    {
+        $compradorExistente = Comprador::factory()->for($this->user)->create(['nombre' => 'test']);
+
+        $comprador = $this->generarComprador();
+        $idRandom = rand(0, $this->cantidad_comprador - 1);
+        $idCompradorEditar = $comprador[$idRandom]->id;
+
+        $response = $this->actingAs($this->user)->putJson(sprintf('api/comprador/%s', $idCompradorEditar), $this->comprador);
+
+        $response->assertStatus(422)->assertJson(fn (AssertableJson $json) =>
+        $json->hasAll(['errors.nombre'])
+        ->etc());
+    }
+    
+    public function test_actualizar_comprador_conservando_campos_unicos(): void
+    {
+        $compradorExistente = Comprador::factory()->for($this->user)->create(['nombre' => 'test']);
+
+        $response = $this->actingAs($this->user)->putJson(sprintf('api/comprador/%s', $compradorExistente->id), $this->comprador);
 
         $response->assertStatus(200);
     }
