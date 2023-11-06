@@ -109,6 +109,30 @@ class InsumoTest extends TestCase
         $response->assertStatus(200)->assertJson(['insumo' => true]);
     }
 
+    public function test_actualizar_insumo_con_otro_existente_repitiendo_campos_unicos(): void
+    {
+        $insumoExistente = Insumo::factory()->for($this->user)->create(['insumo' => 'vacuna']);
+
+        $insumo = $this->generarInsumo();
+        $idRandom = rand(0, $this->cantidad_insumo - 1);
+        $idInsumoEditar = $insumo[$idRandom]->id;
+
+        $response = $this->actingAs($this->user)->putJson(sprintf('api/insumo/%s', $idInsumoEditar), $this->insumo);
+
+        $response->assertStatus(422)->assertJson(fn (AssertableJson $json) =>
+        $json->hasAll(['errors.insumo'])
+        ->etc());
+    }
+
+    public function test_actualizar_insumo_conservando_campos_unicos(): void
+    {
+        $insumoExistente = Insumo::factory()->for($this->user)->create(['insumo' => 'test']);
+
+        $response = $this->actingAs($this->user)->putJson(sprintf('api/insumo/%s', $insumoExistente->id), $this->insumo);
+
+        $response->assertStatus(200);
+    }
+
     public function test_eliminar_insumo(): void
     {
         $insumos = $this->generarInsumo();
