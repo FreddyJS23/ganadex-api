@@ -112,6 +112,7 @@ class ToroTest extends TestCase
 
         $response->assertStatus(200)->assertJson(['toro' => true]);
     }
+   
     public function test_actualizar_toro(): void
     {
         $toros = $this->generarToros();
@@ -122,6 +123,37 @@ class ToroTest extends TestCase
 
         $response->assertStatus(200)->assertJson(['toro' => true]);
     }
+
+    public function test_actualizar_toro_con_otro_existente_repitiendo_campos_unicos(): void
+    {
+        Toro::factory()
+            ->for($this->user)
+            ->for(Ganado::factory()->for($this->user)->create(['nombre' => 'test', 'numero' => 392]))
+            ->create();
+
+        $toros = $this->generarToros();
+        $idRandom = rand(0, $this->cantidad_toro - 1);
+        $idToroEditar = $toros[$idRandom]->id;
+
+        $response = $this->actingAs($this->user)->putJson(sprintf('api/toro/%s', $idToroEditar), $this->toro);
+
+        $response->assertStatus(422)->assertJson(fn (AssertableJson $json) =>
+        $json->hasAll(['errors.nombre', 'errors.numero'])
+        ->etc());
+    }
+
+    public function test_actualizar_toro_sin_modificar_campos_unicos(): void
+    {
+        $toro =Toro::factory()
+            ->for($this->user)
+            ->for(Ganado::factory()->for($this->user)->create(['nombre' => 'test', 'numero' => 392]))
+            ->create();
+
+        $response = $this->actingAs($this->user)->putJson(sprintf('api/toro/%s', $toro->id), $this->toro);
+
+        $response->assertStatus(200)->assertJson(['toro' => true]);
+    }
+
 
     public function test_eliminar_toro(): void
     {
