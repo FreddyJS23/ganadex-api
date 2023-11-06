@@ -24,7 +24,7 @@ class UpdateUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'usuario'=>'required|min:3|max:15',Rule::unique('users')->ignore(Auth::id()),
+            'usuario'=>['required','min:3','max:15',Rule::unique('users')->ignore(Auth::id())],
             'password'=>'required|min:3|max:15'
         ];
     }

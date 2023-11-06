@@ -3,7 +3,6 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class UpdateCompradorRequest extends FormRequest
@@ -23,8 +22,15 @@ class UpdateCompradorRequest extends FormRequest
      */
     public function rules(): array
     {
+        /**
+         * Gets the route parameter.
+         *
+         * @return string
+         */
+        $parametroPath = preg_replace("/[^0-9]/", "", request()->path());
+        
         return [
-            'nombre' => ['required','string','min:3','max:255',Rule::unique('compradors')->ignore(Auth::id())]
+            'nombre' => ['required','string','min:3','max:255',Rule::unique('compradors')->ignore(intval($parametroPath))]
         ];
     }
 }

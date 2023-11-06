@@ -3,7 +3,6 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class UpdateInsumoRequest extends FormRequest
@@ -23,8 +22,15 @@ class UpdateInsumoRequest extends FormRequest
      */
     public function rules(): array
     {
+        /**
+         * Gets the route parameter.
+         *
+         * @return string
+         */
+        $parametroPath = preg_replace("/[^0-9]/", "", request()->path());
+        
         return [
-            'insumo'=>['required','string',Rule::unique('insumos')->ignore(Auth::id(),'user_id')],
+            'insumo'=>['required','string',Rule::unique('insumos')->ignore($parametroPath)],
             'cantidad'=>'required|numeric|between:1,999',
             'precio'=>'required|numeric'
         ];

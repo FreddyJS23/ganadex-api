@@ -3,7 +3,6 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class UpdatePersonalRequest extends FormRequest
@@ -23,8 +22,15 @@ class UpdatePersonalRequest extends FormRequest
      */
     public function rules(): array
     {
+        /**
+         * Gets the route parameter.
+         *
+         * @return string
+         */
+        $parametroPath = preg_replace("/[^0-9]/", "", request()->path());
+       
         return [
-            'ci'=>['required','numeric','digits_between:7,8',Rule::unique('personals')->ignore(Auth::id(),'user_id')],
+            'ci'=>['required','numeric','digits_between:7,8',Rule::unique('personals')->ignore(intval($parametroPath))],
             'nombre'=>'required|string|min:3',
             'apellido'=>'required|string|min:3',
             'fecha_nacimiento'=>'required|date_format:Y-m-d',

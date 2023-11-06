@@ -3,7 +3,6 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class UpdateGanadoRequest extends FormRequest
@@ -15,7 +14,6 @@ class UpdateGanadoRequest extends FormRequest
     {
         return true;
     }
-
     /**
      * Get the validation rules that apply to the request.
      *
@@ -23,9 +21,16 @@ class UpdateGanadoRequest extends FormRequest
      */
     public function rules(): array
     {
+        /**
+         * Gets the route parameter.
+         *
+         * @return string
+         */
+        $parametroPath=preg_replace("/[^0-9]/", "", request()->path());
+
         return [
-            'nombre' => ['required','min:3','max:255', Rule::unique('ganados','nombre')->ignore(Auth::id())],
-            'numero'=>['numeric','between:1,32767', Rule::unique('ganados','numero')->ignore(Auth::id())],
+            'nombre' => ['required','min:3','max:255', Rule::unique('ganados')->ignore(intval($parametroPath))],
+            'numero'=>['numeric','between:1,32767', Rule::unique('ganados')->ignore(intval($parametroPath))],
             'origen'=>'min:3,|max:255',
             'sexo'=>'required|in:H,M',
             'tipo_id'=>'required|exists:ganado_tipos,id',
