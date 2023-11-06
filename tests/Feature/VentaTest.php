@@ -37,7 +37,7 @@ class VentaTest extends TestCase
         return Venta::factory()
             ->count($this->cantidad_ventas)
             ->for($this->user)
-            ->for(Ganado::factory()->for($this->user)->hasPeso(1)->create())
+            ->for(Ganado::factory()->for($this->user)->hasPeso(1)->hasEstado(1)->create())
             ->for(Comprador::factory()->for($this->user)->create())
             ->create();
     }
@@ -83,7 +83,7 @@ class VentaTest extends TestCase
 
     public function test_creacion_venta(): void
     {
-        $ganado=Ganado::factory()->for($this->user)->hasPeso(1)->create();
+        $ganado=Ganado::factory()->for($this->user)->hasPeso(1)->hasEstado(1)->create();
         $comprador=Comprador::factory() ->for($this->user)->create();
         $this->venta = $this->venta + ['ganado_id' => $ganado->id, 'comprador_id' => $comprador->id];
        

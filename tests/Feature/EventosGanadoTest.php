@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Comprador;
 use App\Models\Ganado;
 use App\Models\Parto;
 use App\Models\Toro;
@@ -43,6 +44,9 @@ class EventosGanadoTest extends TestCase
         'tratamiento' => 'medicina',
     ];
 
+    private array $venta = [
+        'precio' => 350,
+    ];
 
     protected function setUp(): void
     {
@@ -174,6 +178,26 @@ class EventosGanadoTest extends TestCase
                 ->where(
                     'ganado.estado',
                     fn (string $estado) => Str::containsAll($estado, ['pendiente_capar'])
+                )->etc()
+        );
+    }
+
+    public function test_cuando_se_realiza_una_venta(): void
+    {
+        $comprador = Comprador::factory()->for($this->user)->create();
+        $this->venta=$this->venta + ['ganado_id'=>$this->ganado->id,'comprador_id'=>$comprador->id];
+        
+        //realizar venta
+       $this->actingAs($this->user)->postJson(route('ventas.store'), $this->venta);
+       
+       
+       $response = $this->actingAs($this->user)->getJson(sprintf('api/ganado/%s', $this->ganado->id));
+
+        $response->assertStatus(200)->assertJson(
+            fn (AssertableJson $json) => $json
+                ->where(
+                    'ganado.estado',
+                    fn (string $estado) =>Str::containsAll($estado, ['vendida'])
                 )->etc()
         );
     }
