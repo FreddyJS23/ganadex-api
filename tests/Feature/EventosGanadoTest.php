@@ -181,6 +181,29 @@ class EventosGanadoTest extends TestCase
                 )->etc()
         );
     }
+    public function test_cuando_se_realiza_un_parto_la_cria_hembra_tiene_que_estar_pendiente_numeracion(): void
+    {
+        //realizar servicio
+        $this->actingAs($this->user)->postJson(
+            sprintf('api/ganado/%s/servicio', $this->ganado->id),
+            $this->servicio + ['numero_toro' => $this->numero_toro]
+        );
+
+        //realizar parto
+        $this->actingAs($this->user)->postJson(
+            sprintf('api/ganado/%s/parto', $this->ganado->id),
+            $this->parto + $this->hembra
+        );
+
+        $cria_id = Parto::select('ganado_cria_id')->where('ganado_id', $this->ganado->id)->first();
+
+        $response = $this->actingAs($this->user)->getJson(sprintf('api/ganado/%s', $cria_id->ganado_cria_id));
+
+        $response->assertStatus(200)->assertJson(
+            fn (AssertableJson $json) => $json
+                ->where(
+                    'ganado.estado',
+                    fn (string $estado) => Str::containsAll($estado, ['-pendiente_numeracion'])
                 )->etc()
         );
     }
