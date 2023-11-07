@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AsignarNumeroCriaController;
 use App\Http\Controllers\AuthLogin;
 use App\Http\Controllers\BalanceAnualLeche;
 use App\Http\Controllers\CaparCriaController;
@@ -60,6 +61,8 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::get('/crias_pendiente_capar',[CaparCriaController::class,'index'])->name('capar.index');
     Route::get('/capar_cria/{ganado}',[CaparCriaController::class,'capar'])->name('capar.capar');
    
+    Route::get('/crias_pendiente_numeracion',[AsignarNumeroCriaController::class,'index'])->name('numeracion.index');
+    Route::post('/asignar_numero_cria/{ganado}',[AsignarNumeroCriaController::class,'store'])->name('numeracion.store');
    
     //rutas peticiones de datos dashboard
      Route::get('/total_ganado_tipo',TotalGanadoTipo::class);
