@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthLogin;
 use App\Http\Controllers\BalanceAnualLeche;
+use App\Http\Controllers\CaparCriaController;
 use App\Http\Controllers\CompradorController;
 use App\Http\Controllers\ConfiguracionController;
 use App\Http\Controllers\GanadoController;
@@ -55,8 +56,12 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::apiResource('/ganado/{ganado}/parto',PartoController::class);
     Route::apiResource('/ganado/{ganado}/pesaje_leche',LecheController::class);
     Route::apiResource('usuario',UserController::class)->only(['show','update','destroy'])->parameters(['usuario'=>'user']);
-
-   //rutas peticiones de datos dashboard
+   
+    Route::get('/crias_pendiente_capar',[CaparCriaController::class,'index'])->name('capar.index');
+    Route::get('/capar_cria/{ganado}',[CaparCriaController::class,'capar'])->name('capar.capar');
+   
+   
+    //rutas peticiones de datos dashboard
      Route::get('/total_ganado_tipo',TotalGanadoTipo::class);
      Route::get('/total_personal',TotalPersonal::class);
      Route::get('/vacas_gestacion',VacasEnGestacion::class);

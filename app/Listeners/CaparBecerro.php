@@ -22,9 +22,8 @@ class CaparBecerro
      */
     public function handle(NaceMacho $event): void
     {
-        
         $estadoGanado=Estado::firstWhere('ganado_id',$event->ganado->id);
-        $estadoGanado->estado="sano-pendiente_capar";
+        $estadoGanado->estado=$estadoGanado->estado . "-pendiente_capar";
         $estadoGanado->save();
     }
 }
