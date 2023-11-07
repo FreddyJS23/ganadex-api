@@ -121,7 +121,16 @@ class ToroTest extends TestCase
 
         $response = $this->actingAs($this->user)->putJson(sprintf('api/toro/%s', $idToroEditar), $this->toro);
 
-        $response->assertStatus(200)->assertJson(['toro' => true]);
+        $response->assertStatus(200)->assertJson(
+            fn (AssertableJson $json) =>
+            $json
+                ->where('toro.nombre', $this->toro['nombre'])
+                ->where('toro.numero', $this->toro['numero'])
+                ->where('toro.origen', $this->toro['origen'])
+                ->where('toro.sexo', $this->toro['sexo'])
+                ->where('toro.fecha_nacimiento', $this->toro['fecha_nacimiento'])
+                ->etc()
+        );
     }
 
     public function test_actualizar_toro_con_otro_existente_repitiendo_campos_unicos(): void

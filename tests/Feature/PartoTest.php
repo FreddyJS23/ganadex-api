@@ -147,7 +147,12 @@ class PartoTest extends TestCase
 
         $response = $this->actingAs($this->user)->putJson(sprintf($this->url . '/%s', $idpartoEditar), $this->parto + ['numero_toro' => $this->numero_toro]);
 
-        $response->assertStatus(200)->assertJson(['parto' => true]);
+        $response->assertStatus(200)->assertJson(
+            fn (AssertableJson $json) =>
+            $json
+                ->where('parto.observacion', $this->parto['observacion'])
+                ->etc()
+        );
     }
 
     public function test_eliminar_parto(): void
