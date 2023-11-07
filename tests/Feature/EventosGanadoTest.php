@@ -177,7 +177,10 @@ class EventosGanadoTest extends TestCase
             fn (AssertableJson $json) => $json
                 ->where(
                     'ganado.estado',
-                    fn (string $estado) => Str::containsAll($estado, ['pendiente_capar'])
+                    fn (string $estado) => Str::containsAll($estado, ['-pendiente_capar','-pendiente_numeracion'])
+                )->etc()
+        );
+    }
                 )->etc()
         );
     }
