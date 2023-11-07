@@ -53,6 +53,7 @@ class DashboardTest extends TestCase
 
     private function generarGanadoPesajeLecheAnual(): Collection
     {
+        //generar una fecha de produccion lactea
         function mesesPesajeAnual()
         {
             $mes = rand(0, 11);
@@ -69,14 +70,17 @@ class DashboardTest extends TestCase
             ->hasPeso(1)
             ->hasEvento(1)
             ->hasEstado(1)
-            ->has(Leche::factory()->for($this->user)->count(12)->state(
-                function (array $attributes, Ganado $ganado) {
-                    return ['ganado_id' => $ganado->id];
-                }
+            /* habra veces que se repita una fecha, por ende se crea 50 elementos ganado, 
+            con 12 elementos de produccion lactea que serian la cantidad de meses que existen, 
+            asi siempre todos los meses estaran cubiertos por lo menos una vez */
+            ->has(
+                Leche::factory()->for($this->user)->count(12)->state(
+                    function (array $attributes, Ganado $ganado) {
+                        return ['ganado_id' => $ganado->id];
+                    }
+                )->sequence(fn (Sequence $sequence) => ['fecha' => mesesPesajeAnual()]),
+                'pesajes_leche'
             )
-
-                ->sequence(fn (Sequence $sequence) =>
-                ['fecha' => mesesPesajeAnual()]), 'pesajes_leche')
             ->for($this->user)
             ->create();
     }
