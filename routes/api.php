@@ -15,6 +15,7 @@ use App\Http\Controllers\MenorCantidadInsumo;
 use App\Http\Controllers\NovillaAMontar;
 use App\Http\Controllers\PartoController;
 use App\Http\Controllers\PersonalController;
+use App\Http\Controllers\PrecioController;
 use App\Http\Controllers\RevisionController;
 use App\Http\Controllers\ServicioController;
 use App\Http\Controllers\TopVacasMenosProductoras;
@@ -57,6 +58,7 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::apiResource('/ganado/{ganado}/parto',PartoController::class);
     Route::apiResource('/ganado/{ganado}/pesaje_leche',LecheController::class);
     Route::apiResource('usuario',UserController::class)->only(['show','update','destroy'])->parameters(['usuario'=>'user']);
+    Route::apiResource('/precio',PrecioController::class)->only(['index','store']);
    
     Route::get('/crias_pendiente_capar',[CaparCriaController::class,'index'])->name('capar.index');
     Route::get('/capar_cria/{ganado}',[CaparCriaController::class,'capar'])->name('capar.capar');
