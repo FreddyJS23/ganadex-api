@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Estado;
 use App\Models\Ganado;
 use App\Models\Parto;
 use App\Models\Servicio;
@@ -19,6 +20,7 @@ class EfectividadTest extends TestCase
     private $user;
     private $ganado;
     private $toro;
+    private $estado;
     private $cantidadServicios;
 
     protected function setUp(): void
@@ -27,12 +29,14 @@ class EfectividadTest extends TestCase
 
         $this->user
             = User::factory()->create();
-
+        
+        $this->estado = Estado::all();
+        
         $this->ganado
             = Ganado::factory()
             ->hasPeso(1)
             ->hasEvento(1)
-            ->hasEstado(1)
+            ->hasAttached($this->estado)
             ->for($this->user)
             ->create();
 
@@ -58,7 +62,7 @@ class EfectividadTest extends TestCase
         Parto::factory()
             ->count(rand(1, $this->cantidadServicios))
             ->for($this->ganado)
-            ->for(Ganado::factory()->for($this->user)->hasEstado(1), 'ganado_cria')
+            ->for(Ganado::factory()->for($this->user)->hasAttached(Estado::firstWhere('estado','sano')), 'ganado_cria')
             ->for($this->toro)
             ->create();
 
@@ -84,7 +88,7 @@ class EfectividadTest extends TestCase
         Parto::factory()
             ->count(rand(1, $this->cantidadServicios))
             ->for($this->ganado)
-            ->for(Ganado::factory()->for($this->user)->hasEstado(1), 'ganado_cria')
+            ->for(Ganado::factory()->for($this->user)->hasAttached(Estado::firstWhere('estado','sano')), 'ganado_cria')
             ->for($this->toro)
             ->create();
 

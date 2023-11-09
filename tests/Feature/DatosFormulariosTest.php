@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Estado;
 use App\Models\Ganado;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
@@ -14,13 +15,15 @@ class DatosFormulariosTest extends TestCase
     use RefreshDatabase;
     private $user;
     private int $cantidad_ganado = 50;
-
+    private $estado;
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->user
             = User::factory()->create();
+
+        $this->estado = Estado::all();
     }
     private function generarGanado(): Collection
     {
@@ -28,7 +31,7 @@ class DatosFormulariosTest extends TestCase
             ->count($this->cantidad_ganado)
             ->hasPeso(1)
             ->hasEvento(1)
-            ->hasEstado(1)
+            ->hasAttached($this->estado)
             ->for($this->user)
             ->create();
     }
