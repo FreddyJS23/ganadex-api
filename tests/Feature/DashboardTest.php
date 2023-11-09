@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Estado;
 use App\Models\Ganado;
 use App\Models\Insumo;
 use App\Models\Leche;
@@ -12,6 +13,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
 
@@ -21,6 +23,7 @@ class DashboardTest extends TestCase
 
     private $user;
     private int $cantidad_elementos = 50;
+    private $estado;
 
     protected function setUp(): void
     {
@@ -28,6 +31,7 @@ class DashboardTest extends TestCase
 
         $this->user
             = User::factory()->create();
+        $this->estado = Estado::all();
     }
     private function generarGanado(): Collection
     {
@@ -35,7 +39,7 @@ class DashboardTest extends TestCase
             ->count($this->cantidad_elementos)
             ->hasPeso(1)
             ->hasEvento(1)
-            ->hasEstado(1)
+            ->hasAttached($this->estado)            
             ->has(
                 Leche::factory()->for($this->user)->state(
                     function (array $attributes, Ganado $ganado) {
@@ -69,7 +73,7 @@ class DashboardTest extends TestCase
             ->count($this->cantidad_elementos)
             ->hasPeso(1)
             ->hasEvento(1)
-            ->hasEstado(1)
+            ->hasAttached($this->estado)
             /* habra veces que se repita una fecha, por ende se crea 50 elementos ganado, 
             con 12 elementos de produccion lactea que serian la cantidad de meses que existen, 
             asi siempre todos los meses estaran cubiertos por lo menos una vez */
