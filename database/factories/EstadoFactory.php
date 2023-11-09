@@ -17,9 +17,7 @@ class EstadoFactory extends Factory
     public function definition(): array
     {
         return [
-            'estado'=>fake()->randomElement(['sano','fallecido','sano-gestacion','sano-pendiente_revision','sano-pendiente_servicio']),
-            'fecha_defuncion'=>fake()->optional()->date(),
-            'causa_defuncion'=>fake()->optional()->sentence(), 
+            
         ];
     }
 }

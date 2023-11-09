@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
@@ -50,14 +51,15 @@ class Ganado extends Model
     {
         return $this->hasOne(Peso::class);
     }
+    
     /**
-     * Get the estado associated with the Ganado
+     * The estados that belong to the Ganado
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function estado(): HasOne
+    public function estados(): BelongsToMany
     {
-        return $this->hasOne(Estado::class);
+        return $this->belongsToMany(Estado::class);
     }
 
     /**

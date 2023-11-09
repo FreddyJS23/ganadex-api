@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Estado extends Model
 {
@@ -12,17 +13,15 @@ class Estado extends Model
 
     protected $fillable=[
         'estado',
-        'fecha_defuncion',
-        'causa_defuncion',
     ];
 
 /**
- * Get the ganado that owns the Estado
+ * The ganados that belong to the Estado
  *
- * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+ * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
  */
-public function ganado(): BelongsTo
+public function ganados(): BelongsToMany
 {
-    return $this->belongsTo(Ganado::class);
+    return $this->belongsToMany(Ganado::class);
 }
 }
