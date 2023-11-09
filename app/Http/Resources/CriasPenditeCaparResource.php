@@ -15,8 +15,8 @@ class CriasPenditeCaparResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'nombre'=>$this->ganado->nombre,
-            'fecha_nacimiento'=>$this->ganado->fecha_nacimiento,
+            'nombre'=>$this->nombre,
+            'fecha_nacimiento'=>$this->fecha_nacimiento,
         ];
     }
 }
