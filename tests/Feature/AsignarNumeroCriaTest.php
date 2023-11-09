@@ -2,9 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Models\Estado;
 use App\Models\Ganado;
 use App\Models\User;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Testing\Fluent\AssertableJson;
@@ -19,7 +20,7 @@ class AsignarNumeroCriaTest extends TestCase
 
     private $user;
     private $ganado;
-
+    private $estado;
 
     protected function setUp(): void
     {
@@ -31,11 +32,13 @@ class AsignarNumeroCriaTest extends TestCase
 
     private function generarGanado(): Collection
     {
+        $this->estado = Estado::where('estado', 'pendiente_numeracion')->get();
+
         return Ganado::factory()
             ->count($this->cantidad_ganado)
             ->hasPeso(1)
             ->hasEvento(1)
-            ->hasEstado(1, ['estado' => '-pendiente_numeracion'])
+            ->hasAttached($this->estado)
             ->for($this->user)
             ->create(['numero' => null]);
     }
@@ -64,12 +67,12 @@ class AsignarNumeroCriaTest extends TestCase
         $response = $this->actingAs($this->user)->getJson(sprintf('api/ganado/%s', $idCria));
 
         $response->assertStatus(200)->assertJson(
-            fn (AssertableJson $json) => $json
-                ->where(
-                    'ganado.estado',
-                    fn (string $estado) => !Str::contains($estado, '-pendiente_numeracion')
-
-                )->whereType('ganado.numero', 'integer')
+            fn (AssertableJson $json) =>
+            $json->where(
+                'ganado.estados',
+                fn (Collection $estados) => $estados->doesntContain('estado', 'pendiente_numeracion')
+            )
+                ->whereType('ganado.numero', 'integer')
                 ->etc()
         );
     }
