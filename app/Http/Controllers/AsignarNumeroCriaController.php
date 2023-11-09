@@ -2,15 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreGanadoRequest;
 use App\Http\Requests\StoreNumeroCriaRequest;
-use App\Http\Requests\UpdateGanadoRequest;
 use App\Http\Resources\CriasPendienteNumeracionCollection;
 use App\Models\Estado;
 use App\Models\Ganado;
-use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
+
 
 class AsignarNumeroCriaController extends Controller
 {
@@ -18,10 +15,10 @@ class AsignarNumeroCriaController extends Controller
      * Display a listing of the resource.
      */
     public function index()
-    {
-        $criasPendienteNumeracion = Estado::whereHas('ganado', function (Builder $query) {
-            $query->where('user_id', Auth::id());
-        })->where('estado', 'like', '%-pendiente_numeracion%')->get();
+    {       
+         $criasPendienteNumeracion = Ganado::whereBelongsTo(Auth::user())
+         ->whereRelation('estados','estado','pendiente_numeracion')
+        ->get(); 
 
         return new CriasPendienteNumeracionCollection($criasPendienteNumeracion);
     }
@@ -31,10 +28,13 @@ class AsignarNumeroCriaController extends Controller
      */
     public function store(StoreNumeroCriaRequest $request,Ganado $ganado)
     {
-        $ganado->estado->estado = Str::remove('-pendiente_numeracion', $ganado->estado->estado);
         $ganado->numero=$request->input('numero');
-        $ganado->push();
+        $ganado->save();
+        
+        $estado=Estado::firstWhere('estado','pendiente_numeracion');
 
+        $ganado->estados()->detach($estado->id);
+        
         return response();
     }
 
