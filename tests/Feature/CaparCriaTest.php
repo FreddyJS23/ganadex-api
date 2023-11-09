@@ -2,15 +2,15 @@
 
 namespace Tests\Feature;
 
-
+use App\Models\Estado;
 use App\Models\Ganado;
 use App\Models\User;
-use Illuminate\Database\Eloquent\Collection;
+
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Collection;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
-use Illuminate\Support\Str;
 
 class CaparCriaTest extends TestCase
 {
@@ -20,7 +20,8 @@ class CaparCriaTest extends TestCase
 
     private $user;
     private $ganado;
-  
+    private $estado;
+
 
     protected function setUp(): void
     {
@@ -28,16 +29,17 @@ class CaparCriaTest extends TestCase
 
         $this->user
             = User::factory()->create();
-
     }
 
     private function generarGanado(): Collection
     {
+        $this->estado = Estado::where('estado', 'pendiente_capar')->get();
+
         return Ganado::factory()
             ->count($this->cantidad_ganado)
             ->hasPeso(1)
             ->hasEvento(1)
-            ->hasEstado(1,['estado'=>'-pendiente_capar'])
+            ->hasAttached($this->estado)
             ->for($this->user)
             ->create();
     }
@@ -48,7 +50,7 @@ class CaparCriaTest extends TestCase
     public function test_obtener_crias_pendientes_capar(): void
     {
         $this->generarGanado();
-        
+
         $response = $this->actingAs($this->user)->getJson(route('capar.index'));
         $response->assertStatus(200)
             ->assertJson(fn (AssertableJson $json) => $json->has('crias_pendiente_capar', $this->cantidad_ganado));
@@ -61,15 +63,17 @@ class CaparCriaTest extends TestCase
         $idCria = $criasGanado[$idRandom]->id;
 
         //capar
-         $this->actingAs($this->user)->getJson(route('capar.capar',['ganado'=>$idCria]));
- 
-        $response = $this->actingAs($this->user)->getJson(sprintf('api/ganado/%s',$idCria));
+        $this->actingAs($this->user)->getJson(route('capar.capar', ['ganado' => $idCria]));
 
-          $response->assertStatus(200)->assertJson(
+        $response = $this->actingAs($this->user)->getJson(sprintf('api/ganado/%s', $idCria));
+
+        $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) => $json
                 ->where(
-                    'ganado.estado',
-                    fn (string $estado) => !Str::contains($estado,'-pendiente_capar')
-                )->etc());
+                    'ganado.estados',
+                    fn (Collection $estados) => $estados->doesntContain('estado', 'pendiente_capar')
+                )
+                ->etc()
+        );
     }
 }
