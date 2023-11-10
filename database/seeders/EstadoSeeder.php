@@ -17,6 +17,7 @@ class EstadoSeeder extends Seeder
         DB::table('estados')->insert(['estado' => 'fallecido']);
         DB::table('estados')->insert(['estado' => 'gestacion']);
         DB::table('estados')->insert(['estado' => 'lactancia']);
+        DB::table('estados')->insert(['estado' => 'vendido']);
         DB::table('estados')->insert(['estado' => 'pendiente_revision']);
         DB::table('estados')->insert(['estado' => 'pendiente_servicio']);
         DB::table('estados')->insert(['estado' => 'pendiente_secar']);
