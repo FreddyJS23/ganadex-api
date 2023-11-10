@@ -31,8 +31,8 @@ class Secado
         $eventoGanado->prox_secado=$fechaSecado;
         $eventoGanado->save();
 
-        $estadoGanado=Estado::firstWhere('ganado_id',$event->revision->ganado->id);
-        $estadoGanado->estado=$estadoGanado->estado . "-pendiente_secar";
-        $estadoGanado->save();
+        $estado = Estado::firstWhere('estado','pendiente_secar');
+
+        $event->revision->ganado->estados()->attach($estado->id);
     }
 }

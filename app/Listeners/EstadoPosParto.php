@@ -22,8 +22,8 @@ class EstadoPosParto
      */
     public function handle(PartoHecho $event): void
     {
-        $estadoGanado=Estado::firstWhere('ganado_id',$event->parto->ganado->id);
-        $estadoGanado->estado="sana-lactancia";
-        $estadoGanado->save();
+        $estado = Estado::whereIn('estado',['sano','lactancia'])->get();
+        
+        $event->parto->ganado->estados()->sync($estado);
     }
 }

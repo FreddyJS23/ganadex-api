@@ -49,8 +49,13 @@ class PartoController extends Controller
         $cria->user_id=Auth::id();
         $cria->save();
         $cria->evento()->create(); 
-        $estado=new Estado(['estado'=>'sano-pendiente_numeracion']);
-        $estado->ganado()->associate($cria)->save();
+  
+        $estados=Estado::select('id')
+        ->whereIn('estado',['sano','pendiente_numeracion'])
+        ->get()
+        ->modelKeys();
+        $cria->estados()->sync($estados);
+        
         $peso_nacimiento=new Peso($request->only(['peso_nacimiento']));
         $peso_nacimiento->ganado()->associate($cria)->save();
         

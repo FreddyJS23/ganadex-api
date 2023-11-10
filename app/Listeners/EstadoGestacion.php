@@ -31,8 +31,8 @@ class EstadoGestacion
         $eventoGanado->prox_parto=$fechaParto;
         $eventoGanado->save();
 
-        $estadoGanado=Estado::firstWhere('ganado_id',$event->revision->ganado->id);
-        $estadoGanado->estado="sana-gestacion";
-        $estadoGanado->save();
+        $estado = Estado::whereIn('estado', ['sano','gestacion'])->get();
+
+        $event->revision->ganado->estados()->sync($estado);
     }
 }

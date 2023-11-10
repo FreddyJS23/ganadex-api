@@ -22,8 +22,10 @@ class EstadoPosVenta
      */
     public function handle(VentaGanado $event): void
     {
-        $estadoGanado = Estado::firstWhere('ganado_id', $event->venta->ganado->id);
-        $estadoGanado->estado = "vendida";
-        $estadoGanado->save();
+
+
+        $estado = Estado::firstWhere('estado', 'vendido');
+
+        $event->venta->ganado->estados()->sync($estado->id);
     }
 }
