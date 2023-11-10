@@ -3,12 +3,14 @@
 namespace Tests\Feature;
 
 use App\Models\Comprador;
+use App\Models\Estado;
 use App\Models\Ganado;
 use App\Models\Parto;
 use App\Models\Toro;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Collection;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
 use Illuminate\Support\Str;
@@ -20,6 +22,7 @@ class EventosGanadoTest extends TestCase
     private $user;
     private $toro;
     private $ganado;
+    private $estado;
     private $numero_toro;
     private int $cantidad_ganado = 50;
 
@@ -55,12 +58,13 @@ class EventosGanadoTest extends TestCase
         $this->user
             = User::factory()->create();
 
+        $this->estado = Estado::all();
 
         $this->ganado
             = Ganado::factory()
             ->hasPeso(1)
             ->hasEvento(1)
-            ->hasEstado(1)
+            ->hasAttached($this->estado)
             ->for($this->user)
             ->create(['sexo' => 'H', 'tipo_id' => 3]);
 
@@ -85,9 +89,10 @@ class EventosGanadoTest extends TestCase
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) => $json->whereAllType([
-            'ganado.prox_revision'=>'string',
-            'servicio_reciente'=>'array',
-            'total_servicios'=>'integer'])->etc()
+                'ganado.prox_revision' => 'string',
+                'servicio_reciente' => 'array',
+                'total_servicios' => 'integer'
+            ])->etc()
         );
     }
 
@@ -115,15 +120,21 @@ class EventosGanadoTest extends TestCase
                     'revision_reciente' => 'array',
                     'total_revisiones' => 'integer',
                 ]
-            )->where(
-                'ganado.estado',
-                fn (string $estado) => Str::containsAll($estado, ['gestacion', 'pendiente_secar'])
-            )->etc()
+            )->has('ganado.estados',3)
+                ->where(
+                    'ganado.estados',
+                    fn (Collection $estados) => $estados->contains('estado', 'pendiente_secar')
+                )
+                ->where(
+                    'ganado.estados',
+                    fn (Collection $estados) => $estados->contains('estado', 'gestacion')
+                )
+                ->etc()
         );
     }
 
 
-    public function test_cuando_se_realiza_un_parto_y_nace_hembra(): void
+    public function test_cuando_se_realiza_un_parto_empieza_lactancia_y_cambia_adulto(): void
     {
         //realizar servicio
         $this->actingAs($this->user)->postJson(
@@ -140,18 +151,26 @@ class EventosGanadoTest extends TestCase
         $response = $this->actingAs($this->user)->getJson(sprintf('api/ganado/%s', $this->ganado->id));
 
         $response->assertStatus(200)->assertJson(
-            fn (AssertableJson $json) => $json->whereAllType([
-                'ganado.prox_revision' => 'string',
-                'servicio_reciente' => 'array',
-                'total_servicios' => 'integer',
-                'parto_reciente'=>'array',
-                'parto_reciente.cria'=>'array',
-                'total_partos' => 'integer',
+            fn (AssertableJson $json) => $json->whereAllType(
+                [
+                    'ganado.prox_revision' => 'string',
+                    'servicio_reciente' => 'array',
+                    'total_servicios' => 'integer',
+                    'parto_reciente' => 'array',
+                    'parto_reciente.cria' => 'array',
+                    'total_partos' => 'integer',
                 ]
-            )->where(
-                'ganado.estado',
-                fn (string $estado) => Str::containsAll($estado, ['lactancia'])
-            )->where('ganado.tipo', 'adulto')->etc()
+            )->has('ganado.estados', 2)
+                ->where('ganado.tipo', 'adulto')
+                ->where(
+                    'ganado.estados',
+                    fn (Collection $estados) => $estados->contains('estado', 'sano')
+
+                )->where(
+                    'ganado.estados',
+                    fn (Collection $estados) => $estados->contains('estado', 'lactancia')
+                )
+                ->etc()
         );
     }
 
@@ -175,12 +194,19 @@ class EventosGanadoTest extends TestCase
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) => $json
-                ->where(
-                    'ganado.estado',
-                    fn (string $estado) => Str::containsAll($estado, ['-pendiente_capar','-pendiente_numeracion'])
+                ->has('ganado.estados', 3)    
+            ->where(
+                    'ganado.estados',
+                    fn (Collection $estados) => $estados->contains('estado', 'pendiente_numeracion')
+
+                )->where(
+                    'ganado.estados',
+                    fn (Collection $estados) => $estados->contains('estado', 'pendiente_capar')
+
                 )->etc()
         );
     }
+
     public function test_cuando_se_realiza_un_parto_la_cria_hembra_tiene_que_estar_pendiente_numeracion(): void
     {
         //realizar servicio
@@ -201,9 +227,11 @@ class EventosGanadoTest extends TestCase
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) => $json
-                ->where(
-                    'ganado.estado',
-                    fn (string $estado) => Str::containsAll($estado, ['-pendiente_numeracion'])
+                ->has('ganado.estados', 2)    
+            ->where(
+                    'ganado.estados',
+                    fn (Collection $estados) => $estados->contains('estado', 'pendiente_numeracion')
+
                 )->etc()
         );
     }
@@ -211,19 +239,21 @@ class EventosGanadoTest extends TestCase
     public function test_cuando_se_realiza_una_venta(): void
     {
         $comprador = Comprador::factory()->for($this->user)->create();
-        $this->venta=$this->venta + ['ganado_id'=>$this->ganado->id,'comprador_id'=>$comprador->id];
-        
+        $this->venta = $this->venta + ['ganado_id' => $this->ganado->id, 'comprador_id' => $comprador->id];
+
         //realizar venta
-       $this->actingAs($this->user)->postJson(route('ventas.store'), $this->venta);
-       
-       
-       $response = $this->actingAs($this->user)->getJson(sprintf('api/ganado/%s', $this->ganado->id));
+        $this->actingAs($this->user)->postJson(route('ventas.store'), $this->venta);
+
+
+        $response = $this->actingAs($this->user)->getJson(sprintf('api/ganado/%s', $this->ganado->id));
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) => $json
-                ->where(
-                    'ganado.estado',
-                    fn (string $estado) =>Str::containsAll($estado, ['vendida'])
+                ->has('ganado.estados', 1)    
+            ->where(
+                    'ganado.estados',
+                    fn (Collection $estados) => $estados->contains('estado', 'vendido')
+
                 )->etc()
         );
     }
