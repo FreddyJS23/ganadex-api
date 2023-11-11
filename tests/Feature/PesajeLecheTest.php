@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Estado;
 use App\Models\Ganado;
 use App\Models\Leche;
 use App\Models\User;
@@ -24,11 +25,14 @@ class PesajeLecheTest extends TestCase
 
     private $user;
     private $ganado;
+    private $estado;
     private $url;
 
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->estado = Estado::all();
 
         $this->user
             = User::factory()->create();
@@ -37,7 +41,7 @@ class PesajeLecheTest extends TestCase
             = Ganado::factory()
             ->hasPeso(1)
             ->hasEvento(1)
-            ->hasEstado(1)
+            ->hasAttached($this->estado)
             ->for($this->user)
             ->create();
 
