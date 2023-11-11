@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Estado;
 use App\Models\Ganado;
 use App\Models\Servicio;
 use App\Models\Toro;
@@ -27,6 +28,7 @@ class ServicioTest extends TestCase
 
     private $user;
     private $ganado;
+    private $estado;
     private $toro;
     private $numero_toro;
     private $url;
@@ -38,11 +40,13 @@ class ServicioTest extends TestCase
         $this->user
             = User::factory()->create();
 
+        $this->estado = Estado::all();
+
         $this->ganado
             = Ganado::factory()
             ->hasPeso(1)
             ->hasEvento(1)
-            ->hasEstado(1)
+            ->hasAttached($this->estado)
             ->for($this->user)
             ->create();
 

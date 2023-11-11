@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Comprador;
+use App\Models\Estado;
 use App\Models\Ganado;
 use App\Models\User;
 use App\Models\Venta;
@@ -23,10 +24,13 @@ class VentaTest extends TestCase
     private int $cantidad_ventas= 10;
 
     private $user;
+    private $estado;
 
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->estado = Estado::all();
 
         $this->user
             = User::factory()->create();
@@ -37,7 +41,7 @@ class VentaTest extends TestCase
         return Venta::factory()
             ->count($this->cantidad_ventas)
             ->for($this->user)
-            ->for(Ganado::factory()->for($this->user)->hasPeso(1)->hasEstado(1)->create())
+            ->for(Ganado::factory()->for($this->user)->hasPeso(1)->hasAttached($this->estado)->create())
             ->for(Comprador::factory()->for($this->user)->create())
             ->create();
     }
@@ -83,7 +87,7 @@ class VentaTest extends TestCase
 
     public function test_creacion_venta(): void
     {
-        $ganado=Ganado::factory()->for($this->user)->hasPeso(1)->hasEstado(1)->create();
+        $ganado=Ganado::factory()->for($this->user)->hasPeso(1)->hasAttached($this->estado)->create();
         $comprador=Comprador::factory() ->for($this->user)->create();
         $this->venta = $this->venta + ['ganado_id' => $ganado->id, 'comprador_id' => $comprador->id];
        
@@ -111,7 +115,7 @@ class VentaTest extends TestCase
         $idRandom = rand(0, $this->cantidad_ventas - 1);
         $idVentaEditar = $venta[$idRandom]->id;
         
-        $ganado = Ganado::factory()->for($this->user)->hasPeso(1)->create();
+        $ganado = Ganado::factory()->for($this->user)->hasAttached($this->estado)->hasPeso(1)->create();
         $comprador = Comprador::factory()->for($this->user)->create();
         $this->venta = $this->venta + ['ganado_id' => $ganado->id, 'comprador_id' => $comprador->id];
 
@@ -145,7 +149,7 @@ class VentaTest extends TestCase
 
     public function test_autorizacion_maniupular__venta_otro_usuario(): void
     {
-        $ganado = Ganado::factory()->for($this->user)->hasPeso(1)->create();
+        $ganado = Ganado::factory()->for($this->user)->hasAttached($this->estado)->hasPeso(1)->create();
         $comprador = Comprador::factory()->for($this->user)->create();
         $this->venta=$this->venta + ['ganado_id'=>$ganado->id,'comprador_id'=>$comprador->id];
         
@@ -153,7 +157,7 @@ class VentaTest extends TestCase
 
         $ventaOtroUsuario =  Venta::factory()
             ->for($otroUsuario)
-            ->for(Ganado::factory()->for($otroUsuario)->hasPeso(1)->create())
+            ->for(Ganado::factory()->for($otroUsuario)->hasAttached($this->estado)->hasPeso(1)->create())
             ->for(Comprador::factory()->for($otroUsuario)->create())
             ->create();
 
