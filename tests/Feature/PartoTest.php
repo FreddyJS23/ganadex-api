@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Estado;
 use App\Models\Ganado;
 use App\Models\Parto;
 use App\Models\Servicio;
@@ -33,12 +34,15 @@ class PartoTest extends TestCase
     private $ganado;
     private $toro;
     private $servicio;
+    private $estado;
     private $numero_toro;
     private $url;
 
     protected function setUp(): void
     {
         parent::setUp();
+       
+        $this->estado = Estado::all();
 
         $this->user
             = User::factory()->create();
@@ -47,7 +51,7 @@ class PartoTest extends TestCase
             = Ganado::factory()
             ->hasPeso(1)
             ->hasEvento(1)
-            ->hasEstado(1)
+            ->hasAttached($this->estado)
             ->for($this->user)
             ->create();
 
@@ -70,7 +74,7 @@ class PartoTest extends TestCase
         return Parto::factory()
             ->count($this->cantidad_parto)
             ->for($this->ganado)
-            ->for(Ganado::factory()->for($this->user)->hasEstado(1), 'ganado_cria')
+            ->for(Ganado::factory()->for($this->user)->hasAttached($this->estado), 'ganado_cria')
             ->for($this->toro)
             ->create();
     }
@@ -175,7 +179,7 @@ class PartoTest extends TestCase
         Ganado::factory()
             ->hasPeso(1)
             ->hasEvento(1)
-            ->hasEstado(1)
+            ->hasAttached($this->estado)
             ->for($this->user)
             ->create(['nombre' => 'test', 'numero' => 33]);
 
