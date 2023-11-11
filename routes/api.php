@@ -6,6 +6,7 @@ use App\Http\Controllers\BalanceAnualLeche;
 use App\Http\Controllers\CaparCriaController;
 use App\Http\Controllers\CompradorController;
 use App\Http\Controllers\ConfiguracionController;
+use App\Http\Controllers\FallecimientoController;
 use App\Http\Controllers\GanadoController;
 use App\Http\Controllers\InsumoController;
 use App\Http\Controllers\LecheController;
@@ -61,7 +62,8 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::apiResource('usuario',UserController::class)->only(['show','update','destroy'])->parameters(['usuario'=>'user']);
     Route::apiResource('/precio',PrecioController::class)->only(['index','store']);
     Route::apiResource('/venta_leche',VentaLecheController::class)->only(['index','store']);
-   
+   Route::apiResource('/fallecimientos',FallecimientoController::class);
+
     Route::get('/crias_pendiente_capar',[CaparCriaController::class,'index'])->name('capar.index');
     Route::get('/capar_cria/{ganado}',[CaparCriaController::class,'capar'])->name('capar.capar');
    
