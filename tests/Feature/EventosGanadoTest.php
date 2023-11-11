@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Comprador;
 use App\Models\Estado;
+use App\Models\Fallecimiento;
 use App\Models\Ganado;
 use App\Models\Parto;
 use App\Models\Toro;
@@ -49,6 +50,10 @@ class EventosGanadoTest extends TestCase
 
     private array $venta = [
         'precio' => 350,
+    ];
+    
+    private array $fallecimiento = [
+        'causa' => 'enferma',
     ];
 
     protected function setUp(): void
@@ -253,6 +258,27 @@ class EventosGanadoTest extends TestCase
             ->where(
                     'ganado.estados',
                     fn (Collection $estados) => $estados->contains('estado', 'vendido')
+
+                )->etc()
+        );
+    }
+    public function test_cuando_se_registra_fallecimiento_de_una_cabeza_ganado(): void
+    {
+      
+        $this->fallecimiento = $this->fallecimiento + ['numero_ganado' => $this->ganado->numero];
+
+        //registrar fallecimiento
+        $this->actingAs($this->user)->postJson(route('fallecimientos.store'), $this->fallecimiento);
+
+
+        $response = $this->actingAs($this->user)->getJson(sprintf('api/ganado/%s', $this->ganado->id));
+
+        $response->assertStatus(200)->assertJson(
+            fn (AssertableJson $json) => $json
+                ->has('ganado.estados', 1)    
+            ->where(
+                    'ganado.estados',
+                    fn (Collection $estados) => $estados->contains('estado','fallecido')
 
                 )->etc()
         );
