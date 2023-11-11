@@ -22,7 +22,7 @@ class GanadoController extends Controller
     }   
     
     
-    public array $estado=['estado','fecha_defuncion','causa_defuncion'];
+    public array $estado=['estado_id'];
     public array $peso=['peso_nacimiento', 'peso_destete','peso_2year','peso_actual'];
     /**
      * Display a listing of the resource.
@@ -43,7 +43,7 @@ class GanadoController extends Controller
       $ganado->save();
       
       $ganado->peso()->create($request->only($this->peso));
-      $ganado->estado()->create($request->only($this->estado));
+      $ganado->estados()->sync($request->only($this->estado));
       $ganado->evento()->create();  
      
       return response()->json(['ganado'=>new GanadoResource($ganado)],201);
@@ -79,7 +79,7 @@ class GanadoController extends Controller
     {
         $ganado->fill($request->except($this->peso + $this->estado))->save();
         $ganado->peso->fill($request->only($this->peso))->save();
-        $ganado->estado->fill($request->only($this->estado))->save();
+        $ganado->estados()->sync($request->only($this->estado));
        
         return response()->json(['ganado'=>new GanadoResource($ganado)],200);
     }

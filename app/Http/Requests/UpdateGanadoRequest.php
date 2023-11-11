@@ -38,8 +38,10 @@ class UpdateGanadoRequest extends FormRequest
             'peso_nacimiento'=>'max:10|regex:/^\d+(\.\d+)?KG$/',
             'peso_destete'=>'max:10|regex:/^\d+(\.\d+)?KG$/',
             'peso_2year'=>'max:10|regex:/^\d+(\.\d+)?KG$/',
-            'peso_actual'=>'max:10|regex:/^\d+(\.\d+)?KG$/', 
-            'estado'=>'in:fallecido,sano,pendiente_revision,pendiente_servicio,prenada',
+            'peso_actual'=>'max:10|regex:/^\d+(\.\d+)?KG$/',
+            'estado_id' => Rule::foreach(function ($value, $attrubute) {
+                return Rule::exists('estados', 'id');
+            }),
             'fecha_defuncion'=>'date_format:Y-m-d',
             'causa_defuncion'=>'max:255', 
         ];
