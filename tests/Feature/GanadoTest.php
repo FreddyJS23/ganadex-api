@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Estado;
 use App\Models\Ganado;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
@@ -25,11 +26,11 @@ class GanadoTest extends TestCase
         'peso_destete' => '130KG',
         'peso_2year' => '300KG',
         'peso_actual' => '600KG',
-        'estado' => 'sano',
+        'estado_id' => 1,
     ];
 
     private int $cantidad_ganado = 10;
-
+    private $estado;
     private $user;
 
     protected function setUp(): void
@@ -38,6 +39,7 @@ class GanadoTest extends TestCase
 
         $this->user
             = User::factory()->create();
+        $this->estado = Estado::all();
     }
 
     private function generarGanado(): Collection
@@ -46,7 +48,7 @@ class GanadoTest extends TestCase
             ->count($this->cantidad_ganado)
             ->hasPeso(1)
             ->hasEvento(1)
-            ->hasEstado(1)
+            ->hasAttached($this->estado)
             ->for($this->user)
             ->create();
     }
@@ -65,7 +67,7 @@ class GanadoTest extends TestCase
                     'peso_destete' => '30KG',
                     'peso_2year' => '30KG',
                     'peso_actual' => '30KG',
-                    'estado' => 'sano',
+                    'estado_id' => 1,
                 ], ['nombre', 'numero']
             ],
             'caso de insertar datos erróneos' => [
@@ -80,10 +82,10 @@ class GanadoTest extends TestCase
                     'peso_destete' => '30Kg',
                     'peso_2year' => 'd30KG',
                     'peso_actual' => '.30KG',
-                    'estado' => 'sanito',
+                    'estado_id' => [1,30,2],
                 ], [
                     'nombre', 'numero', 'origen', 'sexo', 'tipo_id', 'fecha_nacimiento',
-                    'peso_nacimiento', 'peso_destete', 'peso_2year', 'peso_actual', 'estado'
+                    'peso_nacimiento', 'peso_destete', 'peso_2year', 'peso_actual', 'estado_id'
                 ]
             ],
             'caso de no insertar datos requeridos' => [
@@ -95,7 +97,7 @@ class GanadoTest extends TestCase
                     'peso_destete' => '30KG',
                     'peso_2year' => '30KG',
                     'peso_actual' => '30KG',
-                    'estado' => 'sano',
+                    'estado_id' => [1,2,3,],
                 ], ['nombre', 'sexo', 'tipo_id']
             ],
         ];
@@ -157,7 +159,7 @@ class GanadoTest extends TestCase
                 ->where('ganado.peso_destete', $this->cabeza_ganado['peso_destete'])
                 ->where('ganado.peso_2year', $this->cabeza_ganado['peso_2year'])
                 ->where('ganado.peso_actual', $this->cabeza_ganado['peso_actual'])
-                ->where('ganado.estado', $this->cabeza_ganado['estado'])
+
                 ->etc()
         );
     }
@@ -166,7 +168,9 @@ class GanadoTest extends TestCase
     {
         Ganado::factory()->hasPeso(1)
             ->hasEvento(1)
-            ->hasEstado(1)->for($this->user)->create(['nombre' => 'test', 'numero' => 392]);
+            ->hasAttached($this->estado)
+            ->for($this->user)
+            ->create(['nombre' => 'test', 'numero' => 392]);
 
         $cabezasGanado = $this->generarGanado();
         $idRandom = rand(0, $this->cantidad_ganado - 1);
@@ -183,7 +187,9 @@ class GanadoTest extends TestCase
     {
         $ganado = Ganado::factory()->hasPeso(1)
             ->hasEvento(1)
-            ->hasEstado(1)->for($this->user)->create(['nombre' => 'test', 'numero' => 392]);
+            ->hasAttached($this->estado)
+            ->for($this->user)
+            ->create(['nombre' => 'test', 'numero' => 392]);
 
         $response = $this->actingAs($this->user)->putJson(sprintf('api/ganado/%s', $ganado->id), $this->cabeza_ganado);
 
@@ -220,7 +226,7 @@ class GanadoTest extends TestCase
 
         $ganadoOtroUsuario = Ganado::factory()
             ->hasPeso(1)->hasEvento(1)
-            ->hasEstado(1)
+            ->hasAttached($this->estado)
             ->for($otroUsuario)
             ->create();
 
