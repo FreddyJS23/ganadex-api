@@ -21,7 +21,7 @@ class PersonalResource extends JsonResource
         "apellido"=> $this->apellido,
         "fecha_nacimiento"=>$this->fecha_nacimiento,
         "cargo"=> $this->cargo,
-        "sueldo"=> $this->sueldo,
+       /*  "sueldo"=> $this->sueldo, */
         ];
     }
 }

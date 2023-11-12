@@ -22,7 +22,7 @@ class PersonalFactory extends Factory
             'apellido' => fake()->lastName(),
             'fecha_nacimiento' => fake()->date(),
             'cargo' => fake()->jobTitle(),
-            'sueldo' => fake()->numberBetween($int=1,$max=100),
+            /* 'sueldo' => fake()->numberBetween($int=1,$max=100), */
         ];
     }
 }

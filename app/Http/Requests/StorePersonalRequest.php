@@ -27,7 +27,7 @@ class StorePersonalRequest extends FormRequest
             'apellido'=>'required|string|min:3',
             'fecha_nacimiento'=>'required|date_format:Y-m-d',
             'cargo'=> 'required|string|min:3',
-            'sueldo'=>'required|numeric',
+            /* 'sueldo'=>'required|numeric', */
         ];
     }
 }

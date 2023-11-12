@@ -35,7 +35,7 @@ class UpdatePersonalRequest extends FormRequest
             'apellido'=>'required|string|min:3',
             'fecha_nacimiento'=>'required|date_format:Y-m-d',
             'cargo'=>'required',
-            'sueldo'=>'required|numeric',
+            /* 'sueldo'=>'required|numeric', */
         ];
     }
 }

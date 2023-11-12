@@ -20,7 +20,7 @@ class PersonalTest extends TestCase
         'apellido' => 'perez',
         'fecha_nacimiento' => '2000-02-12',
         'cargo' => 'obrero',
-        'sueldo' => 60,
+       /*  'sueldo' => 60, */
     ];
 
     private int $cantidad_personal = 10;
@@ -52,7 +52,7 @@ class PersonalTest extends TestCase
                     'apellido' => 'perez',
                     'fecha_nacimiento' => '2000-02-12',
                     'cargo' => 'obrero',
-                    'sueldo' => 60,
+                    /* 'sueldo' => 60, */
 
                 ], ['ci']
             ],
@@ -63,12 +63,12 @@ class PersonalTest extends TestCase
                     'apellido' => 'ez',
                     'fecha_nacimiento' => '20-12-1',
                     'cargo' => 'er',
-                    'sueldo' => 'ik',
-                ], ['ci', 'nombre', 'apellido', 'fecha_nacimiento', 'cargo', 'sueldo']
+                 /*    'sueldo' => 'ik', */
+                ], ['ci', 'nombre', 'apellido', 'fecha_nacimiento', 'cargo', /* 'sueldo' */]
             ],
             'caso de no insertar datos requeridos' => [
                 [],
-                ['ci', 'nombre', 'apellido', 'fecha_nacimiento', 'cargo', 'sueldo']
+                ['ci', 'nombre', 'apellido', 'fecha_nacimiento', 'cargo',/*  'sueldo' */]
             ],
         ];
     }

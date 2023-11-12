@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('apellido');
             $table->date('fecha_nacimiento');
             $table->string('cargo');
-            $table->integer('sueldo');
+           /*  $table->integer('sueldo'); */
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
