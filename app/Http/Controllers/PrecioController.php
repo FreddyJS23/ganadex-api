@@ -30,7 +30,7 @@ class PrecioController extends Controller
         $precio->user_id = Auth::id();
         $precio->fecha = Carbon::now()->format('Y-m-d');
         $precio->save();
-        return response()->json(['personal' => new PrecioResource($precio)], 201);
+        return response()->json(['precio' => new PrecioResource($precio)], 201);
     }
 
     /**
