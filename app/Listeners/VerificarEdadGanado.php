@@ -40,7 +40,7 @@ class VerificarEdadGanado
                 ->having('diferencia', '<',  729)
                 ->get();
 
-            $becerros->toQuery()->update(['tipo_id' => 2]);
+           $becerros->count() > 0 && $becerros->toQuery()->update(['tipo_id' => 2]);
 
             $mautes = Ganado::where('user_id', $usuarioId)
                 ->where('tipo_id', 2)
@@ -49,7 +49,7 @@ class VerificarEdadGanado
                 ->having('diferencia', '>=', 730)
                 ->get();
 
-            $mautes->toQuery()->update(['tipo_id' => 3]);
+            $mautes->count() > 0 && $mautes->toQuery()->update(['tipo_id' => 3]);
         }
     }
 }
