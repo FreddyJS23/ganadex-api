@@ -28,7 +28,7 @@ class StoreServicioRequest extends FormRequest
             'numero_toro' => ['required', Rule::exists('ganados','numero')->where(function ($query) {
                 return $query->where('sexo', 'M');
             })],
-            'tipo' => 'required|in:monta,inseminacion'
+            'tipo' => 'required|in:Monta,Inseminacion'
         ];
     }
 }
