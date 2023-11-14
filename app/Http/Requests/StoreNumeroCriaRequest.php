@@ -22,7 +22,7 @@ class StoreNumeroCriaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'numero' => 'numeric|between:1,32767|unique:ganados,numero',
+            'numero' => 'required|numeric|between:1,32767|unique:ganados,numero',
         ];
     }
 }
