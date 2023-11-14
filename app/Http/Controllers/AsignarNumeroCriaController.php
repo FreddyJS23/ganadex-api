@@ -35,7 +35,7 @@ class AsignarNumeroCriaController extends Controller
 
         $ganado->estados()->detach($estado->id);
         
-        return response();
+        return response()->json();
     }
 
    

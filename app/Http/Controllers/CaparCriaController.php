@@ -31,7 +31,7 @@ class CaparCriaController extends Controller
         $estado=Estado::firstWhere('estado','pendiente_capar');
         $ganado->estados()->detach($estado->id);
         
-        return response();
+        return response()->json();
     }
 
   
