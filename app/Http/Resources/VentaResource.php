@@ -19,7 +19,7 @@ class VentaResource extends JsonResource
             'numero_ganado'=>$this->ganado->numero,
             'peso'=>$this->ganado->peso->peso_actual,
             'precio'=>$this->precio,
-            'precio_kg'=>round(intval($this->ganado->peso->peso_actual) / $this->precio,2 ),
+            'precio_kg'=>round($this->precio / intval($this->ganado->peso->peso_actual),2 ),
             'comprador'=>$this->comprador->nombre,
         ];
     }
