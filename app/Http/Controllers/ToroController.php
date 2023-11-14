@@ -58,7 +58,7 @@ class ToroController extends Controller
         return response()->json([
             'toro' => new ToroResource($toro),
             'efectividad' => $toro->padre_en_partos_count ? round($efectividad($toro->padre_en_partos_count, $toro->servicios_count),2) : null,
-            'padre_parto'=>$toro->padre_en_partos_count,
+            'padre_en_partos'=>$toro->padre_en_partos_count,
             'servicios'=>$toro->servicios_count,
         ], 200);
     }
