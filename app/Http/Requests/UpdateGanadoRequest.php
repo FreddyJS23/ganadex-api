@@ -42,8 +42,7 @@ class UpdateGanadoRequest extends FormRequest
             'estado_id' => Rule::foreach(function ($value, $attrubute) {
                 return Rule::exists('estados', 'id');
             }),
-            'fecha_defuncion'=>'date_format:Y-m-d',
-            'causa_defuncion'=>'max:255', 
+            
         ];
     }
 }
