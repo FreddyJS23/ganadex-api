@@ -19,7 +19,7 @@ class ServicioTest extends TestCase
 
     private array $servicio = [
         'observacion' => 'bien',
-        'tipo' => 'monta'
+        'tipo' => 'Monta'
 
 
     ];

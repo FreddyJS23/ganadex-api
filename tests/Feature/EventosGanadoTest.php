@@ -29,7 +29,7 @@ class EventosGanadoTest extends TestCase
 
     private array $servicio = [
         'observacion' => 'bien',
-        'tipo' => 'monta'
+        'tipo' => 'Monta'
     ];
 
     private $parto = [
