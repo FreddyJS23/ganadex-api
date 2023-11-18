@@ -19,6 +19,7 @@ use App\Http\Controllers\PersonalController;
 use App\Http\Controllers\PrecioController;
 use App\Http\Controllers\RevisionController;
 use App\Http\Controllers\ServicioController;
+use App\Http\Controllers\TodosRevisiones;
 use App\Http\Controllers\TopVacasMenosProductoras;
 use App\Http\Controllers\TopVacasProductoras;
 use App\Http\Controllers\ToroController;
@@ -56,6 +57,7 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::apiResource('/personal',PersonalController::class);
     Route::apiResource('/configuracion',ConfiguracionController::class)->only(['index','store','update']);
     Route::apiResource('/ganado/{ganado}/revision',RevisionController::class);
+    Route::get('/revisiones',TodosRevisiones::class)->name('todasRevisiones');
     Route::apiResource('/ganado/{ganado}/servicio',ServicioController::class);
     Route::apiResource('/ganado/{ganado}/parto',PartoController::class);
     Route::apiResource('/ganado/{ganado}/pesaje_leche',LecheController::class);
