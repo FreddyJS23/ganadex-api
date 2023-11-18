@@ -149,6 +149,36 @@ class ServicioTest extends TestCase
         $response->assertStatus(200)->assertJson(['servicioID' => $idToDelete]);
     }
 
+    public function test_obtener_servicios_de_todas_las_vacas(): void
+    {
+        Ganado::factory()
+            ->count(10)
+            ->hasPeso(1)
+            ->hasServicios(7, ['toro_id' => $this->toro->id])
+            ->hasParto(3, function(array $attributes,Ganado $ganado){
+                $cria=Ganado::factory()->create(['user_id'=>$ganado->user_id]);
+                return ['toro_id'=>$ganado->servicioReciente->toro_id,'ganado_cria_id'=>$cria->id];
+            })
+            ->hasEvento(1)
+            ->hasAttached($this->estado)
+            ->for($this->user)
+            ->create();
+
+        $response = $this->actingAs($this->user)->getJson(route('todasServicios'));
+        
+        $response->assertStatus(200)
+            ->assertJson(
+                fn (AssertableJson $json) => $json->has('todos_servicios.1', fn (AssertableJson $json) => $json->whereAllType([
+                    'id' => 'integer',
+                    'numero' => 'integer',
+                    'ultimo_servicio' => 'string',
+                    'toro' => 'array',
+                    'efectividad' => 'float|integer',
+                    'total_servicios' => 'integer'
+                ]))
+            );
+    }
+
     /**
      * @dataProvider ErrorinputProvider
      */
