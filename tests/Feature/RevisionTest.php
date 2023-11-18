@@ -130,6 +130,30 @@ class RevisionTest extends TestCase
 
         $response->assertStatus(200)->assertJson(['revisionID' => $idToDelete]);
     }
+    public function test_obtener_revisiones_de_todas_las_vacas(): void
+    {
+        Ganado::factory()
+            ->count(10)
+            ->hasPeso(1)
+            ->hasRevision(5)
+            ->hasEvento(1)
+            ->hasAttached($this->estado)
+            ->for($this->user)
+            ->create();
+
+        $response = $this->actingAs($this->user)->getJson(route('todasRevisiones'));
+        $response->assertStatus(200)
+            ->assertJson(fn (AssertableJson $json) => $json->has('todas_revisiones.1',fn (AssertableJson $json)=> $json->whereAllType([
+                'id' => 'integer',
+                'numero' => 'integer',
+                'diagnostico'=>'string',
+                'ultima_revision' => 'string',
+                'proxima_revision' => 'string|null',
+                'total_revisiones' => 'integer'
+            ]))
+        );
+    }
+
 
     /**
      * @dataProvider ErrorinputProvider
