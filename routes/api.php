@@ -19,6 +19,7 @@ use App\Http\Controllers\PersonalController;
 use App\Http\Controllers\PrecioController;
 use App\Http\Controllers\RevisionController;
 use App\Http\Controllers\ServicioController;
+use App\Http\Controllers\TodosPesajeLeche;
 use App\Http\Controllers\TodosRevisiones;
 use App\Http\Controllers\TodosServicios;
 use App\Http\Controllers\TopVacasMenosProductoras;
@@ -60,6 +61,7 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::apiResource('/ganado/{ganado}/revision',RevisionController::class);
     Route::get('/revisiones',TodosRevisiones::class)->name('todasRevisiones');
     Route::get('/servicios',TodosServicios::class)->name('todasServicios');
+    Route::get('/pesaje_leche',TodosPesajeLeche::class)->name('todosPesajesLeche');
     Route::apiResource('/ganado/{ganado}/servicio',ServicioController::class);
     Route::apiResource('/ganado/{ganado}/parto',PartoController::class);
     Route::apiResource('/ganado/{ganado}/pesaje_leche',LecheController::class);

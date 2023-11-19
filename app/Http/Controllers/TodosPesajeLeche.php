@@ -1,0 +1,23 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Resources\TodosPesajeLecheCollection;
+use App\Models\Ganado;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+class TodosPesajeLeche extends Controller
+{
+    /**
+     * Handle the incoming request.
+     */
+    public function __invoke()
+    {
+        return new TodosPesajeLecheCollection(Ganado::doesntHave('toro')
+        ->has('pesajes_leche')
+        ->where('user_id', Auth::id())
+        ->get());
+
+    }
+}

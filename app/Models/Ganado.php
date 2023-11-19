@@ -51,7 +51,7 @@ class Ganado extends Model
     {
         return $this->hasOne(Peso::class);
     }
-    
+
     /**
      * The estados that belong to the Ganado
      *
@@ -71,7 +71,7 @@ class Ganado extends Model
     {
         return $this->hasMany(Revision::class);
     }
- 
+
     /**
      * Get the ganado most recent servicio
      *
@@ -130,7 +130,17 @@ class Ganado extends Model
     {
         return $this->hasMany(Leche::class);
     }
-
+    
+    /**
+     * Get the ganado most recent pesaje leche
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function pesajeLecheReciente(): HasOne
+    {
+        return $this->pesajes_leche()->one()->latestOfMany();
+    }
+    
     /**
      * Get the user that owns the Ganado
      *
