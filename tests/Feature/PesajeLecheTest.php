@@ -129,6 +129,31 @@ class PesajeLecheTest extends TestCase
         $response->assertStatus(200)->assertJson(['pesajeLecheID' => $idToDelete]);
     }
 
+    public function test_obtener_pesajes_leche_de_todas_las_vacas(): void
+    {
+        Ganado::factory()
+            ->count(10)
+            ->hasPeso(1)
+            ->has(Leche::factory()->for($this->user)->count(3),'pesajes_leche')
+            ->hasEvento(1)
+            ->hasAttached($this->estado)
+            ->for($this->user)
+            ->create();
+
+        $response = $this->actingAs($this->user)->getJson(route('todosPesajesLeche'));
+        
+        $response->assertStatus(200)
+            ->assertJson(
+                fn (AssertableJson $json) => $json->has('todos_pesaje_leche.1', fn (AssertableJson $json) => $json->whereAllType([
+                    'id' => 'integer',
+                    'nombre' => 'string',
+                    'numero' => 'integer',
+                    'ultimo_pesaje' => 'string|null',
+                    'pesaje_este_mes' => 'boolean',
+                ]))
+            );
+    }
+
     /**
      * @dataProvider ErrorinputProvider
      */
