@@ -6,6 +6,7 @@ use App\Http\Controllers\BalanceAnualLeche;
 use App\Http\Controllers\CaparCriaController;
 use App\Http\Controllers\CompradorController;
 use App\Http\Controllers\ConfiguracionController;
+use App\Http\Controllers\DashboardVentaLecheController;
 use App\Http\Controllers\FallecimientoController;
 use App\Http\Controllers\GanadoController;
 use App\Http\Controllers\InsumoController;
@@ -87,7 +88,15 @@ Route::middleware('auth:sanctum')->group(function(){
      Route::get('/menor_insumo',MenorCantidadInsumo::class);
      Route::get('/mayor_insumo',MayorCantidadInsumo::class);
      Route::get('/balance_anual_leche',BalanceAnualLeche::class);
-    
+
+    //rutas peticiones de datos dashboard venta leche
+    Route::get('/dashboard_venta_leche/precio_actual',[DashboardVentaLecheController::class, 'precioActual'])->name('dashboardVentaLeche.precioActual');
+    Route::get('/dashboard_venta_leche/variacion_precio',[DashboardVentaLecheController::class, 'variacionPrecio'])->name('dashboardVentaLeche.variacionPrecio');
+    Route::get('/dashboard_venta_leche/ganancias_mes',[DashboardVentaLecheController::class, 'gananciasDelMes'])->name('dashboardVentaLeche.gananciasDelMes');
+    Route::get('/dashboard_venta_leche/ventas_mes',[DashboardVentaLecheController::class, 'ventasDelMes'])->name('dashboardVentaLeche.ventasDelMes');
+
+
+
     //rutas peticiones datos para rellanr formularios
      Route::get('/novillas_montar',NovillaAMontar::class);
 });
