@@ -15,7 +15,9 @@ use Tests\TestCase;
 class DashboardVentaLecheTest extends TestCase
 {
 
-    private $precios;
+   use RefreshDatabase;
+   
+   private $precios;
 
     private int $cantidad_ventaLeche = 10;
 
@@ -93,7 +95,7 @@ class DashboardVentaLecheTest extends TestCase
         VentaLeche::factory()
             ->for(Precio::factory()->for($this->user))
             ->for($this->user)
-            ->create(['fecha'=>'2023-11-03']);
+            ->create(['fecha'=>now()->format('Y-m-d')]);
        
         $this->generarVentaLeche();
 
