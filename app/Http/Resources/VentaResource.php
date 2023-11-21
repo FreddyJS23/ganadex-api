@@ -15,6 +15,7 @@ class VentaResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
+            'id'=>$this->id,
             'fecha'=>$this->fecha,
             'numero_ganado'=>$this->ganado->numero,
             'peso'=>$this->ganado->peso->peso_actual,
