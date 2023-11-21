@@ -1,0 +1,117 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\Comprador;
+use App\Models\Estado;
+use App\Models\Ganado;
+use App\Models\User;
+use App\Models\Venta;
+use Doctrine\DBAL\Schema\Sequence;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Testing\Fluent\AssertableJson;
+use Tests\TestCase;
+
+class DashboardVentaGanadoTest extends TestCase
+{
+    use RefreshDatabase;
+
+    private $precios;
+    private $estado;
+    private int $cantidad_ventas = 10;
+    
+    private $user;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->user
+            = User::factory()->create();
+
+        $this->estado = Estado::all();
+
+     
+    }
+
+    private function generarVentas(): Collection
+    {
+       $compradores= Comprador::factory()->for($this->user)->count(5)->create();
+       
+        return Venta::factory()
+            ->count($this->cantidad_ventas)
+            ->for($this->user)
+            ->for(Ganado::factory()->for($this->user)->hasPeso(1)->hasAttached($this->estado)->create())
+            ->sequence(
+                ['comprador_id'=>$compradores->random()->id],
+                ['comprador_id'=>$compradores->random()->id],
+                ['comprador_id'=>$compradores->random()->id],
+                )
+            ->create();
+    }
+
+
+    /**
+     * A basic feature test example.
+     */
+    public function test_obtener_mejor_comprador(): void
+    {
+        $this->generarVentas();
+
+        $response = $this->actingAs($this->user)->getJson(route('dashboardVentaGanado.mejorComprador'));
+
+        $response->assertStatus(200)->assertJson(['comprador' => true]);
+    }
+    
+    public function test_error_no_haya_compradores_registrados_para_obtener_mejor_comprador(): void
+    {
+
+        $response = $this->actingAs($this->user)->getJson(route('dashboardVentaGanado.mejorComprador'));
+
+        $response->assertStatus(404);
+    }
+
+    public function test_obtener_mejor_venta(): void
+    {
+        $this->generarVentas();
+
+        $response = $this->actingAs($this->user)->getJson(route('dashboardVentaGanado.mejorVenta'));
+
+        $response->assertStatus(200)->assertJson(['venta' => true]);
+    }
+    
+    public function test_error_no_haya_ventas_registrados_para_obtener_mejor_venta(): void
+    {
+     $response = $this->actingAs($this->user)->getJson(route('dashboardVentaGanado.mejorVenta'));
+
+     $response->assertStatus(404);
+    }
+
+    public function test_obtener_peor_venta(): void
+    {
+        $this->generarVentas();
+
+        $response = $this->actingAs($this->user)->getJson(route('dashboardVentaGanado.peorVenta'));
+
+        $response->assertStatus(200)->assertJson(['venta' => true]);
+    }
+
+
+    public function test_ventas_del_mes(): void
+    {
+        Venta::factory()
+            ->count($this->cantidad_ventas)
+            ->for($this->user)
+            ->for(Ganado::factory()->for($this->user)->hasPeso(1)->hasAttached($this->estado)->create())
+            ->for(Comprador::factory()->for($this->user)->create())
+            ->create(['fecha'=>now()->format('Y-m-d')]);
+
+        $this->generarVentas();
+
+        $response = $this->actingAs($this->user)->getJson(route('dashboardVentaGanado.ventasDelMes'));
+
+        $response->assertStatus(200);
+    }
+}
