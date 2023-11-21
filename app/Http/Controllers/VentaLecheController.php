@@ -17,7 +17,7 @@ class VentaLecheController extends Controller
      */
     public function index()
     {
-        return new VentaLecheCollection(VentaLeche::whereBelongsTo(Auth::user())->get());
+        return new VentaLecheCollection(VentaLeche::whereBelongsTo(Auth::user())->latest('fecha')->get());
     }
 
     /**

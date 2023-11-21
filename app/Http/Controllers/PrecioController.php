@@ -17,7 +17,7 @@ class PrecioController extends Controller
      */
     public function index()
     {
-        return new PrecioCollection(Precio::whereBelongsTo(Auth::user())->get());
+        return new PrecioCollection(Precio::whereBelongsTo(Auth::user())->latest('fecha')->get());
     }
 
     /**
