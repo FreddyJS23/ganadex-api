@@ -6,6 +6,7 @@ use App\Http\Controllers\BalanceAnualLeche;
 use App\Http\Controllers\CaparCriaController;
 use App\Http\Controllers\CompradorController;
 use App\Http\Controllers\ConfiguracionController;
+use App\Http\Controllers\DashboardFallecimientosController;
 use App\Http\Controllers\DashboardVentaGanadoController;
 use App\Http\Controllers\DashboardVentaLecheController;
 use App\Http\Controllers\FallecimientoController;
@@ -101,6 +102,9 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::get('/dashboard_venta_ganado/mejor_venta',[DashboardVentaGanadoController::class, 'mejorVenta'])->name('dashboardVentaGanado.mejorVenta');
     Route::get('/dashboard_venta_ganado/peor_venta',[DashboardVentaGanadoController::class, 'peorVenta'])->name('dashboardVentaGanado.peorVenta');
     Route::get('/dashboard_venta_ganado/ventas_mes',[DashboardVentaGanadoController::class, 'ventasDelMes'])->name('dashboardVentaGanado.ventasDelMes');
+
+    //rutas peticiones de datos dashboard venta ganado
+    Route::get('/dashboard_fallecimientos/causas_frecuentes', [DashboardFallecimientosController::class, 'causasMuertesFrecuentes'])->name('dashboardFallecimientos.causasMuertesFrecuentes');
 
 
 
