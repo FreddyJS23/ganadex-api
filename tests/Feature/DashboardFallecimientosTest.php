@@ -64,4 +64,10 @@ class DashboardFallecimientosTest extends TestCase
 
             );
     }
+    public function test_error_caso_que_no_haya_muertes_para_sacar_causas_de_muertes_mas_frecuentes(): void
+    {
+
+        $response = $this->actingAs($this->user)->getJson(route('dashboardFallecimientos.causasMuertesFrecuentes'));
+        $response->assertStatus(200)->dd();
+    }
 }
