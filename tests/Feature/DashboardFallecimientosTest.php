@@ -68,6 +68,6 @@ class DashboardFallecimientosTest extends TestCase
     {
 
         $response = $this->actingAs($this->user)->getJson(route('dashboardFallecimientos.causasMuertesFrecuentes'));
-        $response->assertStatus(200)->dd();
+        $response->assertStatus(200);
     }
 }
