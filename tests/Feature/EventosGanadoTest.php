@@ -2,16 +2,21 @@
 
 namespace Tests\Feature;
 
+use App\Events\FallecimientoGanado;
 use App\Models\Comprador;
 use App\Models\Estado;
 use App\Models\Fallecimiento;
 use App\Models\Ganado;
+use App\Models\Leche;
 use App\Models\Parto;
 use App\Models\Toro;
 use App\Models\User;
+use Illuminate\Auth\Events\Login;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
 use Illuminate\Support\Str;
@@ -51,9 +56,14 @@ class EventosGanadoTest extends TestCase
     private array $venta = [
         'precio' => 350,
     ];
-    
+
     private array $fallecimiento = [
         'causa' => 'enferma',
+    ];
+
+    private array $pesoLeche = [
+        'peso_leche' => '30',
+
     ];
 
     protected function setUp(): void
@@ -125,7 +135,7 @@ class EventosGanadoTest extends TestCase
                     'revision_reciente' => 'array',
                     'total_revisiones' => 'integer',
                 ]
-            )->has('ganado.estados',3)
+            )->has('ganado.estados', 3)
                 ->where(
                     'ganado.estados',
                     fn (Collection $estados) => $estados->contains('estado', 'pendiente_secar')
@@ -199,8 +209,8 @@ class EventosGanadoTest extends TestCase
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) => $json
-                ->has('ganado.estados', 3)    
-            ->where(
+                ->has('ganado.estados', 3)
+                ->where(
                     'ganado.estados',
                     fn (Collection $estados) => $estados->contains('estado', 'pendiente_numeracion')
 
@@ -232,8 +242,8 @@ class EventosGanadoTest extends TestCase
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) => $json
-                ->has('ganado.estados', 2)    
-            ->where(
+                ->has('ganado.estados', 2)
+                ->where(
                     'ganado.estados',
                     fn (Collection $estados) => $estados->contains('estado', 'pendiente_numeracion')
 
@@ -254,33 +264,116 @@ class EventosGanadoTest extends TestCase
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) => $json
-                ->has('ganado.estados', 1)    
-            ->where(
+                ->has('ganado.estados', 1)
+                ->where(
                     'ganado.estados',
                     fn (Collection $estados) => $estados->contains('estado', 'vendido')
 
                 )->etc()
         );
     }
+
     public function test_cuando_se_registra_fallecimiento_de_una_cabeza_ganado(): void
     {
-      
+
         $this->fallecimiento = $this->fallecimiento + ['numero_ganado' => $this->ganado->numero];
 
+       
         //registrar fallecimiento
+    
         $this->actingAs($this->user)->postJson(route('fallecimientos.store'), $this->fallecimiento);
 
+
+        $response = $this->actingAs($this->user)->getJson(sprintf('api/ganado/%s', $this->ganado->id));
+        
+        $response->assertStatus(200)->assertJson(
+            fn (AssertableJson $json) => $json
+            /* ->has('ganado.estados', 1) */
+            ->where(
+                'ganado.estados',
+                fn (Collection $estados) => $estados->contains('estado', 'fallecido')
+
+                )->etc()
+            );
+
+}
+
+    public function test_cuando_se_realiza_pesaje_mensual_de_leche_ya_no_esta_pendiente_de_pesaje_de_leche(): void
+    {
+        //realizar pesaje de leche
+        $this->actingAs($this->user)->postJson(route('pesaje_leche.store', ['ganado' => $this->ganado->id]), $this->pesoLeche);
 
         $response = $this->actingAs($this->user)->getJson(sprintf('api/ganado/%s', $this->ganado->id));
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) => $json
-                ->has('ganado.estados', 1)    
-            ->where(
+                ->has('ganado.estados', 10)
+                ->where(
                     'ganado.estados',
-                    fn (Collection $estados) => $estados->contains('estado','fallecido')
+                    fn (Collection $estados) => $estados->doesntContain('estado', 'pendiente_pesaje_leche')
 
                 )->etc()
+        );
+    }
+
+    public function test_verificacion_vaca_pendiente_pesaje_leche_este_mes(): void
+    {
+        $estado = Estado::firstWhere('estado', 'sano');
+
+        $ganadoPendientePesajeLeche = Ganado::factory()
+            ->hasPeso(1)
+            ->hasEvento(1)
+            ->has(
+                Leche::factory()->for($this->user)->state(
+                    function (array $attributes, Ganado $ganado) {
+                        return ['ganado_id' => $ganado->id, 'fecha' => now()->subMonths(2)->format('Y-m-d')];
+                    }
+                ),
+                'pesajes_leche'
+            )
+            ->hasAttached($estado)
+            ->for($this->user)
+            ->create();
+
+        $ganadoConPesajeLecheHecho = Ganado::factory()
+            ->hasPeso(1)
+            ->hasEvento(1)
+            ->has(
+                Leche::factory()->for($this->user)->state(
+                    function (array $attributes, Ganado $ganado) {
+                        return ['ganado_id' => $ganado->id, 'fecha' => now()->format('Y-m-d')];
+                    }
+                ),
+                'pesajes_leche'
+            )
+            ->hasAttached($estado)
+            ->for($this->user)
+            ->create();
+
+        //evento login
+        Auth::login($this->user);
+         
+        $response = $this->actingAs($this->user)->getJson(route('ganado.index'));
+            
+        $response->assertStatus(200)->assertJson(
+            fn (AssertableJson $json) =>
+            $json->has(
+               //ganado pendiente pesaje mensual
+                'cabezas_ganado.1',
+                fn (AssertableJson $json) => $json->has('estados', 2)
+                    ->where(
+                        'estados',
+                        fn (Collection $estados) => $estados->contains('estado', 'pendiente_pesaje_leche')
+                    )->etc()
+            )->has(
+                //ganado con pesaje mensual de leche realizado
+                'cabezas_ganado.2',
+                fn (AssertableJson $json) => $json->has('estados', 1)
+                    ->where(
+                        'estados',
+                        fn (Collection $estados) => $estados->doesntContain('estado', 'pendiente_pesaje_leche')
+                    )->etc()
+            )
         );
     }
 }
