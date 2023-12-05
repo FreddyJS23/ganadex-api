@@ -8,6 +8,7 @@ use App\Events\RevisionPrenada;
 use App\Events\ServicioHecho;
 use App\Events\VentaGanado;
 use App\Events\FallecimientoGanado;
+use App\Events\PesajeLecheHecho;
 use App\Listeners\CaparBecerro;
 use App\Listeners\EstadoPosVenta;
 use App\Listeners\EstadoGestacion;
@@ -18,6 +19,8 @@ use App\Listeners\EstadoPosParto;
 use App\Listeners\EstadoPosFallecimiento;
 use App\Listeners\CambiaAvaca;
 use App\Listeners\VerificarEdadGanado;
+use App\Listeners\VerificarPesajeMensualLeche;
+use App\Listeners\EstadoPosPesajeMensualLeche;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
@@ -42,7 +45,8 @@ class EventServiceProvider extends ServiceProvider
         RevisionPrenada::class => [EstadoGestacion::class, Secado::class,],
         PartoHecho::class => [RevisionPosParto::class,EstadoPosParto::class,CambiaAVaca::class],
         NaceMacho::class => [CaparBecerro::class,],
-        Login::class=>[VerificarEdadGanado::class],
+        Login::class=>[VerificarEdadGanado::class,VerificarPesajeMensualLeche::class],
+        PesajeLecheHecho::class=>[EstadoPosPesajeMensualLeche::class],
         VentaGanado::class=>[EstadoPosVenta::class],
         FallecimientoGanado::class=>[EstadoPosFallecimiento::class],
     ];

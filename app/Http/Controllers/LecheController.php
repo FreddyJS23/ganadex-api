@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\PesajeLecheHecho;
 use App\Http\Requests\StoreLecheRequest;
 use App\Http\Requests\UpdateLecheRequest;
 use App\Http\Resources\LecheCollection;
@@ -38,6 +39,9 @@ class LecheController extends Controller
         $leche->fecha=$fecha->format('Y-m-d');
         $leche->ganado()->associate($ganado);
         $leche->save();
+        
+        PesajeLecheHecho::dispatch($ganado);
+        
         return response()->json(['pesaje_leche'=> new LecheResource($leche)],201);
     }
 
