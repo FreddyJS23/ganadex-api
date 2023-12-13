@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
 
 class ConfiguracionTest extends TestCase
@@ -40,12 +41,12 @@ class ConfiguracionTest extends TestCase
     public static function ErrorInputProvider(): array
     {
         return [
-           
+
             'caso de insertar datos erróneos' => [
                 [
                     'dark_mode' => 'te',
                     'moneda' => 1,
-                    
+
                 ], ['dark_mode', 'moneda']
             ],
             'caso de no insertar datos requeridos' => [
@@ -65,15 +66,23 @@ class ConfiguracionTest extends TestCase
         $this->generarConfiguracion();
 
         $response = $this->actingAs($this->user)->getJson('api/configuracion');
-        
-        $response->assertStatus(200)->assertJson(['configuracion' => true]);
+
+        $response->assertStatus(200)->assertJson(
+            fn (AssertableJson $json) => $json->whereAllType(
+                [
+                    'configuracion.id' => 'integer',
+                    'configuracion.dark_mode' => 'boolean',
+                    'configuracion.moneda' => 'string'
+                ]
+            )
+        );
     }
-    
+
     public function test_usuario_no_tiene_configuracion(): void
     {
 
         $response = $this->actingAs($this->user)->getJson('api/configuracion');
-        
+
         $response->assertStatus(404)->assertJson(['configuracion' => '']);
     }
 
@@ -94,7 +103,11 @@ class ConfiguracionTest extends TestCase
 
         $response = $this->actingAs($this->user)->putJson(sprintf('api/configuracion/%s', $idConfiguracionEditar), $this->configuracion);
 
-        $response->assertStatus(200)->assertJson(['configuracion' => true]);
+        $response->assertStatus(200)->assertJson(
+            fn (AssertableJson $json) => $json->where('configuracion.dark_mode',$this->configuracion['dark_mode'])
+            ->where('configuracion.moneda', $this->configuracion['moneda'])
+            ->etc()
+        );
     }
 
 
@@ -103,7 +116,7 @@ class ConfiguracionTest extends TestCase
      */
     public function test_error_validacion_registro_configuracion($configuracion, $errores): void
     {
-     
+
         $response = $this->actingAs($this->user)->postJson('api/configuracion', $configuracion);
 
         $response->assertStatus(422)->assertInvalid($errores);

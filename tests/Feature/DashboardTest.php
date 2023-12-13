@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Collection as SupportCollection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
@@ -39,7 +40,7 @@ class DashboardTest extends TestCase
             ->count($this->cantidad_elementos)
             ->hasPeso(1)
             ->hasEvento(1)
-            ->hasAttached($this->estado)            
+            ->hasAttached($this->estado)
             ->has(
                 Leche::factory()->for($this->user)->state(
                     function (array $attributes, Ganado $ganado) {
@@ -112,6 +113,17 @@ class DashboardTest extends TestCase
     {
         $this->generarGanado();
         $response = $this->actingAs($this->user)->getJson(route('dashboardPrincipal.totalGanadoTipo'));
+
+        $response->assertStatus(200)->assertJson(fn (AssertableJson $json) =>
+        $json->whereType('total_tipos_ganado', 'array')
+            ->where('total_tipos_ganado', fn (SupportCollection $tipos) => count($tipos) == 5 ? true : false)
+            ->whereAllType([
+                'total_tipos_ganado.0.becerro' => 'integer',
+                'total_tipos_ganado.1.maute' => 'integer',
+                'total_tipos_ganado.2.novillo' => 'integer',
+                'total_tipos_ganado.3.adulto' => 'integer',
+                'total_tipos_ganado.4.res' => 'integer',
+            ]));
     }
 
     public function test_total_personal(): void
@@ -133,11 +145,35 @@ class DashboardTest extends TestCase
     public function test_ranking_top_3_vacas_mas_productoras(): void
     {
         $this->generarGanado();
+        $response = $this->actingAs($this->user)->getJson(route('dashboardPrincipal.topVacasProductoras'));
+
+        $response->assertStatus(200)->assertJson(
+            fn (AssertableJson $json) =>
+            $json->whereType('top_vacas_productoras', 'array')
+                ->where('top_vacas_productoras', fn (SupportCollection $top) => count($top) == 3 ? true : false)
+                ->has(
+                    'top_vacas_productoras.0',
+                    fn (AssertableJson $json)
+                    => $json->whereAllType(['numero' => 'integer', 'peso_leche' => 'string'])
+                )
+        );
     }
 
     public function test_ranking_top_3_vacas_menos_productoras(): void
     {
         $this->generarGanado();
+        $response = $this->actingAs($this->user)->getJson(route('dashboardPrincipal.topVacasMenosProductoras'));
+
+        $response->assertStatus(200)->assertJson(
+            fn (AssertableJson $json) =>
+            $json->whereType('top_vacas_menos_productoras', 'array')
+                ->where('top_vacas_menos_productoras', fn (SupportCollection $top) => count($top) == 3 ? true : false)
+                ->has(
+                    'top_vacas_menos_productoras.0',
+                    fn (AssertableJson $json)
+                    => $json->whereAllType(['numero' => 'integer', 'peso_leche' => 'string'])
+                )
+        );
     }
 
     public function test_total_vacas_pendientes_de_revision(): void
@@ -159,17 +195,42 @@ class DashboardTest extends TestCase
     public function test_menor_cantidad_insumo(): void
     {
         $this->generarInsumos();
+        $response = $this->actingAs($this->user)->getJson(route('dashboardPrincipal.insumoMenorExistencia'));
+
+        $response->assertStatus(200)->assertJson(fn (AssertableJSon $json) =>
+        $json->whereAllType([
+            'menor_cantidad_insumo.id' => 'integer',
+            'menor_cantidad_insumo.insumo' => 'string',
+            'menor_cantidad_insumo.cantidad' => 'integer',
+        ]));
     }
 
     public function test_mayor_cantidad_insumo(): void
     {
         $this->generarInsumos();
         $response = $this->actingAs($this->user)->getJson(route('dashboardPrincipal.insumoMayorExistencia'));
+
+        $response->assertStatus(200)->assertJson(fn (AssertableJSon $json) =>
+        $json->whereAllType([
+            'mayor_cantidad_insumo.id' => 'integer',
+            'mayor_cantidad_insumo.insumo' => 'string',
+            'mayor_cantidad_insumo.cantidad' => 'integer',
+        ]));
     }
 
     public function test_balance_anual_leche(): void
     {
         $this->generarGanadoPesajeLecheAnual();
         $response = $this->actingAs($this->user)->getJson(route('dashboardPrincipal.balanceAnualProduccionLeche'));
+
+        $response->assertStatus(200)->assertJson(
+            fn (AssertableJson $json) => $json->has('balance_anual', 12)
+                ->whereAllType(
+                    [
+                        'balance_anual.0.mes' => 'string',
+                        'balance_anual.0.promedio_pesaje' => 'integer'
+                    ]
+                )
+        );
     }
 }
