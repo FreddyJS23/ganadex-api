@@ -2,21 +2,19 @@
 
 use App\Http\Controllers\AsignarNumeroCriaController;
 use App\Http\Controllers\AuthLogin;
-use App\Http\Controllers\BalanceAnualLeche;
 use App\Http\Controllers\CaparCriaController;
 use App\Http\Controllers\CompradorController;
 use App\Http\Controllers\ConfiguracionController;
 use App\Http\Controllers\DashboardFallecimientosController;
+use App\Http\Controllers\DashboardPrincipalController;
 use App\Http\Controllers\DashboardVentaGanadoController;
 use App\Http\Controllers\DashboardVentaLecheController;
+use App\Http\Controllers\DatosParaFormulariosController;
 use App\Http\Controllers\FallecimientoController;
 use App\Http\Controllers\GanadoController;
 use App\Http\Controllers\InsumoController;
 use App\Http\Controllers\LecheController;
 use App\Http\Controllers\Logout;
-use App\Http\Controllers\MayorCantidadInsumo;
-use App\Http\Controllers\MenorCantidadInsumo;
-use App\Http\Controllers\NovillaAMontar;
 use App\Http\Controllers\PartoController;
 use App\Http\Controllers\PersonalController;
 use App\Http\Controllers\PrecioController;
@@ -25,14 +23,8 @@ use App\Http\Controllers\ServicioController;
 use App\Http\Controllers\TodosPesajeLeche;
 use App\Http\Controllers\TodosRevisiones;
 use App\Http\Controllers\TodosServicios;
-use App\Http\Controllers\TopVacasMenosProductoras;
-use App\Http\Controllers\TopVacasProductoras;
 use App\Http\Controllers\ToroController;
-use App\Http\Controllers\TotalGanadoPendienteRevision;
-use App\Http\Controllers\TotalGanadoTipo;
-use App\Http\Controllers\TotalPersonal;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\VacasEnGestacion;
 use App\Http\Controllers\VentaController;
 use App\Http\Controllers\VentaLecheController;
 use Illuminate\Support\Facades\Route;
@@ -62,9 +54,6 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::apiResource('/personal',PersonalController::class);
     Route::apiResource('/configuracion',ConfiguracionController::class)->only(['index','store','update']);
     Route::apiResource('/ganado/{ganado}/revision',RevisionController::class);
-    Route::get('/revisiones',TodosRevisiones::class)->name('todasRevisiones');
-    Route::get('/servicios',TodosServicios::class)->name('todasServicios');
-    Route::get('/pesaje_leche',TodosPesajeLeche::class)->name('todosPesajesLeche');
     Route::apiResource('/ganado/{ganado}/servicio',ServicioController::class);
     Route::apiResource('/ganado/{ganado}/parto',PartoController::class);
     Route::apiResource('/ganado/{ganado}/pesaje_leche',LecheController::class);
@@ -78,18 +67,22 @@ Route::middleware('auth:sanctum')->group(function(){
    
     Route::get('/crias_pendiente_numeracion',[AsignarNumeroCriaController::class,'index'])->name('numeracion.index');
     Route::post('/asignar_numero_cria/{ganado}',[AsignarNumeroCriaController::class,'store'])->name('numeracion.store');
-   
+
+    Route::get('/revisiones', TodosRevisiones::class)->name('todasRevisiones');
+    Route::get('/servicios', TodosServicios::class)->name('todasServicios');
+    Route::get('/pesaje_leche', TodosPesajeLeche::class)->name('todosPesajesLeche');
+  
     //rutas peticiones de datos dashboard
-     Route::get('/total_ganado_tipo',TotalGanadoTipo::class);
-     Route::get('/total_personal',TotalPersonal::class);
-     Route::get('/vacas_gestacion',VacasEnGestacion::class);
-     Route::get('/vacas_productoras',TopVacasProductoras::class);
-     Route::get('/vacas_menos_productoras',TopVacasMenosProductoras::class);
-     Route::get('/ganado_pendiente_revision',TotalGanadoPendienteRevision::class);
-     Route::get('/cantidad_novillas_montar',[NovillaAMontar::class,'total']);
-     Route::get('/menor_insumo',MenorCantidadInsumo::class);
-     Route::get('/mayor_insumo',MayorCantidadInsumo::class);
-     Route::get('/balance_anual_leche',BalanceAnualLeche::class);
+     Route::get('dashboard_principal/total_ganado_tipo',[DashboardPrincipalController::class,'totalGanadoTipo'])->name('dashboardPrincipal.totalGanadoTipo');
+     Route::get('dashboard_principal/total_personal',[DashboardPrincipalController::class,'totalPersonal'])->name('dashboardPrincipal.totalPersonal');
+     Route::get('dashboard_principal/vacas_gestacion',[DashboardPrincipalController::class,'VacasEnGestacion'])->name('dashboardPrincipal.vacasEnGestacion');
+     Route::get('dashboard_principal/vacas_productoras',[DashboardPrincipalController::class,'topVacasProductoras'])->name('dashboardPrincipal.topVacasProductoras');
+     Route::get('dashboard_principal/vacas_menos_productoras',[DashboardPrincipalController::class,'topVacasMenosProductoras'])->name('dashboardPrincipal.topVacasMenosProductoras');
+     Route::get('dashboard_principal/ganado_pendiente_revision',[DashboardPrincipalController::class,'totalGanadoPendienteRevision'])->name('dashboardPrincipal.totalGanadoPendienteRevision');
+     Route::get('dashboard_principal/cantidad_novillas_montar',[DashboardPrincipalController::class,'cantidadVacasParaServir'])->name('dashboardPrincipal.cantidadVacasParaServir');
+     Route::get('dashboard_principal/menor_insumo',[DashboardPrincipalController::class,'insumoMenorExistencia'])->name('dashboardPrincipal.insumoMenorExistencia');
+     Route::get('dashboard_principal/mayor_insumo',[DashboardPrincipalController::class,'insumoMayorExistencia'])->name('dashboardPrincipal.insumoMayorExistencia');
+     Route::get('dashboard_principal/balance_anual_leche',[DashboardPrincipalController::class,'balanceAnualProduccionLeche'])->name('dashboardPrincipal.balanceAnualProduccionLeche');
 
     //rutas peticiones de datos dashboard venta leche
     Route::get('/dashboard_venta_leche/precio_actual',[DashboardVentaLecheController::class, 'precioActual'])->name('dashboardVentaLeche.precioActual');
@@ -106,8 +99,6 @@ Route::middleware('auth:sanctum')->group(function(){
     //rutas peticiones de datos dashboard fallecimientos
     Route::get('/dashboard_fallecimientos/causas_frecuentes', [DashboardFallecimientosController::class, 'causasMuertesFrecuentes'])->name('dashboardFallecimientos.causasMuertesFrecuentes');
 
-
-
     //rutas peticiones datos para rellanr formularios
-     Route::get('/novillas_montar',NovillaAMontar::class);
+     Route::get('/novillas_montar',[DatosParaFormulariosController::class,'novillasParaMontar'])->name('datosParaFormularios.novillasParaMontar');
 });

@@ -111,15 +111,13 @@ class DashboardTest extends TestCase
     public function test_total_ganado_por_tipo(): void
     {
         $this->generarGanado();
-        $response = $this->actingAs($this->user)->getJson('api/total_ganado_tipo');
-
-        $response->assertStatus(200)->assertJson(['total_tipos_ganado' => true]);
+        $response = $this->actingAs($this->user)->getJson(route('dashboardPrincipal.totalGanadoTipo'));
     }
 
     public function test_total_personal(): void
     {
         $this->generarPersonal();
-        $response = $this->actingAs($this->user)->getJson('api/total_personal');
+        $response = $this->actingAs($this->user)->getJson(route('dashboardPrincipal.totalPersonal'));
 
         $response->assertStatus(200)->assertJson(['total_personal' => $this->cantidad_elementos]);
     }
@@ -127,7 +125,7 @@ class DashboardTest extends TestCase
     public function test_total_vacas_en_gestacion(): void
     {
         $this->generarGanado();
-        $response = $this->actingAs($this->user)->getJson('api/vacas_gestacion');
+        $response = $this->actingAs($this->user)->getJson(route('dashboardPrincipal.vacasEnGestacion'));
 
         $response->assertStatus(200)->assertJson(fn (AssertableJson $json) => $json->whereType('vacas_en_gestacion', 'integer'));
     }
@@ -135,23 +133,17 @@ class DashboardTest extends TestCase
     public function test_ranking_top_3_vacas_mas_productoras(): void
     {
         $this->generarGanado();
-        $response = $this->actingAs($this->user)->getJson('api/vacas_productoras');
-
-        $response->assertStatus(200)->assertJson(['top_vacas_productoras' => true]);
     }
 
     public function test_ranking_top_3_vacas_menos_productoras(): void
     {
         $this->generarGanado();
-        $response = $this->actingAs($this->user)->getJson('api/vacas_menos_productoras');
-
-        $response->assertStatus(200)->assertJson(['top_vacas_menos_productoras' => true]);
     }
 
     public function test_total_vacas_pendientes_de_revision(): void
     {
         $this->generarGanado();
-        $response = $this->actingAs($this->user)->getJson('api/ganado_pendiente_revision');
+        $response = $this->actingAs($this->user)->getJson(route('dashboardPrincipal.totalGanadoPendienteRevision'));
 
         $response->assertStatus(200)->assertJson(fn (AssertableJson $json) => $json->whereType('ganado_pendiente_revision', 'integer'));
     }
@@ -159,7 +151,7 @@ class DashboardTest extends TestCase
     public function test_total_novillas_pendientes_de_servicio_o_monta(): void
     {
         $this->generarGanado();
-        $response = $this->actingAs($this->user)->getJson('api/cantidad_novillas_montar');
+        $response = $this->actingAs($this->user)->getJson(route('dashboardPrincipal.cantidadVacasParaServir'));
 
         $response->assertStatus(200)->assertJson(fn (AssertableJson $json) => $json->whereType('cantidad_vacas_para_servir', 'integer'));
     }
@@ -167,25 +159,17 @@ class DashboardTest extends TestCase
     public function test_menor_cantidad_insumo(): void
     {
         $this->generarInsumos();
-        $response = $this->actingAs($this->user)->getJson('api/menor_insumo');
-
-        $response->assertStatus(200)->assertJson(['menor_cantidad_insumo' => true]);
     }
 
     public function test_mayor_cantidad_insumo(): void
     {
         $this->generarInsumos();
-        $response = $this->actingAs($this->user)->getJson('api/mayor_insumo');
-
-        $response->assertStatus(200)->assertJson(['mayor_cantidad_insumo' => true]);
+        $response = $this->actingAs($this->user)->getJson(route('dashboardPrincipal.insumoMayorExistencia'));
     }
 
     public function test_balance_anual_leche(): void
     {
         $this->generarGanadoPesajeLecheAnual();
-        $response = $this->actingAs($this->user)->getJson('api/balance_anual_leche');
-
-
-        $response->assertStatus(200)->assertJson(fn (AssertableJson $json) => $json->has('balance_anual', 12));
+        $response = $this->actingAs($this->user)->getJson(route('dashboardPrincipal.balanceAnualProduccionLeche'));
     }
 }

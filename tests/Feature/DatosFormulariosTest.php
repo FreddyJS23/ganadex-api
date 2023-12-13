@@ -43,7 +43,7 @@ class DatosFormulariosTest extends TestCase
      public function test_obtener_novillas_que_se_pueden_servir()
      {
         $this->generarGanado();
-        $response = $this->actingAs($this->user)->getJson('api/novillas_montar');
+        $response = $this->actingAs($this->user)->getJson(route('datosParaFormularios.novillasParaMontar'));
 
         $response->assertStatus(200)->assertJson(['novillas_para_servicio'=>true]);
      }
