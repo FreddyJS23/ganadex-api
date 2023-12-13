@@ -34,7 +34,7 @@ class CompradorController extends Controller
         $comprador->user_id = Auth::id();
         $comprador->save();
 
-        return response()->json(['compraodr' => new CompradorResource($comprador)], 201);
+        return response()->json(['comprador' => new CompradorResource($comprador)], 201);
     }
 
     /**
@@ -42,7 +42,7 @@ class CompradorController extends Controller
      */
     public function show(Comprador $comprador)
     {
-        return response()->json(['compraodr' => new CompradorResource($comprador)], 200);
+        return response()->json(['comprador' => new CompradorResource($comprador)], 200);
     }
 
     /**
@@ -53,7 +53,7 @@ class CompradorController extends Controller
         $comprador->fill($request->all());
         $comprador->save();
 
-        return response()->json(['compraodr' => new CompradorResource($comprador)], 200);
+        return response()->json(['comprador' => new CompradorResource($comprador)], 200);
     }
 
     /**
