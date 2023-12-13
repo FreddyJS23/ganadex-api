@@ -16,7 +16,7 @@ class ConfiguracionResource extends JsonResource
     {
         return [
             'id'=>$this->id,
-            'dark_mode'=>$this->dark_mode,
+            'dark_mode'=>boolval($this->dark_mode),
             'moneda'=>$this->moneda
         ];
     }
