@@ -8,6 +8,8 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Collection as SupportCollection;
+use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
 
 class DatosFormulariosTest extends TestCase
@@ -45,6 +47,19 @@ class DatosFormulariosTest extends TestCase
         $this->generarGanado();
         $response = $this->actingAs($this->user)->getJson(route('datosParaFormularios.novillasParaMontar'));
 
-        $response->assertStatus(200)->assertJson(['novillas_para_servicio'=>true]);
+        $response->assertStatus(200)->assertJson(
+            fn (AssertableJson $json) =>
+            $json->whereType('novillas_para_servicio', 'array')
+                ->where('novillas_para_servicio', fn (SupportCollection $novillasParaServir) => count($novillasParaServir) > 1  ? true : false)
+                ->has(
+                    'novillas_para_servicio.0',
+                    fn (AssertableJson $json)
+                    => $json->whereAllType([
+                        'id' => 'integer',
+                        'numero' => 'integer',
+                        'peso_actual'=>'string'
+                    ])
+                )
+        );
      }
 }

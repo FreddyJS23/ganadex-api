@@ -101,6 +101,15 @@ class DashboardVentaLecheTest extends TestCase
 
         $response = $this->actingAs($this->user)->getJson(route('dashboardVentaLeche.ventasDelMes'));
 
-        $response->assertStatus(200);
+        $response->assertStatus(200)->assertJson(
+            fn (AssertableJSon $json) =>
+            $json->whereAllType([
+                'ventas_de_leche.0.id' => 'integer',
+                'ventas_de_leche.0.fecha' => 'string',
+                'ventas_de_leche.0.cantidad' => 'string',
+                'ventas_de_leche.0.precio' => 'integer|double',
+               
+            ])
+        );
     }
 }

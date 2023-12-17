@@ -11,6 +11,7 @@ use Doctrine\DBAL\Schema\Sequence;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Collection as SupportCollection;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
 
@@ -21,7 +22,7 @@ class DashboardVentaGanadoTest extends TestCase
     private $precios;
     private $estado;
     private int $cantidad_ventas = 10;
-    
+
     private $user;
 
     protected function setUp(): void
@@ -32,23 +33,21 @@ class DashboardVentaGanadoTest extends TestCase
             = User::factory()->create();
 
         $this->estado = Estado::all();
-
-     
     }
 
     private function generarVentas(): Collection
     {
-       $compradores= Comprador::factory()->for($this->user)->count(5)->create();
-       
+        $compradores = Comprador::factory()->for($this->user)->count(5)->create();
+
         return Venta::factory()
             ->count($this->cantidad_ventas)
             ->for($this->user)
             ->for(Ganado::factory()->for($this->user)->hasPeso(1)->hasAttached($this->estado)->create())
             ->sequence(
-                ['comprador_id'=>$compradores->random()->id],
-                ['comprador_id'=>$compradores->random()->id],
-                ['comprador_id'=>$compradores->random()->id],
-                )
+                ['comprador_id' => $compradores->random()->id],
+                ['comprador_id' => $compradores->random()->id],
+                ['comprador_id' => $compradores->random()->id],
+            )
             ->create();
     }
 
@@ -62,9 +61,15 @@ class DashboardVentaGanadoTest extends TestCase
 
         $response = $this->actingAs($this->user)->getJson(route('dashboardVentaGanado.mejorComprador'));
 
-        $response->assertStatus(200)->assertJson(['comprador' => true]);
+        $response->assertStatus(200)->assertJson(
+            fn (AssertableJSon $json) =>
+            $json->whereAllType([
+                'comprador.id' => 'integer',
+                'comprador.nombre' => 'string',
+            ])
+        );
     }
-    
+
     public function test_error_no_haya_compradores_registrados_para_obtener_mejor_comprador(): void
     {
 
@@ -79,14 +84,25 @@ class DashboardVentaGanadoTest extends TestCase
 
         $response = $this->actingAs($this->user)->getJson(route('dashboardVentaGanado.mejorVenta'));
 
-        $response->assertStatus(200)->assertJson(['venta' => true]);
+        $response->assertStatus(200)->assertJson(
+            fn (AssertableJSon $json) =>
+            $json->whereAllType([
+                'venta.id' => 'integer',
+                'venta.fecha' => 'string',
+                'venta.numero_ganado' => 'integer',
+                'venta.peso' => 'string',
+                'venta.precio' => 'integer|double',
+                'venta.precio_kg' => 'integer|double',
+                'venta.comprador' => 'string',
+            ])
+        );
     }
-    
+
     public function test_error_no_haya_ventas_registrados_para_obtener_mejor_venta(): void
     {
-     $response = $this->actingAs($this->user)->getJson(route('dashboardVentaGanado.mejorVenta'));
+        $response = $this->actingAs($this->user)->getJson(route('dashboardVentaGanado.mejorVenta'));
 
-     $response->assertStatus(404);
+        $response->assertStatus(404);
     }
 
     public function test_obtener_peor_venta(): void
@@ -95,7 +111,18 @@ class DashboardVentaGanadoTest extends TestCase
 
         $response = $this->actingAs($this->user)->getJson(route('dashboardVentaGanado.peorVenta'));
 
-        $response->assertStatus(200)->assertJson(['venta' => true]);
+        $response->assertStatus(200)->assertJson(
+            fn (AssertableJSon $json) =>
+            $json->whereAllType([
+                'venta.id' => 'integer',
+                'venta.fecha' => 'string',
+                'venta.numero_ganado' => 'integer',
+                'venta.peso' => 'string',
+                'venta.precio' => 'integer|double',
+                'venta.precio_kg' => 'integer|double',
+                'venta.comprador' => 'string',
+            ])
+        );
     }
 
 
@@ -106,12 +133,29 @@ class DashboardVentaGanadoTest extends TestCase
             ->for($this->user)
             ->for(Ganado::factory()->for($this->user)->hasPeso(1)->hasAttached($this->estado)->create())
             ->for(Comprador::factory()->for($this->user)->create())
-            ->create(['fecha'=>now()->format('Y-m-d')]);
+            ->create(['fecha' => now()->format('Y-m-d')]);
 
         $this->generarVentas();
 
         $response = $this->actingAs($this->user)->getJson(route('dashboardVentaGanado.ventasDelMes'));
 
-        $response->assertStatus(200);
+        $response->assertStatus(200)->assertJson(
+            fn (AssertableJson $json) =>
+            $json->whereType('ventas', 'array')
+                ->where('ventas', fn (SupportCollection $ventas) => count($ventas) == $this->cantidad_ventas ? true : false)
+                ->has(
+                    'ventas.0',
+                    fn (AssertableJson $json)
+                    => $json->whereAllType([
+                        'id' => 'integer',
+                        'fecha' => 'string',
+                        'numero_ganado' => 'integer',
+                        'peso' => 'string',
+                        'precio' => 'integer|double',
+                        'precio_kg' => 'integer|double',
+                        'comprador' => 'string',
+                    ])
+                )
+        );
     }
 }
