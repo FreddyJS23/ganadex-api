@@ -18,7 +18,7 @@ class ServicioFactory extends Factory
     {
         return [
             'observacion'=>fake()->word(),
-            'tipo'=>fake()->randomElement(['inseminacion','monta']),
+            'tipo'=>fake()->randomElement(['Inseminacion','Monta']),
             'fecha'=>fake()->date()
         ];
     }
