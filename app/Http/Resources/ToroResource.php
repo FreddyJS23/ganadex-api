@@ -15,7 +15,7 @@ class ToroResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id_toro'=>$this->id,
+            'id'=>$this->id,
             'nombre'=>$this->ganado->nombre,
             'numero'=>$this->ganado->numero,
             'origen'=>$this->ganado->origen,
