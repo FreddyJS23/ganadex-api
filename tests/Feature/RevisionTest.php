@@ -84,8 +84,21 @@ class RevisionTest extends TestCase
         $this->generarRevision();
 
         $response = $this->actingAs($this->user)->getJson($this->url);
+        
         $response->assertStatus(200)
-            ->assertJson(fn (AssertableJson $json) => $json->has('revisiones', $this->cantidad_revision));
+            ->assertJson(
+                fn (AssertableJson $json) => $json->has(
+                    'revisiones',
+                    $this->cantidad_revision,
+                    fn (AssertableJson $json) =>
+                    $json->whereAllType([
+                        'id' => 'integer',
+                        'fecha' => 'string',
+                        'diagnostico' => 'string',
+                        'tratamiento' => 'string',
+                    ])
+                )
+            );
     }
 
 
@@ -94,7 +107,19 @@ class RevisionTest extends TestCase
 
         $response = $this->actingAs($this->user)->postJson($this->url, $this->revision);
 
-        $response->assertStatus(201)->assertJson(['revision' => true]);
+        $response->assertStatus(201)
+            ->assertJson(
+                fn (AssertableJson $json) => $json->has(
+                    'revision',
+                    fn (AssertableJson $json) =>
+                    $json->whereAllType([
+                        'id' => 'integer',
+                        'fecha' => 'string',
+                        'diagnostico' => 'string',
+                        'tratamiento' => 'string',
+                    ])
+                )
+            );
     }
 
 
@@ -106,7 +131,19 @@ class RevisionTest extends TestCase
         $idRevision = $revisiones[$idRandom]->id;
         $response = $this->actingAs($this->user)->getJson(sprintf($this->url . '/%s', $idRevision));
 
-        $response->assertStatus(200)->assertJson(['revision' => true]);
+        $response->assertStatus(200)
+            ->assertJson(
+                fn (AssertableJson $json) => $json->has(
+                    'revision',
+                    fn (AssertableJson $json) =>
+                    $json->whereAllType([
+                        'id' => 'integer',
+                        'fecha' => 'string',
+                        'diagnostico' => 'string',
+                        'tratamiento' => 'string',
+                    ])
+                )
+            );
     }
     public function test_actualizar_revision(): void
     {
@@ -116,7 +153,16 @@ class RevisionTest extends TestCase
 
         $response = $this->actingAs($this->user)->putJson(sprintf($this->url . '/%s', $idRevisionEditar), $this->revision);
 
-        $response->assertStatus(200)->assertJson(['revision' => true]);
+        $response->assertStatus(200)
+            ->assertJson(
+                fn (AssertableJson $json) => $json->has(
+                    'revision',
+                    fn (AssertableJson $json) =>
+                    $json->where('diagnostico',$this->revision['diagnostico'])
+                    ->where('tratamiento',$this->revision['tratamiento'])
+                    ->etc()
+                )
+            );
     }
 
     public function test_eliminar_revision(): void
@@ -143,15 +189,16 @@ class RevisionTest extends TestCase
 
         $response = $this->actingAs($this->user)->getJson(route('todasRevisiones'));
         $response->assertStatus(200)
-            ->assertJson(fn (AssertableJson $json) => $json->has('todas_revisiones.1',fn (AssertableJson $json)=> $json->whereAllType([
-                'id' => 'integer',
-                'numero' => 'integer',
-                'diagnostico'=>'string',
-                'ultima_revision' => 'string',
-                'proxima_revision' => 'string|null',
-                'total_revisiones' => 'integer'
-            ]))
-        );
+            ->assertJson(
+                fn (AssertableJson $json) => $json->has('todas_revisiones.1', fn (AssertableJson $json) => $json->whereAllType([
+                    'id' => 'integer',
+                    'numero' => 'integer',
+                    'diagnostico' => 'string',
+                    'ultima_revision' => 'string',
+                    'proxima_revision' => 'string|null',
+                    'total_revisiones' => 'integer'
+                ]))
+            );
     }
 
 

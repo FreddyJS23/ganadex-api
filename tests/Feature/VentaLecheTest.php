@@ -75,7 +75,13 @@ class VentaLecheTest extends TestCase
 
         $response = $this->actingAs($this->user)->getJson('api/venta_leche');
         $response->assertStatus(200)
-            ->assertJson(fn (AssertableJson $json) => $json->has('ventas_de_leche', $this->cantidad_ventaLeche));
+            ->assertJson(fn (AssertableJson $json) => $json->has('ventas_de_leche', $this->cantidad_ventaLeche, fn (AssertableJson $json) => $json
+                ->whereAllType([
+                    'id' => 'integer',
+                    'fecha' => 'string',
+                    'cantidad' => 'string',
+                    'precio' => 'integer|double',
+                ])));
     }
 
 
@@ -87,13 +93,15 @@ class VentaLecheTest extends TestCase
         $response->assertStatus(201)
             ->assertJson(
                 fn (AssertableJson $json) =>
-                $json->first(
+                $json->has(
+                    'venta_leche',
                     fn (AssertableJson $json) =>
                     $json->whereAllType([
+                        'id' => 'integer',
                         'fecha' => 'string',
                         'cantidad' => 'string',
                         'precio' => 'integer|double'
-                    ])->etc()
+                    ])
                 )
             );
     }

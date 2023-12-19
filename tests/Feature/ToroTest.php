@@ -45,7 +45,8 @@ class ToroTest extends TestCase
         return Toro::factory()
             ->count(10)
             ->for($this->user)
-            ->for(Ganado::factory()->for($this->user))->create();
+            ->forGanado(['user_id' => $this->user->id, 'sexo' => 'M', 'tipo_id' => 4])
+            ->create();
     }
     public static function ErrorInputProvider(): array
     {
@@ -87,8 +88,25 @@ class ToroTest extends TestCase
         $this->generarToros();
 
         $response = $this->actingAs($this->user)->getJson('api/toro');
+       
         $response->assertStatus(200)
-            ->assertJson(fn (AssertableJson $json) => $json->has('toros', $this->cantidad_toro));
+            ->assertJson(
+                fn (AssertableJson $json) => $json->has(
+                    'toros',
+                    $this->cantidad_toro,
+                    fn (AssertableJson $json) => $json
+                        ->whereAllType([
+                            'id' => 'integer',
+                            'nombre' => 'string',
+                            'numero' => 'integer',
+                            'origen' => 'string',
+                            'fecha_nacimiento' => 'string',
+                            
+                        ])
+                    ->where('sexo','M')
+                    ->where('tipo', 'adulto')
+                )
+            );
     }
 
 
@@ -97,7 +115,22 @@ class ToroTest extends TestCase
 
         $response = $this->actingAs($this->user)->postJson('api/toro', $this->toro);
 
-        $response->assertStatus(201)->assertJson(['toro' => true]);
+        $response->assertStatus(201)
+            ->assertJson(
+                fn (AssertableJson $json) => $json->has(
+                    'toro',
+                    fn (AssertableJson $json) => $json
+                        ->whereAllType([
+                            'id' => 'integer',
+                            'nombre' => 'string',
+                            'numero' => 'integer',
+                            'origen' => 'string',
+                            'fecha_nacimiento' => 'string',
+                        ])
+                        ->where('sexo', 'M')
+                        ->where('tipo', 'adulto')
+                )
+            );
     }
 
 
@@ -110,7 +143,26 @@ class ToroTest extends TestCase
 
         $response = $this->actingAs($this->user)->getJson(sprintf('api/toro/%s', $idToro));
 
-        $response->assertStatus(200)->assertJson(['toro' => true]);
+        $response->assertStatus(200)
+            ->assertJson(
+                fn (AssertableJson $json) => $json->has(
+                    'toro',
+                    fn (AssertableJson $json) => $json
+                        ->whereAllType([
+                            'id' => 'integer',
+                            'nombre' => 'string',
+                            'numero' => 'integer',
+                            'origen' => 'string',
+                            'fecha_nacimiento' => 'string',
+                        ])
+                        ->where('sexo', 'M')
+                        ->where('tipo', 'adulto')
+                )->whereAllType([
+                    'efectividad'=>'double|null',
+                    'padre_en_partos'=>'integer',
+                    'servicios'=>'integer',
+                ])
+            );
     }
    
     public function test_actualizar_toro(): void

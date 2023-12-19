@@ -41,7 +41,7 @@ class PartoTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-       
+
         $this->estado = Estado::all();
 
         $this->user
@@ -119,8 +119,28 @@ class PartoTest extends TestCase
         $this->generarpartos();
 
         $response = $this->actingAs($this->user)->getJson($this->url);
+        
         $response->assertStatus(200)
-            ->assertJson(fn (AssertableJson $json) => $json->has('partos', $this->cantidad_parto));
+            ->assertJson(
+                fn (AssertableJson $json) => $json->has(
+                    'partos',
+                    $this->cantidad_parto,
+                    fn (AssertableJson $json) =>
+                    $json->whereAllType([
+                        'id' => 'integer',
+                        'fecha' => 'string',
+                        'observacion' => 'string',
+                        'cria' => 'array',
+                        'cria.id' => 'integer',
+                        'cria.nombre' => 'string',
+                        'cria.numero' => 'integer',
+                        'cria.sexo' => 'string',
+                        'cria.origen' => 'string',
+                        'cria.fecha_nacimiento' => 'string',
+                        'padre_numero' => 'integer',
+                    ])
+                )
+            );
     }
 
 
@@ -129,7 +149,26 @@ class PartoTest extends TestCase
 
         $response = $this->actingAs($this->user)->postJson($this->url, $this->parto);
 
-        $response->assertStatus(201)->assertJson(['parto' => true]);
+        $response->assertStatus(201)
+            ->assertJson(
+                fn (AssertableJson $json) => $json->has(
+                    'parto',
+                    fn (AssertableJson $json) =>
+                    $json->whereAllType([
+                        'id' => 'integer',
+                        'fecha' => 'string',
+                        'observacion' => 'string',
+                        'cria' => 'array',
+                        'cria.id' => 'integer',
+                        'cria.nombre' => 'string',
+                        'cria.numero' => 'integer',
+                        'cria.sexo' => 'string',
+                        'cria.origen' => 'string',
+                        'cria.fecha_nacimiento' => 'string',
+                        'padre_numero' => 'integer',
+                    ])
+                )
+            );
     }
 
 
@@ -141,7 +180,26 @@ class PartoTest extends TestCase
         $idparto = $partos[$idRandom]->id;
         $response = $this->actingAs($this->user)->getJson(sprintf($this->url . '/%s', $idparto));
 
-        $response->assertStatus(200)->assertJson(['parto' => true]);
+        $response->assertStatus(200)
+            ->assertJson(
+                fn (AssertableJson $json) => $json->has(
+                    'parto',
+                    fn (AssertableJson $json) =>
+                    $json->whereAllType([
+                        'id' => 'integer',
+                        'fecha' => 'string',
+                        'observacion' => 'string',
+                        'cria' => 'array',
+                        'cria.id' => 'integer',
+                        'cria.nombre' => 'string',
+                        'cria.numero' => 'integer',
+                        'cria.sexo' => 'string',
+                        'cria.origen' => 'string',
+                        'cria.fecha_nacimiento' => 'string',
+                        'padre_numero' => 'integer',
+                    ])
+                )
+            );
     }
     public function test_actualizar_parto(): void
     {

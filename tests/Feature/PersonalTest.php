@@ -20,7 +20,7 @@ class PersonalTest extends TestCase
         'apellido' => 'perez',
         'fecha_nacimiento' => '2000-02-12',
         'cargo' => 'obrero',
-       /*  'sueldo' => 60, */
+        /*  'sueldo' => 60, */
     ];
 
     private int $cantidad_personal = 10;
@@ -63,7 +63,7 @@ class PersonalTest extends TestCase
                     'apellido' => 'ez',
                     'fecha_nacimiento' => '20-12-1',
                     'cargo' => 'er',
-                 /*    'sueldo' => 'ik', */
+                    /*    'sueldo' => 'ik', */
                 ], ['ci', 'nombre', 'apellido', 'fecha_nacimiento', 'cargo', /* 'sueldo' */]
             ],
             'caso de no insertar datos requeridos' => [
@@ -85,7 +85,20 @@ class PersonalTest extends TestCase
 
         $response = $this->actingAs($this->user)->getJson('api/personal');
         $response->assertStatus(200)
-            ->assertJson(fn (AssertableJson $json) => $json->has('todo_personal', $this->cantidad_personal));
+            ->assertJson(
+                fn (AssertableJson $json) => $json->has(
+                    'todo_personal',
+                    $this->cantidad_personal,
+                    fn (AssertableJson $json) => $json->whereAllType([
+                        'id' => 'integer',
+                        'ci' => 'integer',
+                        'nombre' => 'string',
+                        'apellido' => 'string',
+                        'fecha_nacimiento' => 'string',
+                        'cargo' => 'string',
+                    ])
+                )
+            );
     }
 
 
@@ -94,7 +107,20 @@ class PersonalTest extends TestCase
 
         $response = $this->actingAs($this->user)->postJson('api/personal', $this->personal);
 
-        $response->assertStatus(201)->assertJson(['personal' => true]);
+        $response->assertStatus(201)
+            ->assertJson(
+                fn (AssertableJson $json) => $json->has(
+                    'personal',
+                    fn (AssertableJson $json) => $json->whereAllType([
+                        'id' => 'integer',
+                        'ci' => 'integer',
+                        'nombre' => 'string',
+                        'apellido' => 'string',
+                        'fecha_nacimiento' => 'string',
+                        'cargo' => 'string',
+                    ])
+                )
+            );
     }
 
 
@@ -106,9 +132,22 @@ class PersonalTest extends TestCase
 
         $response = $this->actingAs($this->user)->getJson(sprintf('api/personal/%s', $idPersonal));
 
-        $response->assertStatus(200)->assertJson(['personal' => true]);
+        $response->assertStatus(200)
+            ->assertJson(
+                fn (AssertableJson $json) => $json->has(
+                    'personal',
+                    fn (AssertableJson $json) => $json->whereAllType([
+                        'id' => 'integer',
+                        'ci' => 'integer',
+                        'nombre' => 'string',
+                        'apellido' => 'string',
+                        'fecha_nacimiento' => 'string',
+                        'cargo' => 'string',
+                    ])
+                )
+            );
     }
-   
+
     public function test_actualizar_personal(): void
     {
         $personals = $this->generarPersonal();
@@ -117,12 +156,24 @@ class PersonalTest extends TestCase
 
         $response = $this->actingAs($this->user)->putJson(sprintf('api/personal/%s', $idPersonalEditar), $this->personal);
 
-        $response->assertStatus(200)->assertJson(['personal' => true]);
+        $response->assertStatus(200)
+            ->assertJson(
+                fn (AssertableJson $json) => $json->has(
+                    'personal',
+                    fn (AssertableJson $json) => $json
+                    ->where('ci',$this->personal['ci'])
+                    ->where('nombre',$this->personal['nombre'])
+                    ->where('apellido',$this->personal['apellido'])
+                    ->where('fecha_nacimiento',$this->personal['fecha_nacimiento'])
+                    ->where('cargo',$this->personal['cargo'])
+                    ->etc()
+                )
+            );
     }
 
     public function test_actualizar_personal_con_otro_existente_repitiendo_campos_unicos(): void
     {
-        $personalExistente = Personal::factory()->for($this->user)->create(['ci' => 28472738 ]);
+        $personalExistente = Personal::factory()->for($this->user)->create(['ci' => 28472738]);
 
         $personal = $this->generarPersonal();
         $idRandom = rand(0, $this->cantidad_personal - 1);
@@ -132,7 +183,7 @@ class PersonalTest extends TestCase
 
         $response->assertStatus(422)->assertJson(fn (AssertableJson $json) =>
         $json->hasAll(['errors.ci'])
-        ->etc());
+            ->etc());
     }
 
     public function test_actualizar_personal_conservando_campos_unicos(): void

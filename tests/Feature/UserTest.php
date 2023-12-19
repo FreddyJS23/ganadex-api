@@ -71,7 +71,17 @@ class UserTest extends TestCase
 
         $response = $this->actingAs($this->user)->getJson(sprintf('api/usuario/%s', $this->user->id));
 
-        $response->assertStatus(200)->assertJson(['user' => true]);
+        $response->assertStatus(200)
+            ->assertJson(
+                fn (AssertableJson $json) => $json->has(
+                    'user',
+                    fn (AssertableJson $json) =>
+                    $json->whereAllType([
+                        'id' => 'integer',
+                        'usuario' => 'string',
+                    ])
+                )
+            );
     }
 
     public function test_actualizar_usuario(): void

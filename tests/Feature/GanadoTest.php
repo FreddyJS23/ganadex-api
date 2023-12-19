@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Testing\Fluent\AssertableJson;
+use Illuminate\Support\Str;
+
 use Tests\TestCase;
 
 class GanadoTest extends TestCase
@@ -82,7 +84,7 @@ class GanadoTest extends TestCase
                     'peso_destete' => '30Kg',
                     'peso_2year' => 'd30KG',
                     'peso_actual' => '.30KG',
-                    'estado_id' => [1,30,2],
+                    'estado_id' => [1, 30, 2],
                 ], [
                     'nombre', 'numero', 'origen', 'sexo', 'tipo_id', 'fecha_nacimiento',
                     'peso_nacimiento', 'peso_destete', 'peso_2year', 'peso_actual', 'estado_id'
@@ -97,7 +99,7 @@ class GanadoTest extends TestCase
                     'peso_destete' => '30KG',
                     'peso_2year' => '30KG',
                     'peso_actual' => '30KG',
-                    'estado_id' => [1,2,3,],
+                    'estado_id' => [1, 2, 3,],
                 ], ['nombre', 'sexo', 'tipo_id']
             ],
         ];
@@ -115,7 +117,34 @@ class GanadoTest extends TestCase
 
         $response = $this->actingAs($this->user)->getJson('api/ganado');
         $response->assertStatus(200)
-            ->assertJson(fn (AssertableJson $json) => $json->has('cabezas_ganado', $this->cantidad_ganado));
+            ->assertJson(
+                fn (AssertableJson $json) =>
+                $json->has('cabezas_ganado', $this->cantidad_ganado)
+                    ->has(
+                        'cabezas_ganado.0',
+                        fn (AssertableJson $json) =>
+                        $json->whereAllType([
+                            'id' => 'integer',
+                            'nombre' => 'string',
+                            'numero' => 'integer',
+                            'origen' => 'string',
+                            'fecha_nacimiento' => 'string',
+                            'peso_nacimiento' => 'string',
+                            'peso_destete' => 'string',
+                            'peso_2year' => 'string',
+                            'peso_actual' => 'string',
+                            'estados' => 'array',
+                            'estados.0.id' => 'integer',
+                            'estados.0.estado' => 'string',
+                            'prox_revision' => 'string|null',
+                            'prox_servicio' => 'string|null',
+                            'prox_parto' => 'string|null',
+                            'prox_secado' => 'string|null',
+                        ])
+                            ->where('sexo', fn (string $sexo) => Str::contains($sexo, ['M', 'H']))
+                            ->where('tipo', fn (string $tipo) => Str::contains($tipo, ['becerro', 'maute', 'novillo', 'adulto', 'res']))
+                    )
+            );
     }
 
 
@@ -124,7 +153,34 @@ class GanadoTest extends TestCase
 
         $response = $this->actingAs($this->user)->postJson('api/ganado', $this->cabeza_ganado);
 
-        $response->assertStatus(201)->assertJson(['ganado' => true]);
+        $response->assertStatus(201)
+            ->assertJson(
+                fn (AssertableJson $json) =>
+                $json->has(
+                        'ganado',
+                        fn (AssertableJson $json) =>
+                        $json->whereAllType([
+                            'id' => 'integer',
+                            'nombre' => 'string',
+                            'numero' => 'integer',
+                            'origen' => 'string',
+                            'fecha_nacimiento' => 'string',
+                            'peso_nacimiento' => 'string',
+                            'peso_destete' => 'string',
+                            'peso_2year' => 'string',
+                            'peso_actual' => 'string',
+                            'estados' => 'array',
+                            'estados.0.id' => 'integer',
+                            'estados.0.estado' => 'string',
+                            'prox_revision' => 'string|null',
+                            'prox_servicio' => 'string|null',
+                            'prox_parto' => 'string|null',
+                            'prox_secado' => 'string|null',
+                        ])
+                            ->where('sexo', fn (string $sexo) => Str::contains($sexo, ['M', 'H']))
+                            ->where('tipo', fn (string $tipo) => Str::contains($tipo, ['becerro', 'maute', 'novillo', 'adulto', 'res']))
+                    )
+            );
     }
 
 

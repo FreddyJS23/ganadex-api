@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Testing\Fluent\AssertableJson;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class ServicioTest extends TestCase
@@ -102,8 +103,21 @@ class ServicioTest extends TestCase
         $this->generarServicio();
 
         $response = $this->actingAs($this->user)->getJson($this->url);
+      
         $response->assertStatus(200)
-            ->assertJson(fn (AssertableJson $json) => $json->has('servicios', $this->cantidad_servicio));
+            ->assertJson(
+                fn (AssertableJson $json) => $json->has(
+                    'servicios',
+                    $this->cantidad_servicio,
+                    fn (AssertableJson $json) => $json
+                        ->whereAllType([
+                            'id' => 'integer',
+                            'observacion' => 'string',
+                            'fecha' => 'string',
+                            'numero_toro' => 'integer',
+                        ])->where('tipo',fn (string $tipoServicio)=> Str::contains($tipoServicio, ['Monta', 'Inseminacion']))
+                )
+            );
     }
 
 
@@ -112,7 +126,19 @@ class ServicioTest extends TestCase
 
         $response = $this->actingAs($this->user)->postJson($this->url, $this->servicio + ['numero_toro' => $this->numero_toro]);
 
-        $response->assertStatus(201)->assertJson(['servicio' => true]);
+        $response->assertStatus(201)
+            ->assertJson(
+                fn (AssertableJson $json) => $json->has(
+                    'servicio',
+                    fn (AssertableJson $json) => $json
+                        ->whereAllType([
+                            'id' => 'integer',
+                            'observacion' => 'string',
+                            'fecha' => 'string',
+                            'numero_toro' => 'integer',
+                        ])->where('tipo', fn (string $tipoServicio) => Str::contains($tipoServicio, ['Monta', 'Inseminacion']))
+                )
+            );
     }
 
 
@@ -124,7 +150,19 @@ class ServicioTest extends TestCase
         $idservicio = $servicios[$idRandom]->id;
         $response = $this->actingAs($this->user)->getJson(sprintf($this->url . '/%s', $idservicio));
 
-        $response->assertStatus(200)->assertJson(['servicio' => true]);
+        $response->assertStatus(200)
+            ->assertJson(
+                fn (AssertableJson $json) => $json->has(
+                    'servicio',
+                    fn (AssertableJson $json) => $json
+                        ->whereAllType([
+                            'id' => 'integer',
+                            'observacion' => 'string',
+                            'fecha' => 'string',
+                            'numero_toro' => 'integer',
+                        ])->where('tipo', fn (string $tipoServicio) => Str::contains($tipoServicio, ['Monta', 'Inseminacion']))
+                )
+            );
     }
     public function test_actualizar_servicio(): void
     {
@@ -134,7 +172,16 @@ class ServicioTest extends TestCase
 
         $response = $this->actingAs($this->user)->putJson(sprintf($this->url . '/%s', $idservicioEditar), $this->servicio + ['numero_toro' => $this->numero_toro]);
 
-        $response->assertStatus(200)->assertJson(['servicio' => true]);
+        $response->assertStatus(200)
+            ->assertJson(
+                fn (AssertableJson $json) => $json->has(
+                    'servicio',
+                    fn (AssertableJson $json) =>
+                    $json->where('observacion', $this->servicio['observacion'])
+                    ->where('tipo', $this->servicio['tipo'])
+                    ->etc()
+                )
+            );
     }
 
     public function test_eliminar_servicio(): void
@@ -155,9 +202,9 @@ class ServicioTest extends TestCase
             ->count(10)
             ->hasPeso(1)
             ->hasServicios(7, ['toro_id' => $this->toro->id])
-            ->hasParto(3, function(array $attributes,Ganado $ganado){
-                $cria=Ganado::factory()->create(['user_id'=>$ganado->user_id]);
-                return ['toro_id'=>$ganado->servicioReciente->toro_id,'ganado_cria_id'=>$cria->id];
+            ->hasParto(3, function (array $attributes, Ganado $ganado) {
+                $cria = Ganado::factory()->create(['user_id' => $ganado->user_id]);
+                return ['toro_id' => $ganado->servicioReciente->toro_id, 'ganado_cria_id' => $cria->id];
             })
             ->hasEvento(1)
             ->hasAttached($this->estado)
@@ -165,7 +212,7 @@ class ServicioTest extends TestCase
             ->create();
 
         $response = $this->actingAs($this->user)->getJson(route('todasServicios'));
-        
+
         $response->assertStatus(200)
             ->assertJson(
                 fn (AssertableJson $json) => $json->has('todos_servicios.1', fn (AssertableJson $json) => $json->whereAllType([

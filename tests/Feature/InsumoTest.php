@@ -74,8 +74,21 @@ class InsumoTest extends TestCase
         $this->generarInsumo();
 
         $response = $this->actingAs($this->user)->getJson('api/insumo');
-        $response->assertStatus(200)
-            ->assertJson(fn (AssertableJson $json) => $json->has('insumos', $this->cantidad_insumo));
+        $response->assertStatus(200)->assertJson(
+            fn (AssertableJson $json) =>
+            $json->whereType('insumos', 'array')
+                ->has('insumos', $this->cantidad_insumo)
+                ->has(
+                    'insumos.0',
+                    fn (AssertableJson $json)
+                    => $json->whereAllType([
+                        'id' => 'integer',
+                        'insumo' => 'string',
+                        'cantidad' => 'integer',
+                        'precio' => 'integer|double'
+                    ])
+                )
+        );
     }
 
 
@@ -84,7 +97,19 @@ class InsumoTest extends TestCase
 
         $response = $this->actingAs($this->user)->postJson('api/insumo', $this->insumo);
 
-        $response->assertStatus(201)->assertJson(['insumo' => true]);
+        $response->assertStatus(201)->assertJson(
+            fn (AssertableJson $json) =>
+            $json->has(
+                'insumo',
+                fn (AssertableJson $json)
+                => $json->whereAllType([
+                    'id' => 'integer',
+                    'insumo' => 'string',
+                    'cantidad' => 'integer',
+                    'precio' => 'integer|double'
+                ])
+            )
+        );
     }
 
 
@@ -96,7 +121,19 @@ class InsumoTest extends TestCase
 
         $response = $this->actingAs($this->user)->getJson(sprintf('api/insumo/%s', $idInsumo));
 
-        $response->assertStatus(200)->assertJson(['insumo' => true]);
+        $response->assertStatus(200)->assertJson(
+            fn (AssertableJson $json) =>
+            $json->has(
+                'insumo',
+                fn (AssertableJson $json)
+                => $json->whereAllType([
+                    'id' => 'integer',
+                    'insumo' => 'string',
+                    'cantidad' => 'integer',
+                    'precio' => 'integer|double'
+                ])
+            )
+        );
     }
     public function test_actualizar_insumo(): void
     {
@@ -106,7 +143,17 @@ class InsumoTest extends TestCase
 
         $response = $this->actingAs($this->user)->putJson(sprintf('api/insumo/%s', $idInsumoEditar), $this->insumo);
 
-        $response->assertStatus(200)->assertJson(['insumo' => true]);
+        $response->assertStatus(200)->assertJson(
+            fn (AssertableJson $json) =>
+            $json->has(
+                'insumo',
+                fn (AssertableJson $json) =>
+                $json->where('insumo', $this->insumo['insumo'])
+                    ->where('cantidad', $this->insumo['cantidad'])
+                    ->where('precio', $this->insumo['precio'])
+                    ->etc()
+            )
+        );
     }
 
     public function test_actualizar_insumo_con_otro_existente_repitiendo_campos_unicos(): void
@@ -121,7 +168,7 @@ class InsumoTest extends TestCase
 
         $response->assertStatus(422)->assertJson(fn (AssertableJson $json) =>
         $json->hasAll(['errors.insumo'])
-        ->etc());
+            ->etc());
     }
 
     public function test_actualizar_insumo_conservando_campos_unicos(): void

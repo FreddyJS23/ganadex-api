@@ -82,8 +82,19 @@ class PesajeLecheTest extends TestCase
         $this->generarPesajesLeche();
 
         $response = $this->actingAs($this->user)->getJson($this->url);
+       
         $response->assertStatus(200)
-            ->assertJson(fn (AssertableJson $json) => $json->has('pesajes_leche', $this->cantidad_pesoLeche));
+            ->assertJson(
+                fn (AssertableJson $json) => $json->has(
+                    'pesajes_leche',
+                    $this->cantidad_pesoLeche,
+                    fn (AssertableJson $json) => $json->whereAllType([
+                        'id' => 'integer',
+                        'pesaje' => 'string',
+                        'fecha' => 'string',
+                    ])
+                )
+            );
     }
 
 
@@ -92,7 +103,17 @@ class PesajeLecheTest extends TestCase
 
         $response = $this->actingAs($this->user)->postJson($this->url, $this->pesoLeche);
 
-        $response->assertStatus(201)->assertJson(['pesaje_leche' => true]);
+        $response->assertStatus(201)
+            ->assertJson(
+                fn (AssertableJson $json) => $json->has(
+                    'pesaje_leche',
+                    fn (AssertableJson $json) => $json->whereAllType([
+                        'id' => 'integer',
+                        'pesaje' => 'string',
+                        'fecha' => 'string',
+                    ])
+                )
+            );
     }
 
 
@@ -104,7 +125,17 @@ class PesajeLecheTest extends TestCase
         $idPesoLeche = $pesajesDeLeche[$idRandom]->id;
         $response = $this->actingAs($this->user)->getJson(sprintf($this->url . '/%s', $idPesoLeche));
 
-        $response->assertStatus(200)->assertJson(['pesaje_leche' => true]);
+        $response->assertStatus(200)
+            ->assertJson(
+                fn (AssertableJson $json) => $json->has(
+                    'pesaje_leche',
+                    fn (AssertableJson $json) => $json->whereAllType([
+                        'id' => 'integer',
+                        'pesaje' => 'string',
+                        'fecha' => 'string',
+                    ])
+                )
+            );
     }
     public function test_actualizar_pesoLeche(): void
     {
@@ -114,7 +145,15 @@ class PesajeLecheTest extends TestCase
 
         $response = $this->actingAs($this->user)->putJson(sprintf($this->url . '/%s', $idPesoLecheEditar), $this->pesoLeche);
 
-        $response->assertStatus(200)->assertJson(['pesaje_leche' => true]);
+        $response->assertStatus(200)
+            ->assertJson(
+                fn (AssertableJson $json) => $json->has(
+                    'pesaje_leche',
+                    fn (AssertableJson $json) => $json
+                        ->where('pesaje', $this->pesoLeche['peso_leche'] . 'KG')
+                        ->etc()
+                )
+            );
     }
 
     public function test_eliminar_pesoLeche(): void
@@ -134,14 +173,14 @@ class PesajeLecheTest extends TestCase
         Ganado::factory()
             ->count(10)
             ->hasPeso(1)
-            ->has(Leche::factory()->for($this->user)->count(3),'pesajes_leche')
+            ->has(Leche::factory()->for($this->user)->count(3), 'pesajes_leche')
             ->hasEvento(1)
             ->hasAttached($this->estado)
             ->for($this->user)
             ->create();
 
         $response = $this->actingAs($this->user)->getJson(route('todosPesajesLeche'));
-        
+
         $response->assertStatus(200)
             ->assertJson(
                 fn (AssertableJson $json) => $json->has('todos_pesaje_leche.1', fn (AssertableJson $json) => $json->whereAllType([

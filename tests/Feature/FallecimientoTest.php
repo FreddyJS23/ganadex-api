@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Collection as SupportCollection;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
 
@@ -18,7 +19,7 @@ class FallecimientoTest extends TestCase
 
     private array $fallecimiento = [
         'causa' => 'enferma',
-        'fecha'=>'2020-10-02',
+        'fecha' => '2020-10-02',
     ];
 
     private int $cantidad_fallecimientos = 10;
@@ -31,8 +32,8 @@ class FallecimientoTest extends TestCase
 
         $this->user
             = User::factory()->create();
-        
-            $this->estado = Estado::all();
+
+        $this->estado = Estado::all();
     }
 
     private function generarFallecimiento(): Collection
@@ -45,22 +46,22 @@ class FallecimientoTest extends TestCase
     public static function ErrorInputProvider(): array
     {
         return [
-            
+
             'caso de insertar datos erróneos' => [
                 [
                     'causa' => 'te',
                     'numero_ganado' => 'hj',
-                 
-                ], ['causa','numero_ganado']
+
+                ], ['causa', 'numero_ganado']
             ],
             'caso de no insertar datos requeridos' => [
-                [ ], ['causa','numero_ganado']
+                [], ['causa', 'numero_ganado']
             ],
             'caso de inserta numero ganado inexistente' => [
                 [
-                    'causa'=>'enferma',
-                    'numero_ganado'=> 0
-                 ], ['numero_ganado']
+                    'causa' => 'enferma',
+                    'numero_ganado' => 0
+                ], ['numero_ganado']
             ],
         ];
     }
@@ -75,22 +76,43 @@ class FallecimientoTest extends TestCase
         $this->generarFallecimiento();
 
         $response = $this->actingAs($this->user)->getJson('api/fallecimientos');
-        $response->assertStatus(200)
-            ->assertJson(fn (AssertableJson $json) => $json->has('fallecidos', $this->cantidad_fallecimientos));
+        
+        $response->assertStatus(200)->assertJson(
+            fn (AssertableJson $json) =>
+            $json->whereType('fallecidos', 'array')
+                ->has('fallecidos',$this->cantidad_fallecimientos)
+                ->has(
+                    'fallecidos.0',
+                    fn (AssertableJson $json)
+                    => $json->whereAllType([
+                        'id' => 'integer',
+                        'fecha' => 'string',
+                        'causa' => 'string',
+                        'numero_ganado' => 'integer'
+                    ])
+                )
+        );
     }
 
 
     public function test_creacion_fallecimiento(): void
     {
-        $ganado=Ganado::factory()
+        $ganado = Ganado::factory()
             ->hasPeso(1)
             ->hasAttached($this->estado)
             ->for($this->user)
             ->create();
 
-        $response = $this->actingAs($this->user)->postJson('api/fallecimientos', $this->fallecimiento + ['numero_ganado'=>$ganado->numero]);
+        $response = $this->actingAs($this->user)->postJson('api/fallecimientos', $this->fallecimiento + ['numero_ganado' => $ganado->numero]);
 
-        $response->assertStatus(201)->assertJson(['fallecimiento' => true]);
+        $response->assertStatus(201)->assertJson(
+            fn (AssertableJson $json) => $json->whereAllType([
+                'fallecimiento.id' => 'integer',
+                'fallecimiento.fecha' => 'string',
+                'fallecimiento.causa' => 'string',
+                'fallecimiento.numero_ganado' => 'integer'
+            ])
+        );
     }
 
 
@@ -102,7 +124,14 @@ class FallecimientoTest extends TestCase
 
         $response = $this->actingAs($this->user)->getJson(sprintf('api/fallecimientos/%s', $idfallecimientos), $this->fallecimiento);
 
-        $response->assertStatus(200)->assertJson(['fallecimiento' => true]);
+        $response->assertStatus(200)->assertJson(
+            fn (AssertableJson $json) => $json->whereAllType([
+                'fallecimiento.id' => 'integer',
+                'fallecimiento.fecha' => 'string',
+                'fallecimiento.causa' => 'string',
+                'fallecimiento.numero_ganado' => 'integer'
+            ])
+        );
     }
 
     public function test_actualizar_fallecimiento(): void
@@ -118,6 +147,12 @@ class FallecimientoTest extends TestCase
             $json
                 ->where('fallecimiento.causa', $this->fallecimiento['causa'])
                 ->where('fallecimiento.fecha', $this->fallecimiento['fecha'])
+                ->whereAllType([
+                    'fallecimiento.id' => 'integer',
+                    'fallecimiento.fecha' => 'string',
+                    'fallecimiento.causa' => 'string',
+                    'fallecimiento.numero_ganado' => 'integer'
+                ])
                 ->etc()
         );
     }
@@ -144,6 +179,4 @@ class FallecimientoTest extends TestCase
 
         $response->assertStatus(422)->assertInvalid($errores);
     }
-
-    
 }

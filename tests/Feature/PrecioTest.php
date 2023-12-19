@@ -60,8 +60,20 @@ class PrecioTest extends TestCase
         $this->generarPrecio();
 
         $response = $this->actingAs($this->user)->getJson('api/precio');
+       
         $response->assertStatus(200)
-            ->assertJson(fn (AssertableJson $json) => $json->has('precios', $this->cantidad_precio));
+            ->assertJson(
+                fn (AssertableJson $json) => $json->has(
+                    'precios',
+                    $this->cantidad_precio,
+                    fn (AssertableJson $json) =>
+                    $json->whereAllType([
+                        'id' => 'integer',
+                        'precio' => 'integer|double',
+                        'fecha' => 'string',
+                    ])
+                )
+            );
     }
 
 
