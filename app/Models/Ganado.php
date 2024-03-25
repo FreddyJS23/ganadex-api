@@ -41,6 +41,16 @@ class Ganado extends Model
     {
         return $this->hasOne(Toro::class);
     }
+   
+    /**
+     * Get the res associated with the Ganado
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function res(): HasOne
+    {
+        return $this->hasOne(Res::class);
+    }
 
     /**
      * Get the peso associated with the Ganado

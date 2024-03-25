@@ -18,6 +18,7 @@ use App\Http\Controllers\Logout;
 use App\Http\Controllers\PartoController;
 use App\Http\Controllers\PersonalController;
 use App\Http\Controllers\PrecioController;
+use App\Http\Controllers\ResController;
 use App\Http\Controllers\RevisionController;
 use App\Http\Controllers\ServicioController;
 use App\Http\Controllers\TodosPesajeLeche;
@@ -50,6 +51,7 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::apiResource('/ventas',VentaController::class);
     Route::apiResource('/toro',ToroController::class);
     Route::apiResource('/ganado',GanadoController::class);
+    Route::apiResource('/res',ResController::class)->parameters(['res'=>'res']);
     Route::apiResource('/insumo',InsumoController::class);
     Route::apiResource('/personal',PersonalController::class);
     Route::apiResource('/configuracion',ConfiguracionController::class)->only(['index','store','update']);
