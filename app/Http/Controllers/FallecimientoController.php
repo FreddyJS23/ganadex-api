@@ -19,7 +19,7 @@ class FallecimientoController extends Controller
      */
     public function index()
     {
-        return new FallecimientoCollection(Fallecimiento::whereRelation('ganado','user_id',Auth::id())->get());
+        return new FallecimientoCollection(Fallecimiento::whereRelation('ganado','user_id',Auth::id())->with('ganado:id,numero')->get());
     }
 
     /**
@@ -36,7 +36,7 @@ class FallecimientoController extends Controller
 
         FallecimientoGanado::dispatch($ganado);
 
-        return response()->json(['fallecimiento' => new FallecimientoResource($fallecimiento)], 201);
+        return response()->json(['fallecimiento' => new FallecimientoResource($fallecimiento->load('ganado:id,numero'))], 201);
 
     }
 
@@ -45,7 +45,7 @@ class FallecimientoController extends Controller
      */
     public function show(Fallecimiento $fallecimiento)
     {
-        return response()->json(['fallecimiento' => new FallecimientoResource($fallecimiento)], 200);
+        return response()->json(['fallecimiento' => new FallecimientoResource($fallecimiento->load('ganado:id,numero'))], 200);
     }
 
     /**
@@ -58,7 +58,7 @@ class FallecimientoController extends Controller
         $fallecimiento->fecha=$request->input('fecha');
         $fallecimiento->save();
 
-        return response()->json(['fallecimiento' => new FallecimientoResource($fallecimiento)], 200);
+        return response()->json(['fallecimiento' => new FallecimientoResource($fallecimiento->load('ganado:id,numero'))], 200);
     }
 
     /**
