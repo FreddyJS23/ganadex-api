@@ -88,8 +88,12 @@ class FallecimientoTest extends TestCase
                         'id' => 'integer',
                         'fecha' => 'string',
                         'causa' => 'string',
-                        'numero_ganado' => 'integer'
                     ])
+                    ->has(
+                    'ganado',
+                    fn (AssertableJson $json)
+                    => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
+                )
                 )
         );
     }
@@ -110,8 +114,11 @@ class FallecimientoTest extends TestCase
                 'fallecimiento.id' => 'integer',
                 'fallecimiento.fecha' => 'string',
                 'fallecimiento.causa' => 'string',
-                'fallecimiento.numero_ganado' => 'integer'
-            ])
+            ])->has(
+                'fallecimiento.ganado',
+                fn (AssertableJson $json)
+                => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
+            )
         );
     }
 
@@ -129,8 +136,11 @@ class FallecimientoTest extends TestCase
                 'fallecimiento.id' => 'integer',
                 'fallecimiento.fecha' => 'string',
                 'fallecimiento.causa' => 'string',
-                'fallecimiento.numero_ganado' => 'integer'
-            ])
+            ])->has(
+                'fallecimiento.ganado',
+                fn (AssertableJson $json)
+                => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
+            )
         );
     }
 
@@ -151,8 +161,11 @@ class FallecimientoTest extends TestCase
                     'fallecimiento.id' => 'integer',
                     'fallecimiento.fecha' => 'string',
                     'fallecimiento.causa' => 'string',
-                    'fallecimiento.numero_ganado' => 'integer'
-                ])
+                ])->has(
+                    'fallecimiento.ganado',
+                    fn (AssertableJson $json)
+                    => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
+                )
                 ->etc()
         );
     }

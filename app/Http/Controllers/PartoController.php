@@ -14,6 +14,7 @@ use App\Models\GanadoTipo;
 use App\Models\Parto;
 use App\Models\Peso;
 use DateTime;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 
 class PartoController extends Controller
@@ -23,7 +24,7 @@ class PartoController extends Controller
      */
     public function index(Ganado $ganado)
     {
-        return new PartoCollection(Parto::whereBelongsTo($ganado)->get());
+        return new PartoCollection(Parto::whereBelongsTo($ganado)->with(['toro'=>function (Builder $query){$query->select('toros.id','numero')->join('ganados','ganado_id','=','ganados.id');}])->get());
     }
 
     /**
@@ -64,7 +65,11 @@ class PartoController extends Controller
         PartoHecho::dispatch($parto);
         NaceMacho::dispatchIf($cria->sexo == "M",$cria);
 
-        return response()->json(['parto'=>new PartoResource($parto)],201);
+      
+
+        return response()->json(['parto'=>new PartoResource($parto->load(['toro' => function (Builder $query) {
+            $query->select('toros.id', 'numero')->join('ganados', 'ganado_id', '=', 'ganados.id');
+        }]))],201);
     }
 
     /**
@@ -72,7 +77,9 @@ class PartoController extends Controller
      */
     public function show(Ganado $ganado, Parto $parto)
     {
-        return response()->json(['parto'=>new PartoResource($parto)]);
+        return response()->json(['parto'=>new PartoResource($parto->load(['toro' => function (Builder $query) {
+            $query->select('toros.id', 'numero')->join('ganados', 'ganado_id', '=', 'ganados.id');
+        }]))]);
     }
 
     /**
@@ -82,7 +89,9 @@ class PartoController extends Controller
     {
         $parto->fill($request->only(['observacion']))->save();
         
-        return response()->json(['parto'=>new PartoResource($parto)],200);
+        return response()->json(['parto'=>new PartoResource($parto->load(['toro' => function (Builder $query) {
+            $query->select('toros.id', 'numero')->join('ganados', 'ganado_id', '=', 'ganados.id');
+        }]))],200);
     }
 
     /**

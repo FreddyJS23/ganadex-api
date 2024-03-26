@@ -114,8 +114,12 @@ class ServicioTest extends TestCase
                             'id' => 'integer',
                             'observacion' => 'string',
                             'fecha' => 'string',
-                            'numero_toro' => 'integer',
                         ])->where('tipo',fn (string $tipoServicio)=> Str::contains($tipoServicio, ['Monta', 'Inseminacion']))
+                    ->has(
+                        'toro',
+                        fn (AssertableJson $json)
+                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
+                    )
                 )
             );
     }
@@ -135,8 +139,12 @@ class ServicioTest extends TestCase
                             'id' => 'integer',
                             'observacion' => 'string',
                             'fecha' => 'string',
-                            'numero_toro' => 'integer',
                         ])->where('tipo', fn (string $tipoServicio) => Str::contains($tipoServicio, ['Monta', 'Inseminacion']))
+                    ->has(
+                        'toro',
+                        fn (AssertableJson $json)
+                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
+                    )
                 )
             );
     }
@@ -159,8 +167,12 @@ class ServicioTest extends TestCase
                             'id' => 'integer',
                             'observacion' => 'string',
                             'fecha' => 'string',
-                            'numero_toro' => 'integer',
                         ])->where('tipo', fn (string $tipoServicio) => Str::contains($tipoServicio, ['Monta', 'Inseminacion']))
+                    ->has(
+                        'toro',
+                        fn (AssertableJson $json)
+                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
+                    )
                 )
             );
     }

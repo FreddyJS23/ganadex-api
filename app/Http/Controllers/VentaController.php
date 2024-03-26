@@ -9,6 +9,7 @@ use App\Http\Resources\VentaCollection;
 use App\Http\Resources\VentaResource;
 use App\Models\Venta;
 use Carbon\Carbon;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 
 class VentaController extends Controller
@@ -23,7 +24,7 @@ class VentaController extends Controller
      */
     public function index()
     {
-        return new VentaCollection(Venta::whereBelongsTo(Auth::user())->get());
+        return new VentaCollection(Venta::whereBelongsTo(Auth::user())->with('ganado:id,numero')->get());
     }
 
     /**
@@ -39,7 +40,7 @@ class VentaController extends Controller
 
         VentaGanado::dispatch($venta);
 
-        return response()->json(['venta' => new VentaResource($venta)], 201);
+        return response()->json(['venta' => new VentaResource($venta->load('ganado:id,numero'))], 201);
     }
 
     /**
@@ -47,7 +48,7 @@ class VentaController extends Controller
      */
     public function show(Venta $venta)
     {
-        return response()->json(['venta' => new VentaResource($venta)], 200);
+        return response()->json(['venta' => new VentaResource($venta->load('ganado:id,numero'))], 200);
     }
 
     /**
@@ -58,7 +59,7 @@ class VentaController extends Controller
         $venta->fill($request->all());
         $venta->save();
 
-        return response()->json(['venta' => new VentaResource($venta)], 200);
+        return response()->json(['venta' => new VentaResource($venta->load('ganado:id,numero'))], 200);
     }
 
     /**

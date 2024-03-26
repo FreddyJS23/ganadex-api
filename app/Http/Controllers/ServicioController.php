@@ -10,6 +10,7 @@ use App\Http\Resources\ServicioResource;
 use App\Models\Ganado;
 use App\Models\Servicio;
 use DateTime;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 
 class ServicioController extends Controller
 {
@@ -23,7 +24,9 @@ class ServicioController extends Controller
      */
     public function index(Ganado $ganado)
     {
-        return new ServicioCollection(Servicio::whereBelongsTo($ganado)->get());
+        return new ServicioCollection(Servicio::whereBelongsTo($ganado)->with(['toro' => function (Builder $query) {
+            $query->select('toros.id', 'numero')->join('ganados', 'ganado_id', '=', 'ganados.id');
+        }])->get());
     }
 
     /**
@@ -41,7 +44,9 @@ class ServicioController extends Controller
 
         ServicioHecho::dispatch($servicio);
     
-        return response()->json(['servicio'=>new ServicioResource($servicio)],201);
+        return response()->json(['servicio'=>new ServicioResource($servicio->load(['toro' => function (Builder $query) {
+            $query->select('toros.id', 'numero')->join('ganados', 'ganado_id', '=', 'ganados.id');
+        }]))],201);
     }
 
     /**
@@ -49,7 +54,9 @@ class ServicioController extends Controller
      */
     public function show(Ganado $ganado, Servicio $servicio)
     {
-        return response()->json(['servicio'=>new ServicioResource($servicio)]);
+        return response()->json(['servicio'=>new ServicioResource($servicio->load(['toro' => function (Builder $query) {
+            $query->select('toros.id', 'numero')->join('ganados', 'ganado_id', '=', 'ganados.id');
+        }]))]);
     }
 
     /**
@@ -61,7 +68,9 @@ class ServicioController extends Controller
         $servicio->fill($request->except(['numero_toro']));
         $servicio->toro()->associate($toro)->save();
 
-        return response()->json(['servicio'=> new ServicioResource($servicio)],200);
+        return response()->json(['servicio'=> new ServicioResource($servicio->load(['toro' => function (Builder $query) {
+            $query->select('toros.id', 'numero')->join('ganados', 'ganado_id', '=', 'ganados.id');
+        }]))],200);
     }
 
     /**

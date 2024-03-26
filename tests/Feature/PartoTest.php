@@ -137,8 +137,11 @@ class PartoTest extends TestCase
                         'cria.sexo' => 'string',
                         'cria.origen' => 'string',
                         'cria.fecha_nacimiento' => 'string',
-                        'padre_numero' => 'integer',
-                    ])
+                    ])->has(
+                    'padre_toro',
+                    fn (AssertableJson $json)
+                    => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
+                )
                 )
             );
     }
@@ -165,8 +168,11 @@ class PartoTest extends TestCase
                         'cria.sexo' => 'string',
                         'cria.origen' => 'string',
                         'cria.fecha_nacimiento' => 'string',
-                        'padre_numero' => 'integer',
-                    ])
+                    ])->has(
+                    'padre_toro',
+                    fn (AssertableJson $json)
+                    => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
+                )
                 )
             );
     }
@@ -196,8 +202,11 @@ class PartoTest extends TestCase
                         'cria.sexo' => 'string',
                         'cria.origen' => 'string',
                         'cria.fecha_nacimiento' => 'string',
-                        'padre_numero' => 'integer',
-                    ])
+                    ])->has(
+                    'padre_toro',
+                    fn (AssertableJson $json)
+                    => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
+                )
                 )
             );
     }

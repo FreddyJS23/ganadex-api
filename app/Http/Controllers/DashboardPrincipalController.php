@@ -47,9 +47,11 @@ class DashboardPrincipalController extends Controller
     {
         $fechaActual = new DateTime();
         $mesActual = $fechaActual->format('m');
-        $topVacasProductoras = Leche::whereHas('ganado', function (Builder $query) {
-            $query->where('user_id', Auth::id());
+        $topVacasProductoras = Leche::withWhereHas('ganado', function ( $query) {
+            $query->where('user_id', Auth::id())->select('id','numero');
         })->orderBy('peso_leche', 'desc')->whereMonth('fecha', $mesActual)->limit(3)->get();
+
+
 
         return new TopVacasProductorasCollection($topVacasProductoras);
     }
@@ -58,8 +60,8 @@ class DashboardPrincipalController extends Controller
     {
         $fechaActual = new DateTime;
         $mesActual = $fechaActual->format('m');
-        $topVacasMenosProductoras = Leche::whereHas('ganado', function (Builder $query) {
-            $query->where('user_id', Auth::id());
+        $topVacasMenosProductoras = Leche::withWhereHas('ganado', function ($query) {
+            $query->where('user_id', Auth::id())->select('id', 'numero');
         })->orderBy('peso_leche', 'asc')->whereMonth('fecha', $mesActual)->limit(3)->get();
 
         return new TopVacasMenosProductorasCollection($topVacasMenosProductoras);
