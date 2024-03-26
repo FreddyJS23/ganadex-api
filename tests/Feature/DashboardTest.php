@@ -154,8 +154,14 @@ class DashboardTest extends TestCase
                 ->has(
                     'top_vacas_productoras.0',
                     fn (AssertableJson $json)
-                    => $json->whereAllType(['numero' => 'integer', 'peso_leche' => 'string'])
+                    => $json->whereAllType(['peso_leche' => 'string'])
+                    ->has(
+                        'ganado',
+                        fn (AssertableJson $json)
+                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
+                    )
                 )
+
         );
     }
 
@@ -171,8 +177,14 @@ class DashboardTest extends TestCase
                 ->has(
                     'top_vacas_menos_productoras.0',
                     fn (AssertableJson $json)
-                    => $json->whereAllType(['numero' => 'integer', 'peso_leche' => 'string'])
+                    => $json->whereAllType(['peso_leche' => 'string'])
+                    ->has(
+                        'ganado',
+                        fn (AssertableJson $json)
+                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
+                    )
                 )
+
         );
     }
 

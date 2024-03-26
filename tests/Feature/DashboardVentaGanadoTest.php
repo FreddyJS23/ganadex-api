@@ -89,12 +89,20 @@ class DashboardVentaGanadoTest extends TestCase
             $json->whereAllType([
                 'venta.id' => 'integer',
                 'venta.fecha' => 'string',
-                'venta.numero_ganado' => 'integer',
                 'venta.peso' => 'string',
                 'venta.precio' => 'integer|double',
                 'venta.precio_kg' => 'integer|double',
                 'venta.comprador' => 'string',
-            ])
+            ])->has(
+                'venta.ganado',
+                fn (AssertableJson $json)
+                => $json->whereAllType([
+                    'id' => 'integer',
+                    'numero' => 'integer',
+                   //ganado esta trayendo la relacion peso, pero no se puede evitar
+                    'peso' => 'array'
+                ])
+            )
         );
     }
 
@@ -116,12 +124,20 @@ class DashboardVentaGanadoTest extends TestCase
             $json->whereAllType([
                 'venta.id' => 'integer',
                 'venta.fecha' => 'string',
-                'venta.numero_ganado' => 'integer',
                 'venta.peso' => 'string',
                 'venta.precio' => 'integer|double',
                 'venta.precio_kg' => 'integer|double',
                 'venta.comprador' => 'string',
-            ])
+            ])->has(
+                'venta.ganado',
+                fn (AssertableJson $json)
+                => $json->whereAllType([
+                    'id' => 'integer',
+                    'numero' => 'integer',
+                    //ganado esta trayendo la relacion peso, pero no se puede evitar
+                    'peso' => 'array'
+                ])
+            )
         );
     }
 
@@ -149,12 +165,20 @@ class DashboardVentaGanadoTest extends TestCase
                     => $json->whereAllType([
                         'id' => 'integer',
                         'fecha' => 'string',
-                        'numero_ganado' => 'integer',
                         'peso' => 'string',
                         'precio' => 'integer|double',
                         'precio_kg' => 'integer|double',
                         'comprador' => 'string',
-                    ])
+                    ]) ->has(
+                        'ganado',
+                        fn (AssertableJson $json)
+                        => $json->whereAllType([
+                            'id' => 'integer',
+                            'numero' => 'integer',
+                            //ganado esta trayendo la relacion peso, pero no se puede evitar
+                            'peso' => 'array'
+                        ])
+                    )
                 )
         );
     }
