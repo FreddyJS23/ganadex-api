@@ -18,7 +18,7 @@ class FallecimientoResource extends JsonResource
             'id'=>$this->id,
             'fecha'=>$this->fecha,
             'causa'=>$this->causa,
-            'numero_ganado'=>$this->ganado->numero,
+            'ganado'=>$this->ganado,
         ];
     }
 }

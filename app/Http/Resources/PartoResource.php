@@ -19,7 +19,7 @@ class PartoResource extends JsonResource
             'fecha'=>$this->fecha,
             'observacion'=>$this->observacion,
             'cria'=>$this->ganado_cria->makeHidden('tipo_id','user_id','created_at','updated_at'),
-            'padre_numero'=>$this->toro->ganado->numero,
+            'padre_toro'=>$this->toro,
         ];
     }
 }

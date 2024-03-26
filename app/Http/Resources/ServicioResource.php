@@ -19,7 +19,7 @@ class ServicioResource extends JsonResource
             'fecha'=>$this->fecha,
             'observacion'=>$this->observacion,
             'tipo'=>$this->tipo,
-            'numero_toro'=>$this->toro->ganado->numero
+            'toro'=>$this->toro
         ];
     }
 }
