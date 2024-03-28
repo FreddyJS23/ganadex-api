@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             EstadoSeeder::class,
            // UserSeeder::class,
             GanadoTipoSeeder::class,
+            CargoSeeder::class,
         ]);
     }
 }

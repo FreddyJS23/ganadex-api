@@ -21,7 +21,8 @@ class PersonalFactory extends Factory
             'nombre' => fake()->firstName(),
             'apellido' => fake()->lastName(),
             'fecha_nacimiento' => fake()->date(),
-            'cargo' => fake()->jobTitle(),
+            'telefono' => fake()->numerify('0275-#######'),
+            'cargo_id'=>fake()->randomElement([1,2])
             /* 'sueldo' => fake()->numberBetween($int=1,$max=100), */
         ];
     }

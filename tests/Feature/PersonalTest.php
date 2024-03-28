@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Cargo;
 use App\Models\Personal;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
@@ -19,7 +20,8 @@ class PersonalTest extends TestCase
         'nombre' => 'juan',
         'apellido' => 'perez',
         'fecha_nacimiento' => '2000-02-12',
-        'cargo' => 'obrero',
+        'telefono' => '0424-1234567',
+        'cargo_id' => 1,
         /*  'sueldo' => 60, */
     ];
 
@@ -51,7 +53,8 @@ class PersonalTest extends TestCase
                     'nombre' => 'juan',
                     'apellido' => 'perez',
                     'fecha_nacimiento' => '2000-02-12',
-                    'cargo' => 'obrero',
+                    'cargo_id' => 'obrero',
+                    'telefono' => '0424-4232123',
                     /* 'sueldo' => 60, */
 
                 ], ['ci']
@@ -62,13 +65,20 @@ class PersonalTest extends TestCase
                     'nombre' => 'an',
                     'apellido' => 'ez',
                     'fecha_nacimiento' => '20-12-1',
-                    'cargo' => 'er',
+                    'cargo_id' => 'jj',
+                    'telefono' => '04241234567',
                     /*    'sueldo' => 'ik', */
-                ], ['ci', 'nombre', 'apellido', 'fecha_nacimiento', 'cargo', /* 'sueldo' */]
+                ], ['ci', 'nombre', 'apellido', 'fecha_nacimiento', 'cargo_id','telefono', /* 'sueldo' */]
             ],
             'caso de no insertar datos requeridos' => [
                 [],
-                ['ci', 'nombre', 'apellido', 'fecha_nacimiento', 'cargo',/*  'sueldo' */]
+                ['ci', 'nombre', 'apellido', 'fecha_nacimiento', 'cargo_id','telefono',/*  'sueldo' */]
+            ],
+            'caso de insertar un cargo inexistente' => [
+                [
+                    'cargo_id'=>999
+                ],
+                ['cargo_id']
             ],
         ];
     }
@@ -95,6 +105,7 @@ class PersonalTest extends TestCase
                         'nombre' => 'string',
                         'apellido' => 'string',
                         'fecha_nacimiento' => 'string',
+                        'telefono' => 'string',
                         'cargo' => 'string',
                     ])
                 )
@@ -117,6 +128,7 @@ class PersonalTest extends TestCase
                         'nombre' => 'string',
                         'apellido' => 'string',
                         'fecha_nacimiento' => 'string',
+                        'telefono' => 'string',
                         'cargo' => 'string',
                     ])
                 )
@@ -142,6 +154,7 @@ class PersonalTest extends TestCase
                         'nombre' => 'string',
                         'apellido' => 'string',
                         'fecha_nacimiento' => 'string',
+                        'telefono' => 'string',
                         'cargo' => 'string',
                     ])
                 )
@@ -165,7 +178,8 @@ class PersonalTest extends TestCase
                     ->where('nombre',$this->personal['nombre'])
                     ->where('apellido',$this->personal['apellido'])
                     ->where('fecha_nacimiento',$this->personal['fecha_nacimiento'])
-                    ->where('cargo',$this->personal['cargo'])
+                    ->where('telefono',$this->personal['telefono'])
+                    ->where('cargo',Cargo::find($this->personal['cargo_id'])->cargo)
                     ->etc()
                 )
             );
