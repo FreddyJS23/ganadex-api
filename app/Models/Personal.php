@@ -28,4 +28,14 @@ class Personal extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    /**
+     * Get the cargo that owns the Personal
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function cargo(): BelongsTo
+    {
+        return $this->belongsTo(Cargo::class);
+    }
 }
