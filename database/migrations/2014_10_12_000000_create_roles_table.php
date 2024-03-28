@@ -16,11 +16,6 @@ return new class extends Migration
             $table->string('rol');
             $table->timestamps();
         });
-
-        Schema::table('users', function (Blueprint $table) {
-            $table->foreignId('role_id')->constrained();
-        });
-        
     }
 
     /**
@@ -28,10 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropForeign(['role_id']);
-        });
-        
         Schema::dropIfExists('roles');
     }
 };
