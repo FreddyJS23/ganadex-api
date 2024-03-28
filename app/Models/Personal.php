@@ -15,7 +15,8 @@ class Personal extends Model
         'nombre',
         'apellido',
         'fecha_nacimiento',
-        'cargo',
+        'telefono',
+        'cargo_id'
         /* 'sueldo', */
     ];
 
