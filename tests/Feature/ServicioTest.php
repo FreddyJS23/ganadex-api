@@ -245,8 +245,9 @@ class ServicioTest extends TestCase
             ->hasPeso(1)
             ->hasServicios(7, ['toro_id' => $this->toro->id,'personal_id'=>$this->veterinario->id])
             ->hasParto(3, function (array $attributes, Ganado $ganado) {
+                $veterinario= Personal::factory()->create(['user_id'=>$ganado->user_id,'cargo_id' => 2]);
                 $cria = Ganado::factory()->create(['user_id' => $ganado->user_id]);
-                return ['toro_id' => $ganado->servicioReciente->toro_id, 'ganado_cria_id' => $cria->id];
+                return ['toro_id' => $ganado->servicioReciente->toro_id, 'ganado_cria_id' => $cria->id, 'personal_id' => $veterinario->id];
             })
             ->hasEvento(1)
             ->hasAttached($this->estado)
