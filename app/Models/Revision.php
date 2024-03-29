@@ -25,4 +25,14 @@ class Revision extends Model
     {
         return $this->belongsTo(Ganado::class);
     }
+
+    /**
+     * Get the veterinario that owns the Revision
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function veterinario(): BelongsTo
+    {
+        return $this->belongsTo(Personal::class,'personal_id');
+    }
 }

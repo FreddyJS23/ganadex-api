@@ -34,4 +34,14 @@ class Servicio extends Model
     {
         return $this->belongsTo(Toro::class);
     }
+
+    /**
+     * Get the veterinario that owns the Servicio
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function veterinario(): BelongsTo
+    {
+        return $this->belongsTo(Personal::class, 'personal_id');
+    }
 }

@@ -45,4 +45,14 @@ class Parto extends Model
     {
         return $this->belongsTo(Ganado::class, 'ganado_cria_id');
     }
+
+    /**
+     * Get the veterinario that owns the Parto
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function veterinario(): BelongsTo
+    {
+        return $this->belongsTo(Personal::class, 'personal_id');
+    }
 }
