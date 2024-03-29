@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\ComprobarVeterianario;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreRevisionRequest extends FormRequest
 {
@@ -23,7 +25,8 @@ class StoreRevisionRequest extends FormRequest
     {
         return [
             'diagnostico'=>'required|min:3,|max:255',
-            'tratamiento'=>'required|min:3,|max:255'
+            'tratamiento'=>'required|min:3,|max:255',
+            'personal_id'=>['required',new ComprobarVeterianario]
         ];
     }
 }

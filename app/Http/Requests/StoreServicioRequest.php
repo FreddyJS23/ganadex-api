@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\ComprobarVeterianario;
 use App\Rules\VerificarGeneroToro;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -28,7 +29,8 @@ class StoreServicioRequest extends FormRequest
             'numero_toro' => ['required', Rule::exists('ganados','numero')->where(function ($query) {
                 return $query->where('sexo', 'M');
             })],
-            'tipo' => 'required|in:Monta,Inseminacion'
+            'tipo' => 'required|in:Monta,Inseminacion',
+            'personal_id' => ['required', new ComprobarVeterianario]
         ];
     }
 }
