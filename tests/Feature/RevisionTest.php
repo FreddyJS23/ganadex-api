@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Estado;
 use App\Models\Ganado;
+use App\Models\Personal;
 use App\Models\Revision;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
@@ -19,8 +20,6 @@ class RevisionTest extends TestCase
     private array $revision = [
         'diagnostico' => 'revisar',
         'tratamiento' => 'medicina',
-
-
     ];
 
     private int $cantidad_revision = 10;
@@ -28,6 +27,7 @@ class RevisionTest extends TestCase
     private $user;
     private $ganado;
     private $estado;
+    private $veterinario;
     private $url;
 
     protected function setUp(): void
@@ -39,7 +39,12 @@ class RevisionTest extends TestCase
         $this->user
             = User::factory()->create();
 
-        $this->ganado
+        $this->veterinario
+        = Personal::factory()
+            ->for($this->user)
+            ->create(['cargo_id'=>2]);
+
+            $this->ganado
             = Ganado::factory()
             ->hasPeso(1)
             ->hasEvento(1)
@@ -55,7 +60,7 @@ class RevisionTest extends TestCase
         return Revision::factory()
             ->count($this->cantidad_revision)
             ->for($this->ganado)
-            ->create();
+            ->create(['personal_id'=>$this->veterinario]);
     }
     public static function ErrorInputProvider(): array
     {
@@ -65,10 +70,16 @@ class RevisionTest extends TestCase
                 [
                     'diagnostico' => 'te',
                     'tratamiento' => 'hj',
-                ], ['diagnostico', 'tratamiento']
+                    'personal_id'=> 'd'
+                ], ['diagnostico', 'tratamiento','personal_id']
             ],
             'caso de no insertar datos requeridos' => [
-                [], ['diagnostico', 'tratamiento']
+                [], ['diagnostico', 'tratamiento','personal_id']
+            ],
+            'caso de insertar un personal que no sea veterinario' => [
+                [
+                    'personal_id' => 2
+                ], ['personal_id']
             ],
         ];
     }
@@ -96,7 +107,12 @@ class RevisionTest extends TestCase
                         'fecha' => 'string',
                         'diagnostico' => 'string',
                         'tratamiento' => 'string',
-                    ])
+                    ])->has(
+                        'veterinario',
+                        fn(AssertableJson $json)
+                        =>$json->whereAllType([
+                            'id'=>'integer',
+                            'nombre'=>'string']))
                 )
             );
     }
@@ -105,7 +121,7 @@ class RevisionTest extends TestCase
     public function test_creacion_revision(): void
     {
 
-        $response = $this->actingAs($this->user)->postJson($this->url, $this->revision);
+        $response = $this->actingAs($this->user)->postJson($this->url, $this->revision + ['personal_id'=>$this->veterinario->id]);
 
         $response->assertStatus(201)
             ->assertJson(
@@ -117,7 +133,14 @@ class RevisionTest extends TestCase
                         'fecha' => 'string',
                         'diagnostico' => 'string',
                         'tratamiento' => 'string',
+                    ])->has(
+                    'veterinario',
+                    fn (AssertableJson $json)
+                    => $json->whereAllType([
+                        'id' => 'integer',
+                        'nombre' => 'string'
                     ])
+                )
                 )
             );
     }
@@ -141,7 +164,14 @@ class RevisionTest extends TestCase
                         'fecha' => 'string',
                         'diagnostico' => 'string',
                         'tratamiento' => 'string',
+                    ])->has(
+                    'veterinario',
+                    fn (AssertableJson $json)
+                    => $json->whereAllType([
+                        'id' => 'integer',
+                        'nombre' => 'string'
                     ])
+                )
                 )
             );
     }
@@ -160,6 +190,14 @@ class RevisionTest extends TestCase
                     fn (AssertableJson $json) =>
                     $json->where('diagnostico',$this->revision['diagnostico'])
                     ->where('tratamiento',$this->revision['tratamiento'])
+                ->has(
+                    'veterinario',
+                    fn (AssertableJson $json)
+                    => $json->whereAllType([
+                        'id' => 'integer',
+                        'nombre' => 'string'
+                    ])
+                )
                     ->etc()
                 )
             );
@@ -181,7 +219,7 @@ class RevisionTest extends TestCase
         Ganado::factory()
             ->count(10)
             ->hasPeso(1)
-            ->hasRevision(5)
+            ->hasRevision(5,['personal_id'=>$this->veterinario->id])
             ->hasEvento(1)
             ->hasAttached($this->estado)
             ->for($this->user)
@@ -207,6 +245,18 @@ class RevisionTest extends TestCase
      */
     public function test_error_validacion_registro_revision($revision, $errores): void
     {
+        //crear personal no veterinario
+            Personal::factory()
+            ->for($this->user)
+            ->create([
+                'id'=>2,
+                'ci' => 28472738,
+                'nombre' => 'juan',
+                'apellido' => 'perez',
+                'fecha_nacimiento' => '2000-02-12',
+                'telefono' => '0424-1234567',
+                'cargo_id' => 1,
+            ]);;
 
         $response = $this->actingAs($this->user)->postJson($this->url, $revision);
 

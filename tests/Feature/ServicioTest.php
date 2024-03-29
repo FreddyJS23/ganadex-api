@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Estado;
 use App\Models\Ganado;
+use App\Models\Personal;
 use App\Models\Servicio;
 use App\Models\Toro;
 use App\Models\User;
@@ -29,6 +30,7 @@ class ServicioTest extends TestCase
 
     private $user;
     private $ganado;
+    private $veterinario;
     private $estado;
     private $toro;
     private $numero_toro;
@@ -42,6 +44,11 @@ class ServicioTest extends TestCase
             = User::factory()->create();
 
         $this->estado = Estado::all();
+
+        $this->veterinario
+        = Personal::factory()
+            ->for($this->user)
+            ->create(['cargo_id' => 2]);
 
         $this->ganado
             = Ganado::factory()
@@ -66,7 +73,7 @@ class ServicioTest extends TestCase
             ->count($this->cantidad_servicio)
             ->for($this->ganado)
             ->for($this->toro)
-            ->create();
+            ->create(['personal_id' => $this->veterinario]);
     }
     public static function ErrorInputProvider(): array
     {
@@ -89,6 +96,11 @@ class ServicioTest extends TestCase
             'caso de no insertar datos requeridos' => [
                 [], ['observacion', 'numero_toro', 'tipo']
             ],
+            'caso de insertar un personal que no sea veterinario' => [
+                [
+                    'personal_id' => 2
+                ], ['personal_id']
+            ],
         ];
     }
 
@@ -104,7 +116,7 @@ class ServicioTest extends TestCase
 
         $response = $this->actingAs($this->user)->getJson($this->url);
       
-        $response->assertStatus(200)
+        $response->assertStatus(200)    
             ->assertJson(
                 fn (AssertableJson $json) => $json->has(
                     'servicios',
@@ -120,6 +132,11 @@ class ServicioTest extends TestCase
                         fn (AssertableJson $json)
                         => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
                     )
+                    ->has(
+                        'veterinario',
+                        fn (AssertableJson $json)
+                        => $json->whereAllType(['id' => 'integer', 'nombre' => 'string'])
+                    )
                 )
             );
     }
@@ -128,7 +145,7 @@ class ServicioTest extends TestCase
     public function test_creacion_servicio(): void
     {
 
-        $response = $this->actingAs($this->user)->postJson($this->url, $this->servicio + ['numero_toro' => $this->numero_toro]);
+        $response = $this->actingAs($this->user)->postJson($this->url, $this->servicio + ['numero_toro' => $this->numero_toro,'personal_id'=>$this->veterinario->id]);
 
         $response->assertStatus(201)
             ->assertJson(
@@ -144,6 +161,10 @@ class ServicioTest extends TestCase
                         'toro',
                         fn (AssertableJson $json)
                         => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
+                    )->has(
+                        'veterinario',
+                        fn (AssertableJson $json)
+                        => $json->whereAllType(['id' => 'integer', 'nombre' => 'string'])
                     )
                 )
             );
@@ -172,6 +193,10 @@ class ServicioTest extends TestCase
                         'toro',
                         fn (AssertableJson $json)
                         => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
+                    )->has(
+                        'veterinario',
+                        fn (AssertableJson $json)
+                        => $json->whereAllType(['id' => 'integer', 'nombre' => 'string'])
                     )
                 )
             );
@@ -191,6 +216,11 @@ class ServicioTest extends TestCase
                     fn (AssertableJson $json) =>
                     $json->where('observacion', $this->servicio['observacion'])
                     ->where('tipo', $this->servicio['tipo'])
+                    ->has(
+                        'veterinario',
+                        fn (AssertableJson $json)
+                        => $json->whereAllType(['id' => 'integer', 'nombre' => 'string'])
+                    )
                     ->etc()
                 )
             );
@@ -213,7 +243,7 @@ class ServicioTest extends TestCase
         Ganado::factory()
             ->count(10)
             ->hasPeso(1)
-            ->hasServicios(7, ['toro_id' => $this->toro->id])
+            ->hasServicios(7, ['toro_id' => $this->toro->id,'personal_id'=>$this->veterinario->id])
             ->hasParto(3, function (array $attributes, Ganado $ganado) {
                 $cria = Ganado::factory()->create(['user_id' => $ganado->user_id]);
                 return ['toro_id' => $ganado->servicioReciente->toro_id, 'ganado_cria_id' => $cria->id];
@@ -243,6 +273,19 @@ class ServicioTest extends TestCase
      */
     public function test_error_validacion_registro_servicio($servicio, $errores): void
     {
+
+        //crear personal no veterinario
+        Personal::factory()
+            ->for($this->user)
+            ->create([
+                'id' => 2,
+                'ci' => 28472738,
+                'nombre' => 'juan',
+                'apellido' => 'perez',
+                'fecha_nacimiento' => '2000-02-12',
+                'telefono' => '0424-1234567',
+                'cargo_id' => 1,
+            ]);;
 
         $response = $this->actingAs($this->user)->postJson($this->url, $servicio);
 
