@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Estado;
 use App\Models\Ganado;
 use App\Models\Parto;
+use App\Models\Personal;
 use App\Models\Servicio;
 use App\Models\Toro;
 use App\Models\User;
@@ -34,6 +35,7 @@ class PartoTest extends TestCase
     private $ganado;
     private $toro;
     private $servicio;
+    private $veterinario;
     private $estado;
     private $numero_toro;
     private $url;
@@ -59,11 +61,15 @@ class PartoTest extends TestCase
             ->for($this->user)
             ->for(Ganado::factory()->for($this->user)->create(['sexo' => 'M']))->create();
 
+        $this->veterinario
+        = Personal::factory()
+        ->for($this->user)
+        ->create(['cargo_id' => 2]);
 
         $this->servicio = Servicio::factory()
             ->for($this->ganado)
             ->for($this->toro)
-            ->create();
+            ->create(['personal_id' => $this->veterinario]);
 
 
         $this->url = sprintf('api/ganado/%s/parto', $this->ganado->id);
@@ -76,7 +82,7 @@ class PartoTest extends TestCase
             ->for($this->ganado)
             ->for(Ganado::factory()->for($this->user)->hasAttached($this->estado), 'ganado_cria')
             ->for($this->toro)
-            ->create();
+            ->create(['personal_id' => $this->veterinario]);
     }
     public static function ErrorInputProvider(): array
     {
@@ -103,6 +109,11 @@ class PartoTest extends TestCase
                     'tipo_id' => '4',
                     'peso_nacimiento' => '30KG',
                 ], ['nombre', 'numero']
+            ],
+            'caso de insertar un personal que no sea veterinario' => [
+                [
+                    'personal_id' => 2
+                ], ['personal_id']
             ],
         ];
     }
@@ -141,6 +152,10 @@ class PartoTest extends TestCase
                     'padre_toro',
                     fn (AssertableJson $json)
                     => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
+                )->has(
+                    'veterinario',
+                    fn (AssertableJson $json)
+                    => $json->whereAllType(['id' => 'integer', 'nombre' => 'string'])
                 )
                 )
             );
@@ -150,7 +165,7 @@ class PartoTest extends TestCase
     public function test_creacion_parto(): void
     {
 
-        $response = $this->actingAs($this->user)->postJson($this->url, $this->parto);
+        $response = $this->actingAs($this->user)->postJson($this->url, $this->parto + ['personal_id'=>$this->veterinario->id]);
 
         $response->assertStatus(201)
             ->assertJson(
@@ -172,6 +187,10 @@ class PartoTest extends TestCase
                     'padre_toro',
                     fn (AssertableJson $json)
                     => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
+                )->has(
+                    'veterinario',
+                    fn (AssertableJson $json)
+                    => $json->whereAllType(['id' => 'integer', 'nombre' => 'string'])
                 )
                 )
             );
@@ -206,6 +225,10 @@ class PartoTest extends TestCase
                     'padre_toro',
                     fn (AssertableJson $json)
                     => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
+                )->has(
+                    'veterinario',
+                    fn (AssertableJson $json)
+                    => $json->whereAllType(['id' => 'integer', 'nombre' => 'string'])
                 )
                 )
             );
@@ -222,6 +245,11 @@ class PartoTest extends TestCase
             fn (AssertableJson $json) =>
             $json
                 ->where('parto.observacion', $this->parto['observacion'])
+            ->has(
+                'parto.veterinario',
+                fn (AssertableJson $json)
+                => $json->whereAllType(['id' => 'integer', 'nombre' => 'string'])
+            )
                 ->etc()
         );
     }
@@ -243,6 +271,19 @@ class PartoTest extends TestCase
      */
     public function test_error_validacion_registro_parto($parto, $errores): void
     {
+        //crear personal no veterinario
+        Personal::factory()
+            ->for($this->user)
+            ->create([
+                'id' => 2,
+                'ci' => 28472738,
+                'nombre' => 'juan',
+                'apellido' => 'perez',
+                'fecha_nacimiento' => '2000-02-12',
+                'telefono' => '0424-1234567',
+                'cargo_id' => 1,
+            ]);;
+       
         Ganado::factory()
             ->hasPeso(1)
             ->hasEvento(1)

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('diagnostico');
             $table->string('tratamiento');
             $table->foreignId('ganado_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('personal_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }

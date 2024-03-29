@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\ComprobarVeterianario;
 use App\Rules\VerificarGeneroToro;
 use App\Rules\VerificarGeneroVaca;
 use Illuminate\Foundation\Http\FormRequest;
@@ -29,6 +30,7 @@ class StorePartoRequest extends FormRequest
             'numero'=>'numeric|between:1,32767|unique:ganados,numero|nullable',
             'sexo'=>'required|in:H,M',
             'peso_nacimiento'=>'required|max:10|regex:/^\d+(\.\d+)?KG$/',
+            'personal_id' => ['required', new ComprobarVeterianario]
             
         ];
     }

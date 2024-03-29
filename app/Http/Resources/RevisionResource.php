@@ -19,6 +19,7 @@ class RevisionResource extends JsonResource
             'fecha'=>$this->fecha,
             'diagnostico'=>$this->diagnostico,
             'tratamiento'=>$this->tratamiento,
+            'veterinario'=>$this->veterinario,
         ];
     }
 }

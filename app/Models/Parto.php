@@ -12,7 +12,8 @@ class Parto extends Model
 
     protected $fillable = [
         'fecha',
-        'observacion'
+        'observacion',
+        'personal_id'
     ];
 
     /**
@@ -43,5 +44,15 @@ class Parto extends Model
     public function ganado_cria(): BelongsTo
     {
         return $this->belongsTo(Ganado::class, 'ganado_cria_id');
+    }
+
+    /**
+     * Get the veterinario that owns the Parto
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function veterinario(): BelongsTo
+    {
+        return $this->belongsTo(Personal::class, 'personal_id');
     }
 }

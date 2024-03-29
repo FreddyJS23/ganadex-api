@@ -12,7 +12,8 @@ class Servicio extends Model
 
     protected $fillable=[
         'observacion',
-        'tipo'
+        'tipo',
+        'personal_id',
     ];
     /**
      * Get the ganado that owns the Servicio
@@ -32,5 +33,15 @@ class Servicio extends Model
     public function toro(): BelongsTo
     {
         return $this->belongsTo(Toro::class);
+    }
+
+    /**
+     * Get the veterinario that owns the Servicio
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function veterinario(): BelongsTo
+    {
+        return $this->belongsTo(Personal::class, 'personal_id');
     }
 }

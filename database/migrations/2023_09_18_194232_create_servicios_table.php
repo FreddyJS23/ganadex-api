@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('tipo');
             $table->foreignId('toro_id')->constrained();
             $table->foreignId('ganado_id')->constrained();
+            $table->foreignId('personal_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }

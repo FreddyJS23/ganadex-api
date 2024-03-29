@@ -24,7 +24,8 @@ class PartoController extends Controller
      */
     public function index(Ganado $ganado)
     {
-        return new PartoCollection(Parto::whereBelongsTo($ganado)->with(['toro'=>function (Builder $query){$query->select('toros.id','numero')->join('ganados','ganado_id','=','ganados.id');}])->get());
+        return new PartoCollection(Parto::whereBelongsTo($ganado)->with(['toro'=>function (Builder $query){$query->select('toros.id','numero')->join('ganados','ganado_id','=','ganados.id');},
+        'veterinario'=>function(Builder $query){$query->select('personals.id','nombre');}])->get());
     }
 
     /**
@@ -34,7 +35,7 @@ class PartoController extends Controller
     {
         $fecha=new DateTime();
         $parto=new Parto;
-        $parto->fill($request->only(['observacion']));
+        $parto->fill($request->only(['observacion','personal_id']));
         $parto->fecha=$fecha->format('Y-m-d');
         $toro=$ganado->servicioReciente->toro;
         
@@ -69,7 +70,10 @@ class PartoController extends Controller
 
         return response()->json(['parto'=>new PartoResource($parto->load(['toro' => function (Builder $query) {
             $query->select('toros.id', 'numero')->join('ganados', 'ganado_id', '=', 'ganados.id');
-        }]))],201);
+        },
+            'veterinario' => function (Builder $query) {
+                $query->select('personals.id', 'nombre');
+            }]))],201);
     }
 
     /**
@@ -79,6 +83,8 @@ class PartoController extends Controller
     {
         return response()->json(['parto'=>new PartoResource($parto->load(['toro' => function (Builder $query) {
             $query->select('toros.id', 'numero')->join('ganados', 'ganado_id', '=', 'ganados.id');
+        }, 'veterinario' => function (Builder $query) {
+            $query->select('personals.id', 'nombre');
         }]))]);
     }
 
@@ -91,6 +97,8 @@ class PartoController extends Controller
         
         return response()->json(['parto'=>new PartoResource($parto->load(['toro' => function (Builder $query) {
             $query->select('toros.id', 'numero')->join('ganados', 'ganado_id', '=', 'ganados.id');
+        }, 'veterinario' => function (Builder $query) {
+            $query->select('personals.id', 'nombre');
         }]))],200);
     }
 

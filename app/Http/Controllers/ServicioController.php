@@ -26,7 +26,11 @@ class ServicioController extends Controller
     {
         return new ServicioCollection(Servicio::whereBelongsTo($ganado)->with(['toro' => function (Builder $query) {
             $query->select('toros.id', 'numero')->join('ganados', 'ganado_id', '=', 'ganados.id');
-        }])->get());
+        },
+            'veterinario' => function (Builder $query) {
+                $query->select('personals.id', 'nombre');
+            }
+        ])->get());
     }
 
     /**
@@ -46,6 +50,8 @@ class ServicioController extends Controller
     
         return response()->json(['servicio'=>new ServicioResource($servicio->load(['toro' => function (Builder $query) {
             $query->select('toros.id', 'numero')->join('ganados', 'ganado_id', '=', 'ganados.id');
+        }, 'veterinario' => function (Builder $query) {
+            $query->select('personals.id', 'nombre');
         }]))],201);
     }
 
@@ -56,6 +62,8 @@ class ServicioController extends Controller
     {
         return response()->json(['servicio'=>new ServicioResource($servicio->load(['toro' => function (Builder $query) {
             $query->select('toros.id', 'numero')->join('ganados', 'ganado_id', '=', 'ganados.id');
+        }, 'veterinario' => function (Builder $query) {
+            $query->select('personals.id', 'nombre');
         }]))]);
     }
 
@@ -70,6 +78,8 @@ class ServicioController extends Controller
 
         return response()->json(['servicio'=> new ServicioResource($servicio->load(['toro' => function (Builder $query) {
             $query->select('toros.id', 'numero')->join('ganados', 'ganado_id', '=', 'ganados.id');
+        }, 'veterinario' => function (Builder $query) {
+            $query->select('personals.id', 'nombre');
         }]))],200);
     }
 

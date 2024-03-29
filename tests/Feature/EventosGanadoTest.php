@@ -9,6 +9,7 @@ use App\Models\Fallecimiento;
 use App\Models\Ganado;
 use App\Models\Leche;
 use App\Models\Parto;
+use App\Models\Personal;
 use App\Models\Toro;
 use App\Models\User;
 use Illuminate\Auth\Events\Login;
@@ -29,6 +30,7 @@ class EventosGanadoTest extends TestCase
     private $toro;
     private $ganado;
     private $estado;
+    private $veterinario;
     private $numero_toro;
     private int $cantidad_ganado = 50;
 
@@ -74,6 +76,11 @@ class EventosGanadoTest extends TestCase
             = User::factory()->create();
 
         $this->estado = Estado::all();
+        
+        $this->veterinario
+        = Personal::factory()
+            ->for($this->user)
+            ->create(['cargo_id' => 2]);
 
         $this->ganado
             = Ganado::factory()
@@ -98,7 +105,7 @@ class EventosGanadoTest extends TestCase
         //realizar servicio
         $this->actingAs($this->user)->postJson(
             sprintf('api/ganado/%s/servicio', $this->ganado->id),
-            $this->servicio + ['numero_toro' => $this->numero_toro]
+            $this->servicio + ['numero_toro' => $this->numero_toro,'personal_id'=>$this->veterinario->id]
         );
         $response = $this->actingAs($this->user)->getJson(sprintf('api/ganado/%s', $this->ganado->id));
 
@@ -116,13 +123,13 @@ class EventosGanadoTest extends TestCase
         //realizar servicio
         $this->actingAs($this->user)->postJson(
             sprintf('api/ganado/%s/servicio', $this->ganado->id),
-            $this->servicio + ['numero_toro' => $this->numero_toro]
+            $this->servicio + ['numero_toro' => $this->numero_toro,'personal_id' => $this->veterinario->id]
         );
 
         //realizar revision
         $this->actingAs($this->user)->postJson(
             sprintf('api/ganado/%s/revision', $this->ganado->id),
-            $this->revision
+            $this->revision + ['personal_id' => $this->veterinario->id]
         );
 
         $response = $this->actingAs($this->user)->getJson(sprintf('api/ganado/%s', $this->ganado->id));
@@ -154,13 +161,13 @@ class EventosGanadoTest extends TestCase
         //realizar servicio
         $this->actingAs($this->user)->postJson(
             sprintf('api/ganado/%s/servicio', $this->ganado->id),
-            $this->servicio + ['numero_toro' => $this->numero_toro]
+            $this->servicio + ['numero_toro' => $this->numero_toro, 'personal_id' => $this->veterinario->id]
         );
 
         //realizar parto
         $this->actingAs($this->user)->postJson(
             sprintf('api/ganado/%s/parto', $this->ganado->id),
-            $this->parto + $this->hembra
+            $this->parto + $this->hembra + ['personal_id' => $this->veterinario->id]
         );
 
         $response = $this->actingAs($this->user)->getJson(sprintf('api/ganado/%s', $this->ganado->id));
@@ -194,13 +201,13 @@ class EventosGanadoTest extends TestCase
         //realizar servicio
         $this->actingAs($this->user)->postJson(
             sprintf('api/ganado/%s/servicio', $this->ganado->id),
-            $this->servicio + ['numero_toro' => $this->numero_toro]
+            $this->servicio + ['numero_toro' => $this->numero_toro, 'personal_id' => $this->veterinario->id]
         );
 
         //realizar parto
         $this->actingAs($this->user)->postJson(
             sprintf('api/ganado/%s/parto', $this->ganado->id),
-            $this->parto + $this->macho
+            $this->parto + $this->macho + ['personal_id' => $this->veterinario->id]
         );
 
         $cria_id = Parto::select('ganado_cria_id')->where('ganado_id', $this->ganado->id)->first();
@@ -227,13 +234,13 @@ class EventosGanadoTest extends TestCase
         //realizar servicio
         $this->actingAs($this->user)->postJson(
             sprintf('api/ganado/%s/servicio', $this->ganado->id),
-            $this->servicio + ['numero_toro' => $this->numero_toro]
+            $this->servicio + ['numero_toro' => $this->numero_toro, 'personal_id' => $this->veterinario->id]
         );
 
         //realizar parto
         $this->actingAs($this->user)->postJson(
             sprintf('api/ganado/%s/parto', $this->ganado->id),
-            $this->parto + $this->hembra
+            $this->parto + $this->hembra + ['personal_id' => $this->veterinario->id]
         );
 
         $cria_id = Parto::select('ganado_cria_id')->where('ganado_id', $this->ganado->id)->first();

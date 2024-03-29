@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Estado;
 use App\Models\Ganado;
 use App\Models\Parto;
+use App\Models\Personal;
 use App\Models\Servicio;
 use App\Models\Toro;
 use App\Models\User;
@@ -20,6 +21,7 @@ class EfectividadTest extends TestCase
     private $user;
     private $ganado;
     private $toro;
+    private $veterinario;
     private $estado;
     private $cantidadServicios;
 
@@ -39,6 +41,12 @@ class EfectividadTest extends TestCase
             ->hasAttached($this->estado)
             ->for($this->user)
             ->create();
+       
+            $this->veterinario
+        = Personal::factory()
+            ->for($this->user)
+            ->create(['cargo_id' => 2]);
+
 
         $this->toro = Toro::factory()
             ->for($this->user)
@@ -57,14 +65,14 @@ class EfectividadTest extends TestCase
             ->count($this->cantidadServicios)
             ->for($this->ganado)
             ->for($this->toro)
-            ->create();
+            ->create(['personal_id' => $this->veterinario]);
 
         Parto::factory()
             ->count(rand(1, $this->cantidadServicios))
             ->for($this->ganado)
             ->for(Ganado::factory()->for($this->user)->hasAttached(Estado::firstWhere('estado','sano')), 'ganado_cria')
             ->for($this->toro)
-            ->create();
+            ->create(['personal_id' => $this->veterinario]);
 
         $response = $this->actingAs($this->user)->getJson(sprintf('api/ganado/%s', $this->ganado->id));
 
@@ -83,14 +91,14 @@ class EfectividadTest extends TestCase
             ->count($this->cantidadServicios)
             ->for($this->ganado)
             ->for($this->toro)
-            ->create();
+            ->create(['personal_id' => $this->veterinario]);
 
         Parto::factory()
             ->count(rand(1, $this->cantidadServicios))
             ->for($this->ganado)
             ->for(Ganado::factory()->for($this->user)->hasAttached(Estado::firstWhere('estado','sano')), 'ganado_cria')
             ->for($this->toro)
-            ->create();
+            ->create(['personal_id' => $this->veterinario]);
 
         $response = $this->actingAs($this->user)->getJson(sprintf('api/toro/%s', $this->toro->id));
 

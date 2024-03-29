@@ -10,6 +10,7 @@ use App\Http\Resources\RevisionResource;
 use App\Models\Ganado;
 use App\Models\Revision;
 use DateTime;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 
 class RevisionController extends Controller
 {
@@ -23,7 +24,9 @@ class RevisionController extends Controller
      */
     public function index(Ganado $ganado)
     {
-        return new RevisionCollection(Revision::whereBelongsTo($ganado)->get());
+        return new RevisionCollection(Revision::whereBelongsTo($ganado)->with(['veterinario' => function (Builder $query) {
+            $query->select('personals.id', 'nombre');
+        }])->get());
     }
 
     /**
@@ -41,7 +44,9 @@ class RevisionController extends Controller
          RevisionPrenada::dispatchIf($revision->diagnostico == 'prenada',$revision);
          
        
-        return response()->json(['revision'=>new RevisionResource($revision)],201);
+        return response()->json(['revision'=>new RevisionResource($revision->load(['veterinario' => function (Builder $query) {
+            $query->select('personals.id', 'nombre');
+        }]))],201);
     }
 
     /**
@@ -49,7 +54,9 @@ class RevisionController extends Controller
      */
     public function show(Ganado $ganado,Revision $revision)
     {
-        return response()->json(['revision'=>new RevisionResource($revision)]);
+        return response()->json(['revision'=>new RevisionResource($revision->load(['veterinario' => function (Builder $query) {
+            $query->select('personals.id', 'nombre');
+        }]))]);
     }
 
     /**
@@ -60,7 +67,9 @@ class RevisionController extends Controller
         $revision->fill($request->all());
         $revision->save();
 
-        return response()->json(['revision'=>new RevisionResource($revision)],200);
+        return response()->json(['revision'=>new RevisionResource($revision->load(['veterinario' => function (Builder $query) {
+            $query->select('personals.id', 'nombre');
+        }]))],200);
     }
 
     /**
