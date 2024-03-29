@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Personal extends Model
 {
@@ -38,5 +39,33 @@ class Personal extends Model
     public function cargo(): BelongsTo
     {
         return $this->belongsTo(Cargo::class);
+    }
+
+    /**
+     * Get all of the revisiones for the Personal
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function revisiones(): HasMany
+    {
+        return $this->hasMany(Revision::class);
+    }
+    /**
+     * Get all of the servicios for the Personal
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function servicios(): HasMany
+    {
+        return $this->hasMany(Servicio::class);
+    }
+    /**
+     * Get all of the partosAtendidos for the Personal
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function partosAtendidos(): HasMany
+    {
+        return $this->hasMany(Revision::class);
     }
 }
