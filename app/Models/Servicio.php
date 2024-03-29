@@ -12,7 +12,8 @@ class Servicio extends Model
 
     protected $fillable=[
         'observacion',
-        'tipo'
+        'tipo',
+        'personal_id',
     ];
     /**
      * Get the ganado that owns the Servicio

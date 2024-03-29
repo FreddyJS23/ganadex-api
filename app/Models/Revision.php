@@ -13,6 +13,7 @@ class Revision extends Model
     protected $fillable=[
         'diagnostico',
         'tratamiento',
+        'personal_id',
     ];
 
     /**
