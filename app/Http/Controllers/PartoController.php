@@ -35,7 +35,7 @@ class PartoController extends Controller
     {
         $fecha=new DateTime();
         $parto=new Parto;
-        $parto->fill($request->only(['observacion']));
+        $parto->fill($request->only(['observacion','personal_id']));
         $parto->fecha=$fecha->format('Y-m-d');
         $toro=$ganado->servicioReciente->toro;
         
