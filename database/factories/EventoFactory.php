@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,7 +18,9 @@ class EventoFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'prox_revision' => Carbon::now()->subDay(rand(1, 7))->format('Y-m-d'),
+            'prox_parto' => Carbon::now()->subDay(rand(1, 7))->format('Y-m-d'),
+            'prox_secado' => Carbon::now()->subDay(rand(1, 7))->format('Y-m-d'),
         ];
     }
 }
