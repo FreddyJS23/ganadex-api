@@ -10,9 +10,11 @@ use App\Models\Ganado;
 use App\Models\Leche;
 use App\Models\Parto;
 use App\Models\Personal;
+use App\Models\TiposNotifiacion;
 use App\Models\Toro;
 use App\Models\User;
 use Illuminate\Auth\Events\Login;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Collection;
@@ -382,5 +384,49 @@ class EventosGanadoTest extends TestCase
                     )->etc()
             )
         );
+    } 
+
+    public function test_generar_notificaciones_cuando_los_eventos_estan_proximos(): void
+    {
+
+        //crear ganado con todos los evento proximo
+        Ganado::factory()
+            ->count(10)
+            ->hasPeso(1)
+            ->hasEvento()
+            ->for($this->user)
+            ->create();
+
+            //11 por que se suma tambien el que se crea en setUp
+            $cantidadGanadoEventoProximo=11;
+
+        //ganado con un evento lejano
+        Ganado::factory()
+            ->count(10)
+            ->hasPeso(1)
+            ->hasEvento([
+                'prox_revision' => now()->addDays(30)->format('Y-m-d'),
+                'prox_parto' => now()->addDays(30)->format('Y-m-d'),
+                'prox_secado' => now()->addDays(30)->format('Y-m-d'),
+            ])
+            ->for($this->user)
+            ->create();
+
+
+        //evento login
+        Auth::login($this->user);
+
+        $response = $this->actingAs($this->user)->getJson(route('notificaciones.index'));
+
+        $response->assertStatus(200)->assertJson(fn (AssertableJson $json)
+        => $json
+            ->has(
+                'notificaciones',
+                fn (AssertableJson $json)
+                => $json
+                    ->has('revision', $cantidadGanadoEventoProximo)
+                    ->has('secado', $cantidadGanadoEventoProximo)
+                    ->has('parto', $cantidadGanadoEventoProximo)
+            ));
     }
 }
