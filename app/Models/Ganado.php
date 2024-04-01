@@ -180,4 +180,15 @@ class Ganado extends Model
     {
         return $this->hasOne(Fallecimiento::class);
     }
+
+    /**
+     * Get all of the notificaciones for the Ganado
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function notificaciones(): HasMany
+    {
+        return $this->hasMany(Notificacion::class);
+    }
+
 }
