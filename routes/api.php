@@ -15,6 +15,7 @@ use App\Http\Controllers\GanadoController;
 use App\Http\Controllers\InsumoController;
 use App\Http\Controllers\LecheController;
 use App\Http\Controllers\Logout;
+use App\Http\Controllers\NotificacionController;
 use App\Http\Controllers\PartoController;
 use App\Http\Controllers\PersonalController;
 use App\Http\Controllers\PrecioController;
@@ -28,6 +29,7 @@ use App\Http\Controllers\ToroController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VentaController;
 use App\Http\Controllers\VentaLecheController;
+use App\Models\Notificacion;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -63,6 +65,8 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::apiResource('/precio',PrecioController::class)->only(['index','store']);
     Route::apiResource('/venta_leche',VentaLecheController::class)->only(['index','store']);
    Route::apiResource('/fallecimientos',FallecimientoController::class);
+   Route::apiResource('/notificaciones',NotificacionController::class)->only(['index','destroy'])->parameters(['notificaciones' => 'notificacion']);;
+   Route::get('/borrar_notificaciones',[NotificacionController::class,'destroyAll'])->name('notificaciones.destroyAll');
 
     Route::get('/crias_pendiente_capar',[CaparCriaController::class,'index'])->name('capar.index');
     Route::get('/capar_cria/{ganado}',[CaparCriaController::class,'capar'])->name('capar.capar');
