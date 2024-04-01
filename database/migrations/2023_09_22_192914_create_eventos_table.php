@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('eventos', function (Blueprint $table) {
             $table->id();
             $table->date('prox_revision')->nullable($value=true);
-            $table->date('prox_servicio')->nullable($value=true);
             $table->date('prox_parto')->nullable($value=true);
             $table->date('prox_secado')->nullable($value=true);
             $table->foreignId('ganado_id')->constrained()->cascadeOnDelete();
