@@ -29,7 +29,7 @@ class GanadoController extends Controller
      */
     public function index() :ResourceCollection
     {
-        return new GanadoCollection(Ganado::doesntHave('toro')->where('user_id',Auth::id())->get());
+        return new GanadoCollection(Ganado::doesntHave('toro')->where('user_id',Auth::id())->with(['peso','evento','estados'])->get());
     }
 
     /**
