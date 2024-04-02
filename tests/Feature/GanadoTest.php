@@ -129,21 +129,34 @@ class GanadoTest extends TestCase
                             'numero' => 'integer',
                             'origen' => 'string',
                             'fecha_nacimiento' => 'string',
+                            'estados' => 'array',
+                            'estados.0.id' => 'integer',
+                            'estados.0.estado' => 'string',
+                        ])
+                            ->where('sexo', fn (string $sexo) => Str::contains($sexo, ['M', 'H']))
+                            ->where('tipo', fn (string $tipo) => Str::contains($tipo, ['becerro', 'maute', 'novillo', 'adulto', 'res']))
+                ->has(
+                    'pesos',
+                    fn (AssertableJson $json) => $json
+                        ->whereAllType([
+                            'id'=>'integer',
                             'peso_nacimiento' => 'string',
                             'peso_destete' => 'string',
                             'peso_2year' => 'string',
                             'peso_actual' => 'string',
-                            'estados' => 'array',
-                            'estados.0.id' => 'integer',
-                            'estados.0.estado' => 'string',
+                        ])
+                )
+                ->has(
+                    'eventos',
+                    fn (AssertableJson $json) => $json
+                        ->whereAllType([
+                            'id'=>'integer',
                             'prox_revision' => 'string|null',
-                            'prox_servicio' => 'string|null',
                             'prox_parto' => 'string|null',
                             'prox_secado' => 'string|null',
                         ])
-                            ->where('sexo', fn (string $sexo) => Str::contains($sexo, ['M', 'H']))
-                            ->where('tipo', fn (string $tipo) => Str::contains($tipo, ['becerro', 'maute', 'novillo', 'adulto', 'res']))
-                    )
+                )
+                            )
             );
     }
 
@@ -165,21 +178,29 @@ class GanadoTest extends TestCase
                             'numero' => 'integer',
                             'origen' => 'string',
                             'fecha_nacimiento' => 'string',
-                            'peso_nacimiento' => 'string',
-                            'peso_destete' => 'string',
-                            'peso_2year' => 'string',
-                            'peso_actual' => 'string',
                             'estados' => 'array',
                             'estados.0.id' => 'integer',
                             'estados.0.estado' => 'string',
-                            'prox_revision' => 'string|null',
-                            'prox_servicio' => 'string|null',
-                            'prox_parto' => 'string|null',
-                            'prox_secado' => 'string|null',
                         ])
                             ->where('sexo', fn (string $sexo) => Str::contains($sexo, ['M', 'H']))
                             ->where('tipo', fn (string $tipo) => Str::contains($tipo, ['becerro', 'maute', 'novillo', 'adulto', 'res']))
-                    )
+                            ->has('pesos',
+                            fn(AssertableJson $json)=>$json
+                            ->whereAllType([
+                                 'id'=>'integer',      
+                                'peso_nacimiento' => 'string',
+                                        'peso_destete' => 'string',
+                                        'peso_2year' => 'string',
+                                        'peso_actual' => 'string',]))
+                            ->has('eventos',
+                            fn(AssertableJson $json)=>$json
+                            ->whereAllType([
+                         'id'=>'integer',
+                                'prox_revision' => 'string|null',
+                      
+                        'prox_parto' => 'string|null',
+                        'prox_secado' => 'string|null',]))
+                            )
             );
     }
 
@@ -211,10 +232,10 @@ class GanadoTest extends TestCase
                 ->where('ganado.origen', $this->cabeza_ganado['origen'])
                 ->where('ganado.sexo', $this->cabeza_ganado['sexo'])
                 ->where('ganado.fecha_nacimiento', $this->cabeza_ganado['fecha_nacimiento'])
-                ->where('ganado.peso_nacimiento', $this->cabeza_ganado['peso_nacimiento'])
-                ->where('ganado.peso_destete', $this->cabeza_ganado['peso_destete'])
-                ->where('ganado.peso_2year', $this->cabeza_ganado['peso_2year'])
-                ->where('ganado.peso_actual', $this->cabeza_ganado['peso_actual'])
+                ->where('ganado.pesos.peso_nacimiento', $this->cabeza_ganado['peso_nacimiento'])
+                ->where('ganado.pesos.peso_destete', $this->cabeza_ganado['peso_destete'])
+                ->where('ganado.pesos.peso_2year', $this->cabeza_ganado['peso_2year'])
+                ->where('ganado.pesos.peso_actual', $this->cabeza_ganado['peso_actual'])
 
                 ->etc()
         );
