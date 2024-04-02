@@ -113,7 +113,7 @@ class EventosGanadoTest extends TestCase
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) => $json->whereAllType([
-                'ganado.prox_revision' => 'string',
+                'ganado.eventos.prox_revision' => 'string',
                 'servicio_reciente' => 'array',
                 'total_servicios' => 'integer'
             ])->etc()
@@ -139,8 +139,8 @@ class EventosGanadoTest extends TestCase
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) => $json->whereAllType(
                 [
-                    'ganado.prox_parto' => 'string',
-                    'ganado.prox_secado' => 'string',
+                    'ganado.eventos.prox_parto' => 'string',
+                    'ganado.eventos.prox_secado' => 'string',
                     'revision_reciente' => 'array',
                     'total_revisiones' => 'integer',
                 ]
@@ -177,7 +177,7 @@ class EventosGanadoTest extends TestCase
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) => $json->whereAllType(
                 [
-                    'ganado.prox_revision' => 'string',
+                    'ganado.eventos.prox_revision' => 'string',
                     'servicio_reciente' => 'array',
                     'total_servicios' => 'integer',
                     'parto_reciente' => 'array',
