@@ -24,4 +24,6 @@ public function ganados(): BelongsToMany
 {
     return $this->belongsToMany(Ganado::class);
 }
+
+    protected $hidden = ['ganado_id', 'created_at', 'updated_at', 'pivot'];
 }
