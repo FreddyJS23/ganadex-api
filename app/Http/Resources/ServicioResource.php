@@ -19,7 +19,7 @@ class ServicioResource extends JsonResource
             'fecha'=>$this->fecha,
             'observacion'=>$this->observacion,
             'tipo'=>$this->tipo,
-            'toro'=>$this->toro,
+            'toro'=>(object)(['id'=>$this->toro->id,'numero'=>$this->ganado->numero]),
             'veterinario' => $this->veterinario,
         ];
     }

@@ -100,8 +100,6 @@ class VentaTest extends TestCase
                             => $json->whereAllType([
                                 'id' => 'integer',
                                 'numero' => 'integer',
-                                //ganado esta trayendo la relacion peso, pero no se puede evitar
-                                'peso' => 'array'
                             ])
                         )
                 )
@@ -135,8 +133,6 @@ class VentaTest extends TestCase
                         => $json->whereAllType([
                             'id' => 'integer',
                             'numero' => 'integer',
-                            //ganado esta trayendo la relacion peso, pero no se puede evitar
-                            'peso' => 'array'
                         ])
                     )
                 )
@@ -170,8 +166,6 @@ class VentaTest extends TestCase
                         => $json->whereAllType([
                             'id' => 'integer',
                             'numero' => 'integer',
-                            //ganado esta trayendo la relacion peso, pero no se puede evitar
-                            'peso' => 'array'
                         ])
                     )
                 )

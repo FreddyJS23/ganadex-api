@@ -16,7 +16,7 @@ class PrecioResource extends JsonResource
     {
         return [
             'id'=>$this->id,
-            'precio' => round($this->precio, 2),
+            'precio' =>$this->precio,
             'fecha'=>$this->fecha
         ];
     }

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class Toro extends Model
 {
@@ -57,4 +58,7 @@ class Toro extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    protected $hidden = ['created_at', 'updated_at', 'user_id', 'ganado_id'];
+
 }
