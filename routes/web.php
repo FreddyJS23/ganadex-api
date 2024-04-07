@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BackupRestoreBDController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,6 +14,5 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/respaldo',[BackupRestoreBDController::class,'respaldarBd']);
+Route::get('/restaurar', [BackupRestoreBDController::class, 'restaurarBd']);
