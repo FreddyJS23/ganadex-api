@@ -22,10 +22,10 @@ class TodosServiciosResource extends JsonResource
                 "id" => $this->id,
                 "numero" => $this->numero,
                 "ultimo_servicio" => $existeServicio ? $this->servicioReciente->fecha : 'desconocido',
-                "toro" => $existeServicio ? [
-                    "id" => $this->servicioReciente->toro->id,
-                    "numero" => $this->servicioReciente->toro->ganado->numero
-                ] : null,
+                "toro" => $existeServicio ? (object)([
+                    'id' => $this->servicioReciente->toro->id,
+                    'numero' => $this->servicioReciente->toro->ganado->numero
+                ]) : null,
                 "efectividad" => round($efectividad($this->parto_count, $this->servicios_count)),
                 "total_servicios" => $this->servicios_count
             ];
