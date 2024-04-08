@@ -22,6 +22,7 @@ use App\Http\Controllers\PrecioController;
 use App\Http\Controllers\ResController;
 use App\Http\Controllers\RevisionController;
 use App\Http\Controllers\ServicioController;
+use App\Http\Controllers\TodosPartos;
 use App\Http\Controllers\TodosPesajeLeche;
 use App\Http\Controllers\TodosRevisiones;
 use App\Http\Controllers\TodosServicios;
@@ -77,6 +78,7 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::get('/revisiones', TodosRevisiones::class)->name('todasRevisiones');
     Route::get('/servicios', TodosServicios::class)->name('todasServicios');
     Route::get('/pesaje_leche', TodosPesajeLeche::class)->name('todosPesajesLeche');
+    Route::get('/partos', TodosPartos::class)->name('todosPartos');
   
     //rutas peticiones de datos dashboard
      Route::get('dashboard_principal/total_ganado_tipo',[DashboardPrincipalController::class,'totalGanadoTipo'])->name('dashboardPrincipal.totalGanadoTipo');
