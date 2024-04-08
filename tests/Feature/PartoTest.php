@@ -254,6 +254,51 @@ class PartoTest extends TestCase
         );
     }
 
+    public function test_obtener_partos_de_todas_las_vacas(): void
+    {
+        Ganado::factory()
+            ->count(10)
+            ->hasPeso(1)
+            ->hasServicios(7, ['toro_id' => $this->toro->id, 'personal_id' => $this->veterinario->id])
+            ->hasParto(3, function (array $attributes, Ganado $ganado) {
+                $veterinario = Personal::factory()->create(['user_id' => $ganado->user_id, 'cargo_id' => 2]);
+                $cria = Ganado::factory()->create(['user_id' => $ganado->user_id]);
+                return ['toro_id' => $ganado->servicioReciente->toro_id, 'ganado_cria_id' => $cria->id, 'personal_id' => $veterinario->id];
+            })
+            ->hasEvento(1)
+            ->hasAttached($this->estado)
+            ->for($this->user)
+            ->create();
+
+        $response = $this->actingAs($this->user)->getJson(route('todosPartos'));
+
+        $response->assertStatus(200)
+            ->assertJson(
+                fn (AssertableJson $json) => $json->has('todos_partos.1', fn (AssertableJson $json) => $json->whereAllType([
+                    'id' => 'integer',
+                    'numero'=>'integer',
+                    'ultimo_parto' => 'string',
+                    'total_partos' => 'integer'
+                ])->has(
+                    'toro',
+                    fn (AssertableJson $json)
+                    => $json->whereAllType([
+                        'id' => 'integer',
+                        'numero' => 'integer',
+                    ])
+                )->has(
+                    'cria',
+                    fn (AssertableJson $json)
+                    => $json->whereAllType([
+                        'id' => 'integer',
+                        'numero' => 'integer',
+                    ])
+                )
+                
+                )
+            );
+    }
+
     public function test_eliminar_parto(): void
     {
         $partos = $this->generarpartos();
