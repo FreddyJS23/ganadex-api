@@ -90,14 +90,14 @@ class DashboardPrincipalController extends Controller
     {
         $menorCantidadInsumo = Insumo::whereBelongsTo(Auth::user())->orderBy('cantidad', 'asc')->first();
 
-        return response()->json(['menor_cantidad_insumo' => new CantidadInsumoResource($menorCantidadInsumo)]);
+        return response()->json(['menor_cantidad_insumo' =>$menorCantidadInsumo ? new CantidadInsumoResource($menorCantidadInsumo) : null]);
     }
 
     public function insumoMayorExistencia()
     {
-        $menorCantidadInsumo = Insumo::whereBelongsTo(Auth::user())->orderBy('cantidad', 'desc')->first();
+        $mayorCantidadInsumo = Insumo::whereBelongsTo(Auth::user())->orderBy('cantidad', 'desc')->first();
 
-        return response()->json(['mayor_cantidad_insumo' => new CantidadInsumoResource($menorCantidadInsumo)]);
+        return response()->json(['mayor_cantidad_insumo' =>$mayorCantidadInsumo ? new CantidadInsumoResource($mayorCantidadInsumo) : null]);
     }
 
     public function balanceAnualProduccionLeche()
