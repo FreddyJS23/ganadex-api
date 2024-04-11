@@ -8,7 +8,9 @@ use Illuminate\Database\Seeder;
 use App\Models\Estado;
 use App\Models\Fallecimiento;
 use App\Models\Ganado;
+use App\Models\Insumo;
 use App\Models\Leche;
+use App\Models\Notificacion;
 use App\Models\Parto;
 use App\Models\Personal;
 use App\Models\Precio;
@@ -26,7 +28,7 @@ class DemostracionSeeder extends Seeder
      */
     public function run(): void
     {
-        $elementos = 30;
+        $elementos = 3;
 
         $user = User::factory()->create();
         $estado = Estado::all();
@@ -104,5 +106,17 @@ class DemostracionSeeder extends Seeder
             ->count($elementos)
             ->for(Ganado::factory()->for($user)->hasAttached($estado))
             ->create();
+
+
+         Notificacion::factory()
+            ->count($elementos)
+            ->for($user)
+            ->for(Ganado::factory()->for($user)->hasEvento()->create())
+            ->create();
+
+        Insumo::factory()
+        ->count($elementos)
+        ->for($user)
+        ->create();
     }
 }
