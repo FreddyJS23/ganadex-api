@@ -16,7 +16,7 @@ class TopVacasProductorasResource extends JsonResource
     {
         return [
             'ganado'=>$this->ganado,
-            'peso_leche'=>$this->peso_leche . "KG"
+            'peso_leche'=>$this->peso_leche
         ];
     }
 }
