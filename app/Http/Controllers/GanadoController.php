@@ -6,10 +6,12 @@ use App\Http\Requests\StoreGanadoRequest;
 use App\Http\Requests\UpdateGanadoRequest;
 use App\Http\Resources\GanadoCollection;
 use App\Http\Resources\GanadoResource;
+use App\Http\Resources\LecheResource;
 use App\Http\Resources\PartoResource;
 use App\Http\Resources\RevisionResource;
 use App\Http\Resources\ServicioResource;
 use App\Models\Ganado;
+use App\Models\Leche;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -56,20 +58,31 @@ class GanadoController extends Controller
     {
         $ultimaRevision = $ganado->revisionReciente;
         $ultimoServicio = $ganado->servicioReciente;
+        $ultimoPesajeLeche = $ganado->pesajeLecheReciente;
         $ultimoParto = $ganado->partoReciente;
         $ganado->loadCount('servicios')->loadCount('revision')->loadCount('parto');
-        $efectividad=fn(int $resultadoAlcanzado,int $resultadoPrevisto)=>$resultadoAlcanzado * 100 / $resultadoPrevisto;  
+        $efectividad = fn (int $resultadoAlcanzado, int $resultadoPrevisto) => $resultadoAlcanzado * 100 / $resultadoPrevisto;
+
+        $mejorPesajesLeche = Leche::where('ganado_id', $ganado->id)->orderBy('peso_leche', 'desc')->first();
+        $peorPesajesLeche = Leche::where('ganado_id', $ganado->id)->orderBy('peso_leche', 'asc')->first();
+        $estadoProduccionLeche = $ganado->estados->contains('estado', 'lactancia') ? "En producción" : 'Inactiva';
 
         return response()->json([
-            'ganado'=>new GanadoResource($ganado),
-            'servicio_reciente'=>$ultimoServicio ? new ServicioResource($ultimoServicio) : null,
-            'total_servicios'=>$ganado->servicios_count,
-            'revision_reciente'=> $ultimaRevision ? new RevisionResource($ultimaRevision) : null,
-            'total_revisiones'=>$ganado->revision_count,
-            'parto_reciente'=> $ultimoParto ? new PartoResource($ultimoParto) : null,
-            'total_partos'=>$ganado->parto_count,
-            'efectividad'=>$ganado->parto_count ? round($efectividad($ganado->parto_count, $ganado->servicios_count),2) : null
-        ],200);
+            'ganado' => new GanadoResource($ganado),
+            'servicio_reciente' => $ultimoServicio ? new ServicioResource($ultimoServicio) : null,
+            'total_servicios' => $ganado->servicios_count,
+            'revision_reciente' => $ultimaRevision ? new RevisionResource($ultimaRevision) : null,
+            'total_revisiones' => $ganado->revision_count,
+            'parto_reciente' => $ultimoParto ? new PartoResource($ultimoParto) : null,
+            'total_partos' => $ganado->parto_count,
+            'efectividad' => $ganado->parto_count ? round($efectividad($ganado->parto_count, $ganado->servicios_count), 2) : null,
+            'info_pesajes_leche' => (object)([
+                'reciente' => $ultimoPesajeLeche ? new LecheResource($ultimoPesajeLeche) : null,
+                'mejor' => $ultimoPesajeLeche ? new LecheResource($mejorPesajesLeche) : null,
+                'peor' => $ultimoPesajeLeche ? new LecheResource($peorPesajesLeche) : null,
+                'estado' => $estadoProduccionLeche
+            ])
+        ], 200);
     }
 
     /**

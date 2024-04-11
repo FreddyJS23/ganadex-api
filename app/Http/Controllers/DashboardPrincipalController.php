@@ -90,20 +90,21 @@ class DashboardPrincipalController extends Controller
     {
         $menorCantidadInsumo = Insumo::whereBelongsTo(Auth::user())->orderBy('cantidad', 'asc')->first();
 
-        return response()->json(['menor_cantidad_insumo' => new CantidadInsumoResource($menorCantidadInsumo)]);
+        return response()->json(['menor_cantidad_insumo' =>$menorCantidadInsumo ? new CantidadInsumoResource($menorCantidadInsumo) : null]);
     }
 
     public function insumoMayorExistencia()
     {
-        $menorCantidadInsumo = Insumo::whereBelongsTo(Auth::user())->orderBy('cantidad', 'desc')->first();
+        $mayorCantidadInsumo = Insumo::whereBelongsTo(Auth::user())->orderBy('cantidad', 'desc')->first();
 
-        return response()->json(['mayor_cantidad_insumo' => new CantidadInsumoResource($menorCantidadInsumo)]);
+        return response()->json(['mayor_cantidad_insumo' =>$mayorCantidadInsumo ? new CantidadInsumoResource($mayorCantidadInsumo) : null]);
     }
 
     public function balanceAnualProduccionLeche()
     {
         $balanceAnualLeche = Leche::selectRaw("DATE_FORMAT(fecha,'%m') as mes")
         ->selectRaw("AVG(peso_leche) as promedio_pesaje")
+        ->whereYear('fecha',now()->format('Y'))
         ->groupBy('fecha')->get();
 
         return new BalanceAnualLecheCollection($balanceAnualLeche);
