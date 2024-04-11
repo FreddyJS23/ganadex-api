@@ -21,7 +21,7 @@ class TodosRevisionesResource extends JsonResource
         "numero"=>$this->numero,
         "ultima_revision"=>$existeRevision ? $this->revisionReciente->fecha : 'desconocido',
         "diagnostico"=>$existeRevision ? $this->revisionReciente->diagnostico : 'desconocido',
-        "proxima_revision"=>$this->evento->proxima_revision, 
+        "proxima_revision"=>$this->evento ? $this->evento->proxima_revision : null , 
         "total_revisiones"=>$this->revision_count
       ];
     }

@@ -68,4 +68,7 @@ class Personal extends Model
     {
         return $this->hasMany(Revision::class);
     }
+
+    protected $hidden = ['created_at','updated_at','user_id','cargo_id'];
+
 }

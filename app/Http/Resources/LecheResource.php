@@ -16,7 +16,7 @@ class LecheResource extends JsonResource
     {
         return [
             'id'=>$this->id,
-            'pesaje'=>$this->peso_leche . "KG",
+            'pesaje'=>$this->peso_leche,
             'fecha'=>$this->fecha
         ];
     }

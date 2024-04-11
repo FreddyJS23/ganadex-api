@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ReportsPdfController;
+use App\Http\Controllers\BackupRestoreBDController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -24,3 +25,5 @@ Route::get('/reportes/general', [ReportsPdfController::class, 'resumenGeneral'])
 Route::get('/reportes/venta_leche', [ReportsPdfController::class, 'resumenVentaLecheMesActual'])->name('reportes.ventaLeche');
 Route::get('/reportes/venta_ganado', [ReportsPdfController::class, 'resumenVentaGanadoAnual'])->name('reportes.ventaGanado');
 Route::get('/reportes/causas_fallecimientos', [ReportsPdfController::class, 'resumenCausasFAllecimientos'])->name('reportes.fallecimientos');
+Route::get('/respaldo',[BackupRestoreBDController::class,'respaldarBd']);
+Route::get('/restaurar', [BackupRestoreBDController::class, 'restaurarBd']);
