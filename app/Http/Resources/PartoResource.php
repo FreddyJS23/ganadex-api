@@ -18,7 +18,7 @@ class PartoResource extends JsonResource
             'id'=>$this->id,
             'fecha'=>$this->fecha,
             'observacion'=>$this->observacion,
-            'cria'=>$this->ganado_cria->makeHidden('tipo_id','user_id','created_at','updated_at'),
+            'cria'=>$this->ganado_cria->makeHidden('tipo_id','user_id','created_at','updated_at')->load('peso:peso_nacimiento,ganado_id'),
             'padre_toro'=>$this->toro,
             'veterinario' => $this->veterinario,
         ];
