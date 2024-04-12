@@ -15,6 +15,12 @@ class BackupRestoreBDController extends Controller
     public function respaldarBd()
     {
         Artisan::call('backup:run --only-db');
+
+        $listaBackup = Storage::files('Laravel');
+
+        $pathDbBackup = end($listaBackup);
+
+        return Storage::download($pathDbBackup);
     }
 
     public function restaurarBd(Request $file)
@@ -30,7 +36,7 @@ class BackupRestoreBDController extends Controller
         $pathDbRestore = end($listaBackup);
 
         $zip = new ZipArchive;
-        
+
         $zip->open(storage_path('app/' . $pathDbRestore));
 
         try {
