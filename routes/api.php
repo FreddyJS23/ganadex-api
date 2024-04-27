@@ -109,4 +109,5 @@ Route::middleware('auth:sanctum')->group(function(){
 
     //rutas peticiones datos para rellanr formularios
      Route::get('/novillas_montar',[DatosParaFormulariosController::class,'novillasParaMontar'])->name('datosParaFormularios.novillasParaMontar');
+     Route::get('/cargos_personal',[DatosParaFormulariosController::class, 'cargosPersonalDisponible'])->name('datosParaFormularios.cargosPersonal');
 });
