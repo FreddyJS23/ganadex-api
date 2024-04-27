@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\CargosPersonalCollection;
 use App\Http\Resources\NovillaAMontarCollection;
+use App\Models\Cargo;
 use App\Models\Peso;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -17,5 +19,11 @@ class DatosParaFormulariosController extends Controller
         })->where('peso_actual', '>=', 330)->get();
 
         return new NovillaAMontarCollection($novillasAmontar);
+    }
+    public function cargosPersonalDisponible()
+    {
+        $cargos = Cargo::get();
+
+        return new CargosPersonalCollection($cargos);
     }
 }
