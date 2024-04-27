@@ -28,7 +28,7 @@ class GanadoTest extends TestCase
         'peso_destete' => '130KG',
         'peso_2year' => '300KG',
         'peso_actual' => '600KG',
-        'estado_id' => 1,
+        'estado_id' => [1,3,2],
     ];
 
     private int $cantidad_ganado = 10;
@@ -84,7 +84,7 @@ class GanadoTest extends TestCase
                     'peso_destete' => '30Kg',
                     'peso_2year' => 'd30KG',
                     'peso_actual' => '.30KG',
-                    'estado_id' => [1, 30, 2],
+                    'estado_id' => ["f", "fg", 20],
                 ], [
                     'nombre', 'numero', 'origen', 'sexo', 'tipo_id', 'fecha_nacimiento',
                     'peso_nacimiento', 'peso_destete', 'peso_2year', 'peso_actual', 'estado_id'
@@ -99,7 +99,7 @@ class GanadoTest extends TestCase
                     'peso_destete' => '30KG',
                     'peso_2year' => '30KG',
                     'peso_actual' => '30KG',
-                    'estado_id' => [1, 2, 3,],
+                    'estado_id' => ["f", "fg", 20],
                 ], ['nombre', 'sexo', 'tipo_id']
             ],
         ];
