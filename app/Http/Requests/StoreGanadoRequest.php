@@ -27,7 +27,7 @@ class StoreGanadoRequest extends FormRequest
             'numero' => 'numeric|between:1,32767|unique:ganados,numero',
             'origen' => 'min:3,|max:255',
             'sexo' => 'required|in:H,M',
-            'tipo_id' => 'required|exists:ganado_tipos,id',
+            'tipo_id' => 'required|integer|exists:ganado_tipos,id',
             'fecha_nacimiento' => 'date_format:Y-m-d',
             'peso_nacimiento' => 'max:10|regex:/^\d+(\.\d+)?KG$/',
             'peso_destete' => 'max:10|regex:/^\d+(\.\d+)?KG$/',
