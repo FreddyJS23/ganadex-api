@@ -1,4 +1,4 @@
-<x-layouts.layout-pdf titulo-reporte="Resumen ventas de ganado anual" >
+<x-layouts.layout-pdf titulo-reporte="Informe de ventas ganado del año {{$year}}" >
 
 
     <x-tabla-venta-ganado :$ventasGanado />
