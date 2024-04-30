@@ -216,8 +216,10 @@ $estadoProduccionLeche= $ganado->estados->contains('estado','lactancia') ? "En p
     return $pdf->stream();
   }
 
-  public function resumenVentaLecheMesActual()
+  public function resumenVentaLecheMesActual(Request $request)
   {
+$inicio=$request->query('start');
+$fin=$request->query('end');
 
     $ventasLeche = VentaLeche::whereBelongsTo(Auth::user())
       ->oldest('fecha')
