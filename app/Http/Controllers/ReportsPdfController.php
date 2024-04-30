@@ -13,6 +13,7 @@ use App\Models\VentaLeche;
 use Barryvdh\DomPDF\Facade\Pdf;
 use DateTime;
 use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 
