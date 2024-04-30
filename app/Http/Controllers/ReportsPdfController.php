@@ -259,7 +259,7 @@ $fin=$request->query('end');
       return $item;
     });
 
-    $dataPdf = ['ventasGanado' => $ventasGanado->groupBy('mes')->toArray()];
+    $dataPdf = ['ventasGanado' => $ventasGanado->groupBy('mes')->toArray(),'year'=>$year];
 
     $pdf = Pdf::loadView('resumenVentaGanadoAnual', $dataPdf);
     
