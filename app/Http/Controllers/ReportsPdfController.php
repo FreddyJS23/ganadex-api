@@ -241,13 +241,16 @@ $fin=$request->query('end');
   }
 
 
-  public function resumenVentaGanadoAnual()
+  public function resumenVentaGanadoAnual(Request $request)
   {
-    $ventasGanado = Venta::whereBelongsTo(Auth::user())
+
+    $year = $request->query('year');
+    
+  $ventasGanado = Venta::whereBelongsTo(Auth::user()) 
       ->join('ganados', 'ganado_id', 'ganados.id')
       ->selectRaw("DATE_FORMAT(fecha,'%m') as mes,numero,precio")
       ->orderBy('mes', 'asc')
-      ->whereYear('fecha', now()->format('Y'))
+      ->whereYear('fecha', $year)
       ->get();
 
     $ventasGanado->transform(function (Venta $item, int $key) {
@@ -256,7 +259,7 @@ $fin=$request->query('end');
       return $item;
     });
 
-    $dataPdf = ['ventasGanado' => $ventasGanado->groupBy('mes')->toArray()];
+    $dataPdf = ['ventasGanado' => $ventasGanado->groupBy('mes')->toArray(),'year'=>$year];
 
     $pdf = Pdf::loadView('resumenVentaGanadoAnual', $dataPdf);
     

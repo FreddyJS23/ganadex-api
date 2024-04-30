@@ -52,7 +52,7 @@
             </tr>
         @endforelse
         <tr>
-            <td colspan="3"><b>Ganancia mensual</b></td>
+            <td colspan="3"><b>Ganancia Anual</b></td>
             <td> {{ $gananciaTotal }}$ </td>
         </tr>
     </tbody>
