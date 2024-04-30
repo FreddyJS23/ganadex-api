@@ -226,8 +226,7 @@ $fin=$request->query('end');
       ->select('venta_leches.fecha', 'cantidad', 'precio')
       ->selectRaw('(cantidad * precio) AS ganancia_total')
       ->join('precios', 'precio_id', 'precios.id')
-      ->whereMonth('venta_leches.fecha', now()->format('m'))
-      ->whereYear('venta_leches.fecha', now()->format('Y'))
+      ->whereBetween('venta_leches.fecha', [$inicio, $fin])
       ->get()
       ->toArray();
 
