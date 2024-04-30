@@ -6,13 +6,13 @@ use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 
-class TablaVentaMesLeche extends Component
+class TablaVentasLeche extends Component
 {
     /**
      * Create a new component instance.
      */
     public function __construct(
-       public array $ventasLecheMesActual,
+       public array $ventasLeche,
     )
     {
         //
@@ -23,6 +23,6 @@ class TablaVentaMesLeche extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.tabla-venta-mes-leche');
+        return view('components.tabla-ventas-leche');
     }
 }

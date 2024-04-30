@@ -217,7 +217,7 @@ $estadoProduccionLeche= $ganado->estados->contains('estado','lactancia') ? "En p
     return $pdf->stream();
   }
 
-  public function resumenVentaLecheMesActual(Request $request)
+  public function resumenVentasLeche(Request $request)
   {
 $inicio=$request->query('start');
 $fin=$request->query('end');
@@ -231,11 +231,11 @@ $fin=$request->query('end');
       ->get()
       ->toArray();
 
-    $dataPdf = ['ventasLecheMesActual' => $ventasLeche,
+    $dataPdf = ['ventasLeche' => $ventasLeche,
     'inicio'=>$inicio,
     'fin'=>$fin,];
 
-    $pdf = Pdf::loadView('resumenVentaLecheMesActual', $dataPdf);
+    $pdf = Pdf::loadView('resumenVentasLeche', $dataPdf);
   
     return $pdf->stream();
   }

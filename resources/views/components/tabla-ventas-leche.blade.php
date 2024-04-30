@@ -20,22 +20,22 @@
         $gananciaTotal = 0;
     @endphp
     <tbody>
-        @forelse ($ventasLecheMesActual as $venta_mes)
+        @forelse ($ventasLeche as $venta_leche)
             @php
-                $gananciaTotal += $venta_mes['ganancia_total'];
+                $gananciaTotal += $venta_leche['ganancia_total'];
             @endphp
             <tr >
                 <td >
-                    <p>{{ $venta_mes['fecha'] }} </p>
+                    <p>{{ $venta_leche['fecha'] }} </p>
                 </td>
                 <td >
-                    <p>{{ $venta_mes['cantidad'] }}kg </p>
+                    <p>{{ $venta_leche['cantidad'] }}kg </p>
                 </td>
                 <td>
-                    <p>{{ $venta_mes['precio'] }}$ </p>
+                    <p>{{ $venta_leche['precio'] }}$ </p>
                 </td>
                 <td>
-                    <p>{{ $venta_mes['ganancia_total'] }}$ </p>
+                    <p>{{ $venta_leche['ganancia_total'] }}$ </p>
                 </td>
             </tr>
         @empty <tr>
@@ -45,7 +45,7 @@
             </tr>
         @endforelse
         <tr >
-            <td colspan="3" ><b>Ganancia mensual</b></td>
+            <td colspan="3" ><b>Ganancia acumulada</b></td>
             <td > {{$gananciaTotal}}$ </td>
         </tr>
     </tbody>
