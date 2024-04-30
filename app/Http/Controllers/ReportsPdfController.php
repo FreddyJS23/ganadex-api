@@ -250,7 +250,7 @@ $fin=$request->query('end');
       ->join('ganados', 'ganado_id', 'ganados.id')
       ->selectRaw("DATE_FORMAT(fecha,'%m') as mes,numero,precio")
       ->orderBy('mes', 'asc')
-      ->whereYear('fecha', now()->format('Y'))
+      ->whereYear('fecha', $year)
       ->get();
 
     $ventasGanado->transform(function (Venta $item, int $key) {
