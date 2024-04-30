@@ -230,7 +230,9 @@ $fin=$request->query('end');
       ->get()
       ->toArray();
 
-    $dataPdf = ['ventasLecheMesActual' => $ventasLeche];
+    $dataPdf = ['ventasLecheMesActual' => $ventasLeche,
+    'inicio'=>$inicio,
+    'fin'=>$fin,];
 
     $pdf = Pdf::loadView('resumenVentaLecheMesActual', $dataPdf);
   
