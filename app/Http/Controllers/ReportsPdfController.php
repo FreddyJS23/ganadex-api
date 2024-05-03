@@ -85,7 +85,7 @@ $estadoProduccionLeche= $ganado->estados->contains('estado','lactancia') ? "En p
 
   public function resumenGeneral()
   {
-    Auth::loginUsingId(1);
+   
     $fechaActual = new DateTime();
     $mesActual = $fechaActual->format('m');
 
