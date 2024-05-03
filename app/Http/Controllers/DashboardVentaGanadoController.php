@@ -19,9 +19,9 @@ class DashboardVentaGanadoController extends Controller
         $mejorComprador= Comprador::whereBelongsTo(Auth::user())
         ->withCount('ventas')
         ->orderByDesc('ventas_count')
-        ->firstOrFail();
+        ->first();
         
-        return response()->json(['comprador' => new CompradorResource($mejorComprador)], 200);
+        return response()->json(['comprador' =>$mejorComprador ? new CompradorResource($mejorComprador) : ''], 200);
     }
     
     public function mejorVenta()
@@ -29,8 +29,8 @@ class DashboardVentaGanadoController extends Controller
         $mejorVenta=Venta::whereBelongsTo(Auth::user())
         ->with('ganado:id,numero')
         ->orderByDesc('precio')
-        ->firstOrFail();
-        return response()->json(['venta' => new VentaResource($mejorVenta)], 200);
+        ->first();
+        return response()->json(['venta' =>$mejorVenta ? new VentaResource($mejorVenta) : ''], 200);
     }
     
     public function peorVenta()
@@ -38,9 +38,9 @@ class DashboardVentaGanadoController extends Controller
     $peorVenta=Venta::whereBelongsTo(Auth::user())
         ->orderBy('precio')
         ->with('ganado:id,numero')
-        ->firstOrFail();
+        ->first();
        
-        return response()->json(['venta' => new VentaResource($peorVenta)], 200);
+        return response()->json(['venta' =>$peorVenta ? new VentaResource($peorVenta) : ''], 200);
     }
     
     public function ventasDelMes()
@@ -52,6 +52,6 @@ class DashboardVentaGanadoController extends Controller
             ->with('ganado:id,numero')
             ->get();
 
-        return new VentaCollection($ventasDelMes);
+         return new VentaCollection($ventasDelMes) ;
     }
 }
