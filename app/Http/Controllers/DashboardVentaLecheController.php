@@ -13,18 +13,18 @@ class DashboardVentaLecheController extends Controller
     {
         $precioActual = Precio::whereBelongsTo(Auth::user())->latest('fecha')->first();
 
-        return response()->json(['precio_actual' => $precioActual->precio]);
+        return response()->json(['precio_actual' => $precioActual->precio ?? 0]);
     }
 
     public function variacionPrecio()
     {
-        $precioActual = Precio::whereBelongsTo(Auth::user())->latest('fecha')->first();
-        $precioAnterior = Precio::whereBelongsTo(Auth::user())->latest('fecha')->where('fecha', '<', $precioActual->fecha)->first();
+        $precioActual = Precio::whereBelongsTo(Auth::user())->latest('fecha')->first() ?? 0;
+        $precioAnterior = !$precioActual == 0  ? Precio::whereBelongsTo(Auth::user())->latest('fecha')->where('fecha', '<', $precioActual->fecha)->first() : 0;
 
         $variacion = fn (float $precioAnterior, float $precioActual) =>
         $precioAnterior - $precioActual * 100 / $precioAnterior;
 
-        return response()->json(['variacion' => $precioAnterior ? $variacion($precioAnterior->precio, $precioActual->precio) : null]);
+        return response()->json(['variacion' => $precioAnterior ? $variacion($precioAnterior->precio, $precioActual->precio) : 0]);
     }
 
     public function gananciasDelMes()
