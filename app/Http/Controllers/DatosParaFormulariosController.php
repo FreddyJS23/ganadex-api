@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\CargosPersonalCollection;
 use App\Http\Resources\NovillaAMontarCollection;
+use App\Http\Resources\VeterinariosDisponiblesCollection;
 use App\Models\Cargo;
+use App\Models\Personal;
 use App\Models\Peso;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -25,5 +27,12 @@ class DatosParaFormulariosController extends Controller
         $cargos = Cargo::get();
 
         return new CargosPersonalCollection($cargos);
+    }
+    public function veterinariosDisponibles()
+    {
+        return new VeterinariosDisponiblesCollection(Personal::select('id','nombre')
+        ->where('cargo_id',2)
+        ->whereBelongsTo(Auth::user())
+        ->get());
     }
 }
