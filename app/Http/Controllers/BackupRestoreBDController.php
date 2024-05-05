@@ -75,5 +75,7 @@ class BackupRestoreBDController extends Controller
         $fileSqlRestore = Storage::path('restore-bd/restore.sql');
 
         $restaurarDb = exec("mysql -u $dbUser  $dbName < $fileSqlRestore ", $output, $result);
+       
+        return response()->json([],$result == 0 ? 200 : 500);
     }
 }
