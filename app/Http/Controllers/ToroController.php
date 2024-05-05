@@ -15,6 +15,7 @@ use function Laravel\Prompts\select;
 
 class ToroController extends Controller
 {
+    public array $peso = ['peso_nacimiento', 'peso_destete', 'peso_2year', 'peso_actual'];
     public function __construct()
     {
         $this->authorizeResource(Toro::class, 'toro');
@@ -39,6 +40,7 @@ class ToroController extends Controller
         $ganado->tipo_id = GanadoTipo::where('tipo', 'adulto')->first()->id;
         $ganado->sexo = "M";
         $ganado->save();
+        $ganado->peso()->create($request->only($this->peso));
 
         $toro = new Toro;
         $toro->user_id = Auth::id();
