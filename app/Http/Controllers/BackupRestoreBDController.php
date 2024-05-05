@@ -22,6 +22,20 @@ class BackupRestoreBDController extends Controller
 
         return Storage::download($pathDbBackup);
     }
+    public function obtenerUltimoRespaldo()
+    {
+        $listaBackup = Storage::files('Laravel');
+
+        $pathDbRestore = end($listaBackup);
+        //format Y-m-d
+        $regexDate = '/[1-9][0-9][0-9]{2}-([0][1-9]|[1][0-2])-([1-2][0-9]|[0][1-9]|[3][0-1])/';
+        $dateLastBackup = preg_match($regexDate, $pathDbRestore, $mathes);
+        $dateLastBackup = $mathes[0] ?? null;
+        //$dateLastBackup = null;
+        
+        return response()->json(['ultimo_backup' => $dateLastBackup],200);
+    }
+
 
     public function restaurarBd(Request $file)
     {
@@ -61,5 +75,7 @@ class BackupRestoreBDController extends Controller
         $fileSqlRestore = Storage::path('restore-bd/restore.sql');
 
         $restaurarDb = exec("mysql -u $dbUser  $dbName < $fileSqlRestore ", $output, $result);
+       
+        return response()->json([],$result == 0 ? 200 : 500);
     }
 }

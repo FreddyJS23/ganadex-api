@@ -22,6 +22,7 @@ class ResResource extends JsonResource
             'sexo' => $this->ganado->sexo,
             'tipo' => $this->ganado->tipo->tipo,
             'fecha_nacimiento' => $this->ganado->fecha_nacimiento,
+            'pesos'=>$this->ganado->peso
         ];
     }
 }

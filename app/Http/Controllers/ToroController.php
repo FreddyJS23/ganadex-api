@@ -15,6 +15,7 @@ use function Laravel\Prompts\select;
 
 class ToroController extends Controller
 {
+    public array $peso = ['peso_nacimiento', 'peso_destete', 'peso_2year', 'peso_actual'];
     public function __construct()
     {
         $this->authorizeResource(Toro::class, 'toro');
@@ -25,7 +26,9 @@ class ToroController extends Controller
      */
     public function index()
     {
-        return new ToroCollection(Toro::all()->where('user_id', Auth::id()));
+        return new ToroCollection(Toro::where('user_id', Auth::id())
+        ->withCount('servicios')
+        ->withCount('padreEnPartos')->get());
     }
 
 
@@ -39,6 +42,7 @@ class ToroController extends Controller
         $ganado->tipo_id = GanadoTipo::where('tipo', 'adulto')->first()->id;
         $ganado->sexo = "M";
         $ganado->save();
+        $ganado->peso()->create($request->only($this->peso));
 
         $toro = new Toro;
         $toro->user_id = Auth::id();
@@ -53,13 +57,9 @@ class ToroController extends Controller
     public function show(Toro $toro)
     {
         $toro->loadCount('servicios')->loadCount('padreEnPartos');
-        $efectividad = fn (int $resultadoAlcanzado, int $resultadoPrevisto) => $resultadoAlcanzado * 100 / $resultadoPrevisto;
 
         return response()->json([
             'toro' => new ToroResource($toro),
-            'efectividad' => $toro->padre_en_partos_count ? round($efectividad($toro->padre_en_partos_count, $toro->servicios_count),2) : null,
-            'padre_en_partos'=>$toro->padre_en_partos_count,
-            'servicios'=>$toro->servicios_count,
         ], 200);
     }
 

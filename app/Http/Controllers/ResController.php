@@ -13,7 +13,8 @@ use Illuminate\Support\Facades\Auth;
 
 class ResController extends Controller
 {
-
+    public array $peso = ['peso_nacimiento', 'peso_destete', 'peso_2year', 'peso_actual'];
+   
     public function __construct()
     {
         $this->authorizeResource(Res::class, 'res');
@@ -38,6 +39,7 @@ class ResController extends Controller
         $ganado->tipo_id = determinar_edad_res($ganado->fecha_nacimiento);
         $ganado->sexo = "M";
         $ganado->save();
+        $ganado->peso()->create($request->only($this->peso));
 
         $res = new Res;
         $res->user_id = Auth::id();
