@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AsignarNumeroCriaController;
 use App\Http\Controllers\AuthLogin;
+use App\Http\Controllers\BackupRestoreBDController;
 use App\Http\Controllers\CaparCriaController;
 use App\Http\Controllers\CompradorController;
 use App\Http\Controllers\ConfiguracionController;
@@ -111,4 +112,10 @@ Route::middleware('auth:sanctum')->group(function(){
      Route::get('/novillas_montar',[DatosParaFormulariosController::class,'novillasParaMontar'])->name('datosParaFormularios.novillasParaMontar');
      Route::get('/cargos_personal',[DatosParaFormulariosController::class, 'cargosPersonalDisponible'])->name('datosParaFormularios.cargosPersonal');
      Route::get('/veterinarios',[DatosParaFormulariosController::class, 'veterinariosDisponibles'])->name('datosParaFormularios.veterinariosDisponibles');
-});
+
+    //Respaldo - Restauracion de base de datos
+    Route::get('/respaldo', [BackupRestoreBDController::class, 'respaldarBd']);
+    Route::get('/restaurar', [BackupRestoreBDController::class, 'restaurarBd']);
+    Route::get('/ultimo_respaldo', [BackupRestoreBDController::class, 'obtenerUltimoRespaldo']);
+
+    });
