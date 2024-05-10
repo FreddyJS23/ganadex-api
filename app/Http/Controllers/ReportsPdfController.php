@@ -297,4 +297,26 @@ $fin=$request->query('end');
     return $pdf->stream();
 
   }
+
+  public function facturaVentaGanado(){
+
+    $ventaGanado = Venta::whereBelongsTo(Auth::user())
+    ->with(['ganado'=>['peso'],'comprador'])
+      ->orderBy('fecha', 'desc')
+      ->first();
+
+
+    $dataPdf = [
+      'numero' => $ventaGanado->ganado->numero,
+      'tipo' => $ventaGanado->ganado->tipo->tipo,
+      'peso' => $ventaGanado->ganado->peso->peso_actual,
+      'comprador' => $ventaGanado->comprador->nombre,
+      'precio' => $ventaGanado->precio,
+      'precioKg' => round($ventaGanado->precio / intval($ventaGanado->ganado->peso->peso_actual), 2),
+  ];
+
+    $pdf = Pdf::loadView('notaVentaGanado', $dataPdf);
+
+   return $pdf->stream();
+  } 
 }
