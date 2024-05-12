@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\BalanceAnualVentasGanadoCollection;
 use App\Http\Resources\CompradorCollection;
 use App\Http\Resources\CompradorResource;
 use App\Http\Resources\VentaCollection;
@@ -53,5 +54,31 @@ class DashboardVentaGanadoController extends Controller
             ->get();
 
          return new VentaCollection($ventasDelMes) ;
+    }
+   
+    public function balanceAnualVentas()
+    {
+        $meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+      
+    $balanceMesesVentas = Venta::whereBelongsTo(Auth::user())
+    ->selectRaw("DATE_FORMAT(fecha,'%m') as mes, COUNT(id) as ventas")
+        ->whereYear('fecha', now()->format('Y'))
+            ->groupBy('mes')
+            ->get()
+            ->toArray();
+            
+$balanceAnual=[];
+
+foreach ($meses as $keyMes => $mes) {
+
+$cantidadVentasMes=0;
+
+/* Iterar resultado sql para sincronizar numero mes y ventas del mes, 
+al crear array con el nombre del mes y las ventas del mes */
+foreach ($balanceMesesVentas as $mesBalance)  if(intval($mesBalance['mes']) == $keyMes +  1)  $cantidadVentasMes= $mesBalance['ventas'];
+
+array_push($balanceAnual,['mes'=>$mes,'ventas'=>$cantidadVentasMes ]);
+}
+        return new BalanceAnualVentasGanadoCollection($balanceAnual);
     }
 }
