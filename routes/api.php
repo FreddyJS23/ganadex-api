@@ -98,12 +98,14 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::get('/dashboard_venta_leche/variacion_precio',[DashboardVentaLecheController::class, 'variacionPrecio'])->name('dashboardVentaLeche.variacionPrecio');
     Route::get('/dashboard_venta_leche/ganancias_mes',[DashboardVentaLecheController::class, 'gananciasDelMes'])->name('dashboardVentaLeche.gananciasDelMes');
     Route::get('/dashboard_venta_leche/ventas_mes',[DashboardVentaLecheController::class, 'ventasDelMes'])->name('dashboardVentaLeche.ventasDelMes');
+    Route::get('/dashboard_venta_leche/balance_mensual',[DashboardVentaLecheController::class, 'balanceMensual'])->name('dashboardVentaLeche.balanceMensual');
     
     //rutas peticiones de datos dashboard venta ganado
     Route::get('/dashboard_venta_ganado/mejor_comprador',[DashboardVentaGanadoController::class, 'mejorComprador'])->name('dashboardVentaGanado.mejorComprador');
     Route::get('/dashboard_venta_ganado/mejor_venta',[DashboardVentaGanadoController::class, 'mejorVenta'])->name('dashboardVentaGanado.mejorVenta');
     Route::get('/dashboard_venta_ganado/peor_venta',[DashboardVentaGanadoController::class, 'peorVenta'])->name('dashboardVentaGanado.peorVenta');
     Route::get('/dashboard_venta_ganado/ventas_mes',[DashboardVentaGanadoController::class, 'ventasDelMes'])->name('dashboardVentaGanado.ventasDelMes');
+    Route::get('/dashboard_venta_ganado/balance_anual',[DashboardVentaGanadoController::class, 'balanceAnualVentas'])->name('dashboardVentaGanado.balanceAnualVentas');
 
     //rutas peticiones de datos dashboard fallecimientos
     Route::get('/dashboard_fallecimientos/causas_frecuentes', [DashboardFallecimientosController::class, 'causasMuertesFrecuentes'])->name('dashboardFallecimientos.causasMuertesFrecuentes');

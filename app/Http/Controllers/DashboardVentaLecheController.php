@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\BalanceMensualVentaLecheCollection;
 use App\Http\Resources\VentaLecheCollection;
 use App\Models\Precio;
 use App\Models\VentaLeche;
@@ -48,5 +49,16 @@ class DashboardVentaLecheController extends Controller
             ->get();
 
         return new VentaLecheCollection($ventasDelMes);
+    }
+    public function balanceMensual()
+    {
+        $ventasDelMes
+            = VentaLeche::whereBelongsTo(Auth::user())
+            ->select('fecha','cantidad')
+            ->whereMonth('fecha', now()->month)
+            ->whereYear('fecha', now()->year)
+            ->get();
+
+        return new BalanceMensualVentaLecheCollection($ventasDelMes);
     }
 }
