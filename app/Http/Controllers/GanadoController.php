@@ -26,6 +26,7 @@ class GanadoController extends Controller
     
     public array $estado=['estado_id'];
     public array $peso=['peso_nacimiento', 'peso_destete','peso_2year','peso_actual'];
+    public array $vendido=['precio','comprador_id'];
     /**
      * Display a listing of the resource.
      */
@@ -40,10 +41,25 @@ class GanadoController extends Controller
     public function store(StoreGanadoRequest $request) :JsonResponse
     {
       $ganado=new Ganado;
+      $ganado->sexo = "H";
       $ganado->fill($request->except($this->estado + $this->peso));
       $ganado->user_id=Auth::id();
       $ganado->save();
-      
+     
+      //estado fallecido
+      $request->only($this->estado)['estado_id'][0] == 2 && $ganado->fallecimiento()->create(
+        [
+            'fecha'=>$request->input('fecha_fallecimiento'),
+            'causa'=>$request->input('causa')
+    ]);
+     
+    //estado vendido
+      $request->only($this->estado)['estado_id'][0] == 5 && $ganado->venta()->create([
+        'fecha'=>$request->input('fecha_venta'),
+        'precio'=>$request->input('precio'),
+        'comprador_id'=>$request->input('comprador_id')
+    ]);
+   
       $ganado->peso()->create($request->only($this->peso));
       $ganado->estados()->sync($request->only($this->estado)['estado_id']);
       $ganado->evento()->create();  
