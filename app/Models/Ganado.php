@@ -191,4 +191,14 @@ class Ganado extends Model
         return $this->hasMany(Notificacion::class);
     }
 
+    /**
+     * Get the fallecimiento associated with the Ganado
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function venta(): HasOne
+    {
+        return $this->hasOne(Venta::class);
+    }
+
 }
