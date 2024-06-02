@@ -10,6 +10,7 @@ use App\Http\Resources\LecheResource;
 use App\Http\Resources\PartoResource;
 use App\Http\Resources\RevisionResource;
 use App\Http\Resources\ServicioResource;
+use App\Models\Estado;
 use App\Models\Ganado;
 use App\Models\Leche;
 use Illuminate\Http\Resources\Json\ResourceCollection;
@@ -32,7 +33,13 @@ class GanadoController extends Controller
      */
     public function index() :ResourceCollection
     {
-        return new GanadoCollection(Ganado::doesntHave('toro')->where('user_id',Auth::id())->with(['peso','evento','estados'])->get());
+        return new GanadoCollection(
+            Ganado::doesntHave('toro')
+            ->doesntHave('fallecimiento')
+            ->doesntHave('venta')
+            ->where('user_id',Auth::id())
+            ->with(['peso','evento','estados'])
+            ->get());
     }
 
     /**
