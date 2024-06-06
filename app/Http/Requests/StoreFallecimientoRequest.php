@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class StoreFallecimientoRequest extends FormRequest
@@ -24,7 +25,14 @@ class StoreFallecimientoRequest extends FormRequest
     {
         return [
             'causa' => 'required|min:3|max:255|string',
-            'numero_ganado' => ['required', Rule::exists('ganados', 'numero')]    
+            'ganado_id' => [
+                'required', 'numeric', Rule::exists('ganados', 'id')
+                ->where(
+                    function ($query) {
+                        return $query->where('user_id', Auth::id());
+                    }
+                )
+            ], 
         ];
     }
 }

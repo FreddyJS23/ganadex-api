@@ -28,7 +28,7 @@ class FallecimientoController extends Controller
     public function store(StoreFallecimientoRequest $request)
     {
         $fallecimiento=new Fallecimiento;
-        $ganado = Ganado::firstWhere('numero', $request->input('numero_ganado'));
+        $ganado = Ganado::find($request->input('ganado_id'));
         $fallecimiento->fill($request->only('causa'));
         $fallecimiento->fecha=Carbon::now()->format('Y-m-d');
         $fallecimiento->ganado()->associate($ganado);
