@@ -21,6 +21,8 @@ class ResResource extends JsonResource
             'origen' => $this->ganado->origen,
             'sexo' => $this->ganado->sexo,
             'tipo' => $this->ganado->tipo->tipo,
+            'ganado_id'=>$this->ganado->id,
+            'estados' => $this->ganado->estados,
             'fecha_nacimiento' => $this->ganado->fecha_nacimiento,
             'pesos'=>$this->ganado->peso
         ];

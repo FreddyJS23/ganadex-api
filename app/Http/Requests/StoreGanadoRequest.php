@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class StoreGanadoRequest extends FormRequest
@@ -26,16 +27,30 @@ class StoreGanadoRequest extends FormRequest
             'nombre' => 'required|min:3|max:255|unique:ganados,nombre',
             'numero' => 'numeric|between:1,32767|unique:ganados,numero',
             'origen' => 'min:3,|max:255',
-            'sexo' => 'required|in:H,M',
             'tipo_id' => 'required|integer|exists:ganado_tipos,id',
             'fecha_nacimiento' => 'date_format:Y-m-d',
             'peso_nacimiento' => 'max:10|regex:/^\d+(\.\d+)?KG$/',
             'peso_destete' => 'max:10|regex:/^\d+(\.\d+)?KG$/',
             'peso_2year' => 'max:10|regex:/^\d+(\.\d+)?KG$/',
-            'peso_actual' => 'max:10|regex:/^\d+(\.\d+)?KG$/',
+            'peso_actual' => ['max:10','regex:/^\d+(\.\d+)?KG$/',Rule::requiredIf(fn ()=> in_array(5, $this->estado_id))],   
             'estado_id' => Rule::foreach(function ($value, $attrubute) {
                 return Rule::exists('estados', 'id');
             }),
+            //campos para registrar ganado vendido
+            'fecha_venta' =>['date_format:Y-m-d', Rule::requiredIf(fn () => in_array(5, $this->estado_id))],
+            'precio' => ['numeric', Rule::requiredIf(fn () => in_array(5, $this->estado_id))],
+            'comprador_id' => [
+                 Rule::requiredIf(fn () => in_array(5, $this->estado_id)),
+                'numeric', Rule::exists('compradors', 'id')
+                ->where(
+                    function ($query) {
+                        return $query->where('user_id', Auth::id());
+                    }
+                )
+            ],
+            //campos para registrar ganado muerto
+            'fecha_fallecimiento' => ['date_format:Y-m-d', Rule::requiredIf(fn () => in_array(2, $this->estado_id))],       
+            'causa' => ['min:3','max:255','string', Rule::requiredIf(fn () => in_array(2, $this->estado_id))],
             
         ];
     }

@@ -24,6 +24,8 @@ class ToroResource extends JsonResource
             'tipo'=>$this->ganado->tipo->tipo,
             'fecha_nacimiento'=>$this->ganado->fecha_nacimiento,
             'pesos' => $this->ganado->peso,
+            'ganado_id' => $this->ganado->id,
+            'estados' => $this->ganado->estados,
             'efectividad' => $this->padre_en_partos_count ? round($efectividad($this->padre_en_partos_count, $this->servicios_count), 2) : null,
             'padre_en_partos' => $this->padre_en_partos_count,
             'servicios' => $this->servicios_count,

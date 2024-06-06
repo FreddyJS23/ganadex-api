@@ -32,7 +32,6 @@ class UpdateGanadoRequest extends FormRequest
             'nombre' => ['required','min:3','max:255', Rule::unique('ganados')->ignore(intval($parametroPath))],
             'numero'=>['numeric','between:1,32767', Rule::unique('ganados')->ignore(intval($parametroPath))],
             'origen'=>'min:3,|max:255',
-            'sexo'=>'required|in:H,M',
             'tipo_id'=>'required|exists:ganado_tipos,id',
             'fecha_nacimiento'=>'date_format:Y-m-d',
             'peso_nacimiento'=>'max:10|regex:/^\d+(\.\d+)?KG$/',

@@ -10,6 +10,7 @@ use App\Http\Resources\LecheResource;
 use App\Http\Resources\PartoResource;
 use App\Http\Resources\RevisionResource;
 use App\Http\Resources\ServicioResource;
+use App\Models\Estado;
 use App\Models\Ganado;
 use App\Models\Leche;
 use Illuminate\Http\Resources\Json\ResourceCollection;
@@ -26,12 +27,19 @@ class GanadoController extends Controller
     
     public array $estado=['estado_id'];
     public array $peso=['peso_nacimiento', 'peso_destete','peso_2year','peso_actual'];
+    public array $vendido=['precio','comprador_id'];
     /**
      * Display a listing of the resource.
      */
     public function index() :ResourceCollection
     {
-        return new GanadoCollection(Ganado::doesntHave('toro')->where('user_id',Auth::id())->with(['peso','evento','estados'])->get());
+        return new GanadoCollection(
+            Ganado::doesntHave('toro')
+            ->doesntHave('fallecimiento')
+            ->doesntHave('venta')
+            ->where('user_id',Auth::id())
+            ->with(['peso','evento','estados'])
+            ->get());
     }
 
     /**
@@ -40,10 +48,25 @@ class GanadoController extends Controller
     public function store(StoreGanadoRequest $request) :JsonResponse
     {
       $ganado=new Ganado;
+      $ganado->sexo = "H";
       $ganado->fill($request->except($this->estado + $this->peso));
       $ganado->user_id=Auth::id();
       $ganado->save();
-      
+     
+      //estado fallecido
+      $request->only($this->estado)['estado_id'][0] == 2 && $ganado->fallecimiento()->create(
+        [
+            'fecha'=>$request->input('fecha_fallecimiento'),
+            'causa'=>$request->input('causa')
+    ]);
+     
+    //estado vendido
+      $request->only($this->estado)['estado_id'][0] == 5 && $ganado->venta()->create([
+        'fecha'=>$request->input('fecha_venta'),
+        'precio'=>$request->input('precio'),
+        'comprador_id'=>$request->input('comprador_id')
+    ]);
+   
       $ganado->peso()->create($request->only($this->peso));
       $ganado->estados()->sync($request->only($this->estado)['estado_id']);
       $ganado->evento()->create();  

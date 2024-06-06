@@ -266,15 +266,16 @@ $fin=$request->query('end');
     return $pdf->stream();
   }
 
-  public function resumenCausasFallecimientos()
+  public function resumenCausasFallecimientos(Request $request)
   {
-
-    Auth::loginUsingId(1);
+    $inicio = $request->query('start');
+    $fin = $request->query('end');
 
     $fallecimientos = Fallecimiento::whereRelation('ganado', 'user_id', Auth::id())
       ->selectRaw('causa, COUNT(causa) AS cantidad')
       ->orderby('cantidad', 'desc')
       ->groupBy('causa')
+      ->whereBetween('fallecimientos.fecha', [$inicio, $fin])
       ->get();
 
     $cantidadOtrasCausas = 0;

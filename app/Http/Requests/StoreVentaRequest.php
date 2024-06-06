@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\ComprobarTienePesoActual;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -31,7 +32,8 @@ class StoreVentaRequest extends FormRequest
                         function ($query) {
                             return $query->where('user_id',Auth::id());
                         }
-                    )
+                    ),
+                    new ComprobarTienePesoActual
             ],
             'comprador_id' => [
                 'required', 'numeric', Rule::exists('compradors', 'id')
