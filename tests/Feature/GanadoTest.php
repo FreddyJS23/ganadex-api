@@ -28,7 +28,7 @@ class GanadoTest extends TestCase
         'peso_destete' => '130KG',
         'peso_2year' => '300KG',
         'peso_actual' => '600KG',
-        'estado_id' => [1,3,2],
+        'estado_id' => [1],
     ];
 
     private int $cantidad_ganado = 10;
@@ -62,14 +62,13 @@ class GanadoTest extends TestCase
                     'nombre' => 'test',
                     'numero' => 300,
                     'origen' => 'local',
-                    'sexo' => 'H',
                     'tipo_id' => '4',
                     'fecha_nacimiento' => '2015-03-02',
                     'peso_nacimiento' => '30KG',
                     'peso_destete' => '30KG',
                     'peso_2year' => '30KG',
                     'peso_actual' => '30KG',
-                    'estado_id' => 1,
+                    'estado_id' => [1],
                 ], ['nombre', 'numero']
             ],
             'caso de insertar datos erróneos' => [
@@ -77,7 +76,6 @@ class GanadoTest extends TestCase
                     'nombre' => 'te',
                     'numero' => 'hj',
                     'origen' => 'ce',
-                    'sexo' => 'm',
                     'tipo_id' => '30d',
                     'fecha_nacimiento' => '2015-13-02',
                     'peso_nacimiento' => '30KdG',
@@ -86,7 +84,7 @@ class GanadoTest extends TestCase
                     'peso_actual' => '.30KG',
                     'estado_id' => ["f", "fg", 20],
                 ], [
-                    'nombre', 'numero', 'origen', 'sexo', 'tipo_id', 'fecha_nacimiento',
+                    'nombre', 'numero', 'origen', 'tipo_id', 'fecha_nacimiento',
                     'peso_nacimiento', 'peso_destete', 'peso_2year', 'peso_actual', 'estado_id'
                 ]
             ],
@@ -100,7 +98,7 @@ class GanadoTest extends TestCase
                     'peso_2year' => '30KG',
                     'peso_actual' => '30KG',
                     'estado_id' => ["f", "fg", 20],
-                ], ['nombre', 'sexo', 'tipo_id']
+                ], ['nombre', 'tipo_id']
             ],
         ];
     }

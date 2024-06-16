@@ -106,7 +106,6 @@ class DashboardPrincipalController extends Controller
         ->selectRaw("AVG(peso_leche) as promedio_pesaje")
         ->whereYear('fecha',now()->format('Y'))
         ->groupBy('fecha')->get();
-
         return new BalanceAnualLecheCollection($balanceAnualLeche);
     }
 }

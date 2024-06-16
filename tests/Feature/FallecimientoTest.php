@@ -50,18 +50,18 @@ class FallecimientoTest extends TestCase
             'caso de insertar datos erróneos' => [
                 [
                     'causa' => 'te',
-                    'numero_ganado' => 'hj',
+                    'ganado_id' => 'hj',
 
-                ], ['causa', 'numero_ganado']
+                ], ['causa', 'ganado_id']
             ],
             'caso de no insertar datos requeridos' => [
-                [], ['causa', 'numero_ganado']
+                [], ['causa', 'ganado_id']
             ],
             'caso de inserta numero ganado inexistente' => [
                 [
                     'causa' => 'enferma',
-                    'numero_ganado' => 0
-                ], ['numero_ganado']
+                    'ganado_id' => 0
+                ], ['ganado_id']
             ],
         ];
     }
@@ -107,7 +107,7 @@ class FallecimientoTest extends TestCase
             ->for($this->user)
             ->create();
 
-        $response = $this->actingAs($this->user)->postJson('api/fallecimientos', $this->fallecimiento + ['numero_ganado' => $ganado->numero]);
+        $response = $this->actingAs($this->user)->postJson('api/fallecimientos', $this->fallecimiento + ['ganado_id' => $ganado->id]);
 
         $response->assertStatus(201)->assertJson(
             fn (AssertableJson $json) => $json->whereAllType([
