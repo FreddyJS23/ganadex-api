@@ -101,6 +101,12 @@ class ToroTest extends TestCase
                             'numero' => 'integer',
                             'origen' => 'string',
                             'fecha_nacimiento' => 'string',
+                            'ganado_id'=> 'integer',
+                            'estados' => 'array',
+                            'pesos' => 'array|null',
+                            'efectividad'=>'double|null',
+                            'padre_en_partos'=>'integer',
+                            'servicios'=>'integer|null',
                             
                         ])
                     ->where('sexo','M')
@@ -126,6 +132,12 @@ class ToroTest extends TestCase
                             'numero' => 'integer',
                             'origen' => 'string',
                             'fecha_nacimiento' => 'string',
+                            'ganado_id'=> 'integer',
+                            'estados' => 'array',
+                            'pesos' => 'array|null',
+                            'efectividad'=>'double|null',
+                            'padre_en_partos'=>'integer|null',
+                            'servicios'=>'integer|null',
                         ])
                         ->where('sexo', 'M')
                         ->where('tipo', 'adulto')
@@ -154,14 +166,16 @@ class ToroTest extends TestCase
                             'numero' => 'integer',
                             'origen' => 'string',
                             'fecha_nacimiento' => 'string',
+                            'ganado_id'=> 'integer',
+                            'estados' => 'array',
+                            'pesos' => 'array|null',
+                            'efectividad'=>'double|null',
+                            'padre_en_partos'=>'integer',
+                            'servicios'=>'integer|null',
                         ])
                         ->where('sexo', 'M')
                         ->where('tipo', 'adulto')
-                )->whereAllType([
-                    'efectividad'=>'double|null',
-                    'padre_en_partos'=>'integer',
-                    'servicios'=>'integer',
-                ])
+                )
             );
     }
    

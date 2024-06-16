@@ -104,10 +104,10 @@ class EfectividadTest extends TestCase
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) => $json->where(
-                'efectividad',
+                'toro.efectividad',
                 fn ($efectividad) => $efectividad >= 1 && $efectividad <= 100
             )
-                ->whereType('efectividad', ['integer', 'double', 'null'])->etc()
+                ->whereType('toro.efectividad', ['integer', 'double', 'null'])->etc()
 
         );
     }

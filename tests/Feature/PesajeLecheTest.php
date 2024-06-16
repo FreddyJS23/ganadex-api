@@ -90,7 +90,7 @@ class PesajeLecheTest extends TestCase
                     $this->cantidad_pesoLeche,
                     fn (AssertableJson $json) => $json->whereAllType([
                         'id' => 'integer',
-                        'pesaje' => 'string',
+                        'pesaje' => 'integer',
                         'fecha' => 'string',
                     ])
                 )
@@ -131,7 +131,7 @@ class PesajeLecheTest extends TestCase
                     'pesaje_leche',
                     fn (AssertableJson $json) => $json->whereAllType([
                         'id' => 'integer',
-                        'pesaje' => 'string',
+                        'pesaje' => 'integer',
                         'fecha' => 'string',
                     ])
                 )
@@ -150,7 +150,7 @@ class PesajeLecheTest extends TestCase
                 fn (AssertableJson $json) => $json->has(
                     'pesaje_leche',
                     fn (AssertableJson $json) => $json
-                        ->where('pesaje', $this->pesoLeche['peso_leche'] . 'KG')
+                        ->where('pesaje', $this->pesoLeche['peso_leche'])
                         ->etc()
                 )
             );

@@ -75,7 +75,7 @@ class DashboardVentaGanadoTest extends TestCase
 
         $response = $this->actingAs($this->user)->getJson(route('dashboardVentaGanado.mejorComprador'));
 
-        $response->assertStatus(404);
+        $response->assertJson(['comprador' => null]);
     }
 
     public function test_obtener_mejor_venta(): void
@@ -108,7 +108,7 @@ class DashboardVentaGanadoTest extends TestCase
     {
         $response = $this->actingAs($this->user)->getJson(route('dashboardVentaGanado.mejorVenta'));
 
-        $response->assertStatus(404);
+        $response->assertJson(['venta' => null]);
     }
 
     public function test_obtener_peor_venta(): void

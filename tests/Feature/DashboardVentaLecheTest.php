@@ -59,7 +59,7 @@ class DashboardVentaLecheTest extends TestCase
 
         $response = $this->actingAs($this->user)->getJson(route('dashboardVentaLeche.variacionPrecio'));
 
-        $response->assertStatus(200)->assertJson(fn (AssertableJson $json) => $json->whereAllType(['variacion' => 'null']));
+        $response->assertStatus(200)->assertJson(fn (AssertableJson $json) => $json->whereAllType(['variacion' => 'integer']));
     }
 
     public function test_obtener_variacion_precio_actual(): void

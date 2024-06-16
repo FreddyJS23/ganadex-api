@@ -63,7 +63,7 @@ class DashboardTest extends TestCase
         {
             $mes = rand(0, 11);
 
-            $fechaInicial = Carbon::create(2023, 1, 20);
+            $fechaInicial = Carbon::create(now()->format('Y'), 1, 20);
 
             $fechaConMesAñadido = $fechaInicial->addMonths($mes)->format('Y-m-d');
 
@@ -154,7 +154,7 @@ class DashboardTest extends TestCase
                 ->has(
                     'top_vacas_productoras.0',
                     fn (AssertableJson $json)
-                    => $json->whereAllType(['peso_leche' => 'string'])
+                    => $json->whereAllType(['peso_leche' => 'integer'])
                     ->has(
                         'ganado',
                         fn (AssertableJson $json)
@@ -177,7 +177,7 @@ class DashboardTest extends TestCase
                 ->has(
                     'top_vacas_menos_productoras.0',
                     fn (AssertableJson $json)
-                    => $json->whereAllType(['peso_leche' => 'string'])
+                    => $json->whereAllType(['peso_leche' => 'integer'])
                     ->has(
                         'ganado',
                         fn (AssertableJson $json)

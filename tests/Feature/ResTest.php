@@ -101,7 +101,9 @@ class ResTest extends TestCase
                             'numero' => 'integer',
                             'origen' => 'string',
                             'fecha_nacimiento' => 'string',
-
+                            'ganado_id'=> 'integer',
+                            'estados' => 'array',
+                            'pesos' => 'array|null',
                         ])
                         ->where('sexo', 'M')
                         ->where('tipo', fn (string $tipoGanado) => Str::contains($tipoGanado, ['becerro', 'maute','novillo','adulto']))
@@ -127,6 +129,9 @@ class ResTest extends TestCase
                             'origen' => 'string',
                             'tipo' => 'string',
                             'fecha_nacimiento' => 'string',
+                            'ganado_id'=> 'integer',
+                            'estados' => 'array',
+                            'pesos' => 'array|null',
                         ])
                         ->where('sexo', 'M')
                     ->where('tipo', fn (string $tipoGanado) => Str::contains($tipoGanado, ['becerro', 'maute', 'novillo', 'adulto']))
@@ -155,6 +160,9 @@ class ResTest extends TestCase
                             'numero' => 'integer',
                             'origen' => 'string',
                             'fecha_nacimiento' => 'string',
+                            'ganado_id'=> 'integer',
+                            'estados' => 'array',
+                            'pesos' => 'array|null',
                         ])
                         ->where('sexo', 'M')
                     ->where('tipo', fn (string $tipoGanado) => Str::contains($tipoGanado, ['becerro', 'maute', 'novillo', 'adulto']))
