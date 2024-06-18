@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Res extends Model
+class GanadoDescarte extends Model
 {
     use HasFactory;
 
@@ -18,7 +18,7 @@ class Res extends Model
     ];
 
      /**
-     * Get the ganado that owns the Res
+     * Get the ganado that owns the GanadoDescarte
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */

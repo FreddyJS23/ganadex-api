@@ -2,11 +2,9 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Res;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
-class UpdateResRequest extends FormRequest
+class StoreGanadoDescarteRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,17 +21,14 @@ class UpdateResRequest extends FormRequest
      */
     public function rules(): array
     {
-        /**
-         * Gets the route parameter.
-         *
-         * @return string
-         */
-        $parametroPath = preg_replace("/[^0-9]/", "", request()->path());
-        $ganadoId=Res::find($parametroPath)->ganado->id;
         return [
-            'nombre'=>['required','min:3','max:255',Rule::unique('ganados')->ignore($ganadoId)],
-            'numero'=>['required','numeric','between:1,32767',Rule::unique('ganados')->ignore($ganadoId)],
+            'nombre'=>'required|min:3|max:255|unique:ganados,nombre',
+            'numero'=>'numeric|between:1,32767|unique:ganados,numero',
             'origen'=>'min:3,|max:255',
+            'peso_nacimiento' => 'numeric|between:1,32767',
+            'peso_destete' => 'numeric|between:1,32767',
+            'peso_2year' => 'numeric|between:1,32767',
+            'peso_actual' => 'numeric|between:1,32767',
             'fecha_nacimiento'=>'date_format:Y-m-d'
         ];
     }
