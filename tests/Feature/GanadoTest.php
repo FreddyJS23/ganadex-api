@@ -24,10 +24,10 @@ class GanadoTest extends TestCase
         'sexo' => 'H',
         'tipo_id' => 4,
         'fecha_nacimiento' => '2015-02-17',
-        'peso_nacimiento' => '30KG',
-        'peso_destete' => '130KG',
-        'peso_2year' => '300KG',
-        'peso_actual' => '600KG',
+        'peso_nacimiento' => 30,
+        'peso_destete' => 130,
+        'peso_2year' => 300,
+        'peso_actual' => 60,
         'estado_id' => [1],
     ];
 
@@ -64,10 +64,10 @@ class GanadoTest extends TestCase
                     'origen' => 'local',
                     'tipo_id' => '4',
                     'fecha_nacimiento' => '2015-03-02',
-                    'peso_nacimiento' => '30KG',
-                    'peso_destete' => '30KG',
-                    'peso_2year' => '30KG',
-                    'peso_actual' => '30KG',
+                    'peso_nacimiento' => 30,
+                    'peso_destete' => 30,
+                    'peso_2year' => 30,
+                    'peso_actual' => 30,
                     'estado_id' => [1],
                 ], ['nombre', 'numero']
             ],
@@ -93,10 +93,10 @@ class GanadoTest extends TestCase
                     'numero' => 300,
                     'origen' => 'local',
                     'fecha_nacimiento' => '2015-03-02',
-                    'peso_nacimiento' => '30KG',
-                    'peso_destete' => '30KG',
-                    'peso_2year' => '30KG',
-                    'peso_actual' => '30KG',
+                    'peso_nacimiento' => 30,
+                    'peso_destete' => 30,
+                    'peso_2year' => 30,
+                    'peso_actual' => 30,
                     'estado_id' => ["f", "fg", 20],
                 ], ['nombre', 'tipo_id']
             ],
@@ -138,10 +138,10 @@ class GanadoTest extends TestCase
                     fn (AssertableJson $json) => $json
                         ->whereAllType([
                             'id'=>'integer',
-                            'peso_nacimiento' => 'string',
-                            'peso_destete' => 'string',
-                            'peso_2year' => 'string',
-                            'peso_actual' => 'string',
+                            'peso_nacimiento' => 'integer',
+                            'peso_destete' => 'integer',
+                            'peso_2year' => 'integer',
+                            'peso_actual' => 'integer',
                         ])
                 )
                 ->has(
@@ -185,11 +185,11 @@ class GanadoTest extends TestCase
                             ->has('pesos',
                             fn(AssertableJson $json)=>$json
                             ->whereAllType([
-                                 'id'=>'integer',      
-                                'peso_nacimiento' => 'string',
-                                        'peso_destete' => 'string',
-                                        'peso_2year' => 'string',
-                                        'peso_actual' => 'string',]))
+                                'id'=>'integer',      
+                                'peso_nacimiento' => 'integer',
+                                'peso_destete' => 'integer',
+                                'peso_2year' => 'integer',
+                                'peso_actual' => 'integer',]))
                             ->has('eventos',
                             fn(AssertableJson $json)=>$json
                             ->whereAllType([
