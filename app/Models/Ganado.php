@@ -43,13 +43,13 @@ class Ganado extends Model
     }
    
     /**
-     * Get the res associated with the Ganado
+     * Get the ganadoDescarte associated with the Ganado
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
-    public function res(): HasOne
+    public function ganadoDescarte(): HasOne
     {
-        return $this->hasOne(Res::class);
+        return $this->hasOne(GanadoDescarte::class);
     }
 
     /**

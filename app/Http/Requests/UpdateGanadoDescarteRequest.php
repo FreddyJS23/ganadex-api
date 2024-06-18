@@ -2,9 +2,11 @@
 
 namespace App\Http\Requests;
 
+use App\Models\GanadoDescarte;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-class StoreResRequest extends FormRequest
+class UpdateGanadoDescarteRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -21,14 +23,17 @@ class StoreResRequest extends FormRequest
      */
     public function rules(): array
     {
+        /**
+         * Gets the route parameter.
+         *
+         * @return string
+         */
+        $parametroPath = preg_replace("/[^0-9]/", "", request()->path());
+        $ganadoId=GanadoDescarte::find($parametroPath)->ganado->id;
         return [
-            'nombre'=>'required|min:3|max:255|unique:ganados,nombre',
-            'numero'=>'numeric|between:1,32767|unique:ganados,numero',
+            'nombre'=>['required','min:3','max:255',Rule::unique('ganados')->ignore($ganadoId)],
+            'numero'=>['required','numeric','between:1,32767',Rule::unique('ganados')->ignore($ganadoId)],
             'origen'=>'min:3,|max:255',
-            'peso_nacimiento' => 'max:10|regex:/^\d+(\.\d+)?KG$/',
-            'peso_destete' => 'max:10|regex:/^\d+(\.\d+)?KG$/',
-            'peso_2year' => 'max:10|regex:/^\d+(\.\d+)?KG$/',
-            'peso_actual' => 'max:10|regex:/^\d+(\.\d+)?KG$/',
             'fecha_nacimiento'=>'date_format:Y-m-d'
         ];
     }

@@ -17,6 +17,6 @@ class ComprobarTienePesoActual implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (!Ganado::where('id', $value)->whereRelation('peso', 'peso_actual', '>', 0)->first())
-            $fail('La vaca/res/toro debe tener un peso actual');
+            $fail('La vaca/ganado descarte/toro debe tener un peso actual');
     }
 }

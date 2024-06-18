@@ -50,7 +50,7 @@ class DashboardTest extends TestCase
                 'pesajes_leche'
             )
             ->state(new Sequence(
-                fn (Sequence $sequence) => ['tipo_id' => rand(1, 5)]
+                fn (Sequence $sequence) => ['tipo_id' => rand(1, 4)]
             ))
             ->for($this->user)
             ->create();
@@ -116,13 +116,12 @@ class DashboardTest extends TestCase
 
         $response->assertStatus(200)->assertJson(fn (AssertableJson $json) =>
         $json->whereType('total_tipos_ganado', 'array')
-            ->where('total_tipos_ganado', fn (SupportCollection $tipos) => count($tipos) == 5 ? true : false)
+            ->where('total_tipos_ganado', fn (SupportCollection $tipos) => count($tipos) == 4 ? true : false)
             ->whereAllType([
                 'total_tipos_ganado.0.becerro' => 'integer',
                 'total_tipos_ganado.1.maute' => 'integer',
                 'total_tipos_ganado.2.novillo' => 'integer',
                 'total_tipos_ganado.3.adulto' => 'integer',
-                'total_tipos_ganado.4.res' => 'integer',
             ]));
     }
 
