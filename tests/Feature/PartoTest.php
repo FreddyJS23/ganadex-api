@@ -24,7 +24,7 @@ class PartoTest extends TestCase
         'nombre' => 'test',
         'numero' => 33,
         'sexo' => 'H',
-        'peso_nacimiento' => '33KG',
+        'peso_nacimiento' => 33,
 
 
     ];
@@ -98,7 +98,7 @@ class PartoTest extends TestCase
                 ], ['observacion', 'nombre', 'numero', 'sexo', 'peso_nacimiento']
             ],
             'caso de no insertar datos requeridos' => [
-                [], ['observacion', 'nombre', 'sexo', 'peso_nacimiento']
+                [], ['observacion', 'nombre', 'sexo']
             ],
             'caso de que exista el nombre o numero' => [
                 [
@@ -107,7 +107,7 @@ class PartoTest extends TestCase
                     'numero' => 33,
                     'sexo' => 'H',
                     'tipo_id' => '4',
-                    'peso_nacimiento' => '30KG',
+                    'peso_nacimiento' => 30,
                 ], ['nombre', 'numero']
             ],
             'caso de insertar un personal que no sea veterinario' => [

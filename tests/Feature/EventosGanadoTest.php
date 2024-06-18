@@ -45,7 +45,7 @@ class EventosGanadoTest extends TestCase
         'observacion' => 'bien',
         'nombre' => 'test',
         'numero' => 33,
-        'peso_nacimiento' => '50KG',
+        'peso_nacimiento' => 50,
     ];
     private $hembra = ['sexo' => 'H'];
     private $macho = ['sexo' => 'M'];
@@ -66,7 +66,7 @@ class EventosGanadoTest extends TestCase
     ];
 
     private array $pesoLeche = [
-        'peso_leche' => '30',
+        'peso_leche' => 30,
 
     ];
 

@@ -25,10 +25,10 @@ class StoreToroRequest extends FormRequest
             'nombre'=>'required|min:3|max:255|unique:ganados,nombre',
             'numero'=>'required|numeric|between:1,32767|unique:ganados,numero',
             'origen'=>'min:3,|max:255',
-            'peso_nacimiento' => 'max:10|regex:/^\d+(\.\d+)?KG$/',
-            'peso_destete' => 'max:10|regex:/^\d+(\.\d+)?KG$/',
-            'peso_2year' => 'max:10|regex:/^\d+(\.\d+)?KG$/',
-            'peso_actual' => 'max:10|regex:/^\d+(\.\d+)?KG$/',
+            'peso_nacimiento' => 'numeric|between:1,32767',
+            'peso_destete' => 'numeric|between:1,32767',
+            'peso_2year' => 'numeric|between:1,32767',
+            'peso_actual' => 'numeric|between:1,32767',
             'fecha_nacimiento'=>'date_format:Y-m-d'
         ];
     }
