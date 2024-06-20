@@ -90,7 +90,7 @@ class VentaTest extends TestCase
                         ->whereAllType([
                             'id' => 'integer',
                             'fecha' => 'string',
-                            'peso' => 'integer',
+                            'peso' => 'string',
                             'precio' => 'integer|double',
                             'precio_kg' => 'integer|double',
                             'comprador' => 'string',
@@ -123,7 +123,7 @@ class VentaTest extends TestCase
                         ->whereAllType([
                             'id' => 'integer',
                             'fecha' => 'string',
-                            'peso' => 'integer',
+                            'peso' => 'string',
                             'precio' => 'integer|double',
                             'precio_kg' => 'integer|double',
                             'comprador' => 'string',
@@ -156,7 +156,7 @@ class VentaTest extends TestCase
                         ->whereAllType([
                             'id' => 'integer',
                             'fecha' => 'string',
-                            'peso' => 'integer',
+                            'peso' => 'string',
                             'precio' => 'integer|double',
                             'precio_kg' => 'integer|double',
                             'comprador' => 'string',

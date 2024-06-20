@@ -138,10 +138,10 @@ class GanadoTest extends TestCase
                     fn (AssertableJson $json) => $json
                         ->whereAllType([
                             'id'=>'integer',
-                            'peso_nacimiento' => 'integer',
-                            'peso_destete' => 'integer',
-                            'peso_2year' => 'integer',
-                            'peso_actual' => 'integer',
+                            'peso_nacimiento' => 'string',
+                            'peso_destete' => 'string',
+                            'peso_2year' => 'string',
+                            'peso_actual' => 'string',
                         ])
                 )
                 ->has(
@@ -186,10 +186,10 @@ class GanadoTest extends TestCase
                             fn(AssertableJson $json)=>$json
                             ->whereAllType([
                                 'id'=>'integer',      
-                                'peso_nacimiento' => 'integer',
-                                'peso_destete' => 'integer',
-                                'peso_2year' => 'integer',
-                                'peso_actual' => 'integer',]))
+                                'peso_nacimiento' => 'string',
+                                'peso_destete' => 'string',
+                                'peso_2year' => 'string',
+                                'peso_actual' => 'string',]))
                             ->has('eventos',
                             fn(AssertableJson $json)=>$json
                             ->whereAllType([
@@ -230,10 +230,10 @@ class GanadoTest extends TestCase
                 ->where('ganado.origen', $this->cabeza_ganado['origen'])
                 ->where('ganado.sexo', $this->cabeza_ganado['sexo'])
                 ->where('ganado.fecha_nacimiento', $this->cabeza_ganado['fecha_nacimiento'])
-                ->where('ganado.pesos.peso_nacimiento', $this->cabeza_ganado['peso_nacimiento'])
-                ->where('ganado.pesos.peso_destete', $this->cabeza_ganado['peso_destete'])
-                ->where('ganado.pesos.peso_2year', $this->cabeza_ganado['peso_2year'])
-                ->where('ganado.pesos.peso_actual', $this->cabeza_ganado['peso_actual'])
+                ->where('ganado.pesos.peso_nacimiento', $this->cabeza_ganado['peso_nacimiento'] . 'KG')
+                ->where('ganado.pesos.peso_destete', $this->cabeza_ganado['peso_destete'] . 'KG')
+                ->where('ganado.pesos.peso_2year', $this->cabeza_ganado['peso_2year'] . 'KG')
+                ->where('ganado.pesos.peso_actual', $this->cabeza_ganado['peso_actual'] . 'KG')
 
                 ->etc()
         );

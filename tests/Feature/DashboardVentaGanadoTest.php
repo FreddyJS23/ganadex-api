@@ -89,7 +89,7 @@ class DashboardVentaGanadoTest extends TestCase
             $json->whereAllType([
                 'venta.id' => 'integer',
                 'venta.fecha' => 'string',
-                'venta.peso' => 'integer',
+                'venta.peso' => 'string',
                 'venta.precio' => 'integer|double',
                 'venta.precio_kg' => 'integer|double',
                 'venta.comprador' => 'string',
@@ -122,7 +122,7 @@ class DashboardVentaGanadoTest extends TestCase
             $json->whereAllType([
                 'venta.id' => 'integer',
                 'venta.fecha' => 'string',
-                'venta.peso' => 'integer',
+                'venta.peso' => 'string',
                 'venta.precio' => 'integer|double',
                 'venta.precio_kg' => 'integer|double',
                 'venta.comprador' => 'string',
@@ -161,7 +161,7 @@ class DashboardVentaGanadoTest extends TestCase
                     => $json->whereAllType([
                         'id' => 'integer',
                         'fecha' => 'string',
-                        'peso' => 'integer',
+                        'peso' => 'string',
                         'precio' => 'integer|double',
                         'precio_kg' => 'integer|double',
                         'comprador' => 'string',
