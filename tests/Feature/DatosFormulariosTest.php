@@ -57,7 +57,7 @@ class DatosFormulariosTest extends TestCase
                     => $json->whereAllType([
                         'id' => 'integer',
                         'numero' => 'integer',
-                        'peso_actual'=>'integer'
+                        'peso_actual'=>'string'
                     ])
                 )
         );
