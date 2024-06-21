@@ -20,7 +20,7 @@ class GanadoDescarteController extends Controller
    
     public function __construct()
     {
-        $this->authorizeResource(GanadoDescarte::class, 'ganadoDescarte');
+        $this->authorizeResource(GanadoDescarte::class, 'ganado_descarte');
     }
 
     /**
