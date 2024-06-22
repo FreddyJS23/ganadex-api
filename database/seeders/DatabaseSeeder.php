@@ -16,9 +16,10 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             EstadoSeeder::class,
            // UserSeeder::class,
-            GanadoTipoSeeder::class,
-            CargoSeeder::class,
-            TiposNotificacionSeeder::class,
+           GanadoTipoSeeder::class,
+           CargoSeeder::class,
+           TiposNotificacionSeeder::class,
+           DemostracionSeeder::class,
         ]);
     }
 }
