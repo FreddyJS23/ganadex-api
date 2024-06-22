@@ -15,6 +15,7 @@ use App\Models\Ganado;
 use App\Models\Leche;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class GanadoController extends Controller
@@ -51,27 +52,35 @@ class GanadoController extends Controller
       $ganado->sexo = "H";
       $ganado->fill($request->except($this->estado + $this->peso));
       $ganado->user_id=Auth::id();
-      $ganado->save();
      
-      //estado fallecido
-      $request->only($this->estado)['estado_id'][0] == 2 && $ganado->fallecimiento()->create(
-        [
-            'fecha'=>$request->input('fecha_fallecimiento'),
-            'causa'=>$request->input('causa')
-    ]);
-     
-    //estado vendido
-      $request->only($this->estado)['estado_id'][0] == 5 && $ganado->venta()->create([
-        'fecha'=>$request->input('fecha_venta'),
-        'precio'=>$request->input('precio'),
-        'comprador_id'=>$request->input('comprador_id')
-    ]);
-   
-      $ganado->peso()->create($request->only($this->peso));
-      $ganado->estados()->sync($request->only($this->estado)['estado_id']);
-      $ganado->evento()->create();  
-     
-      return response()->json(['ganado'=>new GanadoResource($ganado)],201);
+    try {
+                DB::transaction(function () use ($ganado, $request) {
+                    $ganado->save();
+                    //estado fallecido
+                    $request->only($this->estado)['estado_id'][0] == 2 && $ganado->fallecimiento()->create(
+                        [
+                            'fecha' => $request->input('fecha_fallecimiento'),
+                            'causa' => $request->input('causa')
+                        ]
+                    );
+
+                    //estado vendido
+                    $request->only($this->estado)['estado_id'][0] == 5 && $ganado->venta()->create([
+                        'fecha' => $request->input('fecha_venta'),
+                        'precio' => $request->input('precio'),
+                        'comprador_id' => $request->input('comprador_id')
+                    ]);
+
+                    $ganado->peso()->create(['peso_nacimiento' => 'dgggg']);
+                    //$ganado->peso()->create($request->only($this->peso));
+                    $ganado->estados()->sync($request->only($this->estado)['estado_id']);
+                    $ganado->evento()->create();
+                });
+                return response()->json(['ganado' => new GanadoResource($ganado)], 201);
+    } catch (\Throwable $error) {
+                return response()->json(['error'=>'error al insertar datos'], 501);
+    }
+
     }
 
     /**
