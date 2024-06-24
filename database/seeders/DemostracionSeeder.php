@@ -8,6 +8,7 @@ use Illuminate\Database\Seeder;
 use App\Models\Estado;
 use App\Models\Fallecimiento;
 use App\Models\Ganado;
+use App\Models\GanadoDescarte;
 use App\Models\Insumo;
 use App\Models\Leche;
 use App\Models\Notificacion;
@@ -28,15 +29,23 @@ class DemostracionSeeder extends Seeder
      */
     public function run(): void
     {
-        $elementos = 3;
+        $elementos = 30;
+        $cantidadGanados = 10;
 
         $user = User::factory()->create();
-        $estado = Estado::all();
+        $estadoSano = Estado::firstWhere('estado', 'sano');
+        $estadoFallecido = Estado::firstWhere('estado', 'fallecido');
+        $estadoVendido = Estado::firstWhere('estado', 'vendido');
 
-        $toro = Toro::factory()
+        $toros = Toro::factory()
             ->count($elementos)
             ->for($user)
             ->for(Ganado::factory()->for($user)->create(['sexo' => 'M']))->create();
+        
+        GanadoDescarte::factory()
+            ->count($elementos)
+            ->for($user)
+            ->for(Ganado::factory()->for($user)->create(['sexo' => array_rand(['M', 'F'])]))->create();
 
         $veterinario
             = Personal::factory()
@@ -48,8 +57,8 @@ class DemostracionSeeder extends Seeder
             ->for($user)
             ->create();
 
-        $ganado = Ganado::factory()
-            ->count($elementos)
+        $ganados = Ganado::factory()
+            ->count($cantidadGanados)
             ->hasPeso(1)
             ->sequence(
                 ['tipo_id' => 1],
@@ -59,34 +68,38 @@ class DemostracionSeeder extends Seeder
 
             )
             ->hasEvento(1)
-            ->hasAttached($estado)
+            ->hasAttached($estadoSano)
             ->for($user)
             ->create();
 
-        Revision::factory()
-            ->count($elementos)
-            ->for($ganado[0])
-            ->create(['personal_id' => $veterinario]);
+        for ($i = 0; $i < $cantidadGanados; $i++) {
+            Revision::factory()
+                ->count(5)
+                ->for($ganados[$i])
+                ->create(['personal_id' => $veterinario]);
 
-        Servicio::factory()
-            ->count(30)
-            ->for($ganado[0])
-            ->for($toro[0])
-            ->create(['personal_id' => $veterinario]);
+            Servicio::factory()
+                ->count(5)
+                ->for($ganados[$i])
+                ->for($toros[0])
+                ->create(['personal_id' => $veterinario]);
 
-        Parto::factory()
-            ->count(15)
-            ->for($ganado[0])
-            ->for(Ganado::factory()->for($user)->hasAttached(Estado::firstWhere('estado', 'sano'))->hasPeso(1), 'ganado_cria')
-            ->for($toro[0])
-            ->create(['personal_id' => $veterinario]);
+            Parto::factory()
+                ->count(15)
+                ->for($ganados[0])
+                ->for(Ganado::factory()->for($user)->hasAttached($estadoSano)->hasPeso(1), 'ganado_cria')
+                ->for($toros[0])
+                ->create(['personal_id' => $veterinario]);
 
 
-        Leche::factory()
-            ->count($elementos)
-            ->for($ganado[0])
-            ->for($user)
-            ->create();
+            Leche::factory()
+                ->count(5)
+                ->for($ganados[0])
+                ->for($user)
+                ->create();
+}
+
+       
 
 
         VentaLeche::factory()
@@ -98,13 +111,13 @@ class DemostracionSeeder extends Seeder
         Venta::factory()
             ->count($elementos)
             ->for($user)
-            ->for(Ganado::factory()->for($user)->hasPeso(1)->hasAttached($estado)->create())
+            ->for(Ganado::factory()->for($user)->hasPeso(1)->hasAttached($estadoVendido)->create())
             ->for(Comprador::factory()->for($user)->create())
             ->create();
 
         Fallecimiento::factory()
             ->count($elementos)
-            ->for(Ganado::factory()->for($user)->hasAttached($estado))
+            ->for(Ganado::factory()->for($user)->hasAttached($estadoFallecido))
             ->create();
 
 
