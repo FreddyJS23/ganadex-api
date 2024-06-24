@@ -17,7 +17,7 @@ class BalanceAnualLecheResource extends JsonResource
     {
         return [
             'mes'=>$this->meses[intval($this->mes - 1)],
-            'promedio_pesaje'=>round($this->promedio_pesaje,0)
+            'promedio_mensual'=>round($this->promedio_mensual,0)
         ];
     }
 }
