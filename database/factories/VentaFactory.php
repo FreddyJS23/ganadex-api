@@ -18,7 +18,7 @@ class VentaFactory extends Factory
     {
         return [
             'precio' => fake()->randomFloat(2, 0, 7),
-            'fecha' => fake()->date()
+            'fecha' => fake()->dateTimeThisYear()->format('y-m-d')
         ];
     }
 }

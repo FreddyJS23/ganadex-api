@@ -18,7 +18,7 @@ class VentaLecheFactory extends Factory
     {
         return [
             'cantidad' => fake()->randomFloat(2, 0, 7),
-            'fecha' => fake()->date()
+            'fecha' => fake()->dateTimeThisYear()->format('y-m-d')
         ];
     }
 }

@@ -18,7 +18,7 @@ class LecheFactory extends Factory
     {
         return [
             'peso_leche'=>fake()->randomNumber(4),
-            'fecha'=>fake()->date()
+            'fecha'=>fake()->dateTimeThisYear()->format('y-m-d')
         ];
     }
 }
