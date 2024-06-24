@@ -15,7 +15,7 @@ class TotalGanadoTipoResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-           $this->tipo=>$this->ganado_count
+           $this['tipo'] => $this['ganado_count'],
         ];
     }
 }

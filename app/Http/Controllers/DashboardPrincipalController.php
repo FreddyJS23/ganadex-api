@@ -8,6 +8,7 @@ use App\Http\Resources\TopVacasMenosProductorasCollection;
 use App\Http\Resources\TopVacasProductorasCollection;
 use App\Http\Resources\TotalGanadoTipoCollection;
 use App\Models\Ganado;
+use App\Models\GanadoDescarte;
 use App\Models\GanadoTipo;
 use App\Models\Insumo;
 use App\Models\Leche;
@@ -22,11 +23,34 @@ class DashboardPrincipalController extends Controller
 {
     public function totalGanadoTipo()
     {
-        $TotalGanadoPorTipos = GanadoTipo::withCount(['ganado' => function (Builder $query) {
-            $query->where('user_id', Auth::id());
-        }]);
+        $totalGanadoPorTiposMacho = GanadoTipo::withCount(['ganado' => function (Builder $query) {
+            $query->where('sexo','M')
+            ->where('user_id', Auth::id())
+            ->doesntHave('fallecimiento')
+            ->doesntHave('venta')
+            ->doesntHave('ganadodescarte');
+        }])->get();
+       
+        $totalGanadoPorTiposHembra = GanadoTipo::withCount(['ganado' => function (Builder $query) {
+            $query->where('sexo','H')
+            ->where('user_id', Auth::id())
+            ->doesntHave('fallecimiento')
+            ->doesntHave('venta')
+            ->doesntHave('ganadodescarte');
+        }])->get();
 
-        return  new TotalGanadoTipoCollection($TotalGanadoPorTipos->get());
+        //Cambiar tipo ganado macho por tipo ganado hembra
+        $totalGanadoPorTiposHembra->transform(function (GanadoTipo $item) {
+            $item->tipo = substr($item->tipo, 0, -1) . 'a';
+            return $item;
+        }); 
+
+        $totalGanadoDescarte = GanadoDescarte::where('user_id', Auth::id())->count();
+        $totalGanadoDescarte=collect(    
+           [[  'tipo'=>'descarte',
+            'ganado_count' => $totalGanadoDescarte]]);
+
+        return  new TotalGanadoTipoCollection($totalGanadoPorTiposHembra->concat($totalGanadoPorTiposMacho)->concat($totalGanadoDescarte));
     }
 
     public function totalPersonal(Request $request)
