@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Estado;
 use App\Models\Ganado;
+use App\Models\GanadoDescarte;
 use App\Models\Insumo;
 use App\Models\Leche;
 use App\Models\Personal;
@@ -36,6 +37,12 @@ class DashboardTest extends TestCase
     }
     private function generarGanado(): Collection
     {
+        GanadoDescarte::factory()
+            ->count(10)
+            ->for($this->user)
+            ->forGanado(['user_id' => $this->user->id, 'sexo' => 'M', 'tipo_id' => 4])
+            ->create();
+        
         return Ganado::factory()
             ->count($this->cantidad_elementos)
             ->hasPeso(1)
