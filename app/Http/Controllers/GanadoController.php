@@ -71,7 +71,7 @@ class GanadoController extends Controller
                         'comprador_id' => $request->input('comprador_id')
                     ]);
 
-                    $ganado->peso()->create(['peso_nacimiento' => 'dgggg']);
+                    $ganado->peso()->create($request->only($this->peso));
                     //$ganado->peso()->create($request->only($this->peso));
                     $ganado->estados()->sync($request->only($this->estado)['estado_id']);
                     $ganado->evento()->create();
