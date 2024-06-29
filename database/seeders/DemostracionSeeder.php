@@ -73,6 +73,8 @@ class DemostracionSeeder extends Seeder
             ->create();
 
         for ($i = 0; $i < $cantidadGanados; $i++) {
+            $numeroServicios=15;
+            $numeroPartos=rand(1,$numeroServicios);
             Revision::factory()
                 ->count(5)
                 ->for($ganados[$i])
@@ -85,8 +87,8 @@ class DemostracionSeeder extends Seeder
                 ->create(['personal_id' => $veterinario]);
 
             Parto::factory()
-                ->count(15)
-                ->for($ganados[0])
+                ->count($numeroPartos)
+                ->for($ganados[$i])
                 ->for(Ganado::factory()->for($user)->hasAttached($estadoSano)->hasPeso(1), 'ganado_cria')
                 ->for($toros[0])
                 ->create(['personal_id' => $veterinario]);
@@ -94,7 +96,7 @@ class DemostracionSeeder extends Seeder
 
             Leche::factory()
                 ->count(5)
-                ->for($ganados[0])
+                ->for($ganados[$i])
                 ->for($user)
                 ->create();
 }
