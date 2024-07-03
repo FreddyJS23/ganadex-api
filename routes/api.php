@@ -56,6 +56,7 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::apiResource('/toro',ToroController::class);
     Route::apiResource('/ganado',GanadoController::class);
     Route::apiResource('/ganado_descarte',GanadoDescarteController::class);
+    Route::post('/descartar_ganado',[GanadoDescarteController::class,'descartar'])->name('ganado_descarte.descartar');
     Route::apiResource('/insumo',InsumoController::class);
     Route::apiResource('/personal',PersonalController::class);
     Route::apiResource('/configuracion',ConfiguracionController::class)->only(['index','store','update']);
