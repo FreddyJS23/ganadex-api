@@ -138,8 +138,39 @@ class GanadoDescarteTest extends TestCase
                 )
             );
     }
+    public function test_descartar_ganado(): void
+    {
+        $ganado =Ganado::factory()
+            ->hasPeso(1)
+            ->hasEvento(1)
+            ->for($this->user)
+            ->create();
 
+        $response = $this->actingAs($this->user)->postJson('api/descartar_ganado', ['ganado_id' => $ganado->id]);
 
+        $response->assertStatus(201)
+            ->assertJson(
+                fn (AssertableJson $json) => $json->has(
+                    'ganado_descarte',
+                    fn (AssertableJson $json) => $json
+                        ->whereAllType([
+                            'id' => 'integer',
+                            'nombre' => 'string',
+                            'sexo' => 'string',
+                            'numero' => 'integer',
+                            'origen' => 'string',
+                            'tipo' => 'string',
+                            'fecha_nacimiento' => 'string',
+                            'ganado_id'=> 'integer',
+                            'estados' => 'array',
+                            'pesos' => 'array|null',
+                        ])
+                    ->where('tipo', fn (string $tipoGanado) => Str::contains($tipoGanado, ['becerro', 'maute', 'novillo', 'adulto']))
+                )
+            );
+    }
+
+    
     public function test_obtener_ganadoDescarte(): void
     {
         $ress = $this->generarGanadoDescartes();

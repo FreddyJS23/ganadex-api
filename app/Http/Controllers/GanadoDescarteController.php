@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreDescartarGanado;
 use App\Http\Requests\StoreGanadoDescarteRequest;
 use App\Http\Requests\StoreResRequest;
 use App\Http\Requests\UpdateGanadoDescarteRequest;
@@ -12,6 +13,7 @@ use App\Http\Resources\GanadoDescarteResource;
 use App\Models\Ganado;
 use App\Models\GanadoTipo;
 use App\Models\GanadoDescarte;
+use Illuminate\Contracts\Cache\Store;
 use Illuminate\Support\Facades\Auth;
 
 class GanadoDescarteController extends Controller
@@ -77,5 +79,14 @@ class GanadoDescarteController extends Controller
     public function destroy(GanadoDescarte $ganadoDescarte)
     {
         return  response()->json(['ganado_descarteID' => Ganado::destroy($ganadoDescarte->ganado->id) ?  $ganadoDescarte->id : ''], 200);
+    }
+
+    public function descartar(StoreDescartarGanado $request)
+    {
+        $ganadoDescarte=new GanadoDescarte;
+        $ganadoDescarte->ganado_id=$request->ganado_id;
+        $ganadoDescarte->user_id=Auth::id();
+        $ganadoDescarte->save();
+        return response()->json(['ganado_descarte' => new GanadoDescarteResource($ganadoDescarte)], 201);
     }
 }
