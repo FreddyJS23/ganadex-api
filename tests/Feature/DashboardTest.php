@@ -123,12 +123,17 @@ class DashboardTest extends TestCase
 
         $response->assertStatus(200)->assertJson(fn (AssertableJson $json) =>
         $json->whereType('total_tipos_ganado', 'array')
-            ->where('total_tipos_ganado', fn (SupportCollection $tipos) => count($tipos) == 4 ? true : false)
+            ->where('total_tipos_ganado', fn (SupportCollection $tipos) => count($tipos) == 9 ? true : false)
             ->whereAllType([
-                'total_tipos_ganado.0.becerro' => 'integer',
-                'total_tipos_ganado.1.maute' => 'integer',
-                'total_tipos_ganado.2.novillo' => 'integer',
-                'total_tipos_ganado.3.adulto' => 'integer',
+                'total_tipos_ganado.0.becerra' => 'integer',
+                'total_tipos_ganado.1.mauta' => 'integer',
+                'total_tipos_ganado.2.novilla' => 'integer',
+                'total_tipos_ganado.3.adulta' => 'integer',
+                'total_tipos_ganado.4.becerro' => 'integer',
+                'total_tipos_ganado.5.maute' => 'integer',
+                'total_tipos_ganado.6.novillo' => 'integer',
+                'total_tipos_ganado.7.adulto' => 'integer',
+                'total_tipos_ganado.8.descarte' => 'integer',
             ]));
     }
 
@@ -246,7 +251,7 @@ class DashboardTest extends TestCase
                 ->whereAllType(
                     [
                         'balance_anual.0.mes' => 'string',
-                        'balance_anual.0.promedio_pesaje' => 'integer'
+                        'balance_anual.0.promedio_mensual' => 'integer'
                     ]
                 )
         );
