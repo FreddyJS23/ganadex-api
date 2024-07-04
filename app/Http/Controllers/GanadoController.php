@@ -38,6 +38,7 @@ class GanadoController extends Controller
             Ganado::doesntHave('toro')
             ->doesntHave('fallecimiento')
             ->doesntHave('venta')
+            ->doesntHave('ganadoDescarte')
             ->where('user_id',Auth::id())
             ->with(['peso','evento','estados'])
             ->get());

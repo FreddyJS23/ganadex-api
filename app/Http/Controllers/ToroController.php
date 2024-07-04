@@ -9,6 +9,7 @@ use App\Http\Resources\ToroResource;
 use App\Models\Ganado;
 use App\Models\GanadoTipo;
 use App\Models\Toro;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 
 use function Laravel\Prompts\select;
@@ -27,6 +28,9 @@ class ToroController extends Controller
     public function index()
     {
         return new ToroCollection(Toro::where('user_id', Auth::id())
+        ->with(['ganado' => function (Builder $query) {
+                $query->doesntHave('ganadoDescarte');
+        }])
         ->withCount('servicios')
         ->withCount('padreEnPartos')->get());
     }
