@@ -57,6 +57,11 @@ class EventosGanadoTest extends TestCase
         'tratamiento' => 'medicina',
     ];
 
+    private array $revisionDescarte = [
+        'diagnostico' => 'descartar',
+        'tratamiento' => 'ninguno',
+    ];
+
     private array $venta = [
         'precio' => 350,
     ];
@@ -155,6 +160,19 @@ class EventosGanadoTest extends TestCase
                 )
                 ->etc()
         );
+    }
+    public function test_cuando_se_realiza_una_revision_y_se_descarta(): void
+    {
+        //realizar revision
+        $this->actingAs($this->user)->postJson(
+            sprintf('api/ganado/%s/revision', $this->ganado->id),
+            $this->revisionDescarte + ['personal_id' => $this->veterinario->id]
+        );
+
+        $response = $this->actingAs($this->user)->getJson('api/ganado_descarte');
+
+        $response->assertStatus(200)->AssertJson( fn (AssertableJson $json) => $json
+                ->has('ganado_descartes', 1));
     }
 
 
