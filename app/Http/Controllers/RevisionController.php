@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\RevisionDescarte;
 use App\Events\RevisionPrenada;
 use App\Http\Requests\StoreRevisionRequest;
 use App\Http\Requests\UpdateRevisionRequest;
@@ -43,6 +44,7 @@ class RevisionController extends Controller
         
          RevisionPrenada::dispatchIf($revision->diagnostico == 'prenada',$revision);
          
+         RevisionDescarte::dispatchIf($revision->diagnostico == 'descartar',$revision);
        
         return response()->json(['revision'=>new RevisionResource($revision->load(['veterinario' => function (Builder $query) {
             $query->select('personals.id', 'nombre');
