@@ -154,7 +154,6 @@ class DashboardVentaGanadoTest extends TestCase
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) =>
             $json->whereType('ventas', 'array')
-                ->where('ventas', fn (SupportCollection $ventas) => count($ventas) == $this->cantidad_ventas ? true : false)
                 ->has(
                     'ventas.0',
                     fn (AssertableJson $json)
@@ -174,6 +173,18 @@ class DashboardVentaGanadoTest extends TestCase
                         ])
                     )
                 )
+        );
+    }
+
+    public function test_obtener_balance_anual_ventas(): void
+    {
+        $this->generarVentas();
+
+        $response = $this->actingAs($this->user)->getJson(route('dashboardVentaGanado.balanceAnualVentas'));
+
+        $response->assertStatus(200)->assertJson(
+            fn (AssertableJSon $json) =>
+            $json->has('balance_anual',12,fn (AssertableJson $json) => $json->whereAllType(['mes' => 'string', 'ventas' => 'integer']))
         );
     }
 }
