@@ -8,6 +8,7 @@ use App\Http\Resources\VeterinariosDisponiblesCollection;
 use App\Models\Cargo;
 use App\Models\Personal;
 use App\Models\Peso;
+use App\Models\Venta;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -34,5 +35,21 @@ class DatosParaFormulariosController extends Controller
         ->where('cargo_id',2)
         ->whereBelongsTo(Auth::user())
         ->get());
+    }
+
+    public function añosVentasGanado()
+    {
+        $añosVentasGanado = Venta::whereBelongsTo(Auth::user())
+            ->selectRaw('DATE_FORMAT(fecha,"%Y") as año')
+            ->groupBy('año')
+            ->orderBy('año', 'desc')
+            ->get();
+
+        $añosVentasGanado->transform(function ($item, $key) {
+            $item->año=intval($item->año);
+            return $item;
+        });
+
+        return response()->json(['años_ventas_ganado' => $añosVentasGanado]);
     }
 }
