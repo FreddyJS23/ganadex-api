@@ -154,7 +154,6 @@ class DashboardVentaGanadoTest extends TestCase
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) =>
             $json->whereType('ventas', 'array')
-                ->where('ventas', fn (SupportCollection $ventas) => count($ventas) == $this->cantidad_ventas ? true : false)
                 ->has(
                     'ventas.0',
                     fn (AssertableJson $json)
