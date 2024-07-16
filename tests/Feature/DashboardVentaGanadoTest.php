@@ -176,4 +176,16 @@ class DashboardVentaGanadoTest extends TestCase
                 )
         );
     }
+
+    public function test_obtener_balance_anual_ventas(): void
+    {
+        $this->generarVentas();
+
+        $response = $this->actingAs($this->user)->getJson(route('dashboardVentaGanado.balanceAnualVentas'));
+
+        $response->assertStatus(200)->assertJson(
+            fn (AssertableJSon $json) =>
+            $json->has('balance_anual',12,fn (AssertableJson $json) => $json->whereAllType(['mes' => 'string', 'ventas' => 'integer']))
+        );
+    }
 }
