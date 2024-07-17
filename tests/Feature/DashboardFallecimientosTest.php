@@ -16,7 +16,7 @@ class DashboardFallecimientosTest extends TestCase
 {
     use RefreshDatabase;
 
-    private int $cantidad_fallecimientos = 10;
+    private int $cantidad_fallecimientos = 50;
     private $estado;
     private $user;
 
@@ -35,7 +35,16 @@ class DashboardFallecimientosTest extends TestCase
         return Fallecimiento::factory()
             ->count($this->cantidad_fallecimientos)
             ->for(Ganado::factory()->for($this->user)->hasAttached($this->estado))
-            ->sequence(['causa' => 'enferma'], ['causa' => 'accidente'])
+            ->sequence(
+                ['causa' => 'enferma'], 
+                ['causa' => 'accidente'],
+                ['causa' => 'accidente2'],
+                ['causa' => 'accidente3'],
+                ['causa' => 'accidente4'],
+                ['causa' => 'accidente5'],
+                ['causa' => 'accidente6'],
+                ['causa' => 'accidente7'],
+                )
             ->create();
     }
 
