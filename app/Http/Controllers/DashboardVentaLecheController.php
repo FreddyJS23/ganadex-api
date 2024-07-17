@@ -6,6 +6,7 @@ use App\Http\Resources\BalanceMensualVentaLecheCollection;
 use App\Http\Resources\VentaLecheCollection;
 use App\Models\Precio;
 use App\Models\VentaLeche;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class DashboardVentaLecheController extends Controller
@@ -50,12 +51,17 @@ class DashboardVentaLecheController extends Controller
 
         return new VentaLecheCollection($ventasDelMes);
     }
-    public function balanceMensual()
+    public function balanceMensual(Request $request)
     {
+        $regexMonth = "/^[0-9][0-9]$/";
+
+        $month = preg_match($regexMonth, $request->query('month')) ? $request->query('month') : now()->format('m');
+
         $ventasDelMes
             = VentaLeche::whereBelongsTo(Auth::user())
             ->select('fecha','cantidad')
-            ->whereMonth('fecha', now()->month)
+            ->whereMonth('fecha', $month)
+            ->orderBy('fecha')
             ->whereYear('fecha', now()->year)
             ->get();
 
