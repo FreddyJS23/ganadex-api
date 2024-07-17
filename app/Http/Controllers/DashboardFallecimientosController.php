@@ -15,6 +15,8 @@ class DashboardFallecimientosController extends Controller
         $causasFrecuentes = Fallecimiento::whereRelation('ganado', 'user_id', Auth::id())
             ->select(DB::raw('count(*) as fallecimientos'), 'causa')
             ->groupBy('causa')
+            ->limit(5)
+            ->orderBy('fallecimientos', 'desc')
             ->get();
 
         $totalFallecidos
