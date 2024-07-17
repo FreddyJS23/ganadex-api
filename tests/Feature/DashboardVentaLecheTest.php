@@ -19,7 +19,7 @@ class DashboardVentaLecheTest extends TestCase
    
    private $precios;
 
-    private int $cantidad_ventaLeche = 10;
+    private int $cantidad_ventaLeche = 100;
 
     private $user;
 
@@ -110,6 +110,18 @@ class DashboardVentaLecheTest extends TestCase
                 'ventas_de_leche.0.precio' => 'integer|double',
                
             ])
+        );
+    }
+
+    public function test_balance_mensual_venta_leche(): void
+    {
+        $this->generarVentaLeche();
+
+        $response = $this->actingAs($this->user)->getJson(route('dashboardVentaLeche.balanceMensual'));
+
+        $response->assertStatus(200)->assertJson(
+            fn (AssertableJSon $json) =>
+          $json->has('balance_mensual.0',fn (AssertableJson $json) => $json->whereAllType(['fecha' => 'string', 'cantidad' => 'integer|double']))
         );
     }
 }
