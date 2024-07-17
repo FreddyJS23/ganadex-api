@@ -56,13 +56,17 @@ class DashboardVentaGanadoController extends Controller
          return new VentaCollection($ventasDelMes) ;
     }
    
-    public function balanceAnualVentas()
+    public function balanceAnualVentas(Request $request)
     {
+        $regexYear = "/^[2][0-9][0-9][0-9]$/";
+
+        $year =preg_match($regexYear, $request->query('year')) ? $request->query('year') : now()->format('Y');
+
         $meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
       
     $balanceMesesVentas = Venta::whereBelongsTo(Auth::user())
     ->selectRaw("DATE_FORMAT(fecha,'%m') as mes, COUNT(id) as ventas")
-        ->whereYear('fecha', now()->format('Y'))
+        ->whereYear('fecha', $year)
             ->groupBy('mes')
             ->get()
             ->toArray();

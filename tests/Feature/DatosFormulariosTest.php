@@ -2,9 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Models\Comprador;
 use App\Models\Estado;
 use App\Models\Ganado;
 use App\Models\User;
+use App\Models\Venta;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -61,5 +63,29 @@ class DatosFormulariosTest extends TestCase
                     ])
                 )
         );
+     }
+
+     public function test_obtener_años_de_ventas_de_ganados()
+     {
+         Venta::factory()
+            ->count(10)
+            ->for($this->user)
+            ->for(Ganado::factory()->for($this->user)->hasPeso(1)->hasAttached($this->estado)->create())
+            ->for(Comprador::factory()->for($this->user)->create())
+            ->create();
+
+            $response=$this->actingAs($this->user)->getJson(route('datosParaFormularios.añosVentasGanado'));
+
+            $response->assertStatus(200)->assertJson(
+                fn (AssertableJson $json) =>
+                $json->whereType('años_ventas_ganado', 'array')
+                    ->has(
+                        'años_ventas_ganado.0',
+                        fn (AssertableJson $json)
+                        => $json->whereAllType([
+                            'año' => 'integer',
+                        ])
+                    )
+            );
      }
 }
