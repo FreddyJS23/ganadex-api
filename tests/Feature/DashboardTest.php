@@ -63,20 +63,21 @@ class DashboardTest extends TestCase
             ->create();
     }
 
-    private function generarGanadoPesajeLecheAnual(): Collection
-    {
-        //generar una fecha de produccion lactea
-        function mesesPesajeAnual()
+  //generar una fecha de produccion lactea
+      private  function mesesPesajeAnual(int $año)
         {
             $mes = rand(0, 11);
 
-            $fechaInicial = Carbon::create(now()->format('Y'), 1, 20);
+            $fechaInicial = Carbon::create($año, 1, 20);
 
             $fechaConMesAñadido = $fechaInicial->addMonths($mes)->format('Y-m-d');
 
             return $mes == 0 ? $fechaInicial->format('Y-m-d') : $fechaConMesAñadido;
-        };
+        }
 
+    private function generarGanadoPesajeLecheAnual(int $año): Collection
+    {
+      
         return Ganado::factory()
             ->count($this->cantidad_elementos)
             ->hasPeso(1)
@@ -90,7 +91,7 @@ class DashboardTest extends TestCase
                     function (array $attributes, Ganado $ganado) {
                         return ['ganado_id' => $ganado->id];
                     }
-                )->sequence(fn (Sequence $sequence) => ['fecha' => mesesPesajeAnual()]),
+                )->sequence(fn (Sequence $sequence) => ['fecha' =>$this->mesesPesajeAnual($año)]),
                 'pesajes_leche'
             )
             ->for($this->user)
@@ -243,7 +244,7 @@ class DashboardTest extends TestCase
 
     public function test_balance_anual_leche(): void
     {
-        $this->generarGanadoPesajeLecheAnual();
+        $this->generarGanadoPesajeLecheAnual(now()->format('Y'));
         $response = $this->actingAs($this->user)->getJson(route('dashboardPrincipal.balanceAnualProduccionLeche'));
 
         $response->assertStatus(200)->assertJson(
@@ -256,4 +257,19 @@ class DashboardTest extends TestCase
                 )
         );
     }
+     public function test_balance_anual_leche_con_parametro(): void
+    {
+        $this->generarGanadoPesajeLecheAnual(now()->addYear()->format('Y'));
+        $response = $this->actingAs($this->user)->getJson(route('dashboardPrincipal.balanceAnualProduccionLeche',['year'=>now()->addYear()->format('Y')]));
+
+        $response->assertStatus(200)->assertJson(
+            fn (AssertableJson $json) => $json->has('balance_anual', 12)
+                ->whereAllType(
+                    [
+                        'balance_anual.0.mes' => 'string',
+                        'balance_anual.0.promedio_mensual' => 'integer'
+                    ]
+                )
+        );
+    } 
 }

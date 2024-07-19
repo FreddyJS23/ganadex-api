@@ -116,6 +116,7 @@ Route::middleware('auth:sanctum')->group(function(){
      Route::get('/cargos_personal',[DatosParaFormulariosController::class, 'cargosPersonalDisponible'])->name('datosParaFormularios.cargosPersonal');
      Route::get('/veterinarios',[DatosParaFormulariosController::class, 'veterinariosDisponibles'])->name('datosParaFormularios.veterinariosDisponibles');
      Route::get('/años_ventas_ganado',[DatosParaFormulariosController::class, 'añosVentasGanado'])->name('datosParaFormularios.añosVentasGanado');
+     Route::get('/años_produccion_leche',[DatosParaFormulariosController::class, 'añosProduccionLeche'])->name('datosParaFormularios.añosProduccionLeche');
 
     //Respaldo - Restauracion de base de datos
     Route::get('/respaldo', [BackupRestoreBDController::class, 'respaldarBd']);

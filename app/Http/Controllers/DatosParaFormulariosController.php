@@ -6,6 +6,7 @@ use App\Http\Resources\CargosPersonalCollection;
 use App\Http\Resources\NovillaAMontarCollection;
 use App\Http\Resources\VeterinariosDisponiblesCollection;
 use App\Models\Cargo;
+use App\Models\Leche;
 use App\Models\Personal;
 use App\Models\Peso;
 use App\Models\Venta;
@@ -51,5 +52,20 @@ class DatosParaFormulariosController extends Controller
         });
 
         return response()->json(['años_ventas_ganado' => $añosVentasGanado]);
+    }
+    public function añosProduccionLeche()
+    {
+        $añosVentaProduccionLeche = Leche::whereBelongsTo(Auth::user())
+            ->selectRaw('DATE_FORMAT(fecha,"%Y") as año')
+            ->groupBy('año')
+            ->orderBy('año', 'desc')
+            ->get();
+
+        $añosVentaProduccionLeche->transform(function ($item, $key) {
+            $item->año=intval($item->año);
+            return $item;
+        });
+
+        return response()->json(['años_produccion_leche' => $añosVentaProduccionLeche]);
     }
 }

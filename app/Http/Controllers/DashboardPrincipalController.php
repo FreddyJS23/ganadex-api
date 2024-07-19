@@ -124,11 +124,15 @@ class DashboardPrincipalController extends Controller
         return response()->json(['mayor_cantidad_insumo' =>$mayorCantidadInsumo ? new CantidadInsumoResource($mayorCantidadInsumo) : null]);
     }
 
-    public function balanceAnualProduccionLeche()
+    public function balanceAnualProduccionLeche(Request $request)
     {
+        $regexYear = "/^[2][0-9][0-9][0-9]$/";
+
+        $year = preg_match($regexYear, $request->query('year')) ? $request->query('year') : now()->format('Y');
+        
         $balanceAnualLeche = Leche::selectRaw("DATE_FORMAT(fecha,'%m') as mes")
         ->selectRaw("AVG(peso_leche) as promedio_mensual")
-        ->whereYear('fecha',now()->format('Y'))
+        ->whereYear('fecha',$year)
         ->groupBy('mes')->get();
 
         
