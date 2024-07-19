@@ -53,9 +53,16 @@ class DashboardVentaLecheController extends Controller
     }
     public function balanceMensual(Request $request)
     {
-        $regexMonth = "/^[0-9][0-9]$/";
-
-        $month = preg_match($regexMonth, $request->query('month')) ? $request->query('month') : now()->format('m');
+        $regexMonthOneDigit = "/^[1-9]$/";
+        $regexMonthTwoDigit = "/^[1][0-2]$/";
+        $month = 0;
+        $monthActual = intval(now()->format('m'));
+        $monthQueryParam = intval($request->query('month'));
+         
+        if (preg_match($regexMonthOneDigit, $monthQueryParam)) $month =$monthQueryParam;
+        else if (preg_match($regexMonthTwoDigit, $monthQueryParam)) $month = $monthQueryParam;
+        else $month = $monthActual;
+      
 
         $ventasDelMes
             = VentaLeche::whereBelongsTo(Auth::user())
