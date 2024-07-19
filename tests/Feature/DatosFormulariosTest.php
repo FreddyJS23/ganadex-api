@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Comprador;
 use App\Models\Estado;
 use App\Models\Ganado;
+use App\Models\Leche;
 use App\Models\User;
 use App\Models\Venta;
 use Illuminate\Database\Eloquent\Collection;
@@ -81,6 +82,28 @@ class DatosFormulariosTest extends TestCase
                 $json->whereType('años_ventas_ganado', 'array')
                     ->has(
                         'años_ventas_ganado.0',
+                        fn (AssertableJson $json)
+                        => $json->whereAllType([
+                            'año' => 'integer',
+                        ])
+                    )
+            );
+     }
+     public function test_obtener_años_de_produccion_de_leches()
+     { 
+        Leche::factory()
+        ->count(10)
+        ->for(Ganado::factory()->for($this->user)->hasPeso(1)->hasAttached($this->estado)->create())
+        ->for($this->user)
+        ->create();
+
+            $response=$this->actingAs($this->user)->getJson(route('datosParaFormularios.añosProduccionLeche'));
+
+            $response->dd()->assertStatus(200)->assertJson(
+                fn (AssertableJson $json) =>
+                $json->whereType('años_produccion_leche', 'array')
+                    ->has(
+                        'años_produccion_leche.0',
                         fn (AssertableJson $json)
                         => $json->whereAllType([
                             'año' => 'integer',
