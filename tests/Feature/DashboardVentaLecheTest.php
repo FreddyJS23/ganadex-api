@@ -124,4 +124,19 @@ class DashboardVentaLecheTest extends TestCase
           $json->has('balance_mensual.0',fn (AssertableJson $json) => $json->whereAllType(['fecha' => 'string', 'cantidad' => 'integer|double']))
         );
     }
+    public function test_balance_mensual_venta_leche_con_parametro_mes(): void
+    {
+         VentaLeche::factory()
+            ->count($this->cantidad_ventaLeche)
+            ->for(Precio::factory()->for($this->user))
+            ->for($this->user)
+            ->create(['fecha'=>now()->addMonth()->format('Y-m-d')]);
+
+        $response = $this->actingAs($this->user)->getJson(route('dashboardVentaLeche.balanceMensual',['month' => now()->addMonth()->format('m') ]));
+
+        $response->assertStatus(200)->assertJson(
+            fn (AssertableJSon $json) =>
+          $json->has('balance_mensual.0',fn (AssertableJson $json) => $json->where('fecha', now()->addMonth()->format('Y-m-d'))->etc())
+        );
+    }
 }
