@@ -99,7 +99,7 @@ class DatosFormulariosTest extends TestCase
 
             $response=$this->actingAs($this->user)->getJson(route('datosParaFormularios.añosProduccionLeche'));
 
-            $response->dd()->assertStatus(200)->assertJson(
+            $response->assertStatus(200)->assertJson(
                 fn (AssertableJson $json) =>
                 $json->whereType('años_produccion_leche', 'array')
                     ->has(
