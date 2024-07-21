@@ -21,6 +21,7 @@ use App\Http\Controllers\PartoController;
 use App\Http\Controllers\PersonalController;
 use App\Http\Controllers\PrecioController;
 use App\Http\Controllers\GanadoDescarteController;
+use App\Http\Controllers\PajuelaToroController;
 use App\Http\Controllers\RevisionController;
 use App\Http\Controllers\ServicioController;
 use App\Http\Controllers\TodosPartos;
@@ -67,6 +68,7 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::apiResource('usuario',UserController::class)->only(['show','update','destroy'])->parameters(['usuario'=>'user']);
     Route::apiResource('/precio',PrecioController::class)->only(['index','store']);
     Route::apiResource('/venta_leche',VentaLecheController::class)->only(['index','store']);
+    Route::apiResource('/pajuela_toros',PajuelaToroController::class);
    Route::apiResource('/fallecimientos',FallecimientoController::class);
    Route::apiResource('/notificaciones',NotificacionController::class)->only(['index','destroy'])->parameters(['notificaciones' => 'notificacion']);;
    Route::get('/borrar_notificaciones',[NotificacionController::class,'destroyAll'])->name('notificaciones.destroyAll');
