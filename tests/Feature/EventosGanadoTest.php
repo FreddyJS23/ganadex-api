@@ -38,7 +38,7 @@ class EventosGanadoTest extends TestCase
 
     private array $servicio = [
         'observacion' => 'bien',
-        'tipo' => 'Monta'
+        'tipo' => 'monta'
     ];
 
     private $parto = [
@@ -112,7 +112,7 @@ class EventosGanadoTest extends TestCase
         //realizar servicio
         $this->actingAs($this->user)->postJson(
             sprintf('api/ganado/%s/servicio', $this->ganado->id),
-            $this->servicio + ['numero_toro' => $this->numero_toro,'personal_id'=>$this->veterinario->id]
+            $this->servicio + ['toro_id' => $this->toro->id,'personal_id'=>$this->veterinario->id]
         );
         $response = $this->actingAs($this->user)->getJson(sprintf('api/ganado/%s', $this->ganado->id));
 
@@ -130,7 +130,7 @@ class EventosGanadoTest extends TestCase
         //realizar servicio
         $this->actingAs($this->user)->postJson(
             sprintf('api/ganado/%s/servicio', $this->ganado->id),
-            $this->servicio + ['numero_toro' => $this->numero_toro,'personal_id' => $this->veterinario->id]
+            $this->servicio + ['toro_id' => $this->toro->id,'personal_id' => $this->veterinario->id]
         );
 
         //realizar revision
@@ -181,7 +181,7 @@ class EventosGanadoTest extends TestCase
         //realizar servicio
         $this->actingAs($this->user)->postJson(
             sprintf('api/ganado/%s/servicio', $this->ganado->id),
-            $this->servicio + ['numero_toro' => $this->numero_toro, 'personal_id' => $this->veterinario->id]
+            $this->servicio + ['toro_id' => $this->toro->id, 'personal_id' => $this->veterinario->id]
         );
 
         //realizar parto
@@ -221,7 +221,7 @@ class EventosGanadoTest extends TestCase
         //realizar servicio
         $this->actingAs($this->user)->postJson(
             sprintf('api/ganado/%s/servicio', $this->ganado->id),
-            $this->servicio + ['numero_toro' => $this->numero_toro, 'personal_id' => $this->veterinario->id]
+            $this->servicio + ['toro_id' => $this->toro->id, 'personal_id' => $this->veterinario->id]
         );
 
         //realizar parto
@@ -254,7 +254,7 @@ class EventosGanadoTest extends TestCase
         //realizar servicio
         $this->actingAs($this->user)->postJson(
             sprintf('api/ganado/%s/servicio', $this->ganado->id),
-            $this->servicio + ['numero_toro' => $this->numero_toro, 'personal_id' => $this->veterinario->id]
+            $this->servicio + ['toro_id' => $this->toro->id, 'personal_id' => $this->veterinario->id]
         );
 
         //realizar parto

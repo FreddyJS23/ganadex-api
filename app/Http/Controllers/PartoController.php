@@ -11,10 +11,13 @@ use App\Http\Resources\PartoResource;
 use App\Models\Estado;
 use App\Models\Ganado;
 use App\Models\GanadoTipo;
+use App\Models\PajuelaToro;
 use App\Models\Parto;
 use App\Models\Peso;
+use App\Models\Toro;
 use DateTime;
 use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Facades\Auth;
 
 class PartoController extends Controller
@@ -24,8 +27,16 @@ class PartoController extends Controller
      */
     public function index(Ganado $ganado)
     {
-        return new PartoCollection(Parto::whereBelongsTo($ganado)->with(['toro'=>function (Builder $query){$query->select('toros.id','numero')->join('ganados','ganado_id','=','ganados.id');},
-        'veterinario'=>function(Builder $query){$query->select('personals.id','nombre');}])->get());
+        return new PartoCollection(Parto::whereBelongsTo($ganado)
+            ->with([
+                'partoable' => function (MorphTo $morphTo) {
+                    $morphTo->morphWith([Toro::class => 'ganado:id,numero', PajuelaToro::class]);
+                },
+                'veterinario' => function (Builder $query) {
+                    $query->select('personals.id', 'nombre');
+                }
+            ])->get()
+        );
     }
 
     /**
@@ -37,10 +48,10 @@ class PartoController extends Controller
         $parto=new Parto;
         $parto->fill($request->only(['observacion','personal_id']));
         $parto->fecha=$fecha->format('Y-m-d');
-        $toro=$ganado->servicioReciente->toro;
+        $servicio=$ganado->servicioReciente->servicioable;
         
         $parto->ganado()->associate($ganado);
-        $parto->toro()->associate($toro);
+        $parto->partoable()->associate($servicio);
         
         $cria=new Ganado;
 
@@ -66,14 +77,12 @@ class PartoController extends Controller
         PartoHecho::dispatch($parto);
         NaceMacho::dispatchIf($cria->sexo == "M",$cria);
 
-      
-
-        return response()->json(['parto'=>new PartoResource($parto->load(['toro' => function (Builder $query) {
-            $query->select('toros.id', 'numero')->join('ganados', 'ganado_id', '=', 'ganados.id');
-        },
-            'veterinario' => function (Builder $query) {
+        return response()->json(['parto'=>new PartoResource($parto->load(['veterinario' => function (Builder $query)
+         {
                 $query->select('personals.id', 'nombre');
-            }]))],201);
+            }
+            ])->loadMorph('partoable', [Toro::class => 'ganado:id,numero', PajuelaToro::class])
+            )],201);
     }
 
     /**
@@ -81,11 +90,13 @@ class PartoController extends Controller
      */
     public function show(Ganado $ganado, Parto $parto)
     {
-        return response()->json(['parto'=>new PartoResource($parto->load(['toro' => function (Builder $query) {
-            $query->select('toros.id', 'numero')->join('ganados', 'ganado_id', '=', 'ganados.id');
-        }, 'veterinario' => function (Builder $query) {
-            $query->select('personals.id', 'nombre');
-        }]))]);
+        return response()->json(['parto' => new PartoResource(
+            $parto->load([
+                'veterinario' => function (Builder $query) {
+                    $query->select('personals.id', 'nombre');
+                }
+            ])->loadMorph('partoable', [Toro::class => 'ganado:id,numero', PajuelaToro::class])
+        )], 200);
     }
 
     /**
@@ -94,12 +105,14 @@ class PartoController extends Controller
     public function update(UpdatePartoRequest $request,Ganado $ganado, Parto $parto)
     {
         $parto->fill($request->only(['observacion']))->save();
-        
-        return response()->json(['parto'=>new PartoResource($parto->load(['toro' => function (Builder $query) {
-            $query->select('toros.id', 'numero')->join('ganados', 'ganado_id', '=', 'ganados.id');
-        }, 'veterinario' => function (Builder $query) {
-            $query->select('personals.id', 'nombre');
-        }]))],200);
+
+        return response()->json(['parto' => new PartoResource(
+            $parto->load([
+                'veterinario' => function (Builder $query) {
+                    $query->select('personals.id', 'nombre');
+                }
+            ])->loadMorph('partoable', [Toro::class => 'ganado:id,numero', PajuelaToro::class])
+        )], 200);
     }
 
     /**

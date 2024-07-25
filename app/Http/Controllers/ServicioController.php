@@ -8,9 +8,12 @@ use App\Http\Requests\UpdateServicioRequest;
 use App\Http\Resources\ServicioCollection;
 use App\Http\Resources\ServicioResource;
 use App\Models\Ganado;
+use App\Models\PajuelaToro;
 use App\Models\Servicio;
+use App\Models\Toro;
 use DateTime;
 use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class ServicioController extends Controller
 {
@@ -24,15 +27,16 @@ class ServicioController extends Controller
      */
     public function index(Ganado $ganado)
     {
-        return new ServicioCollection(Servicio::whereBelongsTo($ganado)->with(['toro' => function (Builder $query) {
-            $query->select('toros.id', 'numero')->join('ganados', 'ganado_id', '=', 'ganados.id');
+        return new ServicioCollection(Servicio::whereBelongsTo($ganado)
+        ->with(['servicioable' => function (MorphTo $morphTo) {
+           $morphTo->morphWith([Toro::class=>'ganado:id,numero',PajuelaToro::class]);
         },
             'veterinario' => function (Builder $query) {
                 $query->select('personals.id', 'nombre');
             }
-        ])->get());
+        ])->get()
+    );
     }
-
     /**
      * Store a newly created resource in storage.
      */
@@ -40,19 +44,29 @@ class ServicioController extends Controller
     {
         $fecha=new DateTime();
         $servicio=new Servicio;
-        $toro=Ganado::firstWhere('numero',$request->input('numero_toro'))->toro;
-        $servicio->fill($request->except(['numero_toro']));
+        $servicio->fill($request->except(['toro_id','pajuela_toro_id']));
         $servicio->fecha=$fecha->format('Y-m-d');
         $servicio->ganado()->associate($ganado);
-        $servicio->toro()->associate($toro)->save();
-
-        ServicioHecho::dispatch($servicio);
+        /** 
+         *@var 'monta' | 'inseminacion'  */
+        $tipoServicio=$request->input('tipo');
+        
+        if($tipoServicio == 'monta') {
+            $toro = Toro::find($request->input('toro_id'));
+            $servicio->servicioable()->associate($toro);
+        }
+        elseif($tipoServicio == 'inseminacion') {
+            $pajuelaToro = PajuelaToro::find($request->input('pajuela_toro_id'));
+            $servicio->servicioable()->associate($pajuelaToro);
+        }
+        $servicio->save();
+         ServicioHecho::dispatch($servicio);
     
-        return response()->json(['servicio'=>new ServicioResource($servicio->load(['toro' => function (Builder $query) {
-            $query->select('toros.id', 'numero')->join('ganados', 'ganado_id', '=', 'ganados.id');
-        }, 'veterinario' => function (Builder $query) {
+        return response()->json(['servicio'=>new ServicioResource($servicio->load(['veterinario' => function (Builder $query) {
             $query->select('personals.id', 'nombre');
-        }]))],201);
+        }]
+        )->loadMorph('servicioable', [Toro::class => 'ganado:id,numero', PajuelaToro::class])
+        )],201);
     }
 
     /**
@@ -60,11 +74,13 @@ class ServicioController extends Controller
      */
     public function show(Ganado $ganado, Servicio $servicio)
     {
-        return response()->json(['servicio'=>new ServicioResource($servicio->load(['toro' => function (Builder $query) {
-            $query->select('toros.id', 'numero')->join('ganados', 'ganado_id', '=', 'ganados.id');
-        }, 'veterinario' => function (Builder $query) {
-            $query->select('personals.id', 'nombre');
-        }]))]);
+        return response()->json(['servicio' => new ServicioResource(
+            $servicio->load(
+                ['veterinario' => function (Builder $query) {
+                    $query->select('personals.id', 'nombre');
+                }]
+            )->loadMorph('servicioable', [Toro::class => 'ganado:id,numero', PajuelaToro::class])
+        )], 200);
     }
 
     /**
@@ -72,15 +88,27 @@ class ServicioController extends Controller
      */
     public function update(UpdateServicioRequest $request,Ganado $ganado, Servicio $servicio)
     {
-        $toro=Ganado::firstWhere('numero',$request->input('numero_toro'))->toro;
-        $servicio->fill($request->except(['numero_toro']));
-        $servicio->toro()->associate($toro)->save();
+        $servicio->fill($request->except(['toro_id', 'pajuela_toro_id'])); 
+       
+        /** 
+         *@var 'monta' | 'inseminacion'  */
+        $tipoServicio = $request->input('tipo');
+        if ($tipoServicio == 'monta') {
+            $toro = Toro::find($request->input('toro_id'));
+            $servicio->servicioable()->associate($toro);
+        } elseif ($tipoServicio == 'inseminacion') {
+            $pajuelaToro = PajuelaToro::find($request->input('pajuela_toro_id'));
+            $servicio->servicioable()->associate($pajuelaToro);
+        }
+        $servicio->save();
 
-        return response()->json(['servicio'=> new ServicioResource($servicio->load(['toro' => function (Builder $query) {
-            $query->select('toros.id', 'numero')->join('ganados', 'ganado_id', '=', 'ganados.id');
-        }, 'veterinario' => function (Builder $query) {
-            $query->select('personals.id', 'nombre');
-        }]))],200);
+        return response()->json(['servicio' => new ServicioResource(
+            $servicio->load(
+                ['veterinario' => function (Builder $query) {
+                    $query->select('personals.id', 'nombre');
+                }]
+            )->loadMorph('servicioable', [Toro::class => 'ganado:id,numero', PajuelaToro::class])
+        )], 200);
     }
 
     /**
