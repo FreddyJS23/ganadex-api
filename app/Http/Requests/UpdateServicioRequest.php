@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\ComprobarVeterianario;
 use App\Rules\VerificarGeneroToro;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class UpdateServicioRequest extends FormRequest
@@ -25,10 +27,24 @@ class UpdateServicioRequest extends FormRequest
     {
         return [
             'observacion' => 'required|min:3|max:255',
-            'numero_toro' => ['required', Rule::exists('ganados','numero')->where(function ($query) {
-                return $query->where('sexo', 'M');
-            })],
-            'tipo' => 'required|in:Monta,Inseminacion'
+            'toro_id' => [
+                Rule::requiredIf($this->tipo == 'monta'),Rule::exists('toros', 'id')
+                ->where(
+                    function ($query) {
+                        return $query->where('user_id', Auth::id());
+                    }
+                )
+            ],
+            'pajuela_toro_id' => [
+                Rule::requiredIf($this->tipo == 'inseminacion'), Rule::exists('pajuela_toros', 'id')
+                ->where(
+                    function ($query) {
+                        return $query->where('user_id', Auth::id());
+                    }
+                )
+            ],
+            'tipo' => 'required|in:monta,inseminacion',
+
         ];
     }
 }
