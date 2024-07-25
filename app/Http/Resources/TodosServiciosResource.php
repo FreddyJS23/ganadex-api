@@ -17,17 +17,27 @@ class TodosServiciosResource extends JsonResource
         $efectividad = fn (int $resultadoAlcanzado, int $resultadoPrevisto) => $resultadoAlcanzado * 100 / $resultadoPrevisto;
 
         $existeServicio = $this->servicioReciente ? true : false;
-        return
-            [
+        
+          $resource=  [
                 "id" => $this->id,
                 "numero" => $this->numero,
                 "ultimo_servicio" => $existeServicio ? $this->servicioReciente->fecha : 'desconocido',
-                "toro" => $existeServicio ? (object)([
-                    'id' => $this->servicioReciente->toro->id,
-                    'numero' => $this->servicioReciente->toro->ganado->numero
-                ]) : null,
                 "efectividad" => round($efectividad($this->parto_count, $this->servicios_count)),
                 "total_servicios" => $this->servicios_count
             ];
+        if ($existeServicio && $this->servicioReciente->servicioable_type == 'App\Models\Toro')
+        $resource['toro'] = (object)
+        [
+            'id' => $this->servicioReciente->servicioable->id,
+            'numero' => $this->servicioReciente->servicioable->ganado->numero
+        ];
+        elseif ($existeServicio && $this->servicioReciente->servicioable_type == 'App\Models\PajuelaToro')
+        $resource['pajuela_toro'] = (object)
+        [
+            'id' => $this->servicioReciente->servicioable->id,
+            'codigo' => $this->servicioReciente->servicioable->codigo
+        ];
+
+        return $resource;
     }
 }
