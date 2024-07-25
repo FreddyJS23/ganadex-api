@@ -16,7 +16,7 @@ return new class extends Migration
             $table->date('fecha');
             $table->string('observacion');
             $table->string('tipo');
-            $table->foreignId('toro_id')->constrained();
+            $table->morphs('servicioable');
             $table->foreignId('ganado_id')->constrained();
             $table->foreignId('personal_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
