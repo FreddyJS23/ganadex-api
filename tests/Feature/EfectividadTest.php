@@ -64,14 +64,14 @@ class EfectividadTest extends TestCase
         Servicio::factory()
             ->count($this->cantidadServicios)
             ->for($this->ganado)
-            ->for($this->toro)
+            ->for($this->toro,'servicioable')
             ->create(['personal_id' => $this->veterinario]);
 
         Parto::factory()
             ->count(rand(1, $this->cantidadServicios))
             ->for($this->ganado)
             ->for(Ganado::factory()->for($this->user)->hasAttached(Estado::firstWhere('estado','sano')), 'ganado_cria')
-            ->for($this->toro)
+            ->for($this->toro,'partoable')
             ->create(['personal_id' => $this->veterinario]);
 
         $response = $this->actingAs($this->user)->getJson(sprintf('api/ganado/%s', $this->ganado->id));
@@ -90,14 +90,14 @@ class EfectividadTest extends TestCase
         Servicio::factory()
             ->count($this->cantidadServicios)
             ->for($this->ganado)
-            ->for($this->toro)
+            ->for($this->toro,'servicioable')
             ->create(['personal_id' => $this->veterinario]);
 
         Parto::factory()
             ->count(rand(1, $this->cantidadServicios))
             ->for($this->ganado)
             ->for(Ganado::factory()->for($this->user)->hasAttached(Estado::firstWhere('estado','sano')), 'ganado_cria')
-            ->for($this->toro)
+            ->for($this->toro,'partoable')
             ->create(['personal_id' => $this->veterinario]);
 
         $response = $this->actingAs($this->user)->getJson(sprintf('api/toro/%s', $this->toro->id));
