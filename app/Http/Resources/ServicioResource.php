@@ -12,15 +12,29 @@ class ServicioResource extends JsonResource
      *
      * @return array<string, mixed>
      */
-    public function toArray(Request $request): array
+    public function toArray(Request $request)
     {
-        return [
-            'id'=>$this->id,
-            'fecha'=>$this->fecha,
-            'observacion'=>$this->observacion,
-            'tipo'=>$this->tipo,
-            'toro'=>(object)(['id'=>$this->toro->id,'numero'=>$this->ganado->numero]),
+        $resource = [
+            'id' => $this->id,
+            'fecha' => $this->fecha,
+            'observacion' => $this->observacion,
+            'tipo' => $this->tipo,
             'veterinario' => $this->veterinario,
         ];
+
+        if ($this->servicioable_type == 'App\Models\Toro')
+            $resource['toro'] = (object)
+            [
+                'id' => $this->servicioable->id,
+                'numero' => $this->servicioable->ganado->numero
+            ];
+        elseif ($this->servicioable_type == 'App\Models\PajuelaToro')
+            $resource['pajuela_toro'] = (object)
+            [
+                'id' => $this->servicioable->id,
+                'codigo' => $this->servicioable->codigo
+            ];
+
+        return $resource;
     }
 }
