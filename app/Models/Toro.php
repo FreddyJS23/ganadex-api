@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Toro extends Model
 {
@@ -33,21 +34,21 @@ class Toro extends Model
  /**
   * Get all of the servicios for the Toro
   *
-  * @return \Illuminate\Database\Eloquent\Relations\HasMany
+  * @return \Illuminate\Database\Eloquent\Relations\MorphMany
   */
- public function servicios(): HasMany
+ public function servicios(): MorphMany
  {
-     return $this->hasMany(Servicio::class);
+     return $this->morphMany(Servicio::class, 'servicioable');
  }
  
  /**
   * Get all of the partos for the Toro
   *
-  * @return \Illuminate\Database\Eloquent\Relations\HasMany
+  * @return \Illuminate\Database\Eloquent\Relations\MorphMany
   */
- public function padreEnpartos(): HasMany
+ public function padreEnpartos(): MorphMany
  {
-     return $this->hasMany(Parto::class);
+     return $this->morphMany(Parto::class, 'partoable');
  }
     /**
      * Get the user that owns the Toro

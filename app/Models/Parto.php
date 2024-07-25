@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Parto extends Model
 {
@@ -26,14 +27,9 @@ class Parto extends Model
         return $this->belongsTo(Ganado::class);
     }
 
-    /**
-     * Get the toro that owns the Parto
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function toro(): BelongsTo
+    public function partoable(): MorphTo
     {
-        return $this->belongsTo(Toro::class);
+        return $this->morphTo();
     }
 
     /**
