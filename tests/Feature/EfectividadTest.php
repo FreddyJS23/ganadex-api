@@ -9,6 +9,7 @@ use App\Models\Personal;
 use App\Models\Servicio;
 use App\Models\Toro;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Testing\Fluent\AssertableJson;
@@ -90,12 +91,14 @@ class EfectividadTest extends TestCase
         Servicio::factory()
             ->count($this->cantidadServicios)
             ->for($this->ganado)
+            ->sequence(fn(Sequence $sequence) => ['fecha'=>now()->subDays(rand(1,30))->subMonths(rand(1,3))])
             ->for($this->toro,'servicioable')
             ->create(['personal_id' => $this->veterinario]);
 
         Parto::factory()
             ->count(rand(1, $this->cantidadServicios))
             ->for($this->ganado)
+            ->sequence(fn (Sequence $sequence) => ['fecha' => now()->subDays(rand(1, 30))->subMonths(rand(1, 3))])
             ->for(Ganado::factory()->for($this->user)->hasAttached(Estado::firstWhere('estado','sano')), 'ganado_cria')
             ->for($this->toro,'partoable')
             ->create(['personal_id' => $this->veterinario]);
