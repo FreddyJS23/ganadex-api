@@ -19,7 +19,7 @@ class ServicioFactory extends Factory
         return [
             'observacion'=>fake()->word(),
             'tipo'=>fake()->randomElement(['Inseminacion','Monta']),
-            'fecha'=>fake()->date()
+            'fecha'=>fake()->dateTimeThisYear()->format('Y-m-d'),
         ];
     }
 }
