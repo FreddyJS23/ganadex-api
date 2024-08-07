@@ -19,7 +19,7 @@ class PartoFactory extends Factory
     {
         return [
             'observacion'=>fake()->word(),
-            'fecha'=>fake()->date(),
+            'fecha'=>fake()->dateTimeThisYear()->format('Y-m-d'),
            
             
         ];
