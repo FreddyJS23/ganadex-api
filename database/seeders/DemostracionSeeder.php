@@ -12,6 +12,7 @@ use App\Models\GanadoDescarte;
 use App\Models\Insumo;
 use App\Models\Leche;
 use App\Models\Notificacion;
+use App\Models\PajuelaToro;
 use App\Models\Parto;
 use App\Models\Personal;
 use App\Models\Precio;
@@ -37,15 +38,35 @@ class DemostracionSeeder extends Seeder
         $estadoFallecido = Estado::firstWhere('estado', 'fallecido');
         $estadoVendido = Estado::firstWhere('estado', 'vendido');
 
-        $toros = Toro::factory()
+        $toros = Ganado::factory()
             ->count($elementos)
             ->for($user)
-            ->for(Ganado::factory()->for($user)->create(['sexo' => 'M']))->create();
-        
-        GanadoDescarte::factory()
+            ->hasPeso(1)
+            ->sequence(
+                ['tipo_id' => 1],
+                ['tipo_id' => 2],
+                ['tipo_id' => 3],
+                ['tipo_id' => 4],
+            )
+            ->has(Toro::factory()->for($user))
+            ->hasAttached($estadoSano)
+            ->create(['sexo' => 'M']);
+
+        $toros = Toro::all();
+
+
+        $pajuelaToros = PajuelaToro::factory()
             ->count($elementos)
             ->for($user)
-            ->for(Ganado::factory()->for($user)->create(['sexo' => array_rand(['M', 'F'])]))->create();
+            ->create();
+
+        //Ganado descarte
+        Ganado::factory()
+            ->count($elementos)
+            ->for($user)
+            ->has(GanadoDescarte::factory()->for($user))
+            ->hasAttached($estadoSano)
+            ->create(['sexo' => array_rand(['M' => 'M', 'H' => 'H'])]);
 
         $veterinario
             = Personal::factory()
@@ -73,35 +94,39 @@ class DemostracionSeeder extends Seeder
             ->create();
 
         for ($i = 0; $i < $cantidadGanados; $i++) {
-            $numeroServicios=15;
-            $numeroPartos=rand(1,$numeroServicios);
+            $numeroServicios = 15;
+            $numeroPartos = rand(1, $numeroServicios);
+
             Revision::factory()
                 ->count(5)
                 ->for($ganados[$i])
                 ->create(['personal_id' => $veterinario]);
 
-            Servicio::factory()
-                ->count(5)
-                ->for($ganados[$i])
-                ->for($toros[0])
-                ->create(['personal_id' => $veterinario]);
+            //Producir numero de partos y servicios individuales
+            for ($j = 0; $j < $numeroPartos; $j++) {
+                Servicio::factory()
+                    ->count(rand($numeroPartos, $numeroServicios))
+                    ->for($ganados[$i])
+                    //alternar un servicio con monta y otro con inseminacion
+                    ->for($i % 2 == 0 ? $toros[rand(0, $elementos - 1)] : $pajuelaToros[rand(0, $elementos - 1)], 'servicioable')
+                    ->create(['personal_id' => $veterinario,'tipo'=>$i % 2 == 0 ? 'monta' : 'inseminacion']);
 
-            Parto::factory()
-                ->count($numeroPartos)
-                ->for($ganados[$i])
-                ->for(Ganado::factory()->for($user)->hasAttached($estadoSano)->hasPeso(1), 'ganado_cria')
-                ->for($toros[0])
-                ->create(['personal_id' => $veterinario]);
-
+                Parto::factory()
+                    ->for($ganados[$i])
+                    ->for(Ganado::factory()->for($user)->hasAttached($estadoSano)->hasPeso(1), 'ganado_cria')
+                    //alternar un parto con monta y otro con inseminacion
+                    ->for($i % 2 == 0 ? $toros[rand(0, $elementos - 1)] : $pajuelaToros[rand(0, $elementos - 1)], 'partoable')
+                    ->create(['personal_id' => $veterinario]);
+            }
 
             Leche::factory()
                 ->count(5)
                 ->for($ganados[$i])
                 ->for($user)
                 ->create();
-}
+        }
 
-       
+
 
 
         VentaLeche::factory()
@@ -123,15 +148,15 @@ class DemostracionSeeder extends Seeder
             ->create();
 
 
-         Notificacion::factory()
+        Notificacion::factory()
             ->count($elementos)
             ->for($user)
             ->for(Ganado::factory()->for($user)->hasEvento()->create())
             ->create();
 
         Insumo::factory()
-        ->count($elementos)
-        ->for($user)
-        ->create();
+            ->count($elementos)
+            ->for($user)
+            ->create();
     }
 }
