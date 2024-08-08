@@ -13,6 +13,7 @@ use App\Http\Resources\ServicioResource;
 use App\Models\Estado;
 use App\Models\Ganado;
 use App\Models\Leche;
+use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -93,8 +94,33 @@ class GanadoController extends Controller
         $ultimoServicio = $ganado->servicioReciente;
         $ultimoPesajeLeche = $ganado->pesajeLecheReciente;
         $ultimoParto = $ganado->partoReciente;
-        $ganado->loadCount('servicios')->loadCount('revision')->loadCount('parto');
-        $efectividad = fn (int $resultadoAlcanzado, int $resultadoPrevisto) => $resultadoAlcanzado * 100 / $resultadoPrevisto;
+        $ganado->load(['parto'=>function (Builder $query) {
+            $query->orderBy('fecha','desc');
+            },
+    ])->loadCount('revision');
+
+        /*efectividad respecto a cuantos servicios fueron necesarios para que la vaca quede prenada */
+        $efectividad = fn (int $resultadoAlcanzado) => round(1 / $resultadoAlcanzado * 100, 2);
+
+        if ($ganado->parto->count() == 1) {
+
+            $ganado->load('servicios');
+
+            $ganado->efectividad = $efectividad($ganado->servicios->count());
+        } elseif ($ganado->parto->count() >= 2) {
+            $fechaInicio = $ganado->parto[1]->fecha;
+            $fechaFin = $ganado->parto[0]->fecha;
+
+            $ganado->fechaInicio = $fechaInicio;
+            $ganado->fechaFin = $fechaFin;
+
+            $ganado->load(['servicios' => function (Builder $query) use ($fechaInicio, $fechaFin) {
+                $query->whereBetween('fecha', [$fechaInicio, $fechaFin]);
+            }]);
+
+            $ganado->efectividad = $ganado->servicios->count() >= 1 ?  $efectividad($ganado->servicios->count()) : null;
+        }
+
 
         $mejorPesajesLeche = Leche::where('ganado_id', $ganado->id)->orderBy('peso_leche', 'desc')->first();
         $peorPesajesLeche = Leche::where('ganado_id', $ganado->id)->orderBy('peso_leche', 'asc')->first();
@@ -103,12 +129,12 @@ class GanadoController extends Controller
         return response()->json([
             'ganado' => new GanadoResource($ganado),
             'servicio_reciente' => $ultimoServicio ? new ServicioResource($ultimoServicio) : null,
-            'total_servicios' => $ganado->servicios_count,
+            'total_servicios' => $ganado->servicios->count(),
             'revision_reciente' => $ultimaRevision ? new RevisionResource($ultimaRevision) : null,
             'total_revisiones' => $ganado->revision_count,
             'parto_reciente' => $ultimoParto ? new PartoResource($ultimoParto) : null,
-            'total_partos' => $ganado->parto_count,
-            'efectividad' => $ganado->parto_count ? round($efectividad($ganado->parto_count, $ganado->servicios_count), 2) : null,
+            'total_partos' => $ganado->parto->count(),
+            'efectividad' => $ganado->efectividad,
             'info_pesajes_leche' => (object)([
                 'reciente' => $ultimoPesajeLeche ? new LecheResource($ultimoPesajeLeche) : null,
                 'mejor' => $ultimoPesajeLeche ? new LecheResource($mejorPesajesLeche) : null,

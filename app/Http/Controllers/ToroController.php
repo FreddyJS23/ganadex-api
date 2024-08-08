@@ -8,6 +8,7 @@ use App\Http\Resources\ToroCollection;
 use App\Http\Resources\ToroResource;
 use App\Models\Ganado;
 use App\Models\GanadoTipo;
+use App\Models\Servicio;
 use App\Models\Toro;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
@@ -27,12 +28,49 @@ class ToroController extends Controller
      */
     public function index()
     {
-        return new ToroCollection(Toro::where('user_id', Auth::id())
-        ->with(['ganado' => function (Builder $query) {
-                $query->doesntHave('ganadoDescarte');
-        }])
-        ->withCount('servicios')
-        ->withCount('padreEnPartos')->get());
+        $toros = Toro::where('user_id', Auth::id())
+            ->with([
+                'ganado' => function (Builder $query) {
+                    $query->doesntHave('ganadoDescarte');
+                },
+                'padreEnPartos' => function (Builder $query) {
+                    $query->orderBy('fecha', 'desc');
+                },
+            ])
+            ->withCount('servicios')
+            ->withCount('padreEnPartos')->get();
+
+        $toros->transform(
+            function (Toro $toro) {
+
+                $toro->efectividad = null;
+
+                /*efectividad respecto a cuantos servicios hiso para que la vaca quede prenada */
+                $efectividad = fn (int $resultadoAlcanzado) => round(1 / $resultadoAlcanzado * 100, 2);
+
+                if ($toro->padreEnPartos->count() == 1) {
+
+                    $toro->load('servicios');
+
+                    $toro->efectividad = $toro->servicios->count() >= 1 ? $efectividad($toro->servicios->count()) : null;
+                } elseif ($toro->padreEnPartos->count() >= 2) {
+                    $fechaInicio = $toro->padreEnPartos[1]->fecha;
+                    $fechaFin = $toro->padreEnPartos[0]->fecha;
+
+                    $toro->fechaInicio = $fechaInicio;
+                    $toro->fechaFin = $fechaFin;
+
+                    $toro->load(['servicios' => function (Builder $query) use ($fechaInicio, $fechaFin) {
+                        $query->whereBetween('fecha', [$fechaInicio, $fechaFin]);
+                    }]);
+
+                    $toro->efectividad = $toro->servicios->count() >= 1 ?  $efectividad($toro->servicios->count()) : null;
+                }
+                return $toro;
+            }
+        );
+
+        return new ToroCollection($toros);
     }
 
 
@@ -60,7 +98,36 @@ class ToroController extends Controller
      */
     public function show(Toro $toro)
     {
-        $toro->loadCount('servicios')->loadCount('padreEnPartos');
+        $toro
+            ->load([
+                'padreEnPartos' => function (Builder $query) {
+                    $query->orderBy('fecha', 'desc');
+                },
+            ]);
+
+        $toro->efectividad = null;
+
+        /*efectividad respecto a cuantos servicios hiso para que la vaca quede prenada */
+        $efectividad = fn (int $resultadoAlcanzado) => round(1 / $resultadoAlcanzado * 100, 2);
+
+        if ($toro->padreEnPartos->count() == 1) {
+
+            $toro->load('servicios');
+
+            $toro->efectividad = $efectividad($toro->servicios->count());
+        } elseif ($toro->padreEnPartos->count() >= 2) {
+            $fechaInicio = $toro->padreEnPartos[1]->fecha;
+            $fechaFin = $toro->padreEnPartos[0]->fecha;
+
+            $toro->fechaInicio = $fechaInicio;
+            $toro->fechaFin = $fechaFin;
+
+            $toro->load(['servicios' => function (Builder $query) use ($fechaInicio, $fechaFin) {
+                $query->whereBetween('fecha', [$fechaInicio, $fechaFin]);
+            }]);
+
+            $toro->efectividad = $toro->servicios->count() >= 1 ?  $efectividad($toro->servicios->count()) : null;
+        }
 
         return response()->json([
             'toro' => new ToroResource($toro),
