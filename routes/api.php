@@ -92,8 +92,8 @@ Route::middleware('auth:sanctum')->group(function(){
      Route::get('dashboard_principal/vacas_menos_productoras',[DashboardPrincipalController::class,'topVacasMenosProductoras'])->name('dashboardPrincipal.topVacasMenosProductoras');
      Route::get('dashboard_principal/ganado_pendiente_revision',[DashboardPrincipalController::class,'totalGanadoPendienteRevision'])->name('dashboardPrincipal.totalGanadoPendienteRevision');
      Route::get('dashboard_principal/cantidad_novillas_montar',[DashboardPrincipalController::class,'cantidadVacasParaServir'])->name('dashboardPrincipal.cantidadVacasParaServir');
-     Route::get('dashboard_principal/menor_insumo',[DashboardPrincipalController::class,'insumoMenorExistencia'])->name('dashboardPrincipal.insumoMenorExistencia');
-     Route::get('dashboard_principal/mayor_insumo',[DashboardPrincipalController::class,'insumoMayorExistencia'])->name('dashboardPrincipal.insumoMayorExistencia');
+   /*   Route::get('dashboard_principal/menor_insumo',[DashboardPrincipalController::class,'insumoMenorExistencia'])->name('dashboardPrincipal.insumoMenorExistencia');
+     Route::get('dashboard_principal/mayor_insumo',[DashboardPrincipalController::class,'insumoMayorExistencia'])->name('dashboardPrincipal.insumoMayorExistencia'); */
      Route::get('dashboard_principal/balance_anual_leche',[DashboardPrincipalController::class,'balanceAnualProduccionLeche'])->name('dashboardPrincipal.balanceAnualProduccionLeche');
 
     //rutas peticiones de datos dashboard venta leche

@@ -215,7 +215,7 @@ class DashboardTest extends TestCase
 
         $response->assertStatus(200)->assertJson(fn (AssertableJson $json) => $json->whereType('cantidad_vacas_para_servir', 'integer'));
     }
-
+/* 
     public function test_menor_cantidad_insumo(): void
     {
         $this->generarInsumos();
@@ -240,7 +240,7 @@ class DashboardTest extends TestCase
             'mayor_cantidad_insumo.insumo' => 'string',
             'mayor_cantidad_insumo.cantidad' => 'integer',
         ]));
-    }
+    } */
 
     public function test_balance_anual_leche(): void
     {
