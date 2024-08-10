@@ -154,9 +154,9 @@ class DemostracionSeeder extends Seeder
             ->for(Ganado::factory()->for($user)->hasEvento()->create())
             ->create();
 
-        Insumo::factory()
+       /*  Insumo::factory()
             ->count($elementos)
             ->for($user)
-            ->create();
+            ->create(); */
     }
 }
