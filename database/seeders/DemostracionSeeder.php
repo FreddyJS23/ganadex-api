@@ -129,11 +129,11 @@ class DemostracionSeeder extends Seeder
 
 
 
-        VentaLeche::factory()
+       /*  VentaLeche::factory()
             ->count($elementos)
             ->for(Precio::factory()->for($user))
             ->for($user)
-            ->create();
+            ->create(); */
 
         Venta::factory()
             ->count($elementos)
