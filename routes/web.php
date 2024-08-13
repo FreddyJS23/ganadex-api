@@ -25,7 +25,7 @@ Route::get('/', function () {
         //rutas reportes pdf
 Route::get('/reportes/ganado/{ganado}', [ReportsPdfController::class, 'resumenGanado'])->name('reportes.ganado');
 Route::get('/reportes/general', [ReportsPdfController::class, 'resumenGeneral'])->name('reportes.general');
-Route::get('/reportes/venta_leche', [ReportsPdfController::class, 'resumenVentasLeche'])->name('reportes.ventaLeche');
+//Route::get('/reportes/venta_leche', [ReportsPdfController::class, 'resumenVentasLeche'])->name('reportes.ventaLeche');
 Route::get('/reportes/venta_ganado', [ReportsPdfController::class, 'resumenVentaGanadoAnual'])->name('reportes.ventaGanado');
 Route::get('/reportes/causas_fallecimientos', [ReportsPdfController::class, 'resumenCausasFAllecimientos'])->name('reportes.fallecimientos');
 Route::get('/reportes/nota_venta', [ReportsPdfController::class, 'facturaVentaGanado'])->name('reportes.facturaVentaGanado');

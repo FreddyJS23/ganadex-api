@@ -67,8 +67,8 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::apiResource('/ganado/{ganado}/pesaje_leche',LecheController::class);
     Route::apiResource('usuario',UserController::class)->only(['show','update','destroy'])->parameters(['usuario'=>'user']);
     Route::apiResource('/precio',PrecioController::class)->only(['index','store']);
-    Route::apiResource('/venta_leche',VentaLecheController::class)->only(['index','store']);
-    Route::apiResource('/pajuela_toros',PajuelaToroController::class);
+/*  Route::apiResource('/venta_leche',VentaLecheController::class)->only(['index','store']);*/
+   Route::apiResource('/pajuela_toros',PajuelaToroController::class);
    Route::apiResource('/fallecimientos',FallecimientoController::class);
    Route::apiResource('/notificaciones',NotificacionController::class)->only(['index','destroy'])->parameters(['notificaciones' => 'notificacion']);;
    Route::get('/borrar_notificaciones',[NotificacionController::class,'destroyAll'])->name('notificaciones.destroyAll');
@@ -97,11 +97,11 @@ Route::middleware('auth:sanctum')->group(function(){
      Route::get('dashboard_principal/balance_anual_leche',[DashboardPrincipalController::class,'balanceAnualProduccionLeche'])->name('dashboardPrincipal.balanceAnualProduccionLeche');
 
     //rutas peticiones de datos dashboard venta leche
-    Route::get('/dashboard_venta_leche/precio_actual',[DashboardVentaLecheController::class, 'precioActual'])->name('dashboardVentaLeche.precioActual');
+   /*  Route::get('/dashboard_venta_leche/precio_actual',[DashboardVentaLecheController::class, 'precioActual'])->name('dashboardVentaLeche.precioActual');
     Route::get('/dashboard_venta_leche/variacion_precio',[DashboardVentaLecheController::class, 'variacionPrecio'])->name('dashboardVentaLeche.variacionPrecio');
     Route::get('/dashboard_venta_leche/ganancias_mes',[DashboardVentaLecheController::class, 'gananciasDelMes'])->name('dashboardVentaLeche.gananciasDelMes');
     Route::get('/dashboard_venta_leche/ventas_mes',[DashboardVentaLecheController::class, 'ventasDelMes'])->name('dashboardVentaLeche.ventasDelMes');
-    Route::get('/dashboard_venta_leche/balance_mensual',[DashboardVentaLecheController::class, 'balanceMensual'])->name('dashboardVentaLeche.balanceMensual');
+    Route::get('/dashboard_venta_leche/balance_mensual',[DashboardVentaLecheController::class, 'balanceMensual'])->name('dashboardVentaLeche.balanceMensual'); */
     
     //rutas peticiones de datos dashboard venta ganado
     Route::get('/dashboard_venta_ganado/mejor_comprador',[DashboardVentaGanadoController::class, 'mejorComprador'])->name('dashboardVentaGanado.mejorComprador');
