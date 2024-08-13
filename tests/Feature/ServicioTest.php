@@ -508,14 +508,14 @@ class ServicioTest extends TestCase
                     'numero' => 'integer',
                     'ultimo_servicio' => 'string',
                     'toro' => 'array',
-                    'efectividad' => 'float|integer',
+                    'efectividad' => 'double|integer|null',
                     'total_servicios' => 'integer'
                 ]))->has('todos_servicios.6', fn (AssertableJson $json) => $json->whereAllType([
                 'id' => 'integer',
                 'numero' => 'integer',
                 'ultimo_servicio' => 'string',
                 'pajuela_toro' => 'array',
-                'efectividad' => 'float|integer',
+                'efectividad' => 'double|integer|null',
                 'total_servicios' => 'integer'
             ]))
             );
