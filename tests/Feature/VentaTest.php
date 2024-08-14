@@ -18,7 +18,7 @@ class VentaTest extends TestCase
     use RefreshDatabase;
 
     private array $venta = [
-        'precio' => 350,
+        //'precio' => 350,
     ];
 
     private int $cantidad_ventas = 10;
@@ -51,18 +51,18 @@ class VentaTest extends TestCase
 
             'caso de insertar datos erróneos' => [
                 [
-                    'precio' => 'te',
+                   // 'precio' => 'te',
                     'ganado_id' => 'te',
                     'comprador_id' => 'te',
 
-                ], ['precio', 'ganado_id', 'comprador_id']
+                ], [ 'ganado_id', 'comprador_id']
             ],
             'caso de no insertar datos requeridos' => [
-                [], ['precio', 'ganado_id', 'comprador_id']
+                [], [ 'ganado_id', 'comprador_id']
             ],
             'caso de insertar datos inexistentes' => [
                 [
-                    'precio' => 400,
+                    //'precio' => 400,
                     'ganado_id' => 0,
                     'comprador_id' => 0,
 
@@ -91,8 +91,8 @@ class VentaTest extends TestCase
                             'id' => 'integer',
                             'fecha' => 'string',
                             'peso' => 'string',
-                            'precio' => 'integer|double',
-                            'precio_kg' => 'integer|double',
+                            //'precio' => 'integer|double',
+                            //'precio_kg' => 'integer|double',
                             'comprador' => 'string',
                         ])->has(
                             'ganado',
@@ -124,8 +124,8 @@ class VentaTest extends TestCase
                             'id' => 'integer',
                             'fecha' => 'string',
                             'peso' => 'string',
-                            'precio' => 'integer|double',
-                            'precio_kg' => 'integer|double',
+                           /*  'precio' => 'integer|double',
+                            'precio_kg' => 'integer|double', */
                             'comprador' => 'string',
                         ])->has(
                         'ganado',
@@ -157,8 +157,8 @@ class VentaTest extends TestCase
                             'id' => 'integer',
                             'fecha' => 'string',
                             'peso' => 'string',
-                            'precio' => 'integer|double',
-                            'precio_kg' => 'integer|double',
+                           /*  'precio' => 'integer|double',
+                            'precio_kg' => 'integer|double', */
                             'comprador' => 'string',
                         ])->has(
                         'ganado',
@@ -190,7 +190,7 @@ class VentaTest extends TestCase
             $json->has(
                 'venta',
                 fn (AssertableJson $json) =>
-                $json->where('precio', $this->venta['precio'])
+                $json->where('ganado.id', $this->venta['ganado_id'])
                 ->etc()
             )
         );
