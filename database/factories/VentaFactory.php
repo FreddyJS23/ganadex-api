@@ -17,7 +17,7 @@ class VentaFactory extends Factory
     public function definition(): array
     {
         return [
-            'precio' => fake()->randomFloat(2, 0, 7),
+            //'precio' => fake()->randomFloat(2, 0, 7),
             'fecha' => fake()->dateTimeThisYear()->format('y-m-d')
         ];
     }

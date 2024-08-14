@@ -24,7 +24,7 @@ class UpdateVentaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'precio' => 'required|numeric',
+            //'precio' => 'required|numeric',
             'ganado_id' => [
                 'required', 'numeric', Rule::exists('ganados', 'id')
                     ->where(

@@ -19,8 +19,8 @@ class VentaResource extends JsonResource
             'fecha'=>$this->fecha,
             'ganado'=>$this->ganado->makeHidden('peso'),
             'peso'=>$this->ganado->peso->peso_actual,
-            'precio'=>$this->precio,
-            'precio_kg'=>round($this->precio / intval($this->ganado->peso->peso_actual),2 ),
+            //'precio'=>$this->precio,
+            //'precio_kg'=>round($this->precio / intval($this->ganado->peso->peso_actual),2 ),
             'comprador'=>$this->comprador->nombre,
         ];
     }
