@@ -66,7 +66,7 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::apiResource('/ganado/{ganado}/parto',PartoController::class);
     Route::apiResource('/ganado/{ganado}/pesaje_leche',LecheController::class);
     Route::apiResource('usuario',UserController::class)->only(['show','update','destroy'])->parameters(['usuario'=>'user']);
-    Route::apiResource('/precio',PrecioController::class)->only(['index','store']);
+    //Route::apiResource('/precio',PrecioController::class)->only(['index','store']);
 /*  Route::apiResource('/venta_leche',VentaLecheController::class)->only(['index','store']);*/
    Route::apiResource('/pajuela_toros',PajuelaToroController::class);
    Route::apiResource('/fallecimientos',FallecimientoController::class);
