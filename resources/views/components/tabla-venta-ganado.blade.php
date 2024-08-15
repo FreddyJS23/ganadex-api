@@ -10,9 +10,9 @@
             <th>
                 <p>Total vendido</p>
             </th>
-            <th>
+            {{-- <th>
                 <p>Suma de ventas</p>
-            </th>
+            </th> --}}
         </tr>
     </thead>
 
@@ -23,13 +23,13 @@
         @forelse ($ventasGanado as $mes => $ventas_mes)
             @php
                 $ganadoVendidoMes='';
-                $sumaAcumuladaVentaMes = 0;
+               /*  $sumaAcumuladaVentaMes = 0; */
                 foreach ($ventas_mes as $key => $venta) {
-                    $sumaAcumuladaVentaMes += $venta['precio'];
+                   /*  $sumaAcumuladaVentaMes += $venta['precio']; */
                     $ganadoVendidoMes=$ganadoVendidoMes . $venta['numero'] . '-';
                 }
                 $ganadoVendidoMes=rtrim($ganadoVendidoMes,'-');
-                $gananciaTotal += $sumaAcumuladaVentaMes;
+               /*  $gananciaTotal += $sumaAcumuladaVentaMes; */
             @endphp
             <tr>
                 <td>
@@ -41,9 +41,9 @@
                 <td>
                     <p>{{ count($ventas_mes) }} </p>
                 </td>
-                <td>
+               {{--  <td>
                     <p>{{ $sumaAcumuladaVentaMes }}$ </p>
-                </td>
+                </td> --}}
             </tr>
         @empty <tr>
                 <td class="celda_sin_info">
@@ -51,9 +51,9 @@
                 </td>
             </tr>
         @endforelse
-        <tr>
+       {{--  <tr>
             <td colspan="3"><b>Ganancia Anual</b></td>
             <td> {{ $gananciaTotal }}$ </td>
-        </tr>
+        </tr> --}}
     </tbody>
 </table>

@@ -248,7 +248,8 @@ $fin=$request->query('end');
     
   $ventasGanado = Venta::whereBelongsTo(Auth::user()) 
       ->join('ganados', 'ganado_id', 'ganados.id')
-      ->selectRaw("DATE_FORMAT(fecha,'%m') as mes,numero,precio")
+      //->selectRaw("DATE_FORMAT(fecha,'%m') as mes,numero,precio")
+      ->selectRaw("DATE_FORMAT(fecha,'%m') as mes,numero")
       ->orderBy('mes', 'asc')
       ->whereYear('fecha', $year)
       ->get();
