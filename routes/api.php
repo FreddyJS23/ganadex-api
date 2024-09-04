@@ -30,6 +30,7 @@ use App\Http\Controllers\TodosRevisiones;
 use App\Http\Controllers\TodosServicios;
 use App\Http\Controllers\ToroController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\VacunaController;
 use App\Http\Controllers\VentaController;
 use App\Http\Controllers\VentaLecheController;
 use App\Models\Notificacion;
@@ -56,6 +57,7 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::apiResource('/ventas',VentaController::class);
     Route::apiResource('/toro',ToroController::class);
     Route::apiResource('/ganado',GanadoController::class);
+    Route::apiResource('vacunas',VacunaController::class);  
     Route::apiResource('/ganado_descarte',GanadoDescarteController::class);
     Route::post('/descartar_ganado',[GanadoDescarteController::class,'descartar'])->name('ganado_descarte.descartar');
     //Route::apiResource('/insumo',InsumoController::class);
