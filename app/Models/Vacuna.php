@@ -12,7 +12,7 @@ class Vacuna extends Model
 {
     use HasFactory;
 
-    protected $fillable=[
+    protected $fillable = [
         'nombre',
         'tipo_animal',
         'intervalo_dosis'
@@ -22,3 +22,23 @@ class Vacuna extends Model
         'tipo_animal' => AsArrayObject::class,
     ];
 
+    /**
+     * Get all of the vacunaciones for the Vacuna
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function vacunaciones(): HasMany
+    {
+        return $this->hasMany(Vacunacion::class);
+    }
+
+    /**
+     * Get all of the jornadasVacunacion for the Vacuna
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function jornadasVacunacion(): HasMany
+    {
+        return $this->hasMany(Jornada_vacunacion::class);
+    }
+}
