@@ -21,6 +21,7 @@ use App\Http\Controllers\PartoController;
 use App\Http\Controllers\PersonalController;
 use App\Http\Controllers\PrecioController;
 use App\Http\Controllers\GanadoDescarteController;
+use App\Http\Controllers\JornadaVacunacionController;
 use App\Http\Controllers\PajuelaToroController;
 use App\Http\Controllers\RevisionController;
 use App\Http\Controllers\ServicioController;
