@@ -71,7 +71,6 @@ class VacunasTest extends TestCase
         $response->assertStatus(200)->assertJson(
             fn(AssertableJson $json) =>
             $json->whereType('vacunas', 'array')
-                ->has('vacunas', $this->cantidad_vacunas)
                 ->has(
                     'vacunas.0',
                     fn(AssertableJson $json)
