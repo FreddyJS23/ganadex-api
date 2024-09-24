@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Estado;
 use App\Models\Ganado;
+use App\Models\Jornada_vacunacion;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -29,6 +30,18 @@ class GanadoTest extends TestCase
         'peso_2year' => 300,
         'peso_actual' => 60,
         'estado_id' => [1],
+        'vacunas' => [
+            [
+                'fecha' => '2015-02-17',
+                'vacuna_id' => 1,
+                'prox_dosis' => '2015-02-17',
+            ],
+            [
+                'fecha' => '2015-02-17',
+                'vacuna_id' => 2,
+                'prox_dosis' => '2015-02-17',
+            ],
+        ],
     ];
 
     private int $cantidad_ganado = 10;
@@ -51,6 +64,7 @@ class GanadoTest extends TestCase
             ->hasPeso(1)
             ->hasEvento(1)
             ->hasAttached($this->estado)
+            ->hasVacunaciones(3,['user_id'=>$this->user->id])
             ->for($this->user)
             ->create();
     }
@@ -185,7 +199,7 @@ class GanadoTest extends TestCase
                             ->has('pesos',
                             fn(AssertableJson $json)=>$json
                             ->whereAllType([
-                                'id'=>'integer',      
+                                'id'=>'integer',
                                 'peso_nacimiento' => 'string',
                                 'peso_destete' => 'string',
                                 'peso_2year' => 'string',
@@ -205,13 +219,27 @@ class GanadoTest extends TestCase
 
     public function test_obtener_cabeza_ganado(): void
     {
+        Jornada_vacunacion::factory()->for($this->user)->count(2)->create();
         $cabezasGanado = $this->generarGanado();
         $idRandom = rand(0, $this->cantidad_ganado - 1);
         $idGanado = $cabezasGanado[$idRandom]->id;
 
         $response = $this->actingAs($this->user)->getJson(sprintf('api/ganado/%s', $idGanado), $this->cabeza_ganado);
 
-        $response->assertStatus(200)->assertJson(['ganado' => true]);
+        $response->assertStatus(200)
+            ->assertJson(
+                fn(AssertableJson $json) =>
+                $json->has(
+                    'vacunaciones.0',
+                    fn(AssertableJson $json) =>
+                    $json->whereAllType([
+                        'id' => 'integer',
+                        'vacuna' => 'string',
+                        'fecha' => 'string',
+                        'prox_dosis' => 'string',
+                    ])
+                )->etc()
+            );
     }
 
     public function test_actualizar_cabeza_ganado(): void
@@ -234,8 +262,6 @@ class GanadoTest extends TestCase
                 ->where('ganado.pesos.peso_destete', $this->cabeza_ganado['peso_destete'] . 'KG')
                 ->where('ganado.pesos.peso_2year', $this->cabeza_ganado['peso_2year'] . 'KG')
                 ->where('ganado.pesos.peso_actual', $this->cabeza_ganado['peso_actual'] . 'KG')
-
-                ->etc()
         );
     }
 
