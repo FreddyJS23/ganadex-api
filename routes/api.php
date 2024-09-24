@@ -72,6 +72,7 @@ Route::middleware('auth:sanctum')->group(function(){
 /*  Route::apiResource('/venta_leche',VentaLecheController::class)->only(['index','store']);*/
    Route::apiResource('/pajuela_toros',PajuelaToroController::class);
    Route::apiResource('/fallecimientos',FallecimientoController::class);
+   Route::apiResource('/jornada_vacunacion',JornadaVacunacionController::class);
    Route::apiResource('/notificaciones',NotificacionController::class)->only(['index','destroy'])->parameters(['notificaciones' => 'notificacion']);;
    Route::get('/borrar_notificaciones',[NotificacionController::class,'destroyAll'])->name('notificaciones.destroyAll');
 
