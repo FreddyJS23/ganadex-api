@@ -12,7 +12,9 @@ use App\Http\Resources\RevisionResource;
 use App\Http\Resources\ServicioResource;
 use App\Models\Estado;
 use App\Models\Ganado;
+use App\Models\Jornada_vacunacion;
 use App\Models\Leche;
+use App\Models\Vacunacion;
 use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Facades\Auth;
@@ -76,11 +78,23 @@ class GanadoController extends Controller
                     $ganado->peso()->create($request->only($this->peso));
                     //$ganado->peso()->create($request->only($this->peso));
                     $ganado->estados()->sync($request->only($this->estado)['estado_id']);
+
+                    //vacunacion
+
+                    $vacunas=[];
+
+                    foreach ($request->only('vacunas')['vacunas'] as $vacuna) {
+                        array_push($vacunas, $vacuna + ['ganado_id' => $ganado->id, 'user_id' => $ganado->user_id]);
+                    }
+
+                    $ganado->vacunaciones()->createMany($vacunas);
+
                     $ganado->evento()->create();
                 });
                 return response()->json(['ganado' => new GanadoResource($ganado)], 201);
     } catch (\Throwable $error) {
-                return response()->json(['error'=>'error al insertar datos'], 501);
+
+        return response()->json(['error'=>'error al insertar datos'], 501);
     }
 
     }
@@ -90,14 +104,37 @@ class GanadoController extends Controller
      */
     public function show(Ganado $ganado)
     {
+
+        $jornadasVacunacionPosteriores =  Jornada_vacunacion::where('user_id',Auth::id())
+        ->select('jornada_vacunacions.id','nombre as vacuna', 'fecha_inicio as fecha','prox_dosis')
+        ->join('vacunas', 'jornada_vacunacions.vacuna_id', 'vacunas.id')
+        ->orderBy('fecha', 'desc')
+        ->where('fecha_inicio','>',$ganado->fecha_nacimiento ?? $ganado->created_at)
+        ->get();
+
+
         $ultimaRevision = $ganado->revisionReciente;
         $ultimoServicio = $ganado->servicioReciente;
         $ultimoPesajeLeche = $ganado->pesajeLecheReciente;
         $ultimoParto = $ganado->partoReciente;
         $ganado->load(['parto'=>function (Builder $query) {
             $query->orderBy('fecha','desc');
-            },
+            }, 'vacunaciones'=>function (Builder $query) {
+                $query->select('vacunacions.id','nombre AS vacuna','fecha','ganado_id','prox_dosis')
+                ->join('vacunas','vacunacions.vacuna_id','vacunas.id');
+            }
     ])->loadCount('revision');
+
+    //concatenando los datos de las vacunaciones con las jornadas de vacunacion posteriores
+    $ganado->vacunaciones=$ganado->vacunaciones->makeHidden('ganado_id')->concat($jornadasVacunacionPosteriores);
+
+    //ordeno todas las vacunaciones y jornadas concadenadas por fecha
+    $ganado->vacunaciones=$ganado->vacunaciones->sortByDesc('fecha');
+    //transformar el id para evitar duplicados de vacunaciones y jornadas vacunacion
+    $ganado->vacunaciones=$ganado->vacunaciones->transform(function(Vacunacion|Jornada_vacunacion $item,int $key){
+        $item->id=$item->id . $item->prox_dosis;
+        return $item;
+    });
 
         /*efectividad respecto a cuantos servicios fueron necesarios para que la vaca quede prenada */
         $efectividad = fn (int $resultadoAlcanzado) => round(1 / $resultadoAlcanzado * 100, 2);
@@ -140,7 +177,8 @@ class GanadoController extends Controller
                 'mejor' => $ultimoPesajeLeche ? new LecheResource($mejorPesajesLeche) : null,
                 'peor' => $ultimoPesajeLeche ? new LecheResource($peorPesajesLeche) : null,
                 'estado' => $estadoProduccionLeche
-            ])
+            ]),
+            'vacunaciones' => $ganado->vacunaciones->values()->all()
         ], 200);
     }
 

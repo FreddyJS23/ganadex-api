@@ -22,6 +22,7 @@ use App\Http\Controllers\PartoController;
 use App\Http\Controllers\PersonalController;
 use App\Http\Controllers\PrecioController;
 use App\Http\Controllers\GanadoDescarteController;
+use App\Http\Controllers\JornadaVacunacionController;
 use App\Http\Controllers\PajuelaToroController;
 use App\Http\Controllers\RevisionController;
 use App\Http\Controllers\ServicioController;
@@ -31,6 +32,7 @@ use App\Http\Controllers\TodosRevisiones;
 use App\Http\Controllers\TodosServicios;
 use App\Http\Controllers\ToroController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\VacunaController;
 use App\Http\Controllers\VentaController;
 use App\Http\Controllers\VentaLecheController;
 use App\Models\Notificacion;
@@ -57,6 +59,7 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::apiResource('/ventas',VentaController::class);
     Route::apiResource('/toro',ToroController::class);
     Route::apiResource('/ganado',GanadoController::class);
+    Route::apiResource('vacunas',VacunaController::class);  
     Route::apiResource('/ganado_descarte',GanadoDescarteController::class);
     Route::post('/descartar_ganado',[GanadoDescarteController::class,'descartar'])->name('ganado_descarte.descartar');
     //Route::apiResource('/insumo',InsumoController::class);
@@ -71,6 +74,7 @@ Route::middleware('auth:sanctum')->group(function(){
 /*  Route::apiResource('/venta_leche',VentaLecheController::class)->only(['index','store']);*/
    Route::apiResource('/pajuela_toros',PajuelaToroController::class);
    Route::apiResource('/fallecimientos',FallecimientoController::class);
+   Route::apiResource('/jornada_vacunacion',JornadaVacunacionController::class);
    Route::apiResource('/notificaciones',NotificacionController::class)->only(['index','destroy'])->parameters(['notificaciones' => 'notificacion']);;
    Route::get('/borrar_notificaciones',[NotificacionController::class,'destroyAll'])->name('notificaciones.destroyAll');
 

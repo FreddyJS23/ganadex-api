@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
            GanadoTipoSeeder::class,
            CargoSeeder::class,
            TiposNotificacionSeeder::class,
+           VacunaSeeder::class,
            //DemostracionSeeder::class,
         ]);
     }
