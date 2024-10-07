@@ -7,6 +7,7 @@ use App\Http\Controllers\CaparCriaController;
 use App\Http\Controllers\CompradorController;
 use App\Http\Controllers\ConfiguracionController;
 use App\Http\Controllers\DashboardFallecimientosController;
+use App\Http\Controllers\DashboardJornadasVacunacion;
 use App\Http\Controllers\DashboardPrincipalController;
 use App\Http\Controllers\DashboardVentaGanadoController;
 use App\Http\Controllers\DashboardVentaLecheController;
@@ -51,14 +52,14 @@ Route::post('login',AuthLogin::class);
 Route::post('register',[UserController::class,'store'])->name('usuario.store');
 
 Route::middleware('auth:sanctum')->group(function(){
-    
+
     Route::get('/logout',Logout::class);
 
     Route::apiResource('/comprador',CompradorController::class);
     Route::apiResource('/ventas',VentaController::class);
     Route::apiResource('/toro',ToroController::class);
     Route::apiResource('/ganado',GanadoController::class);
-    Route::apiResource('vacunas',VacunaController::class);  
+    Route::apiResource('vacunas',VacunaController::class);
     Route::apiResource('/ganado_descarte',GanadoDescarteController::class);
     Route::post('/descartar_ganado',[GanadoDescarteController::class,'descartar'])->name('ganado_descarte.descartar');
     //Route::apiResource('/insumo',InsumoController::class);
@@ -79,7 +80,7 @@ Route::middleware('auth:sanctum')->group(function(){
 
     Route::get('/crias_pendiente_capar',[CaparCriaController::class,'index'])->name('capar.index');
     Route::get('/capar_cria/{ganado}',[CaparCriaController::class,'capar'])->name('capar.capar');
-   
+
     Route::get('/crias_pendiente_numeracion',[AsignarNumeroCriaController::class,'index'])->name('numeracion.index');
     Route::post('/asignar_numero_cria/{ganado}',[AsignarNumeroCriaController::class,'store'])->name('numeracion.store');
 
@@ -87,7 +88,7 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::get('/servicios', TodosServicios::class)->name('todasServicios');
     Route::get('/pesaje_leche', TodosPesajeLeche::class)->name('todosPesajesLeche');
     Route::get('/partos', TodosPartos::class)->name('todosPartos');
-  
+
     //rutas peticiones de datos dashboard
      Route::get('dashboard_principal/total_ganado_tipo',[DashboardPrincipalController::class,'totalGanadoTipo'])->name('dashboardPrincipal.totalGanadoTipo');
      Route::get('dashboard_principal/total_personal',[DashboardPrincipalController::class,'totalPersonal'])->name('dashboardPrincipal.totalPersonal');
@@ -106,7 +107,7 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::get('/dashboard_venta_leche/ganancias_mes',[DashboardVentaLecheController::class, 'gananciasDelMes'])->name('dashboardVentaLeche.gananciasDelMes');
     Route::get('/dashboard_venta_leche/ventas_mes',[DashboardVentaLecheController::class, 'ventasDelMes'])->name('dashboardVentaLeche.ventasDelMes');
     Route::get('/dashboard_venta_leche/balance_mensual',[DashboardVentaLecheController::class, 'balanceMensual'])->name('dashboardVentaLeche.balanceMensual'); */
-    
+
     //rutas peticiones de datos dashboard venta ganado
     Route::get('/dashboard_venta_ganado/mejor_comprador',[DashboardVentaGanadoController::class, 'mejorComprador'])->name('dashboardVentaGanado.mejorComprador');
     /* Route::get('/dashboard_venta_ganado/mejor_venta',[DashboardVentaGanadoController::class, 'mejorVenta'])->name('dashboardVentaGanado.mejorVenta');
@@ -116,6 +117,9 @@ Route::middleware('auth:sanctum')->group(function(){
 
     //rutas peticiones de datos dashboard fallecimientos
     Route::get('/dashboard_fallecimientos/causas_frecuentes', [DashboardFallecimientosController::class, 'causasMuertesFrecuentes'])->name('dashboardFallecimientos.causasMuertesFrecuentes');
+
+    //rutas de peticiones de datos dashboard jornadas vacunacion
+    Route::get('/dashboard_jornadas_vacunacion/proximas_jornadas_vacunacion', [DashboardJornadasVacunacion::class, 'proximasJornadasVacunacion'])->name('dashboardJornadasVacunacion.proximasJornadasVacunacion');
 
     //rutas peticiones datos para rellanr formularios
      Route::get('/novillas_montar',[DatosParaFormulariosController::class,'novillasParaMontar'])->name('datosParaFormularios.novillasParaMontar');
