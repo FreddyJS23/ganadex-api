@@ -17,11 +17,14 @@ class Jornada_vacunacionFactory extends Factory
      */
     public function definition(): array
     {
+        $vacuna = Vacuna::all()->random();
         return [
             'fecha_inicio' => fake()->dateTimeThisYear()->format('y-m-d'),
             'fecha_fin' => fake()->dateTimeThisYear()->format('y-m-d'),
             'prox_dosis' => fake()->dateTimeThisYear()->format('y-m-d'),
-            'vacuna_id' => Vacuna::all()->random()->id,
+            'vacuna_id' => $vacuna->id,
+            'vacunados' => rand(1, 100),
+            'ganado_vacunado' =>json_encode($vacuna->tipo_animal),
         ];
     }
 }

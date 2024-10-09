@@ -19,6 +19,8 @@ class JornadaVacunacionResource extends JsonResource
             'fecha_inicio' => $this->fecha_inicio,
             'fecha_fin' => $this->fecha_fin,
             'vacuna' => $this->vacuna->nombre,
+            'vacunados' => $this->vacunados,
+            'ganado_vacunado' => $this->ganado_vacunado,
         ];
     }
 }
