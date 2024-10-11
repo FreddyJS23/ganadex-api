@@ -54,7 +54,7 @@ class JornadaVacunacionController extends Controller
         $jornadaVacunacion->user_id = Auth::id();
         $jornadaVacunacion->prox_dosis = $proximaDosis;
         $jornadaVacunacion->vacunados=$cantidadGanadoVacunado;
-        $jornadaVacunacion->ganado_vacunado=json_encode($vacuna->tipo_animal);
+        $jornadaVacunacion->ganado_vacunado=$vacuna->tipo_animal;
         $jornadaVacunacion->save();
 
         return response()->json(['jornada_vacunacion' => new JornadaVacunacionResource($jornadaVacunacion)], 201);

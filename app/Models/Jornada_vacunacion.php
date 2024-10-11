@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,6 +15,10 @@ class Jornada_vacunacion extends Model
         'fecha_inicio',
         'fecha_fin',
         'vacuna_id',
+    ];
+
+    protected $casts = [
+        'ganado_vacunado' => AsArrayObject::class,
     ];
 
     /**

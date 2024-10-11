@@ -91,7 +91,7 @@ class JornadaVacunacionTest extends TestCase
                         'fecha_fin' => 'string',
                         'vacuna' => 'string',
                         'vacunados' => 'integer',
-                        'ganado_vacunado'=>'string',
+                        'ganado_vacunado'=>'array',
                     ])
                 )
         );
@@ -110,7 +110,7 @@ class JornadaVacunacionTest extends TestCase
                 'jornada_vacunacion.fecha_fin' => 'string',
                 'jornada_vacunacion.vacuna' => 'string',
                 'jornada_vacunacion.vacunados' => 'integer',
-                'jornada_vacunacion.ganado_vacunado'=>'string',
+                'jornada_vacunacion.ganado_vacunado'=>'array',
             ])
         );
     }
@@ -130,7 +130,7 @@ class JornadaVacunacionTest extends TestCase
                 'jornada_vacunacion.fecha_fin' => 'string',
                 'jornada_vacunacion.vacuna' => 'string',
                 'jornada_vacunacion.vacunados' => 'integer',
-                'jornada_vacunacion.ganado_vacunado'=>'string',
+                'jornada_vacunacion.ganado_vacunado'=>'array',
             ])
         );
     }
@@ -154,7 +154,7 @@ class JornadaVacunacionTest extends TestCase
                     'jornada_vacunacion.fecha_fin' => 'string',
                     'jornada_vacunacion.vacuna' => 'string',
                     'jornada_vacunacion.vacunados' => 'integer',
-                    'jornada_vacunacion.ganado_vacunado'=>'string',
+                    'jornada_vacunacion.ganado_vacunado'=>'array',
                 ])
                 ->etc()
         );
