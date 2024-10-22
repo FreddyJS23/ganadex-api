@@ -41,6 +41,9 @@ class JornadaVacunacionController extends Controller
         /* iterarar sobre los tipo de animal correspondiente a la vacuna
         para agregar clausulas de busqueda para buscar los ganados de esos tipos*/
         foreach ($vacuna->tipo_animal->toArray() as $key => $tipoAnimalVacuna) {
+
+            if($tipoAnimalVacuna=='rebano') break;
+
             //eliminar los últimos dos caracteres para no distinguir terminos femeninos y masculinos
             $tipoAnimalVacuna=substr($tipoAnimalVacuna,0,-2);
             $cantidadGanadoVacunado->orWhere('tipo','like',"$tipoAnimalVacuna%");
