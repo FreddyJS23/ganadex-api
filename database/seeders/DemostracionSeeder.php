@@ -10,6 +10,7 @@ use App\Models\Fallecimiento;
 use App\Models\Ganado;
 use App\Models\GanadoDescarte;
 use App\Models\Insumo;
+use App\Models\Jornada_vacunacion;
 use App\Models\Leche;
 use App\Models\Notificacion;
 use App\Models\PajuelaToro;
@@ -158,5 +159,10 @@ class DemostracionSeeder extends Seeder
             ->count($elementos)
             ->for($user)
             ->create(); */
+
+        Jornada_vacunacion::factory()
+            ->count($elementos)
+            ->for($user)
+            ->create();
     }
 }

@@ -2,9 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Models\Ganado;
 use App\Models\Jornada_vacunacion;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Testing\Fluent\AssertableJson;
@@ -17,7 +19,7 @@ class JornadaVacunacionTest extends TestCase
     private array $jornadaVacunacion = [
         'fecha_inicio' => '2020-10-02',
         'fecha_fin' => '2020-10-02',
-        'vacuna_id' => 1,
+        'vacuna_id' => 4,
     ];
 
     private int $cantidad_jornadasVacunacion = 10;
@@ -29,6 +31,17 @@ class JornadaVacunacionTest extends TestCase
 
         $this->user
             = User::factory()->create();
+
+            Ganado::factory()
+            ->count(30)
+            ->for($this->user)
+            ->sequence(
+                ['tipo_id' => 1],
+                ['tipo_id' => 2],
+                ['tipo_id' => 3],
+                ['tipo_id' => 4],
+            )
+            ->create();
 
     }
 
@@ -77,6 +90,8 @@ class JornadaVacunacionTest extends TestCase
                         'fecha_inicio' => 'string',
                         'fecha_fin' => 'string',
                         'vacuna' => 'string',
+                        'vacunados' => 'integer',
+                        'ganado_vacunado'=>'array',
                     ])
                 )
         );
@@ -94,6 +109,8 @@ class JornadaVacunacionTest extends TestCase
                 'jornada_vacunacion.fecha_inicio' => 'string',
                 'jornada_vacunacion.fecha_fin' => 'string',
                 'jornada_vacunacion.vacuna' => 'string',
+                'jornada_vacunacion.vacunados' => 'integer',
+                'jornada_vacunacion.ganado_vacunado'=>'array',
             ])
         );
     }
@@ -112,6 +129,8 @@ class JornadaVacunacionTest extends TestCase
                 'jornada_vacunacion.fecha_inicio' => 'string',
                 'jornada_vacunacion.fecha_fin' => 'string',
                 'jornada_vacunacion.vacuna' => 'string',
+                'jornada_vacunacion.vacunados' => 'integer',
+                'jornada_vacunacion.ganado_vacunado'=>'array',
             ])
         );
     }
@@ -134,6 +153,8 @@ class JornadaVacunacionTest extends TestCase
                     'jornada_vacunacion.fecha_inicio' => 'string',
                     'jornada_vacunacion.fecha_fin' => 'string',
                     'jornada_vacunacion.vacuna' => 'string',
+                    'jornada_vacunacion.vacunados' => 'integer',
+                    'jornada_vacunacion.ganado_vacunado'=>'array',
                 ])
                 ->etc()
         );

@@ -6,6 +6,7 @@ use App\Http\Requests\StoreJornada_vacunacionRequest;
 use App\Http\Requests\UpdateJornada_vacunacionRequest;
 use App\Http\Resources\JornadaVacunacionCollection;
 use App\Http\Resources\JornadaVacunacionResource;
+use App\Models\Ganado;
 use App\Models\Jornada_vacunacion;
 use App\Models\Vacuna;
 use Carbon\Carbon;
@@ -23,7 +24,9 @@ class JornadaVacunacionController extends Controller
      */
     public function index()
     {
-        return new JornadaVacunacionCollection(Jornada_vacunacion::whereBelongsTo(Auth::user())->get());
+        return new JornadaVacunacionCollection(Jornada_vacunacion::whereBelongsTo(Auth::user())
+        ->orderBy('fecha_inicio','desc')
+        ->get());
     }
 
     /**
@@ -31,6 +34,23 @@ class JornadaVacunacionController extends Controller
      */
     public function store(StoreJornada_vacunacionRequest $request)
     {
+        $vacuna=Vacuna::find($request->input('vacuna_id'));
+        $cantidadGanadoVacunado=Ganado::selectRaw('ganados.id,tipo')
+        ->join('ganado_tipos','ganados.tipo_id','ganado_tipos.id');
+
+        /* iterarar sobre los tipo de animal correspondiente a la vacuna
+        para agregar clausulas de busqueda para buscar los ganados de esos tipos*/
+        foreach ($vacuna->tipo_animal->toArray() as $key => $tipoAnimalVacuna) {
+
+            if($tipoAnimalVacuna=='rebano') break;
+
+            //eliminar los últimos dos caracteres para no distinguir terminos femeninos y masculinos
+            $tipoAnimalVacuna=substr($tipoAnimalVacuna,0,-2);
+            $cantidadGanadoVacunado->orWhere('tipo','like',"$tipoAnimalVacuna%");
+        }
+
+        $cantidadGanadoVacunado=$cantidadGanadoVacunado->whereBelongsTo(Auth::user())->count();
+
         $intervaloDosis=Vacuna::find($request->input('vacuna_id'))->intervalo_dosis;
         $proximaDosis=Carbon::create($request->input('fecha_fin'))->addDays($intervaloDosis)->format('Y-m-d');
 
@@ -38,6 +58,8 @@ class JornadaVacunacionController extends Controller
         $jornadaVacunacion->fill($request->all());
         $jornadaVacunacion->user_id = Auth::id();
         $jornadaVacunacion->prox_dosis = $proximaDosis;
+        $jornadaVacunacion->vacunados=$cantidadGanadoVacunado;
+        $jornadaVacunacion->ganado_vacunado=$vacuna->tipo_animal;
         $jornadaVacunacion->save();
 
         return response()->json(['jornada_vacunacion' => new JornadaVacunacionResource($jornadaVacunacion)], 201);

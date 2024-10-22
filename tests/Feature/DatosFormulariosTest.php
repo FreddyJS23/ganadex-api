@@ -7,6 +7,7 @@ use App\Models\Estado;
 use App\Models\Ganado;
 use App\Models\Leche;
 use App\Models\User;
+use App\Models\Vacuna;
 use App\Models\Venta;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -40,11 +41,11 @@ class DatosFormulariosTest extends TestCase
             ->for($this->user)
             ->create();
     }
-  
+
     /**
      * A basic feature test example.
      */
-  
+
      public function test_obtener_novillas_que_se_pueden_servir()
      {
         $this->generarGanado();
@@ -90,7 +91,7 @@ class DatosFormulariosTest extends TestCase
             );
      }
      public function test_obtener_años_de_produccion_de_leches()
-     { 
+     {
         Leche::factory()
         ->count(10)
         ->for(Ganado::factory()->for($this->user)->hasPeso(1)->hasAttached($this->estado)->create())
@@ -110,5 +111,27 @@ class DatosFormulariosTest extends TestCase
                         ])
                     )
             );
+     }
+
+     public function test_obtener_vacunas_disponibles(){
+        Vacuna::factory()
+        ->count(10)
+        ->create();
+
+        $response=$this->actingAs($this->user)->getJson(route('datosParaFormularios.vacunasDisponibles'));
+
+        $response->assertStatus(200)->assertJson(
+            fn (AssertableJson $json) =>
+            $json->whereType('vacunas_disponibles', 'array')
+                ->has(
+                    'vacunas_disponibles.0',
+                    fn (AssertableJson $json)
+                    => $json->whereAllType([
+                        'id'=>'integer',
+                        'nombre'=>'string'
+                    ])
+                )
+        );
+
      }
 }
