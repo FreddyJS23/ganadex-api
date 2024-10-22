@@ -24,7 +24,9 @@ class JornadaVacunacionController extends Controller
      */
     public function index()
     {
-        return new JornadaVacunacionCollection(Jornada_vacunacion::whereBelongsTo(Auth::user())->get());
+        return new JornadaVacunacionCollection(Jornada_vacunacion::whereBelongsTo(Auth::user())
+        ->orderBy('fecha_inicio','desc')
+        ->get());
     }
 
     /**
