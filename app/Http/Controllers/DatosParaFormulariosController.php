@@ -9,6 +9,7 @@ use App\Models\Cargo;
 use App\Models\Leche;
 use App\Models\Personal;
 use App\Models\Peso;
+use App\Models\Vacuna;
 use App\Models\Venta;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -67,5 +68,13 @@ class DatosParaFormulariosController extends Controller
         });
 
         return response()->json(['años_produccion_leche' => $añosVentaProduccionLeche]);
+    }
+
+    public function vacunasDisponibles()
+    {
+        $vacunasDisponibles = Vacuna::select('id','nombre')
+            ->get();
+
+        return response()->json(['vacunas_disponibles' => $vacunasDisponibles]);
     }
 }
