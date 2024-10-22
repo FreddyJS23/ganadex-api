@@ -105,7 +105,7 @@ class GanadoController extends Controller
     public function show(Ganado $ganado)
     {
 
-        $jornadasVacunacionPosteriores =  Jornada_vacunacion::where('user_id',Auth::id())
+        $jornadasVacunacionAnteriores =  Jornada_vacunacion::where('user_id',Auth::id())
         ->select('jornada_vacunacions.id','nombre as vacuna', 'fecha_inicio as fecha','prox_dosis')
         ->join('vacunas', 'jornada_vacunacions.vacuna_id', 'vacunas.id')
         ->orderBy('fecha', 'desc')
@@ -126,7 +126,7 @@ class GanadoController extends Controller
     ])->loadCount('revision');
 
     //concatenando los datos de las vacunaciones con las jornadas de vacunacion posteriores
-    $ganado->vacunaciones=$ganado->vacunaciones->makeHidden('ganado_id')->concat($jornadasVacunacionPosteriores);
+    $ganado->vacunaciones=$ganado->vacunaciones->makeHidden('ganado_id')->concat($jornadasVacunacionAnteriores);
 
     //ordeno todas las vacunaciones y jornadas concadenadas por fecha
     $ganado->vacunaciones=$ganado->vacunaciones->sortByDesc('fecha');
