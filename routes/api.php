@@ -4,6 +4,7 @@ use App\Http\Controllers\AsignarNumeroCriaController;
 use App\Http\Controllers\AuthLogin;
 use App\Http\Controllers\BackupRestoreBDController;
 use App\Http\Controllers\CaparCriaController;
+use App\Http\Controllers\checkSesionActivaUsuario;
 use App\Http\Controllers\CompradorController;
 use App\Http\Controllers\ConfiguracionController;
 use App\Http\Controllers\DashboardFallecimientosController;
@@ -118,8 +119,12 @@ Route::middleware('auth:sanctum')->group(function(){
     //rutas peticiones de datos dashboard fallecimientos
     Route::get('/dashboard_fallecimientos/causas_frecuentes', [DashboardFallecimientosController::class, 'causasMuertesFrecuentes'])->name('dashboardFallecimientos.causasMuertesFrecuentes');
 
+
     //rutas de peticiones de datos dashboard jornadas vacunacion
     Route::get('/dashboard_jornadas_vacunacion/proximas_jornadas_vacunacion', [DashboardJornadasVacunacion::class, 'proximasJornadasVacunacion'])->name('dashboardJornadasVacunacion.proximasJornadasVacunacion');
+
+     Route::get('/check_session_activa',checkSesionActivaUsuario::class)->name('checkSession');
+
 
     //rutas peticiones datos para rellanr formularios
      Route::get('/novillas_montar',[DatosParaFormulariosController::class,'novillasParaMontar'])->name('datosParaFormularios.novillasParaMontar');
