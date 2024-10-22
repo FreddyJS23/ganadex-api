@@ -12,8 +12,9 @@ class DashboardJornadasVacunacion extends Controller
     public function proximasJornadasVacunacion()
     {
         $jornadasVacunacion = Jornada_vacunacion::whereBelongsTo(Auth::user())
-            ->selectRaw('nombre as vacuna , MAX(prox_dosis) as prox_dosis , tipo_animal')
+            ->selectRaw('nombre as vacuna , MAX(prox_dosis) as prox_dosis , tipo_animal as ganado_vacunado')
             ->join('vacunas', 'vacuna_id', 'vacunas.id')
+            ->orderBy('prox_dosis')
             ->groupBy('vacuna', 'tipo_animal')
             ->get();
 
