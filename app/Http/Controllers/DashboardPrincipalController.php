@@ -25,15 +25,15 @@ class DashboardPrincipalController extends Controller
     {
         $totalGanadoPorTiposMacho = GanadoTipo::withCount(['ganado' => function (Builder $query) {
             $query->where('sexo','M')
-            ->where('user_id', Auth::id())
+            ->whereIn('finca_id', session('finca_id'))
             ->doesntHave('fallecimiento')
             ->doesntHave('venta')
             ->doesntHave('ganadodescarte');
         }])->get();
-       
+
         $totalGanadoPorTiposHembra = GanadoTipo::withCount(['ganado' => function (Builder $query) {
             $query->where('sexo','H')
-            ->where('user_id', Auth::id())
+            ->whereIn('finca_id', session('finca_id'))
             ->doesntHave('fallecimiento')
             ->doesntHave('venta')
             ->doesntHave('ganadodescarte');
@@ -43,10 +43,10 @@ class DashboardPrincipalController extends Controller
         $totalGanadoPorTiposHembra->transform(function (GanadoTipo $item) {
             $item->tipo = substr($item->tipo, 0, -1) . 'a';
             return $item;
-        }); 
+        });
 
-        $totalGanadoDescarte = GanadoDescarte::where('user_id', Auth::id())->count();
-        $totalGanadoDescarte=collect(    
+        $totalGanadoDescarte = GanadoDescarte ::whereIn('finca_id', session('finca_id'))->count();
+        $totalGanadoDescarte=collect(
            [[  'tipo'=>'descarte',
             'ganado_count' => $totalGanadoDescarte]]);
 
@@ -55,12 +55,12 @@ class DashboardPrincipalController extends Controller
 
     public function totalPersonal(Request $request)
     {
-        return response()->json(['total_personal' => Personal::whereBelongsTo(Auth::user())->count()]);
+        return response()->json(['total_personal' => Personal::whereIn('finca_id',session('finca_id'))->count()]);
     }
 
     public function vacasEnGestacion(Request $request)
     {
-        $totalVacasEnGestacion = Ganado::whereBelongsTo(Auth::user())
+        $totalVacasEnGestacion = Ganado::whereIn('finca_id',session('finca_id'))
             ->whereRelation('estados', 'estado', 'gestacion')
             ->count();
 
@@ -72,7 +72,7 @@ class DashboardPrincipalController extends Controller
         $fechaActual = new DateTime();
         $mesActual = $fechaActual->format('m');
         $topVacasProductoras = Leche::withWhereHas('ganado', function ( $query) {
-            $query->where('user_id', Auth::id())->select('id','numero');
+            $query->where('finca_id', session('finca_id'))->select('id','numero');
         })->orderBy('peso_leche', 'desc')->whereMonth('fecha', $mesActual)->limit(3)->get();
 
 
@@ -85,7 +85,7 @@ class DashboardPrincipalController extends Controller
         $fechaActual = new DateTime;
         $mesActual = $fechaActual->format('m');
         $topVacasMenosProductoras = Leche::withWhereHas('ganado', function ($query) {
-            $query->where('user_id', Auth::id())->select('id', 'numero');
+            $query->where('finca_id', session('finca_id'))->select('id', 'numero');
         })->orderBy('peso_leche', 'asc')->whereMonth('fecha', $mesActual)->limit(3)->get();
 
         return new TopVacasMenosProductorasCollection($topVacasMenosProductoras);
@@ -94,7 +94,7 @@ class DashboardPrincipalController extends Controller
     public function totalGanadoPendienteRevision(Request $request)
     {
 
-        $totalGanadoPendienteRevision = Ganado::whereBelongsTo(Auth::user())
+        $totalGanadoPendienteRevision = Ganado::whereIn('finca_id',session('finca_id'))
             ->whereRelation('estados', 'estado', 'pendiente_revision')
             ->count();
 
@@ -104,7 +104,7 @@ class DashboardPrincipalController extends Controller
     public function cantidadVacasParaServir()
     {
         $novillasAmontar = Peso::whereHas('ganado', function (Builder $query) {
-            $query->where('user_id', Auth::id());
+            $query->where('finca_id', session('finca_id'));
         })->where('peso_actual', '>=', 330)->count();
 
         return response()->json(['cantidad_vacas_para_servir' => $novillasAmontar], 200);
@@ -112,14 +112,14 @@ class DashboardPrincipalController extends Controller
 
     public function insumoMenorExistencia()
     {
-        $menorCantidadInsumo = Insumo::whereBelongsTo(Auth::user())->orderBy('cantidad', 'asc')->first();
+        $menorCantidadInsumo = Insumo::whereIn('finca_id',session('finca_id'))->orderBy('cantidad', 'asc')->first();
 
         return response()->json(['menor_cantidad_insumo' =>$menorCantidadInsumo ? new CantidadInsumoResource($menorCantidadInsumo) : null]);
     }
 
     public function insumoMayorExistencia()
     {
-        $mayorCantidadInsumo = Insumo::whereBelongsTo(Auth::user())->orderBy('cantidad', 'desc')->first();
+        $mayorCantidadInsumo = Insumo::whereIn('finca_id',session('finca_id'))->orderBy('cantidad', 'desc')->first();
 
         return response()->json(['mayor_cantidad_insumo' =>$mayorCantidadInsumo ? new CantidadInsumoResource($mayorCantidadInsumo) : null]);
     }
@@ -129,13 +129,13 @@ class DashboardPrincipalController extends Controller
         $regexYear = "/^[2][0-9][0-9][0-9]$/";
 
         $year = preg_match($regexYear, $request->query('year')) ? $request->query('year') : now()->format('Y');
-        
+
         $balanceAnualLeche = Leche::selectRaw("DATE_FORMAT(fecha,'%m') as mes")
         ->selectRaw("AVG(peso_leche) as promedio_mensual")
         ->whereYear('fecha',$year)
         ->groupBy('mes')->get();
 
-        
+
         return new BalanceAnualLecheCollection($balanceAnualLeche);
     }
 }

@@ -15,16 +15,16 @@ use Illuminate\Support\Facades\Auth;
 class JornadaVacunacionController extends Controller
 {
 
-    public function __construct() {
+ /*    public function __construct() {
         $this->authorizeResource(Jornada_vacunacion::class,'jornada_vacunacion');
     }
-
+ */
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return new JornadaVacunacionCollection(Jornada_vacunacion::whereBelongsTo(Auth::user())
+        return new JornadaVacunacionCollection(Jornada_vacunacion::whereIn('finca_id',session('finca_id'))
         ->orderBy('fecha_inicio','desc')
         ->get());
     }
@@ -49,14 +49,14 @@ class JornadaVacunacionController extends Controller
             $cantidadGanadoVacunado->orWhere('tipo','like',"$tipoAnimalVacuna%");
         }
 
-        $cantidadGanadoVacunado=$cantidadGanadoVacunado->whereBelongsTo(Auth::user())->count();
+        $cantidadGanadoVacunado=$cantidadGanadoVacunado->whereIn('finca_id',session('finca_id'))->count();
 
         $intervaloDosis=Vacuna::find($request->input('vacuna_id'))->intervalo_dosis;
         $proximaDosis=Carbon::create($request->input('fecha_fin'))->addDays($intervaloDosis)->format('Y-m-d');
 
         $jornadaVacunacion = new Jornada_vacunacion();
         $jornadaVacunacion->fill($request->all());
-        $jornadaVacunacion->user_id = Auth::id();
+        $jornadaVacunacion->finca_id = session('finca_id')[0];
         $jornadaVacunacion->prox_dosis = $proximaDosis;
         $jornadaVacunacion->vacunados=$cantidadGanadoVacunado;
         $jornadaVacunacion->ganado_vacunado=$vacuna->tipo_animal;

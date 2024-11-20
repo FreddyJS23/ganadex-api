@@ -19,18 +19,18 @@ use Illuminate\Support\Facades\Auth;
 class GanadoDescarteController extends Controller
 {
     public array $peso = ['peso_nacimiento', 'peso_destete', 'peso_2year', 'peso_actual'];
-   
-    public function __construct()
+
+   /*  public function __construct()
     {
         $this->authorizeResource(GanadoDescarte::class, 'ganado_descarte');
-    }
+    } */
 
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return new GanadoDescarteCollection(GanadoDescarte::all()->where('user_id', Auth::id()));
+        return new GanadoDescarteCollection(GanadoDescarte::whereIn('finca_id', session('finca_id'))->get());
     }
 
 
@@ -40,14 +40,14 @@ class GanadoDescarteController extends Controller
     public function store(StoreGanadoDescarteRequest $request)
     {
         $ganado = new Ganado($request->all());
-        $ganado->user_id = Auth::id();
+        $ganado->finca_id = session('finca_id')[0];
         $ganado->tipo_id = determinar_edad_res($ganado->fecha_nacimiento);
         $ganado->sexo = "M";
         $ganado->save();
         $ganado->peso()->create($request->only($this->peso));
 
         $ganadoDescarte = new GanadoDescarte;
-        $ganadoDescarte->user_id = Auth::id();
+        $ganadoDescarte->finca_id = session('finca_id')[0];
         $ganadoDescarte->ganado()->associate($ganado)->save();
 
         return response()->json(['ganado_descarte' => new GanadoDescarteResource($ganadoDescarte)], 201);
@@ -85,7 +85,7 @@ class GanadoDescarteController extends Controller
     {
         $ganadoDescarte=new GanadoDescarte;
         $ganadoDescarte->ganado_id=$request->ganado_id;
-        $ganadoDescarte->user_id=Auth::id();
+        $ganadoDescarte->finca_id=session('finca_id')[0];
         $ganadoDescarte->save();
         return response()->json(['ganado_descarte' => new GanadoDescarteResource($ganadoDescarte)], 201);
     }

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('toros', function (Blueprint $table) {
             $table->id();
             $table->foreignId('ganado_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('finca_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }

@@ -32,7 +32,7 @@ class StoreGanadoRequest extends FormRequest
             'peso_nacimiento' => 'numeric|between:1,32767',
             'peso_destete' => 'numeric|between:1,32767',
             'peso_2year' => 'numeric|between:1,32767',
-            'peso_actual' => ['numeric','between:1,32767',Rule::requiredIf(fn ()=> in_array(5, $this->estado_id))],   
+            'peso_actual' => ['numeric','between:1,32767',Rule::requiredIf(fn ()=> in_array(5, $this->estado_id))],
             'estado_id' => Rule::foreach(function ($value, $attrubute) {
                 return Rule::exists('estados', 'id');
             }),
@@ -44,12 +44,12 @@ class StoreGanadoRequest extends FormRequest
                 'numeric', Rule::exists('compradors', 'id')
                 ->where(
                     function ($query) {
-                        return $query->where('user_id', Auth::id());
+                        return $query->where('finca_id', session('finca_id'));
                     }
                 )
             ],
             //campos para registrar ganado muerto
-            'fecha_fallecimiento' => ['date_format:Y-m-d', Rule::requiredIf(fn () => in_array(2, $this->estado_id))],       
+            'fecha_fallecimiento' => ['date_format:Y-m-d', Rule::requiredIf(fn () => in_array(2, $this->estado_id))],
             'causa' => ['min:3','max:255','string', Rule::requiredIf(fn () => in_array(2, $this->estado_id))],
             //campos vacunacion
             'vacunas.*.fecha'=> 'date_format:Y-m-d',

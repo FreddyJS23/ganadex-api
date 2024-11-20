@@ -17,37 +17,37 @@ class DashboardVentaGanadoController extends Controller
 {
     public function mejorComprador()
     {
-        $mejorComprador= Comprador::whereBelongsTo(Auth::user())
+        $mejorComprador= Comprador::whereIn('finca_id',session('finca_id'))
         ->withCount('ventas')
         ->orderByDesc('ventas_count')
         ->first();
-        
+
         return response()->json(['comprador' =>$mejorComprador ? new CompradorResource($mejorComprador) : ''], 200);
     }
-    
+
     public function mejorVenta()
     {
-        $mejorVenta=Venta::whereBelongsTo(Auth::user())
+        $mejorVenta=Venta::whereIn('finca_id',session('finca_id'))
         ->with('ganado:id,numero')
         ->orderByDesc('precio')
         ->first();
         return response()->json(['venta' =>$mejorVenta ? new VentaResource($mejorVenta) : ''], 200);
     }
-    
+
     public function peorVenta()
     {
-    $peorVenta=Venta::whereBelongsTo(Auth::user())
+    $peorVenta=Venta::whereIn('finca_id',session('finca_id'))
         ->orderBy('precio')
         ->with('ganado:id,numero')
         ->first();
-       
+
         return response()->json(['venta' =>$peorVenta ? new VentaResource($peorVenta) : ''], 200);
     }
-    
+
     public function ventasDelMes()
     {
         $ventasDelMes
-        = Venta::whereBelongsTo(Auth::user())
+        = Venta::whereIn('finca_id',session('finca_id'))
             ->whereMonth('fecha', now()->month)
             ->whereYear('fecha', now()->year)
             ->with('ganado:id,numero')
@@ -55,7 +55,7 @@ class DashboardVentaGanadoController extends Controller
 
          return new VentaCollection($ventasDelMes) ;
     }
-   
+
     public function balanceAnualVentas(Request $request)
     {
         $regexYear = "/^[2][0-9][0-9][0-9]$/";
@@ -63,21 +63,21 @@ class DashboardVentaGanadoController extends Controller
         $year =preg_match($regexYear, $request->query('year')) ? $request->query('year') : now()->format('Y');
 
         $meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-      
-    $balanceMesesVentas = Venta::whereBelongsTo(Auth::user())
+
+    $balanceMesesVentas = Venta::whereIn('finca_id',session('finca_id'))
     ->selectRaw("DATE_FORMAT(fecha,'%m') as mes, COUNT(id) as ventas")
         ->whereYear('fecha', $year)
             ->groupBy('mes')
             ->get()
             ->toArray();
-            
+
 $balanceAnual=[];
 
 foreach ($meses as $keyMes => $mes) {
 
 $cantidadVentasMes=0;
 
-/* Iterar resultado sql para sincronizar numero mes y ventas del mes, 
+/* Iterar resultado sql para sincronizar numero mes y ventas del mes,
 al crear array con el nombre del mes y las ventas del mes */
 foreach ($balanceMesesVentas as $mesBalance)  if(intval($mesBalance['mes']) == $keyMes +  1)  $cantidadVentasMes= $mesBalance['ventas'];
 

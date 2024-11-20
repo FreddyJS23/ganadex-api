@@ -6,23 +6,22 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Insumo extends Model
+class Finca extends Model
 {
     use HasFactory;
 
     protected $fillable=[
-        'insumo',
-        'cantidad',
-        'precio',
+        'nombre'
     ];
 
+
     /**
-     * Get the user that owns the Insumo
+     * Get the user that owns the Finca
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function finca(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(Finca::class);
+        return $this->belongsTo(User::class);
     }
 }

@@ -14,17 +14,18 @@ use Illuminate\Support\Facades\Auth;
 
 class VentaController extends Controller
 {
-    public function __construct()
+
+    /*  public function __construct()
     {
         $this->authorizeResource(Venta::class,'venta');
-    }
-    
+    } */
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return new VentaCollection(Venta::whereBelongsTo(Auth::user())->with('ganado:id,numero')->get());
+        return new VentaCollection(Venta::whereIn('finca_id',session('finca_id'))->with('ganado:id,numero')->get());
     }
 
     /**
@@ -34,7 +35,7 @@ class VentaController extends Controller
     {
         $venta = new Venta;
         $venta->fill($request->all());
-        $venta->user_id = Auth::id();
+        $venta->finca_id = session('finca_id')[0];
         $venta->fecha = Carbon::now()->format('Y-m-d');
         $venta->save();
 

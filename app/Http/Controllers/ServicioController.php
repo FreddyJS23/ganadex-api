@@ -17,11 +17,11 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class ServicioController extends Controller
 {
-    public function __construct()
+ /*    public function __construct()
     {
         $this->authorizeResource(Servicio::class,'servicio');
-    }   
-    
+    }   */
+
     /**
      * Display a listing of the resource.
      */
@@ -47,10 +47,10 @@ class ServicioController extends Controller
         $servicio->fill($request->except(['toro_id','pajuela_toro_id']));
         $servicio->fecha=$fecha->format('Y-m-d');
         $servicio->ganado()->associate($ganado);
-        /** 
+        /**
          *@var 'monta' | 'inseminacion'  */
         $tipoServicio=$request->input('tipo');
-        
+
         if($tipoServicio == 'monta') {
             $toro = Toro::find($request->input('toro_id'));
             $servicio->servicioable()->associate($toro);
@@ -61,7 +61,7 @@ class ServicioController extends Controller
         }
         $servicio->save();
          ServicioHecho::dispatch($servicio);
-    
+
         return response()->json(['servicio'=>new ServicioResource($servicio->load(['veterinario' => function (Builder $query) {
             $query->select('personals.id', 'nombre');
         }]
@@ -88,9 +88,9 @@ class ServicioController extends Controller
      */
     public function update(UpdateServicioRequest $request,Ganado $ganado, Servicio $servicio)
     {
-        $servicio->fill($request->except(['toro_id', 'pajuela_toro_id'])); 
-       
-        /** 
+        $servicio->fill($request->except(['toro_id', 'pajuela_toro_id']));
+
+        /**
          *@var 'monta' | 'inseminacion'  */
         $tipoServicio = $request->input('tipo');
         if ($tipoServicio == 'monta') {

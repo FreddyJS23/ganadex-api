@@ -14,11 +14,11 @@ use Illuminate\Support\Facades\Auth;
 
 class LecheController extends Controller
 {
-    public function __construct()
+   /*  public function __construct()
     {
         $this->authorizeResource(Leche::class,'pesaje_leche');
-    }
-    
+    } */
+
     /**
      * Display a listing of the resource.
      */
@@ -35,13 +35,13 @@ class LecheController extends Controller
         $fecha=new DateTime();
         $leche=new Leche;
         $leche->fill($request->all());
-        $leche->user_id=Auth::id();
+        $leche->finca_id=session('finca_id')[0];
         $leche->fecha=$fecha->format('Y-m-d');
         $leche->ganado()->associate($ganado);
         $leche->save();
-        
+
         PesajeLecheHecho::dispatch($ganado);
-        
+
         return response()->json(['pesaje_leche'=> new LecheResource($leche)],201);
     }
 

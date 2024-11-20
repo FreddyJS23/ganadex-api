@@ -49,29 +49,29 @@ class PartoController extends Controller
         $parto->fill($request->only(['observacion','personal_id']));
         $parto->fecha=$fecha->format('Y-m-d');
         $servicio=$ganado->servicioReciente->servicioable;
-        
+
         $parto->ganado()->associate($ganado);
         $parto->partoable()->associate($servicio);
-        
+
         $cria=new Ganado;
 
         $cria->fill($request->except(['observacion','peso_nacimiento']));
         $cria->fecha_nacimiento=$fecha->format('Y-m-d');
         $cria->tipo_id=GanadoTipo::where('tipo','becerro')->first()->id;
         $cria->origen='local';
-        $cria->user_id=Auth::id();
+        $cria->finca_id=session('finca_id')[0];
         $cria->save();
-        $cria->evento()->create(); 
-  
+        $cria->evento()->create();
+
         $estados=Estado::select('id')
         ->whereIn('estado',['sano','pendiente_numeracion'])
         ->get()
         ->modelKeys();
         $cria->estados()->sync($estados);
-        
+
         $peso_nacimiento=new Peso($request->only(['peso_nacimiento']));
         $peso_nacimiento->ganado()->associate($cria)->save();
-        
+
         $parto->ganado_cria()->associate($cria)->save();
 
         PartoHecho::dispatch($parto);

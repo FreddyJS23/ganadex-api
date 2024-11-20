@@ -10,17 +10,17 @@ use Illuminate\Support\Facades\Auth;
 
 class ConfiguracionController extends Controller
 {
-    
-    public function __construct() {
+
+  /*   public function __construct() {
         $this->authorizeResource(Configuracion::class,'configuracion');
-    }
+    } */
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return Configuracion::firstWhere('user_id', Auth::id()) 
-        ? response()->json(['configuracion' => new ConfiguracionResource(Configuracion::firstWhere('user_id', Auth::id()))], 200) 
+        return Configuracion::firstWhere('user_id', Auth::id())
+        ? response()->json(['configuracion' => new ConfiguracionResource(Configuracion::firstWhere('user_id', Auth::id()))], 200)
         : response()->json(['configuracion' => ''], 404);
     }
 
@@ -31,7 +31,7 @@ class ConfiguracionController extends Controller
     {
         $configuracion = new Configuracion;
         $configuracion->fill($request->all());
-        $configuracion->user_id = Auth::id();
+        $configuracion->user_id =Auth::id();
         $configuracion->save();
 
         return response()->json(['configuracion' => new ConfiguracionResource($configuracion)], 201);

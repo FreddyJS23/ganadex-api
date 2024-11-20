@@ -13,7 +13,7 @@ class Vacunacion extends Model
 
     protected $fillable=[
         'vacuna_id',
-        'user_id',
+        'finca_id',
         'fecha',
         'prox_dosis',
     ];
@@ -22,9 +22,9 @@ class Vacunacion extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function user(): BelongsTo
+    public function finca(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Finca::class);
     }
 
     /**

@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('ganado_vacunado');
             $table->date('prox_dosis');
             $table->foreignId('vacuna_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('finca_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }

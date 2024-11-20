@@ -15,11 +15,11 @@ use Illuminate\Contracts\Database\Eloquent\Builder;
 
 class RevisionController extends Controller
 {
-    public function __construct()
+  /*   public function __construct()
     {
         $this->authorizeResource(Revision::class,'revision');
-    }   
-    
+    }    */
+
     /**
      * Display a listing of the resource.
      */
@@ -41,11 +41,11 @@ class RevisionController extends Controller
         $revision->fecha=$fecha->format('Y-m-d');
         $revision->ganado()->associate($ganado)->save();
 
-        
+
          RevisionPrenada::dispatchIf($revision->diagnostico == 'prenada',$revision);
-         
+
          RevisionDescarte::dispatchIf($revision->diagnostico == 'descartar',$revision);
-       
+
         return response()->json(['revision'=>new RevisionResource($revision->load(['veterinario' => function (Builder $query) {
             $query->select('personals.id', 'nombre');
         }]))],201);

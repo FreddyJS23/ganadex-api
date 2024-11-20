@@ -58,9 +58,9 @@ $resumenRevision = $ultimaRevision ? [
       'total' => $ganado->parto_count,
     ] : [];
 
-   
+
 $estadoProduccionLeche= $ganado->estados->contains('estado','lactancia') ? "En producción" : 'Inactiva';
-    
+
     $resumenPesajeLeche = $ultimoPesajeLeche ? [
       'ultimo' => $ultimoPesajeLeche->fecha,
       'peso' => $ultimoPesajeLeche->peso_leche,
@@ -85,11 +85,11 @@ $estadoProduccionLeche= $ganado->estados->contains('estado','lactancia') ? "En p
 
   public function resumenGeneral()
   {
-   
+
     $fechaActual = new DateTime();
     $mesActual = $fechaActual->format('m');
 
-    $TotalGanadoPorTiposMacho = Ganado::where('user_id', Auth::id())
+    $TotalGanadoPorTiposMacho = Ganado ::whereIn('finca_id', session('finca_id'))
       ->where('sexo', 'M')
       ->selectRaw('tipo, COUNT(tipo) as cantidad')
       ->join('ganado_tipos', 'tipo_id', 'ganado_tipos.id')
@@ -103,7 +103,7 @@ $estadoProduccionLeche= $ganado->estados->contains('estado','lactancia') ? "En p
     array_push($TotalGanadoPorTiposMacho, ['tipo' => 'total', 'cantidad' => $totalMacho]);
 
     $TotalGanadoPorTiposHembra
-      = Ganado::where('user_id', Auth::id())
+      = Ganado ::whereIn('finca_id', session('finca_id'))
       ->where('sexo', 'H')
       ->selectRaw('tipo, COUNT(tipo) as cantidad')
       ->join('ganado_tipos', 'tipo_id', 'ganado_tipos.id')
@@ -117,7 +117,7 @@ $estadoProduccionLeche= $ganado->estados->contains('estado','lactancia') ? "En p
     array_push($TotalGanadoPorTiposHembra, ['tipo' => 'total', 'cantidad' => $totalHembra]);
 
     $topVacasProductoras = Leche::withWhereHas('ganado', function ($query) {
-      $query->where('user_id', Auth::id())
+      $query->where('finca_id', session('finca_id'))
         ->select('id', 'numero');
     })->orderBy('peso_leche', 'desc')
       ->whereMonth('fecha', $mesActual)
@@ -136,7 +136,7 @@ $estadoProduccionLeche= $ganado->estados->contains('estado','lactancia') ? "En p
 
     $ordernarArrayVacasMenosProductoras = [];
     $topVacasMenosProductoras = Leche::withWhereHas('ganado', function ($query) {
-      $query->where('user_id', Auth::id())->select('id', 'numero');
+      $query->where('finca_id', session('finca_id'))->select('id', 'numero');
     })->orderBy('peso_leche', 'asc')
       ->whereMonth('fecha', $mesActual)
       ->limit(3)
@@ -150,16 +150,16 @@ $estadoProduccionLeche= $ganado->estados->contains('estado','lactancia') ? "En p
     }
     $topVacasMenosProductoras = $ordernarArrayVacasMenosProductoras;
 
-    $totalVacasEnGestacion = Ganado::whereBelongsTo(Auth::user())
+    $totalVacasEnGestacion = Ganado::whereIn('finca_id',session('finca_id'))
       ->whereRelation('estados', 'estado', 'gestacion')
       ->count();
 
-    $totalGanadoPendienteRevision = Ganado::whereBelongsTo(Auth::user())
+    $totalGanadoPendienteRevision = Ganado::whereIn('finca_id',session('finca_id'))
       ->whereRelation('estados', 'estado', 'pendiente_revision')
       ->count();
 
     $novillasAmontar = Peso::whereHas('ganado', function (Builder $query) {
-      $query->where('user_id', Auth::id());
+      $query->where('finca_id', session('finca_id'));
     })->where('peso_actual', '>=', 330)->count();
 
     $ganadoPendienteAcciones = [
@@ -169,7 +169,7 @@ $estadoProduccionLeche= $ganado->estados->contains('estado','lactancia') ? "En p
     ];
 
 
-    $totalPersonal = Personal::whereBelongsTo(Auth::user())
+    $totalPersonal = Personal::whereIn('finca_id',session('finca_id'))
       ->selectRaw('cargo, COUNT(cargo) as cantidad')
       ->join('cargos', 'cargo_id', 'cargos.id')
       ->groupBy('cargo')
@@ -213,7 +213,7 @@ $estadoProduccionLeche= $ganado->estados->contains('estado','lactancia') ? "En p
     ];
 
     $pdf = Pdf::loadView('resumenGeneralReporte', $dataPdf);
-    
+
     return $pdf->stream();
   }
 
@@ -222,7 +222,7 @@ $estadoProduccionLeche= $ganado->estados->contains('estado','lactancia') ? "En p
 $inicio=$request->query('start');
 $fin=$request->query('end');
 
-    $ventasLeche = VentaLeche::whereBelongsTo(Auth::user())
+    $ventasLeche = VentaLeche::whereIn('finca_id',session('finca_id'))
       ->oldest('fecha')
       ->select('venta_leches.fecha', 'cantidad', 'precio')
       ->selectRaw('(cantidad * precio) AS ganancia_total')
@@ -236,7 +236,7 @@ $fin=$request->query('end');
     'fin'=>$fin,];
 
     $pdf = Pdf::loadView('resumenVentasLeche', $dataPdf);
-  
+
     return $pdf->stream();
   }
 
@@ -245,8 +245,8 @@ $fin=$request->query('end');
   {
 
     $year = $request->query('year');
-    
-  $ventasGanado = Venta::whereBelongsTo(Auth::user()) 
+
+  $ventasGanado = Venta::whereIn('finca_id',session('finca_id'))
       ->join('ganados', 'ganado_id', 'ganados.id')
       //->selectRaw("DATE_FORMAT(fecha,'%m') as mes,numero,precio")
       ->selectRaw("DATE_FORMAT(fecha,'%m') as mes,numero")
@@ -263,7 +263,7 @@ $fin=$request->query('end');
     $dataPdf = ['ventasGanado' => $ventasGanado->groupBy('mes')->toArray(),'year'=>$year];
 
     $pdf = Pdf::loadView('resumenVentaGanadoAnual', $dataPdf);
-    
+
     return $pdf->stream();
   }
 
@@ -272,7 +272,7 @@ $fin=$request->query('end');
     $inicio = $request->query('start');
     $fin = $request->query('end');
 
-    $fallecimientos = Fallecimiento::whereRelation('ganado', 'user_id', Auth::id())
+    $fallecimientos = Fallecimiento::whereRelation('ganado', 'finca_id', session('finca_id'))
       ->selectRaw('causa, COUNT(causa) AS cantidad')
       ->orderby('cantidad', 'desc')
       ->groupBy('causa')
@@ -295,14 +295,14 @@ $fin=$request->query('end');
     $dataPdf = ['causasFallecimientos' => $fallecimientos];
 
     $pdf = Pdf::loadView('resumenCausasFallecimientos',$dataPdf);
-    
+
     return $pdf->stream();
 
   }
 
   public function facturaVentaGanado(){
 
-    $ventaGanado = Venta::whereBelongsTo(Auth::user())
+    $ventaGanado = Venta::whereIn('finca_id',session('finca_id'))
     ->with(['ganado'=>['peso'],'comprador'])
       ->orderBy('fecha', 'desc')
       ->first();
@@ -320,5 +320,5 @@ $fin=$request->query('end');
     $pdf = Pdf::loadView('notaVentaGanado', $dataPdf);
 
    return $pdf->stream();
-  } 
+  }
 }

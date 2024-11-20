@@ -41,7 +41,7 @@ class Ganado extends Model
     {
         return $this->hasOne(Toro::class);
     }
-   
+
     /**
      * Get the ganadoDescarte associated with the Ganado
      *
@@ -140,7 +140,7 @@ class Ganado extends Model
     {
         return $this->hasMany(Leche::class);
     }
-    
+
     /**
      * Get the ganado most recent pesaje leche
      *
@@ -150,15 +150,15 @@ class Ganado extends Model
     {
         return $this->pesajes_leche()->one()->latestOfMany();
     }
-    
+
     /**
      * Get the user that owns the Ganado
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function user(): BelongsTo
+    public function finca(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Finca::class);
     }
 
     /**

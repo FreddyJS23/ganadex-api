@@ -16,7 +16,7 @@ class CaparCriaController extends Controller
      */
     public function index()
     {
-        $criasPendienteCapar = Ganado::whereBelongsTo(Auth::user())
+        $criasPendienteCapar = Ganado::whereIn('finca_id',session('finca_id'))
         ->whereRelation('estados','estado','pendiente_capar')
         ->get();
 
@@ -30,9 +30,9 @@ class CaparCriaController extends Controller
     {
         $estado=Estado::firstWhere('estado','pendiente_capar');
         $ganado->estados()->detach($estado->id);
-        
+
         return response()->json();
     }
 
-  
+
 }

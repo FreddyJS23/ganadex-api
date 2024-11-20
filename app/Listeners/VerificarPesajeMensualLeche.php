@@ -26,13 +26,14 @@ class VerificarPesajeMensualLeche
     public function handle(Login $event): void
     {
         $estado = Estado::firstWhere('estado', 'pendiente_pesaje_leche');
-        
-        $usuarioId = $event->user->getAuthIdentifier();;
-        
-        if (Ganado::where('user_id', $usuarioId)->count() > 0) {
+
+        //no se obtiene la finca de la sesion ya que se esta logeando manualmente
+        $fincaId = $event->user->fincas->first()->id;
+
+        if (Ganado::where('finca_id', $fincaId)->count() > 0) {
 
             $vacasSinPesarEsteMes = Ganado::doesntHave('toro')
-                ->where('user_id', $usuarioId)
+                ->where('finca_id', $fincaId)
                 ->whereHas(
                     'pesajes_leche',
                     function (Builder $query) {
@@ -42,7 +43,7 @@ class VerificarPesajeMensualLeche
                 )
                 ->get();
 
-        
+
             foreach ($vacasSinPesarEsteMes as $vacaSinPesarEsteMes) {
                 $vacaSinPesarEsteMes->estados()->attach($estado->id);
             }

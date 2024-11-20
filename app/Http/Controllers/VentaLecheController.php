@@ -17,7 +17,7 @@ class VentaLecheController extends Controller
      */
     public function index()
     {
-        return new VentaLecheCollection(VentaLeche::whereBelongsTo(Auth::user())->latest('fecha')->get());
+        return new VentaLecheCollection(VentaLeche::whereIn('finca_id',session('finca_id'))->latest('fecha')->get());
     }
 
     /**
@@ -25,9 +25,10 @@ class VentaLecheController extends Controller
      */
     public function store(StoreVentaLecheRequest $request)
     {
+        dd(4);
         $ventaLeche=new VentaLeche;
         $ventaLeche->fill($request->only('cantidad','precio_id'));
-        $ventaLeche->user_id=Auth::id();
+        $ventaLeche->finca_id=session('finca_id')[0];
         $ventaLeche->fecha=Carbon::now()->format('Y-m-d');
         $ventaLeche->save();
 

@@ -31,7 +31,7 @@ class UpdateServicioRequest extends FormRequest
                 Rule::requiredIf($this->tipo == 'monta'),Rule::exists('toros', 'id')
                 ->where(
                     function ($query) {
-                        return $query->where('user_id', Auth::id());
+                        return $query->where('finca_id', session('finca_id'));
                     }
                 )
             ],
@@ -39,7 +39,7 @@ class UpdateServicioRequest extends FormRequest
                 Rule::requiredIf($this->tipo == 'inseminacion'), Rule::exists('pajuela_toros', 'id')
                 ->where(
                     function ($query) {
-                        return $query->where('user_id', Auth::id());
+                        return $query->where('finca_id', session('finca_id'));
                     }
                 )
             ],
