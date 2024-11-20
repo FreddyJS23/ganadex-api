@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Finca;
 use App\Models\Ganado;
 use App\Models\GanadoDescarte;
 use App\Models\User;
@@ -31,6 +32,7 @@ class GanadoDescarteTest extends TestCase
     private int $cantidad_ganadoDescarte = 10;
 
     private $user;
+    private $finca;
 
     protected function setUp(): void
     {
@@ -38,14 +40,19 @@ class GanadoDescarteTest extends TestCase
 
         $this->user
             = User::factory()->create();
+
+            $this->finca
+            = Finca::factory()
+            ->for($this->user)
+            ->create();
     }
 
     private function generarGanadoDescartes(): Collection
     {
         return GanadoDescarte::factory()
             ->count(10)
-            ->for($this->user)
-            ->forGanado(['user_id' => $this->user->id, 'sexo' => 'M', 'tipo_id' => 4])
+            ->for($this->finca)
+            ->forGanado(['finca_id' => $this->finca->id, 'sexo' => 'M', 'tipo_id' => 4])
             ->create();
     }
     public static function ErrorInputProvider(): array
@@ -87,7 +94,7 @@ class GanadoDescarteTest extends TestCase
     {
         $this->generarGanadoDescartes();
 
-        $response = $this->actingAs($this->user)->getJson('api/ganado_descarte');
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson('api/ganado_descarte');
 
         $response->assertStatus(200)
             ->assertJson(
@@ -115,7 +122,7 @@ class GanadoDescarteTest extends TestCase
     public function test_creacion_ganadoDescarte(): void
     {
 
-        $response = $this->actingAs($this->user)->postJson('api/ganado_descarte', $this->ganadoDescarte);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->postJson('api/ganado_descarte', $this->ganadoDescarte);
 
         $response->assertStatus(201)
             ->assertJson(
@@ -143,10 +150,10 @@ class GanadoDescarteTest extends TestCase
         $ganado =Ganado::factory()
             ->hasPeso(1)
             ->hasEvento(1)
-            ->for($this->user)
+            ->for($this->finca)
             ->create();
 
-        $response = $this->actingAs($this->user)->postJson('api/descartar_ganado', ['ganado_id' => $ganado->id]);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->postJson('api/descartar_ganado', ['ganado_id' => $ganado->id]);
 
         $response->assertStatus(201)
             ->assertJson(
@@ -170,7 +177,7 @@ class GanadoDescarteTest extends TestCase
             );
     }
 
-    
+
     public function test_obtener_ganadoDescarte(): void
     {
         $ress = $this->generarGanadoDescartes();
@@ -178,7 +185,7 @@ class GanadoDescarteTest extends TestCase
         $idRes = $ress[$idRandom]->id;
 
 
-        $response = $this->actingAs($this->user)->getJson(sprintf('api/ganado_descarte/%s', $idRes));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(sprintf('api/ganado_descarte/%s', $idRes));
 
         $response->assertStatus(200)
             ->assertJson(
@@ -197,7 +204,7 @@ class GanadoDescarteTest extends TestCase
                         ])
                         ->where('sexo', 'M')
                     ->where('tipo', fn (string $tipoGanado) => Str::contains($tipoGanado, ['becerro', 'maute', 'novillo', 'adulto']))
-                        
+
                 )
             );
     }
@@ -208,7 +215,7 @@ class GanadoDescarteTest extends TestCase
         $idRandom = rand(0, $this->cantidad_ganadoDescarte - 1);
         $idResEditar = $ress[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->putJson(sprintf('api/ganado_descarte/%s', $idResEditar), $this->ganadoDescarte);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(sprintf('api/ganado_descarte/%s', $idResEditar), $this->ganadoDescarte);
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) =>
@@ -226,15 +233,15 @@ class GanadoDescarteTest extends TestCase
     public function test_actualizar_res_con_otro_existente_repitiendo_campos_unicos(): void
     {
         GanadoDescarte::factory()
-            ->for($this->user)
-            ->for(Ganado::factory()->for($this->user)->create(['nombre' => 'test', 'numero' => 392]))
+            ->for($this->finca)
+            ->for(Ganado::factory()->for($this->finca)->create(['nombre' => 'test', 'numero' => 392]))
             ->create();
 
         $ganadoDescarte = $this->generarGanadoDescartes();
         $idRandom = rand(0, $this->cantidad_ganadoDescarte - 1);
         $idResEditar = $ganadoDescarte[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->putJson(sprintf('api/ganado_descarte/%s', $idResEditar), $this->ganadoDescarte);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(sprintf('api/ganado_descarte/%s', $idResEditar), $this->ganadoDescarte);
 
         $response->assertStatus(422)->assertJson(fn (AssertableJson $json) =>
         $json->hasAll(['errors.nombre', 'errors.numero'])
@@ -244,11 +251,11 @@ class GanadoDescarteTest extends TestCase
     public function test_actualizar_res_sin_modificar_campos_unicos(): void
     {
         $ganadoDescarte = GanadoDescarte::factory()
-            ->for($this->user)
-            ->for(Ganado::factory()->for($this->user)->create(['nombre' => 'test', 'numero' => 392]))
+            ->for($this->finca)
+            ->for(Ganado::factory()->for($this->finca)->create(['nombre' => 'test', 'numero' => 392]))
             ->create();
 
-        $response = $this->actingAs($this->user)->putJson(sprintf('api/ganado_descarte/%s', $ganadoDescarte->id), $this->ganadoDescarte);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(sprintf('api/ganado_descarte/%s', $ganadoDescarte->id), $this->ganadoDescarte);
 
         $response->assertStatus(200)->assertJson(['ganado_descarte' => true]);
     }
@@ -261,7 +268,7 @@ class GanadoDescarteTest extends TestCase
         $idToDelete = $ress[$idRandom]->id;
 
 
-        $response = $this->actingAs($this->user)->deleteJson(sprintf('api/ganado_descarte/%s', $idToDelete));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->deleteJson(sprintf('api/ganado_descarte/%s', $idToDelete));
 
         $response->assertStatus(200)->assertJson(['ganado_descarteID' => $idToDelete]);
     }
@@ -272,11 +279,11 @@ class GanadoDescarteTest extends TestCase
     public function test_error_validacion_registro_res($ganadoDescarte, $errores): void
     {
         GanadoDescarte::factory()
-            ->for($this->user)
-            ->for(Ganado::factory()->for($this->user)->create(['nombre' => 'test', 'numero' => 300]))
+            ->for($this->finca)
+            ->for(Ganado::factory()->for($this->finca)->create(['nombre' => 'test', 'numero' => 300]))
             ->create();
 
-        $response = $this->actingAs($this->user)->postJson('api/ganado_descarte', $ganadoDescarte);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->postJson('api/ganado_descarte', $ganadoDescarte);
 
         $response->assertStatus(422)->assertInvalid($errores);
     }
@@ -294,7 +301,7 @@ class GanadoDescarteTest extends TestCase
 
         $this->generarGanadoDescartes();
 
-        $response = $this->actingAs($this->user)->putJson(sprintf('api/ganado_descarte/%s', $idResOtroUsuario), $this->ganadoDescarte);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(sprintf('api/ganado_descarte/%s', $idResOtroUsuario), $this->ganadoDescarte);
 
         $response->assertStatus(403);
     }

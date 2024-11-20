@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Estado;
+use App\Models\Finca;
 use App\Models\Ganado;
 use App\Models\Personal;
 use App\Models\Revision;
@@ -29,6 +30,7 @@ class RevisionTest extends TestCase
     private $estado;
     private $veterinario;
     private $url;
+    private $finca;
 
     protected function setUp(): void
     {
@@ -39,9 +41,15 @@ class RevisionTest extends TestCase
         $this->user
             = User::factory()->create();
 
+
+            $this->finca
+            = Finca::factory()
+            ->for($this->user)
+            ->create();
+
         $this->veterinario
         = Personal::factory()
-            ->for($this->user)
+            ->for($this->finca)
             ->create(['cargo_id'=>2]);
 
             $this->ganado
@@ -49,7 +57,7 @@ class RevisionTest extends TestCase
             ->hasPeso(1)
             ->hasEvento(1)
             ->hasAttached($this->estado)
-            ->for($this->user)
+            ->for($this->finca)
             ->create();
 
         $this->url = sprintf('api/ganado/%s/revision', $this->ganado->id);
@@ -94,8 +102,8 @@ class RevisionTest extends TestCase
     {
         $this->generarRevision();
 
-        $response = $this->actingAs($this->user)->getJson($this->url);
-        
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson($this->url);
+
         $response->assertStatus(200)
             ->assertJson(
                 fn (AssertableJson $json) => $json->has(
@@ -121,7 +129,7 @@ class RevisionTest extends TestCase
     public function test_creacion_revision(): void
     {
 
-        $response = $this->actingAs($this->user)->postJson($this->url, $this->revision + ['personal_id'=>$this->veterinario->id]);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->postJson($this->url, $this->revision + ['personal_id'=>$this->veterinario->id]);
 
         $response->assertStatus(201)
             ->assertJson(
@@ -152,7 +160,7 @@ class RevisionTest extends TestCase
 
         $idRandom = rand(0, $this->cantidad_revision - 1);
         $idRevision = $revisiones[$idRandom]->id;
-        $response = $this->actingAs($this->user)->getJson(sprintf($this->url . '/%s', $idRevision));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(sprintf($this->url . '/%s', $idRevision));
 
         $response->assertStatus(200)
             ->assertJson(
@@ -181,7 +189,7 @@ class RevisionTest extends TestCase
         $idRandom = rand(0, $this->cantidad_revision - 1);
         $idRevisionEditar = $revisiones[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->putJson(sprintf($this->url . '/%s', $idRevisionEditar), $this->revision);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(sprintf($this->url . '/%s', $idRevisionEditar), $this->revision);
 
         $response->assertStatus(200)
             ->assertJson(
@@ -210,7 +218,7 @@ class RevisionTest extends TestCase
         $idToDelete = $revisiones[$idRandom]->id;
 
 
-        $response = $this->actingAs($this->user)->deleteJson(sprintf($this->url . '/%s', $idToDelete));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->deleteJson(sprintf($this->url . '/%s', $idToDelete));
 
         $response->assertStatus(200)->assertJson(['revisionID' => $idToDelete]);
     }
@@ -222,10 +230,10 @@ class RevisionTest extends TestCase
             ->hasRevision(5,['personal_id'=>$this->veterinario->id])
             ->hasEvento(1)
             ->hasAttached($this->estado)
-            ->for($this->user)
+            ->for($this->finca)
             ->create();
 
-        $response = $this->actingAs($this->user)->getJson(route('todasRevisiones'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('todasRevisiones'));
         $response->assertStatus(200)
             ->assertJson(
                 fn (AssertableJson $json) => $json->has('todas_revisiones.1', fn (AssertableJson $json) => $json->whereAllType([
@@ -247,7 +255,7 @@ class RevisionTest extends TestCase
     {
         //crear personal no veterinario
             Personal::factory()
-            ->for($this->user)
+            ->for($this->finca)
             ->create([
                 'id'=>2,
                 'ci' => 28472738,
@@ -258,7 +266,7 @@ class RevisionTest extends TestCase
                 'cargo_id' => 1,
             ]);;
 
-        $response = $this->actingAs($this->user)->postJson($this->url, $revision);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->postJson($this->url, $revision);
 
         $response->assertStatus(422)->assertInvalid($errores);
     }

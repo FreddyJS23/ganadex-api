@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Estado;
+use App\Models\Finca;
 use App\Models\Ganado;
 use App\Models\User;
 
@@ -21,6 +22,7 @@ class CaparCriaTest extends TestCase
     private $user;
     private $ganado;
     private $estado;
+    private $finca;
 
 
     protected function setUp(): void
@@ -29,6 +31,11 @@ class CaparCriaTest extends TestCase
 
         $this->user
             = User::factory()->create();
+
+            $this->finca
+            = Finca::factory()
+            ->for($this->user)
+            ->create();
     }
 
     private function generarGanado(): Collection
@@ -40,7 +47,7 @@ class CaparCriaTest extends TestCase
             ->hasPeso(1)
             ->hasEvento(1)
             ->hasAttached($this->estado)
-            ->for($this->user)
+            ->for($this->finca)
             ->create();
     }
 
@@ -51,7 +58,7 @@ class CaparCriaTest extends TestCase
     {
         $this->generarGanado();
 
-        $response = $this->actingAs($this->user)->getJson(route('capar.index'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('capar.index'));
         $response->assertStatus(200)
             ->assertJson(fn (AssertableJson $json) => $json->has('crias_pendiente_capar', $this->cantidad_ganado));
     }
@@ -63,9 +70,9 @@ class CaparCriaTest extends TestCase
         $idCria = $criasGanado[$idRandom]->id;
 
         //capar
-        $this->actingAs($this->user)->getJson(route('capar.capar', ['ganado' => $idCria]));
+        $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('capar.capar', ['ganado' => $idCria]));
 
-        $response = $this->actingAs($this->user)->getJson(sprintf('api/ganado/%s', $idCria));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(sprintf('api/ganado/%s', $idCria));
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) => $json

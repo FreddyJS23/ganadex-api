@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Finca;
 use App\Models\Jornada_vacunacion;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
@@ -14,6 +15,7 @@ class DashboardJornadasVacunacionTest extends TestCase
     use RefreshDatabase;
 
     private $user;
+    private $finca;
 
     private int $cantidad_jornadasVacunacion = 10;
 
@@ -23,13 +25,18 @@ class DashboardJornadasVacunacionTest extends TestCase
 
         $this->user
             = User::factory()->create();
+
+            $this->finca
+            = Finca::factory()
+            ->for($this->user)
+            ->create();
     }
 
     private function generarJornadasVacunacion(): Collection
     {
         return Jornada_vacunacion::factory()
             ->count($this->cantidad_jornadasVacunacion)
-            ->for($this->user)
+            ->for($this->finca)
             ->create();
     }
 
@@ -40,7 +47,7 @@ class DashboardJornadasVacunacionTest extends TestCase
     {
         $this->generarJornadasVacunacion();
 
-        $response = $this->actingAs($this->user)->getJson(route('dashboardJornadasVacunacion.proximasJornadasVacunacion'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('dashboardJornadasVacunacion.proximasJornadasVacunacion'));
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) =>

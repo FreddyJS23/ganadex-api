@@ -59,8 +59,8 @@ class PrecioTest extends TestCase
     {
         $this->generarPrecio();
 
-        $response = $this->actingAs($this->user)->getJson('api/precio');
-       
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson('api/precio');
+
         $response->assertStatus(200)
             ->assertJson(
                 fn (AssertableJson $json) => $json->has(
@@ -80,7 +80,7 @@ class PrecioTest extends TestCase
     public function test_creacion_precio(): void
     {
 
-        $response = $this->actingAs($this->user)->postJson('api/precio', $this->precio);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->postJson('api/precio', $this->precio);
 
         $response->assertStatus(201)->assertJson(
             fn (AssertableJson $json) =>
@@ -100,7 +100,7 @@ class PrecioTest extends TestCase
      */
     public function test_error_validacion_registro_precio($precio, $errores): void
     {
-        $response = $this->actingAs($this->user)->postJson('api/precio', $precio);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->postJson('api/precio', $precio);
 
         $response->assertStatus(422)->assertInvalid($errores);
     }

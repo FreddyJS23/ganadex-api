@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Estado;
+use App\Models\Finca;
 use App\Models\Ganado;
 use App\Models\User;
 use Illuminate\Support\Collection;
@@ -21,6 +22,7 @@ class AsignarNumeroCriaTest extends TestCase
     private $user;
     private $ganado;
     private $estado;
+    private $finca;
 
     protected function setUp(): void
     {
@@ -28,6 +30,12 @@ class AsignarNumeroCriaTest extends TestCase
 
         $this->user
             = User::factory()->create();
+
+            $this->finca
+            = Finca::factory()
+            ->for($this->user)
+            ->create();
+
     }
 
     private function generarGanado(): Collection
@@ -39,7 +47,7 @@ class AsignarNumeroCriaTest extends TestCase
             ->hasPeso(1)
             ->hasEvento(1)
             ->hasAttached($this->estado)
-            ->for($this->user)
+            ->for($this->finca)
             ->create(['numero' => null]);
     }
 
@@ -50,7 +58,7 @@ class AsignarNumeroCriaTest extends TestCase
     {
         $this->generarGanado();
 
-        $response = $this->actingAs($this->user)->getJson(route('numeracion.index'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('numeracion.index'));
         $response->assertStatus(200)
             ->assertJson(fn (AssertableJson $json) => $json->has('crias_pendiente_numeracion', $this->cantidad_ganado));
     }
@@ -62,9 +70,9 @@ class AsignarNumeroCriaTest extends TestCase
         $idCria = $criasGanado[$idRandom]->id;
 
         //asignar numero
-        $this->actingAs($this->user)->postJson(route('numeracion.store', ['ganado' => $idCria]), ['numero' => rand(1, 999)]);
+        $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->postJson(route('numeracion.store', ['ganado' => $idCria]), ['numero' => rand(1, 999)]);
 
-        $response = $this->actingAs($this->user)->getJson(sprintf('api/ganado/%s', $idCria));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(sprintf('api/ganado/%s', $idCria));
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) =>

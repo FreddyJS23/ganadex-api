@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Finca;
 use App\Models\Insumo;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
@@ -23,6 +24,7 @@ class InsumoTest extends TestCase
     private int $cantidad_insumo = 10;
 
     private $user;
+    private $finca;
 
     protected function setUp(): void
     {
@@ -30,13 +32,18 @@ class InsumoTest extends TestCase
 
         $this->user
             = User::factory()->create();
+
+            $this->finca
+            = Finca::factory()
+            ->for($this->user)
+            ->create();
     }
 
     private function generarInsumo(): Collection
     {
         return Insumo::factory()
             ->count($this->cantidad_insumo)
-            ->for($this->user)
+            ->for($this->finca)
             ->create();
     }
     public static function ErrorInputProvider(): array
@@ -73,7 +80,7 @@ class InsumoTest extends TestCase
     {
         $this->generarInsumo();
 
-        $response = $this->actingAs($this->user)->getJson('api/insumo');
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson('api/insumo');
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) =>
             $json->whereType('insumos', 'array')
@@ -95,7 +102,7 @@ class InsumoTest extends TestCase
     public function test_creacion_insumo(): void
     {
 
-        $response = $this->actingAs($this->user)->postJson('api/insumo', $this->insumo);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->postJson('api/insumo', $this->insumo);
 
         $response->assertStatus(201)->assertJson(
             fn (AssertableJson $json) =>
@@ -119,7 +126,7 @@ class InsumoTest extends TestCase
         $idRandom = rand(0, $this->cantidad_insumo - 1);
         $idInsumo = $insumos[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->getJson(sprintf('api/insumo/%s', $idInsumo));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(sprintf('api/insumo/%s', $idInsumo));
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) =>
@@ -141,7 +148,7 @@ class InsumoTest extends TestCase
         $idRandom = rand(0, $this->cantidad_insumo - 1);
         $idInsumoEditar = $insumos[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->putJson(sprintf('api/insumo/%s', $idInsumoEditar), $this->insumo);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(sprintf('api/insumo/%s', $idInsumoEditar), $this->insumo);
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) =>
@@ -158,13 +165,13 @@ class InsumoTest extends TestCase
 
     public function test_actualizar_insumo_con_otro_existente_repitiendo_campos_unicos(): void
     {
-        $insumoExistente = Insumo::factory()->for($this->user)->create(['insumo' => 'vacuna']);
+        $insumoExistente = Insumo::factory()->for($this->finca)->create(['insumo' => 'vacuna']);
 
         $insumo = $this->generarInsumo();
         $idRandom = rand(0, $this->cantidad_insumo - 1);
         $idInsumoEditar = $insumo[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->putJson(sprintf('api/insumo/%s', $idInsumoEditar), $this->insumo);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(sprintf('api/insumo/%s', $idInsumoEditar), $this->insumo);
 
         $response->assertStatus(422)->assertJson(fn (AssertableJson $json) =>
         $json->hasAll(['errors.insumo'])
@@ -173,9 +180,9 @@ class InsumoTest extends TestCase
 
     public function test_actualizar_insumo_conservando_campos_unicos(): void
     {
-        $insumoExistente = Insumo::factory()->for($this->user)->create(['insumo' => 'test']);
+        $insumoExistente = Insumo::factory()->for($this->finca)->create(['insumo' => 'test']);
 
-        $response = $this->actingAs($this->user)->putJson(sprintf('api/insumo/%s', $insumoExistente->id), $this->insumo);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(sprintf('api/insumo/%s', $insumoExistente->id), $this->insumo);
 
         $response->assertStatus(200);
     }
@@ -187,7 +194,7 @@ class InsumoTest extends TestCase
         $idToDelete = $insumos[$idRandom]->id;
 
 
-        $response = $this->actingAs($this->user)->deleteJson(sprintf('api/insumo/%s', $idToDelete));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->deleteJson(sprintf('api/insumo/%s', $idToDelete));
 
         $response->assertStatus(200)->assertJson(['insumoID' => $idToDelete]);
     }
@@ -197,9 +204,9 @@ class InsumoTest extends TestCase
      */
     public function test_error_validacion_registro_insumo($insumo, $errores): void
     {
-        Insumo::factory()->for($this->user)->create(['insumo' => 'test']);
+        Insumo::factory()->for($this->finca)->create(['insumo' => 'test']);
 
-        $response = $this->actingAs($this->user)->postJson('api/insumo', $insumo);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->postJson('api/insumo', $insumo);
 
         $response->assertStatus(422)->assertInvalid($errores);
     }
@@ -214,7 +221,7 @@ class InsumoTest extends TestCase
 
         $this->generarInsumo();
 
-        $response = $this->actingAs($this->user)->putJson(sprintf('api/insumo/%s', $idInsumoOtroUsuario), $this->insumo);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(sprintf('api/insumo/%s', $idInsumoOtroUsuario), $this->insumo);
 
         $response->assertStatus(403);
     }

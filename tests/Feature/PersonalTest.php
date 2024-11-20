@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Cargo;
+use App\Models\Finca;
 use App\Models\Personal;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
@@ -28,6 +29,7 @@ class PersonalTest extends TestCase
     private int $cantidad_personal = 10;
 
     private $user;
+    private $finca;
 
     protected function setUp(): void
     {
@@ -35,13 +37,18 @@ class PersonalTest extends TestCase
 
         $this->user
             = User::factory()->create();
+
+            $this->finca
+            = Finca::factory()
+            ->for($this->user)
+            ->create();
     }
 
     private function generarPersonal(): Collection
     {
         return Personal::factory()
             ->count($this->cantidad_personal)
-            ->for($this->user)
+            ->for($this->finca)
             ->create();
     }
     public static function ErrorInputProvider(): array
@@ -93,7 +100,7 @@ class PersonalTest extends TestCase
     {
         $this->generarPersonal();
 
-        $response = $this->actingAs($this->user)->getJson('api/personal');
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson('api/personal');
         $response->assertStatus(200)
             ->assertJson(
                 fn (AssertableJson $json) => $json->has(
@@ -116,7 +123,7 @@ class PersonalTest extends TestCase
     public function test_creacion_personal(): void
     {
 
-        $response = $this->actingAs($this->user)->postJson('api/personal', $this->personal);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->postJson('api/personal', $this->personal);
 
         $response->assertStatus(201)
             ->assertJson(
@@ -142,7 +149,7 @@ class PersonalTest extends TestCase
         $idRandom = rand(0, $this->cantidad_personal - 1);
         $idPersonal = $personals[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->getJson(sprintf('api/personal/%s', $idPersonal));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(sprintf('api/personal/%s', $idPersonal));
 
         $response->assertStatus(200)
             ->assertJson(
@@ -167,7 +174,7 @@ class PersonalTest extends TestCase
         $idRandom = rand(0, $this->cantidad_personal - 1);
         $idPersonalEditar = $personals[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->putJson(sprintf('api/personal/%s', $idPersonalEditar), $this->personal);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(sprintf('api/personal/%s', $idPersonalEditar), $this->personal);
 
         $response->assertStatus(200)
             ->assertJson(
@@ -187,13 +194,13 @@ class PersonalTest extends TestCase
 
     public function test_actualizar_personal_con_otro_existente_repitiendo_campos_unicos(): void
     {
-        $personalExistente = Personal::factory()->for($this->user)->create(['ci' => 28472738]);
+        $personalExistente = Personal::factory()->for($this->finca)->create(['ci' => 28472738]);
 
         $personal = $this->generarPersonal();
         $idRandom = rand(0, $this->cantidad_personal - 1);
         $idPersonalEditar = $personal[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->putJson(sprintf('api/personal/%s', $idPersonalEditar), $this->personal);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(sprintf('api/personal/%s', $idPersonalEditar), $this->personal);
 
         $response->assertStatus(422)->assertJson(fn (AssertableJson $json) =>
         $json->hasAll(['errors.ci'])
@@ -202,9 +209,9 @@ class PersonalTest extends TestCase
 
     public function test_actualizar_personal_conservando_campos_unicos(): void
     {
-        $personalExistente = Personal::factory()->for($this->user)->create(['ci' => 28472738]);
+        $personalExistente = Personal::factory()->for($this->finca)->create(['ci' => 28472738]);
 
-        $response = $this->actingAs($this->user)->putJson(sprintf('api/personal/%s', $personalExistente->id), $this->personal);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(sprintf('api/personal/%s', $personalExistente->id), $this->personal);
 
         $response->assertStatus(200);
     }
@@ -217,7 +224,7 @@ class PersonalTest extends TestCase
         $idToDelete = $personals[$idRandom]->id;
 
 
-        $response = $this->actingAs($this->user)->deleteJson(sprintf('api/personal/%s', $idToDelete));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->deleteJson(sprintf('api/personal/%s', $idToDelete));
 
         $response->assertStatus(200)->assertJson(['personalID' => $idToDelete]);
     }
@@ -227,9 +234,9 @@ class PersonalTest extends TestCase
      */
     public function test_error_validacion_registro_personal($personal, $errores): void
     {
-        personal::factory()->for($this->user)->create(['ci' => 28472738]);
+        personal::factory()->for($this->finca)->create(['ci' => 28472738]);
 
-        $response = $this->actingAs($this->user)->postJson('api/personal', $personal);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->postJson('api/personal', $personal);
 
         $response->assertStatus(422)->assertInvalid($errores);
     }
@@ -244,7 +251,7 @@ class PersonalTest extends TestCase
 
         $this->generarPersonal();
 
-        $response = $this->actingAs($this->user)->putJson(sprintf('api/personal/%s', $idPersonalOtroUsuario), $this->personal);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(sprintf('api/personal/%s', $idPersonalOtroUsuario), $this->personal);
 
         $response->assertStatus(403);
     }

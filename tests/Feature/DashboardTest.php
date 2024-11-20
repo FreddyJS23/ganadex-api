@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Estado;
+use App\Models\Finca;
 use App\Models\Ganado;
 use App\Models\GanadoDescarte;
 use App\Models\Insumo;
@@ -26,6 +27,7 @@ class DashboardTest extends TestCase
     private $user;
     private int $cantidad_elementos = 50;
     private $estado;
+    private $finca;
 
     protected function setUp(): void
     {
@@ -33,23 +35,29 @@ class DashboardTest extends TestCase
 
         $this->user
             = User::factory()->create();
-        $this->estado = Estado::all();
+
+            $this->finca
+            = Finca::factory()
+            ->for($this->user)
+            ->create();
+
+            $this->estado = Estado::all();
     }
     private function generarGanado(): Collection
     {
         GanadoDescarte::factory()
             ->count(10)
-            ->for($this->user)
-            ->forGanado(['user_id' => $this->user->id, 'sexo' => 'M', 'tipo_id' => 4])
+            ->for($this->finca)
+            ->forGanado(['finca_id' => $this->finca->id, 'sexo' => 'M', 'tipo_id' => 4])
             ->create();
-        
+
         return Ganado::factory()
             ->count($this->cantidad_elementos)
             ->hasPeso(1)
             ->hasEvento(1)
             ->hasAttached($this->estado)
             ->has(
-                Leche::factory()->for($this->user)->state(
+                Leche::factory()->for($this->finca)->state(
                     function (array $attributes, Ganado $ganado) {
                         return ['ganado_id' => $ganado->id, 'fecha' => Carbon::now()->format('Y-m-d')];
                     }
@@ -59,7 +67,7 @@ class DashboardTest extends TestCase
             ->state(new Sequence(
                 fn (Sequence $sequence) => ['tipo_id' => rand(1, 4)]
             ))
-            ->for($this->user)
+            ->for($this->finca)
             ->create();
     }
 
@@ -77,24 +85,24 @@ class DashboardTest extends TestCase
 
     private function generarGanadoPesajeLecheAnual(int $año): Collection
     {
-      
+
         return Ganado::factory()
             ->count($this->cantidad_elementos)
             ->hasPeso(1)
             ->hasEvento(1)
             ->hasAttached($this->estado)
-            /* habra veces que se repita una fecha, por ende se crea 50 elementos ganado, 
-            con 12 elementos de produccion lactea que serian la cantidad de meses que existen, 
+            /* habra veces que se repita una fecha, por ende se crea 50 elementos ganado,
+            con 12 elementos de produccion lactea que serian la cantidad de meses que existen,
             asi siempre todos los meses estaran cubiertos por lo menos una vez */
             ->has(
-                Leche::factory()->for($this->user)->count(12)->state(
+                Leche::factory()->for($this->finca)->count(12)->state(
                     function (array $attributes, Ganado $ganado) {
                         return ['ganado_id' => $ganado->id];
                     }
                 )->sequence(fn (Sequence $sequence) => ['fecha' =>$this->mesesPesajeAnual($año)]),
                 'pesajes_leche'
             )
-            ->for($this->user)
+            ->for($this->finca)
             ->create();
     }
 
@@ -102,7 +110,7 @@ class DashboardTest extends TestCase
     {
         return Personal::factory()
             ->count($this->cantidad_elementos)
-            ->for($this->user)
+            ->for($this->finca)
             ->create();
     }
 
@@ -110,7 +118,7 @@ class DashboardTest extends TestCase
     {
         return Insumo::factory()
             ->count($this->cantidad_elementos)
-            ->for($this->user)
+            ->for($this->finca)
             ->create();
     }
 
@@ -120,7 +128,7 @@ class DashboardTest extends TestCase
     public function test_total_ganado_por_tipo(): void
     {
         $this->generarGanado();
-        $response = $this->actingAs($this->user)->getJson(route('dashboardPrincipal.totalGanadoTipo'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('dashboardPrincipal.totalGanadoTipo'));
 
         $response->assertStatus(200)->assertJson(fn (AssertableJson $json) =>
         $json->whereType('total_tipos_ganado', 'array')
@@ -141,7 +149,7 @@ class DashboardTest extends TestCase
     public function test_total_personal(): void
     {
         $this->generarPersonal();
-        $response = $this->actingAs($this->user)->getJson(route('dashboardPrincipal.totalPersonal'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('dashboardPrincipal.totalPersonal'));
 
         $response->assertStatus(200)->assertJson(['total_personal' => $this->cantidad_elementos]);
     }
@@ -149,7 +157,7 @@ class DashboardTest extends TestCase
     public function test_total_vacas_en_gestacion(): void
     {
         $this->generarGanado();
-        $response = $this->actingAs($this->user)->getJson(route('dashboardPrincipal.vacasEnGestacion'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('dashboardPrincipal.vacasEnGestacion'));
 
         $response->assertStatus(200)->assertJson(fn (AssertableJson $json) => $json->whereType('vacas_en_gestacion', 'integer'));
     }
@@ -157,7 +165,7 @@ class DashboardTest extends TestCase
     public function test_ranking_top_3_vacas_mas_productoras(): void
     {
         $this->generarGanado();
-        $response = $this->actingAs($this->user)->getJson(route('dashboardPrincipal.topVacasProductoras'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('dashboardPrincipal.topVacasProductoras'));
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) =>
@@ -180,7 +188,7 @@ class DashboardTest extends TestCase
     public function test_ranking_top_3_vacas_menos_productoras(): void
     {
         $this->generarGanado();
-        $response = $this->actingAs($this->user)->getJson(route('dashboardPrincipal.topVacasMenosProductoras'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('dashboardPrincipal.topVacasMenosProductoras'));
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) =>
@@ -203,7 +211,7 @@ class DashboardTest extends TestCase
     public function test_total_vacas_pendientes_de_revision(): void
     {
         $this->generarGanado();
-        $response = $this->actingAs($this->user)->getJson(route('dashboardPrincipal.totalGanadoPendienteRevision'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('dashboardPrincipal.totalGanadoPendienteRevision'));
 
         $response->assertStatus(200)->assertJson(fn (AssertableJson $json) => $json->whereType('ganado_pendiente_revision', 'integer'));
     }
@@ -211,15 +219,15 @@ class DashboardTest extends TestCase
     public function test_total_novillas_pendientes_de_servicio_o_monta(): void
     {
         $this->generarGanado();
-        $response = $this->actingAs($this->user)->getJson(route('dashboardPrincipal.cantidadVacasParaServir'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('dashboardPrincipal.cantidadVacasParaServir'));
 
         $response->assertStatus(200)->assertJson(fn (AssertableJson $json) => $json->whereType('cantidad_vacas_para_servir', 'integer'));
     }
-/* 
+/*
     public function test_menor_cantidad_insumo(): void
     {
         $this->generarInsumos();
-        $response = $this->actingAs($this->user)->getJson(route('dashboardPrincipal.insumoMenorExistencia'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('dashboardPrincipal.insumoMenorExistencia'));
 
         $response->assertStatus(200)->assertJson(fn (AssertableJSon $json) =>
         $json->whereAllType([
@@ -232,7 +240,7 @@ class DashboardTest extends TestCase
     public function test_mayor_cantidad_insumo(): void
     {
         $this->generarInsumos();
-        $response = $this->actingAs($this->user)->getJson(route('dashboardPrincipal.insumoMayorExistencia'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('dashboardPrincipal.insumoMayorExistencia'));
 
         $response->assertStatus(200)->assertJson(fn (AssertableJSon $json) =>
         $json->whereAllType([
@@ -245,7 +253,7 @@ class DashboardTest extends TestCase
     public function test_balance_anual_leche(): void
     {
         $this->generarGanadoPesajeLecheAnual(now()->format('Y'));
-        $response = $this->actingAs($this->user)->getJson(route('dashboardPrincipal.balanceAnualProduccionLeche'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('dashboardPrincipal.balanceAnualProduccionLeche'));
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) => $json->has('balance_anual', 12)
@@ -260,7 +268,7 @@ class DashboardTest extends TestCase
      public function test_balance_anual_leche_con_parametro(): void
     {
         $this->generarGanadoPesajeLecheAnual(now()->addYear()->format('Y'));
-        $response = $this->actingAs($this->user)->getJson(route('dashboardPrincipal.balanceAnualProduccionLeche',['year'=>now()->addYear()->format('Y')]));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('dashboardPrincipal.balanceAnualProduccionLeche',['year'=>now()->addYear()->format('Y')]));
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) => $json->has('balance_anual', 12)
@@ -271,5 +279,5 @@ class DashboardTest extends TestCase
                     ]
                 )
         );
-    } 
+    }
 }
