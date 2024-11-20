@@ -15,7 +15,7 @@ class Venta extends Model
         'ganado_id',
         'comprador_id'
     ];
-    
+
     /**
      * Get the ganador that owns the Venta
      *
@@ -41,9 +41,9 @@ class Venta extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function user(): BelongsTo
+    public function finca(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Finca::class);
     }
 
 }

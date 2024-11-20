@@ -16,9 +16,9 @@ use Illuminate\Support\Str;
 
 class GenerarNotificaciones
 {
-   
+
    /* se utiliza este scope ya que el evento
-    que es login tiene varios listener por ende 
+    que es login tiene varios listener por ende
     llama varias veces este archivo, si se declaran estas funciones
     dentro del handle, dara error que la funcion ya se ha creado anteriormente */
     private function CrearNotificaion($tipo, $userId, $ganadoId, $diferenciaDiasEvento)
@@ -35,13 +35,13 @@ class GenerarNotificaciones
     }
 
     //Consultar si un evento esta cercano a los 7 dias
-    private function VerificarEventoCercano($evento, $usuarioId, $fechaActual)
+    private function VerificarEventoCercano($evento, $usuarioId,$fincaId, $fechaActual)
     {
         //eliminar sufijo de la columna eventos
         $tipoEvento = Str::of($evento)->after('prox_');
         $nombreColumna = "dias_para_" . $tipoEvento;
 
-        $eventosProximos = Evento::whereRelation('ganado', 'user_id', $usuarioId)
+        $eventosProximos = Evento::whereRelation('ganado', 'finca_id', $fincaId)
             ->select('id', 'ganado_id')
             ->selectRaw("DATEDIFF($evento,'$fechaActual') AS $nombreColumna")
             ->having("dias_para_$tipoEvento", '<=', 7)->get();
@@ -64,25 +64,25 @@ class GenerarNotificaciones
 
     /**
      * Handle the event.
-     * 
+     *
      */
     public function handle(Login $event): void
     {
-        $usuarioId = $event->user->getAuthIdentifier();
+        $fincaId = $event->user->fincas->first()->id;
         $fechaActual = now()->format('Y-m-d');
-        if (Ganado::where('user_id', $usuarioId)->count() > 0) {
+        if (Ganado::where('finca_id', $fincaId)->count() > 0) {
 
 
             //extraer nombres de columnas de la tabla
             $columnasTablaEvento = Schema::getColumnListing('eventos');
-            //intercambiar key=>valor por valor=>key exeptuando 
+            //intercambiar key=>valor por valor=>key exeptuando
             $columnasTablaEvento = array_flip($columnasTablaEvento);
             //exeptuar columnas inncesarias
             $columnasTablaEvento = (array) Arr::except($columnasTablaEvento, ['id', 'ganado_id', 'created_at', 'updated_at']);
 
             //iterar columnas
             foreach ($columnasTablaEvento as $columna => $key) {
-                $this->VerificarEventoCercano($columna, $usuarioId, $fechaActual);
+                $this->VerificarEventoCercano($columna, $event->user->id,$fincaId, $fechaActual);
             }
         }
     }

@@ -73,7 +73,7 @@ class VentaLecheTest extends TestCase
     {
         $this->generarVentaLeche();
 
-        $response = $this->actingAs($this->user)->getJson('api/venta_leche');
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson('api/venta_leche');
         $response->assertStatus(200)
             ->assertJson(fn (AssertableJson $json) => $json->has('ventas_de_leche', $this->cantidad_ventaLeche, fn (AssertableJson $json) => $json
                 ->whereAllType([
@@ -88,7 +88,7 @@ class VentaLecheTest extends TestCase
     public function test_creacion_venta_de_leche(): void
     {
 
-        $response = $this->actingAs($this->user)->postJson('api/venta_leche', $this->ventaLeche + ['precio_id' => $this->precio->id]);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->postJson('api/venta_leche', $this->ventaLeche + ['precio_id' => $this->precio->id]);
 
         $response->assertStatus(201)
             ->assertJson(
@@ -112,7 +112,7 @@ class VentaLecheTest extends TestCase
      */
     public function test_error_validacion_registro_venta_de_leche($ventaLeche, $errores): void
     {
-        $response = $this->actingAs($this->user)->postJson('api/venta_leche', $ventaLeche);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->postJson('api/venta_leche', $ventaLeche);
 
         $response->assertStatus(422)->assertInvalid($errores);
     }

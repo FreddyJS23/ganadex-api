@@ -17,7 +17,7 @@ class TodosPartos extends Controller
             return new TodosPartosCollection(Ganado::doesntHave('toro')
         ->has('parto')
         ->withCount('parto')
-        ->where('user_id', Auth::id())
+        ->whereIn('finca_id', session('finca_id'))
             ->get());
     }
 }

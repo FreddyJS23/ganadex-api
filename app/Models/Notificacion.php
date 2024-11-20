@@ -47,7 +47,7 @@ class Notificacion extends Model
     {
         return $this->belongsTo(User::class);
     }
-    
+
     public function leido(): Attribute
     {
         return Attribute::make(

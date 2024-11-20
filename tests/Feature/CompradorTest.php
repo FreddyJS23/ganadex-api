@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Comprador;
+use App\Models\Finca;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -20,6 +21,7 @@ class CompradorTest extends TestCase
     private int $cantidad_comprador = 10;
 
     private $user;
+    private $finca;
 
     protected function setUp(): void
     {
@@ -27,13 +29,18 @@ class CompradorTest extends TestCase
 
         $this->user
             = User::factory()->create();
+
+            $this->finca
+            = Finca::factory()
+            ->for($this->user)
+            ->create();
     }
 
     private function generarComprador(): Collection
     {
         return Comprador::factory()
             ->count($this->cantidad_comprador)
-            ->for($this->user)
+            ->for($this->finca)
             ->create();
     }
     public static function ErrorInputProvider(): array
@@ -65,7 +72,7 @@ class CompradorTest extends TestCase
     {
         $this->generarComprador();
 
-        $response = $this->actingAs($this->user)->getJson('api/comprador');
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson('api/comprador');
         $response->assertStatus(200)
             ->assertJson(
                 fn (AssertableJson $json) => $json->has(
@@ -85,7 +92,7 @@ class CompradorTest extends TestCase
     public function test_creacion_comprador(): void
     {
 
-        $response = $this->actingAs($this->user)->postJson('api/comprador', $this->comprador);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->postJson('api/comprador', $this->comprador);
 
         $response->assertStatus(201)->assertJson(
             fn (AssertableJson $json) =>
@@ -101,7 +108,7 @@ class CompradorTest extends TestCase
         $idRandom = rand(0, $this->cantidad_comprador - 1);
         $idComprador = $comprador[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->getJson(sprintf('api/comprador/%s', $idComprador));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(sprintf('api/comprador/%s', $idComprador));
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) =>
@@ -118,7 +125,7 @@ class CompradorTest extends TestCase
         $idRandom = rand(0, $this->cantidad_comprador - 1);
         $idCompradorEditar = $comprador[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->putJson(sprintf('api/comprador/%s', $idCompradorEditar), $this->comprador);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(sprintf('api/comprador/%s', $idCompradorEditar), $this->comprador);
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) =>
@@ -129,13 +136,13 @@ class CompradorTest extends TestCase
 
     public function test_actualizar_comprador_con_otro_existente_repitiendo_campos_unicos(): void
     {
-        $compradorExistente = Comprador::factory()->for($this->user)->create(['nombre' => 'test']);
+        $compradorExistente = Comprador::factory()->for($this->finca)->create(['nombre' => 'test']);
 
         $comprador = $this->generarComprador();
         $idRandom = rand(0, $this->cantidad_comprador - 1);
         $idCompradorEditar = $comprador[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->putJson(sprintf('api/comprador/%s', $idCompradorEditar), $this->comprador);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(sprintf('api/comprador/%s', $idCompradorEditar), $this->comprador);
 
         $response->assertStatus(422)->assertJson(fn (AssertableJson $json) =>
         $json->hasAll(['errors.nombre'])
@@ -144,9 +151,9 @@ class CompradorTest extends TestCase
 
     public function test_actualizar_comprador_conservando_campos_unicos(): void
     {
-        $compradorExistente = Comprador::factory()->for($this->user)->create(['nombre' => 'test']);
+        $compradorExistente = Comprador::factory()->for($this->finca)->create(['nombre' => 'test']);
 
-        $response = $this->actingAs($this->user)->putJson(sprintf('api/comprador/%s', $compradorExistente->id), $this->comprador);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(sprintf('api/comprador/%s', $compradorExistente->id), $this->comprador);
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) =>
@@ -162,7 +169,7 @@ class CompradorTest extends TestCase
         $idToDelete = $comprador[$idRandom]->id;
 
 
-        $response = $this->actingAs($this->user)->deleteJson(sprintf('api/comprador/%s', $idToDelete));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->deleteJson(sprintf('api/comprador/%s', $idToDelete));
 
         $response->assertStatus(200)->assertJson(['compradorID' => $idToDelete]);
     }
@@ -172,9 +179,9 @@ class CompradorTest extends TestCase
      */
     public function test_error_validacion_registro_comprador($comprador, $errores): void
     {
-        Comprador::factory()->for($this->user)->create(['nombre' => 'test']);
+        Comprador::factory()->for($this->finca)->create(['nombre' => 'test']);
 
-        $response = $this->actingAs($this->user)->postJson('api/comprador', $comprador);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->postJson('api/comprador', $comprador);
 
         $response->assertStatus(422)->assertInvalid($errores);
     }
@@ -189,7 +196,7 @@ class CompradorTest extends TestCase
 
         $this->generarComprador();
 
-        $response = $this->actingAs($this->user)->putJson(sprintf('api/comprador/%s', $idCompradorOtroUsuario), $this->comprador);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(sprintf('api/comprador/%s', $idCompradorOtroUsuario), $this->comprador);
 
         $response->assertStatus(403);
     }

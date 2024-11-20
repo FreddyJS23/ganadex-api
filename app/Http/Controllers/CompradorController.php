@@ -11,17 +11,17 @@ use Illuminate\Support\Facades\Auth;
 
 class CompradorController extends Controller
 {
-    public function __construct()
+  /*   public function __construct()
     {
         $this->authorizeResource(Comprador::class, 'comprador');
-    }
-    
+    } */
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return new CompradorCollection(Comprador::whereBelongsTo(Auth::user())->get());
+        return new CompradorCollection(Comprador::whereIn('finca_id',session('finca_id'))->get());
     }
 
     /**
@@ -31,7 +31,7 @@ class CompradorController extends Controller
     {
         $comprador = new Comprador;
         $comprador->fill($request->all());
-        $comprador->user_id = Auth::id();
+        $comprador->finca_id = session('finca_id')[0];
         $comprador->save();
 
         return response()->json(['comprador' => new CompradorResource($comprador)], 201);

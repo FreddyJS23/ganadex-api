@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('compradors', function (Blueprint $table) {
             $table->id();
             $table->string('nombre')->unique();
-            $table->foreignId('user_id');
+            $table->foreignId('finca_id');
             $table->timestamps();
         });
     }

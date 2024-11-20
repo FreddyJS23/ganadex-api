@@ -2,6 +2,7 @@
 
 namespace App\Listeners;
 
+use App\Models\Finca;
 use App\Models\Ganado;
 use App\Models\User;
 use DateTime;
@@ -29,10 +30,12 @@ class VerificarEdadGanado
         $fechaActual = $incializarFecha->format('Y-m-d');
         //consulta sql, la diferencia seran los dias que le saca la fecha de nacimiento con la fecha actual
         $sentenciaSqlDiferenciaDias = "DATEDIFF('$fechaActual',fecha_nacimiento) as diferencia";
-        $usuarioId = $event->user->getAuthIdentifier();;
 
-        if (Ganado::where('user_id', $usuarioId)->count() > 0) {
-            $becerros = Ganado::where('user_id', $usuarioId)
+        
+        $fincaId =Finca::where('user_id', $event->user->id)->first()->id;
+
+        if (Ganado::where('finca_id', $fincaId)->count() > 0) {
+            $becerros = Ganado::where('finca_id', $fincaId)
                 ->where('tipo_id', 1)
                 ->select('tipo_id')
                 ->selectRaw($sentenciaSqlDiferenciaDias)
@@ -42,7 +45,7 @@ class VerificarEdadGanado
 
            $becerros->count() > 0 && $becerros->toQuery()->update(['tipo_id' => 2]);
 
-            $mautes = Ganado::where('user_id', $usuarioId)
+            $mautes = Ganado::where('finca_id', $fincaId)
                 ->where('tipo_id', 2)
                 ->select('tipo_id')
                 ->selectRaw($sentenciaSqlDiferenciaDias)

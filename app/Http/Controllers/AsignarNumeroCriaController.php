@@ -15,10 +15,10 @@ class AsignarNumeroCriaController extends Controller
      * Display a listing of the resource.
      */
     public function index()
-    {       
-         $criasPendienteNumeracion = Ganado::whereBelongsTo(Auth::user())
+    {
+         $criasPendienteNumeracion = Ganado::whereIn('finca_id',session('finca_id'))
          ->whereRelation('estados','estado','pendiente_numeracion')
-        ->get(); 
+        ->get();
 
         return new CriasPendienteNumeracionCollection($criasPendienteNumeracion);
     }
@@ -30,13 +30,13 @@ class AsignarNumeroCriaController extends Controller
     {
         $ganado->numero=$request->input('numero');
         $ganado->save();
-        
+
         $estado=Estado::firstWhere('estado','pendiente_numeracion');
 
         $ganado->estados()->detach($estado->id);
-        
+
         return response()->json();
     }
 
-   
+
 }

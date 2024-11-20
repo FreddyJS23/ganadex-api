@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('pajuela_toros', function (Blueprint $table) {
             $table->id();
             $table->string('codigo');
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('finca_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }

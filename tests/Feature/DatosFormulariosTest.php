@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Comprador;
 use App\Models\Estado;
+use App\Models\Finca;
 use App\Models\Ganado;
 use App\Models\Leche;
 use App\Models\User;
@@ -22,12 +23,18 @@ class DatosFormulariosTest extends TestCase
     private $user;
     private int $cantidad_ganado = 50;
     private $estado;
+    private $finca;
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->user
             = User::factory()->create();
+
+            $this->finca
+            = Finca::factory()
+            ->for($this->user)
+            ->create();
 
         $this->estado = Estado::all();
     }
@@ -38,7 +45,7 @@ class DatosFormulariosTest extends TestCase
             ->hasPeso(1)
             ->hasEvento(1)
             ->hasAttached($this->estado)
-            ->for($this->user)
+            ->for($this->finca)
             ->create();
     }
 
@@ -49,7 +56,7 @@ class DatosFormulariosTest extends TestCase
      public function test_obtener_novillas_que_se_pueden_servir()
      {
         $this->generarGanado();
-        $response = $this->actingAs($this->user)->getJson(route('datosParaFormularios.novillasParaMontar'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('datosParaFormularios.novillasParaMontar'));
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) =>
@@ -71,12 +78,12 @@ class DatosFormulariosTest extends TestCase
      {
          Venta::factory()
             ->count(10)
-            ->for($this->user)
-            ->for(Ganado::factory()->for($this->user)->hasPeso(1)->hasAttached($this->estado)->create())
-            ->for(Comprador::factory()->for($this->user)->create())
+            ->for($this->finca)
+            ->for(Ganado::factory()->for($this->finca)->hasPeso(1)->hasAttached($this->estado)->create())
+            ->for(Comprador::factory()->for($this->finca)->create())
             ->create();
 
-            $response=$this->actingAs($this->user)->getJson(route('datosParaFormularios.añosVentasGanado'));
+            $response=$this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('datosParaFormularios.añosVentasGanado'));
 
             $response->assertStatus(200)->assertJson(
                 fn (AssertableJson $json) =>
@@ -94,11 +101,11 @@ class DatosFormulariosTest extends TestCase
      {
         Leche::factory()
         ->count(10)
-        ->for(Ganado::factory()->for($this->user)->hasPeso(1)->hasAttached($this->estado)->create())
-        ->for($this->user)
+        ->for(Ganado::factory()->for($this->finca)->hasPeso(1)->hasAttached($this->estado)->create())
+        ->for($this->finca)
         ->create();
 
-            $response=$this->actingAs($this->user)->getJson(route('datosParaFormularios.añosProduccionLeche'));
+            $response=$this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('datosParaFormularios.añosProduccionLeche'));
 
             $response->assertStatus(200)->assertJson(
                 fn (AssertableJson $json) =>
@@ -118,7 +125,7 @@ class DatosFormulariosTest extends TestCase
         ->count(10)
         ->create();
 
-        $response=$this->actingAs($this->user)->getJson(route('datosParaFormularios.vacunasDisponibles'));
+        $response=$this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('datosParaFormularios.vacunasDisponibles'));
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) =>

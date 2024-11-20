@@ -23,12 +23,12 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class GanadoController extends Controller
 {
-    public function __construct()
+   /*  public function __construct()
     {
         $this->authorizeResource(Ganado::class,'ganado');
-    }   
-    
-    
+    } */
+
+
     public array $estado=['estado_id'];
     public array $peso=['peso_nacimiento', 'peso_destete','peso_2year','peso_actual'];
     public array $vendido=['precio','comprador_id'];
@@ -42,7 +42,7 @@ class GanadoController extends Controller
             ->doesntHave('fallecimiento')
             ->doesntHave('venta')
             ->doesntHave('ganadoDescarte')
-            ->where('user_id',Auth::id())
+            ->where('finca_id',session('finca_id'))
             ->with(['peso','evento','estados'])
             ->get());
     }
@@ -55,8 +55,8 @@ class GanadoController extends Controller
       $ganado=new Ganado;
       $ganado->sexo = "H";
       $ganado->fill($request->except($this->estado + $this->peso));
-      $ganado->user_id=Auth::id();
-     
+      $ganado->finca_id=session('finca_id')[0];
+
     try {
                 DB::transaction(function () use ($ganado, $request) {
                     $ganado->save();
@@ -84,7 +84,7 @@ class GanadoController extends Controller
                     $vacunas=[];
 
                     foreach ($request->only('vacunas')['vacunas'] as $vacuna) {
-                        array_push($vacunas, $vacuna + ['ganado_id' => $ganado->id, 'user_id' => $ganado->user_id]);
+                        array_push($vacunas, $vacuna + ['ganado_id' => $ganado->id, 'finca_id' => $ganado->finca_id]);
                     }
 
                     $ganado->vacunaciones()->createMany($vacunas);
@@ -105,7 +105,7 @@ class GanadoController extends Controller
     public function show(Ganado $ganado)
     {
 
-        $jornadasVacunacionAnteriores =  Jornada_vacunacion::where('user_id',Auth::id())
+        $jornadasVacunacionAnteriores =  Jornada_vacunacion::where('finca_id',session('finca_id'))
         ->select('jornada_vacunacions.id','nombre as vacuna', 'fecha_inicio as fecha','prox_dosis')
         ->join('vacunas', 'jornada_vacunacions.vacuna_id', 'vacunas.id')
         ->orderBy('fecha', 'desc')
@@ -190,7 +190,7 @@ class GanadoController extends Controller
         $ganado->fill($request->except($this->peso + $this->estado))->save();
         $ganado->peso->fill($request->only($this->peso))->save();
         $ganado->estados()->sync($request->only($this->estado)['estado_id']);
-       
+
         return response()->json(['ganado'=>new GanadoResource($ganado)],200);
     }
 

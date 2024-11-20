@@ -11,17 +11,17 @@ use Illuminate\Support\Facades\Auth;
 
 class InsumoController extends Controller
 {
-    
-    public function __construct() {
+
+  /*   public function __construct() {
         $this->authorizeResource(Insumo::class,'insumo');
-    }
-    
+    } */
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return new InsumoCollection(Insumo::whereBelongsTo(Auth::user())->get());
+        return new InsumoCollection(Insumo::whereIn('finca_id',session('finca_id'))->get());
     }
 
     /**
@@ -31,9 +31,9 @@ class InsumoController extends Controller
     {
         $insumo=new Insumo;
         $insumo->fill($request->all());
-        $insumo->user_id=Auth::id();
+        $insumo->finca_id=session('finca_id')[0];
         $insumo->save();
-        
+
         return response()->json(['insumo'=>new InsumoResource($insumo)],201);
     }
 
@@ -52,7 +52,7 @@ class InsumoController extends Controller
     {
         $insumo->fill($request->all());
         $insumo->save();
-        
+
         return response()->json(['insumo'=>new InsumoResource($insumo)],200);
     }
 

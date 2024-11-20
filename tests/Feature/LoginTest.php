@@ -2,21 +2,34 @@
 
 namespace Tests\Feature;
 
+use App\Models\Finca;
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
 
 class LoginTest extends TestCase
 {
+    use RefreshDatabase;
 
     private $user;
+    private $finca;
 
     protected function setUp(): void
     {
         parent::setUp();
 
+
+
         $this->user
             = User::factory()->create();
+
+            $this->finca
+            = Finca::factory()
+            ->for($this->user)
+            ->create();
+
+
     }
 
     /**

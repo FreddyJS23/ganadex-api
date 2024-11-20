@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Estado;
+use App\Models\Finca;
 use App\Models\Ganado;
 use App\Models\PajuelaToro;
 use App\Models\Personal;
@@ -38,6 +39,7 @@ class ServicioTest extends TestCase
     private $toro;
     private $pajuelaToro ;
     private $url;
+    private $finca;
 
     protected function setUp(): void
     {
@@ -46,11 +48,17 @@ class ServicioTest extends TestCase
         $this->user
             = User::factory()->create();
 
+
+            $this->finca
+            = Finca::factory()
+            ->for($this->user)
+            ->create();
+
         $this->estado = Estado::all();
 
         $this->veterinario
         = Personal::factory()
-            ->for($this->user)
+            ->for($this->finca)
             ->create(['cargo_id' => 2]);
 
         $this->ganado
@@ -58,14 +66,14 @@ class ServicioTest extends TestCase
             ->hasPeso(1)
             ->hasEvento(1)
             ->hasAttached($this->estado)
-            ->for($this->user)
+            ->for($this->finca)
             ->create();
 
         $this->toro = Toro::factory()
-            ->for($this->user)
-            ->for(Ganado::factory()->for($this->user)->create(['sexo' => 'M']))->create();
+            ->for($this->finca)
+            ->for(Ganado::factory()->for($this->finca)->create(['sexo' => 'M']))->create();
 
-        $this->pajuelaToro = PajuelaToro::factory()->for($this->user)->create();
+        $this->pajuelaToro = PajuelaToro::factory()->for($this->finca)->create();
 
         $this->url = sprintf('api/ganado/%s/servicio', $this->ganado->id);
     }
@@ -78,7 +86,7 @@ class ServicioTest extends TestCase
             ->for($this->toro,'servicioable')
             ->create(['personal_id' => $this->veterinario]);
     }
-    
+
     private function generarServicioInseminacion(): Collection
     {
        return Servicio::factory()
@@ -155,9 +163,9 @@ class ServicioTest extends TestCase
     {
         $this->generarServicioMonta();
 
-        $response = $this->actingAs($this->user)->getJson($this->url);
-      
-        $response->assertStatus(200)    
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson($this->url);
+
+        $response->assertStatus(200)
             ->assertJson(
                 fn (AssertableJson $json) => $json->has(
                     'servicios',
@@ -186,7 +194,7 @@ class ServicioTest extends TestCase
     public function test_creacion_servicio_monta(): void
     {
 
-        $response = $this->actingAs($this->user)->postJson($this->url, $this->servicioMonta + ['toro_id' => $this->toro->id,'personal_id'=>$this->veterinario->id]);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->postJson($this->url, $this->servicioMonta + ['toro_id' => $this->toro->id,'personal_id'=>$this->veterinario->id]);
 
         $response->assertStatus(201)
             ->assertJson(
@@ -218,7 +226,7 @@ class ServicioTest extends TestCase
 
         $idRandom = rand(0, $this->cantidad_servicio - 1);
         $idservicio = $servicios[$idRandom]->id;
-        $response = $this->actingAs($this->user)->getJson(sprintf($this->url . '/%s', $idservicio));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(sprintf($this->url . '/%s', $idservicio));
 
         $response->assertStatus(200)
             ->assertJson(
@@ -242,14 +250,14 @@ class ServicioTest extends TestCase
                 )
             );
     }
-   
+
     public function test_actualizar_servicio_monta(): void
     {
         $servicios = $this->generarServicioMonta();
         $idRandom = rand(0, $this->cantidad_servicio - 1);
         $idservicioEditar = $servicios[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->putJson(sprintf($this->url . '/%s', $idservicioEditar), $this->servicioMonta + ['toro_id' => $this->toro->id]);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(sprintf($this->url . '/%s', $idservicioEditar), $this->servicioMonta + ['toro_id' => $this->toro->id]);
 
         $response->assertStatus(200)
             ->assertJson(
@@ -275,12 +283,12 @@ class ServicioTest extends TestCase
         $idToDelete = $servicios[$idRandom]->id;
 
 
-        $response = $this->actingAs($this->user)->deleteJson(sprintf($this->url . '/%s', $idToDelete));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->deleteJson(sprintf($this->url . '/%s', $idToDelete));
 
         $response->assertStatus(200)->assertJson(['servicioID' => $idToDelete]);
     }
 
-  
+
 
     /**
      * @dataProvider ErrorinputProviderMonta
@@ -289,7 +297,7 @@ class ServicioTest extends TestCase
     {
         //crear personal no veterinario
         Personal::factory()
-            ->for($this->user)
+            ->for($this->finca)
             ->create([
                 'id' => 2,
                 'ci' => 28472738,
@@ -300,22 +308,22 @@ class ServicioTest extends TestCase
                 'cargo_id' => 1,
             ]);;
 
-        $response = $this->actingAs($this->user)->postJson($this->url, $servicio);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->postJson($this->url, $servicio);
 
         $response->assertStatus(422)->assertInvalid($errores);
     }
-   
-        
-    
-    /*servicio con inseminacion*/    
+
+
+
+    /*servicio con inseminacion*/
 
     public function test_obtener_servicios_inseminacion(): void
     {
         $this->generarServicioInseminacion();
 
-        $response = $this->actingAs($this->user)->getJson($this->url);
-      
-        $response->assertStatus(200)    
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson($this->url);
+
+        $response->assertStatus(200)
             ->assertJson(
                 fn (AssertableJson $json) => $json->has(
                     'servicios',
@@ -344,7 +352,7 @@ class ServicioTest extends TestCase
     public function test_creacion_servicio_inseminacion(): void
     {
 
-        $response = $this->actingAs($this->user)->postJson($this->url, $this->servicioInseminacion + ['pajuela_toro_id' => $this->pajuelaToro->id,'personal_id'=>$this->veterinario->id]);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->postJson($this->url, $this->servicioInseminacion + ['pajuela_toro_id' => $this->pajuelaToro->id,'personal_id'=>$this->veterinario->id]);
 
         $response->assertStatus(201)
             ->assertJson(
@@ -376,7 +384,7 @@ class ServicioTest extends TestCase
 
         $idRandom = rand(0, $this->cantidad_servicio - 1);
         $idservicio = $servicios[$idRandom]->id;
-        $response = $this->actingAs($this->user)->getJson(sprintf($this->url . '/%s', $idservicio));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(sprintf($this->url . '/%s', $idservicio));
 
         $response->assertStatus(200)
             ->assertJson(
@@ -406,7 +414,7 @@ class ServicioTest extends TestCase
         $idRandom = rand(0, $this->cantidad_servicio - 1);
         $idservicioEditar = $servicios[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->putJson(sprintf($this->url . '/%s', $idservicioEditar), $this->servicioInseminacion + ['pajuela_toro_id' => $this->pajuelaToro->id]);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(sprintf($this->url . '/%s', $idservicioEditar), $this->servicioInseminacion + ['pajuela_toro_id' => $this->pajuelaToro->id]);
 
         $response->assertStatus(200)
             ->assertJson(
@@ -432,12 +440,12 @@ class ServicioTest extends TestCase
         $idToDelete = $servicios[$idRandom]->id;
 
 
-        $response = $this->actingAs($this->user)->deleteJson(sprintf($this->url . '/%s', $idToDelete));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->deleteJson(sprintf($this->url . '/%s', $idToDelete));
 
         $response->assertStatus(200)->assertJson(['servicioID' => $idToDelete]);
     }
 
-   
+
 
     /**
      * @dataProvider ErrorinputProviderInseminacion
@@ -447,7 +455,7 @@ class ServicioTest extends TestCase
 
         //crear personal no veterinario
         Personal::factory()
-            ->for($this->user)
+            ->for($this->finca)
             ->create([
                 'id' => 2,
                 'ci' => 28472738,
@@ -458,7 +466,7 @@ class ServicioTest extends TestCase
                 'cargo_id' => 1,
             ]);;
 
-        $response = $this->actingAs($this->user)->postJson($this->url, $servicio);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->postJson($this->url, $servicio);
 
         $response->assertStatus(422)->assertInvalid($errores);
     }
@@ -473,14 +481,15 @@ class ServicioTest extends TestCase
             ->hasPeso(1)
             ->hasServicios(7, ['servicioable_id' => $this->toro->id, 'servicioable_type' => $this->toro->getMorphClass(), 'personal_id' => $this->veterinario->id])
             ->hasParto(3, function (array $attributes, Ganado $ganado) {
-                $veterinario = Personal::factory()->create(['user_id' => $ganado->user_id, 'cargo_id' => 2]);
-                $cria = Ganado::factory()->create(['user_id' => $ganado->user_id]);
+                $finca=$ganado->finca->id;
+                $veterinario = Personal::factory()->create(['finca_id' => $finca, 'cargo_id' => 2]);
+                $cria = Ganado::factory()->create(['finca_id' => $finca]);
 
                 return ['partoable_id' => $ganado->servicioReciente->servicioable->id, 'partoable_type' => $ganado->servicioReciente->servicioable->getMorphClass(), 'ganado_cria_id' => $cria->id, 'personal_id' => $veterinario->id];
             })
             ->hasEvento(1)
             ->hasAttached($this->estado)
-            ->for($this->user)
+            ->for($this->finca)
             ->create();
 
         /* partos con inseminacion */
@@ -489,17 +498,19 @@ class ServicioTest extends TestCase
             ->hasPeso(1)
             ->hasServicios(7, ['servicioable_id' => $this->pajuelaToro->id, 'servicioable_type' => $this->pajuelaToro->getMorphClass(), 'personal_id' => $this->veterinario->id])
             ->hasParto(3, function (array $attributes, Ganado $ganado) {
-                $veterinario = Personal::factory()->create(['user_id' => $ganado->user_id, 'cargo_id' => 2]);
-                $cria = Ganado::factory()->create(['user_id' => $ganado->user_id]);
+                $finca=$ganado->finca->id;
+                $veterinario = Personal::factory()->create(['finca_id' => $finca, 'cargo_id' => 2]);
+                $cria = Ganado::factory()->create(['finca_id' => $finca]);
+
 
                 return ['partoable_id' => $ganado->servicioReciente->servicioable->id, 'partoable_type' => $ganado->servicioReciente->servicioable->getMorphClass(), 'ganado_cria_id' => $cria->id, 'personal_id' => $veterinario->id];
             })
             ->hasEvento(1)
             ->hasAttached($this->estado)
-            ->for($this->user)
+            ->for($this->finca)
             ->create();
 
-        $response = $this->actingAs($this->user)->getJson(route('todasServicios'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('todasServicios'));
 
         $response->assertStatus(200)
             ->assertJson(

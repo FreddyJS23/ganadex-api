@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Finca;
 use App\Models\PajuelaToro;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
@@ -21,6 +22,7 @@ class PajuelaToroTest extends TestCase
     private int $cantidad_pajuelaToro = 10;
 
     private $user;
+    private $finca;
 
     protected function setUp(): void
     {
@@ -28,13 +30,18 @@ class PajuelaToroTest extends TestCase
 
         $this->user
             = User::factory()->create();
+
+            $this->finca
+            = Finca::factory()
+            ->for($this->user)
+            ->create();
     }
 
     private function generarPersonal(): Collection
     {
         return PajuelaToro::factory()
             ->count($this->cantidad_pajuelaToro)
-            ->for($this->user)
+            ->for($this->finca)
             ->create();
     }
     public static function ErrorInputProvider(): array
@@ -61,7 +68,7 @@ class PajuelaToroTest extends TestCase
     {
         $this->generarPersonal();
 
-        $response = $this->actingAs($this->user)->getJson(route('pajuela_toros.index'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('pajuela_toros.index'));
         $response->assertStatus(200)
             ->assertJson(
                 fn (AssertableJson $json) => $json->has(
@@ -79,7 +86,7 @@ class PajuelaToroTest extends TestCase
     public function test_creacion_pajuela_toro(): void
     {
 
-        $response = $this->actingAs($this->user)->postJson(route('pajuela_toros.store'), $this->pajuela_toro);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->postJson(route('pajuela_toros.store'), $this->pajuela_toro);
 
         $response->assertStatus(201)
             ->assertJson(
@@ -100,7 +107,7 @@ class PajuelaToroTest extends TestCase
         $idRandom = rand(0, $this->cantidad_pajuelaToro - 1);
         $idPajuelaToro = $pajuela_torols[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->getJson(route('pajuela_toros.show',['pajuela_toro'=>$idPajuelaToro]));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('pajuela_toros.show',['pajuela_toro'=>$idPajuelaToro]));
 
         $response->assertStatus(200)
             ->assertJson(
@@ -120,7 +127,7 @@ class PajuelaToroTest extends TestCase
         $idRandom = rand(0, $this->cantidad_pajuelaToro - 1);
         $idPajuelaToroEditar = $pajuela_toro[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->putJson(route('pajuela_toros.update',['pajuela_toro'=>$idPajuelaToroEditar]), $this->pajuela_toro);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(route('pajuela_toros.update',['pajuela_toro'=>$idPajuelaToroEditar]), $this->pajuela_toro);
 
         $response->assertStatus(200)
             ->assertJson(
@@ -141,7 +148,7 @@ class PajuelaToroTest extends TestCase
         $idToDelete = $pajuela_toro[$idRandom]->id;
 
 
-        $response = $this->actingAs($this->user)->deleteJson(route('pajuela_toros.destroy',['pajuela_toro'=>$idToDelete]));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->deleteJson(route('pajuela_toros.destroy',['pajuela_toro'=>$idToDelete]));
 
         $response->assertStatus(200)->assertJson(['pajuela_toroID' => $idToDelete]);
     }
@@ -151,9 +158,9 @@ class PajuelaToroTest extends TestCase
      */
     public function test_error_validacion_registro_personal($pajuela_toro, $errores): void
     {
-        PajuelaToro::factory()->for($this->user)->create(['codigo' => 28472738]);
+        PajuelaToro::factory()->for($this->finca)->create(['codigo' => 28472738]);
 
-        $response = $this->actingAs($this->user)->postJson(route('pajuela_toros.store'), $pajuela_toro);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->postJson(route('pajuela_toros.store'), $pajuela_toro);
 
         $response->assertStatus(422)->assertInvalid($errores);
     }
@@ -168,7 +175,7 @@ class PajuelaToroTest extends TestCase
 
         $this->generarPersonal();
 
-        $response = $this->actingAs($this->user)->putJson(route('pajuela_toros.update',['pajuela_toro'=>$idPersonalOtroUsuario]), $this->pajuela_toro);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(route('pajuela_toros.update',['pajuela_toro'=>$idPersonalOtroUsuario]), $this->pajuela_toro);
 
         $response->assertStatus(403);
     }

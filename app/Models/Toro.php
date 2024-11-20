@@ -19,8 +19,8 @@ class Toro extends Model
         'origen',
         'fecha_nacimiento',
     ];
-    
-    
+
+
     /**
      * Get the ganado that owns the Toro
      *
@@ -40,7 +40,7 @@ class Toro extends Model
  {
      return $this->morphMany(Servicio::class, 'servicioable');
  }
- 
+
  /**
   * Get all of the partos for the Toro
   *
@@ -55,9 +55,9 @@ class Toro extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function user(): BelongsTo
+    public function finca(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Finca::class);
     }
 
     protected $hidden = ['created_at', 'updated_at', 'user_id', 'ganado_id'];

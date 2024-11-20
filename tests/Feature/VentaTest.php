@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Comprador;
 use App\Models\Estado;
+use App\Models\Finca;
 use App\Models\Ganado;
 use App\Models\User;
 use App\Models\Venta;
@@ -25,6 +26,7 @@ class VentaTest extends TestCase
 
     private $user;
     private $estado;
+    private $finca;
 
     protected function setUp(): void
     {
@@ -32,17 +34,23 @@ class VentaTest extends TestCase
 
         $this->estado = Estado::all();
 
+
         $this->user
             = User::factory()->create();
+
+            $this->finca
+            = Finca::factory()
+            ->for($this->user)
+            ->create();
     }
 
     private function generarVentas(): Collection
     {
         return Venta::factory()
             ->count($this->cantidad_ventas)
-            ->for($this->user)
-            ->for(Ganado::factory()->for($this->user)->hasPeso(1)->hasAttached($this->estado)->create())
-            ->for(Comprador::factory()->for($this->user)->create())
+            ->for($this->finca)
+            ->for(Ganado::factory()->for($this->finca)->hasPeso(1)->hasAttached($this->estado)->create())
+            ->for(Comprador::factory()->for($this->finca)->create())
             ->create();
     }
     public static function ErrorInputProvider(): array
@@ -79,7 +87,7 @@ class VentaTest extends TestCase
     {
         $this->generarVentas();
 
-        $response = $this->actingAs($this->user)->getJson(route('ventas.index'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('ventas.index'));
 
         $response->assertStatus(200)
             ->assertJson(
@@ -109,11 +117,11 @@ class VentaTest extends TestCase
 
     public function test_creacion_venta(): void
     {
-        $ganado = Ganado::factory()->for($this->user)->hasPeso(1)->hasAttached($this->estado)->create();
-        $comprador = Comprador::factory()->for($this->user)->create();
+        $ganado = Ganado::factory()->for($this->finca)->hasPeso(1)->hasAttached($this->estado)->create();
+        $comprador = Comprador::factory()->for($this->finca)->create();
         $this->venta = $this->venta + ['ganado_id' => $ganado->id, 'comprador_id' => $comprador->id];
 
-        $response = $this->actingAs($this->user)->postJson(route('ventas.store'), $this->venta);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->postJson(route('ventas.store'), $this->venta);
 
         $response->assertStatus(201)
             ->assertJson(
@@ -146,7 +154,7 @@ class VentaTest extends TestCase
         $idRandom = rand(0, $this->cantidad_ventas - 1);
         $idVenta = $venta[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->getJson(route('ventas.show', ['venta' => $idVenta]));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('ventas.show', ['venta' => $idVenta]));
 
         $response->assertStatus(200)
             ->assertJson(
@@ -179,11 +187,11 @@ class VentaTest extends TestCase
         $idRandom = rand(0, $this->cantidad_ventas - 1);
         $idVentaEditar = $venta[$idRandom]->id;
 
-        $ganado = Ganado::factory()->for($this->user)->hasAttached($this->estado)->hasPeso(1)->create();
-        $comprador = Comprador::factory()->for($this->user)->create();
+        $ganado = Ganado::factory()->for($this->finca)->hasAttached($this->estado)->hasPeso(1)->create();
+        $comprador = Comprador::factory()->for($this->finca)->create();
         $this->venta = $this->venta + ['ganado_id' => $ganado->id, 'comprador_id' => $comprador->id];
 
-        $response = $this->actingAs($this->user)->putJson(route('ventas.update', ['venta' => $idVentaEditar]), $this->venta);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(route('ventas.update', ['venta' => $idVentaEditar]), $this->venta);
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) =>
@@ -203,7 +211,7 @@ class VentaTest extends TestCase
         $idToDelete = $venta[$idRandom]->id;
 
 
-        $response = $this->actingAs($this->user)->deleteJson(route('ventas.destroy', ['venta' => $idToDelete]));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->deleteJson(route('ventas.destroy', ['venta' => $idToDelete]));
 
         $response->assertStatus(200)->assertJson(['ventaID' => $idToDelete]);
     }
@@ -214,15 +222,15 @@ class VentaTest extends TestCase
     public function test_error_validacion_registro_venta($venta, $errores): void
     {
 
-        $response = $this->actingAs($this->user)->postJson(route('ventas.store'), $venta);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->postJson(route('ventas.store'), $venta);
 
         $response->assertStatus(422)->assertInvalid($errores);
     }
 
     public function test_autorizacion_maniupular__venta_otro_usuario(): void
     {
-        $ganado = Ganado::factory()->for($this->user)->hasAttached($this->estado)->hasPeso(1)->create();
-        $comprador = Comprador::factory()->for($this->user)->create();
+        $ganado = Ganado::factory()->for($this->finca)->hasAttached($this->estado)->hasPeso(1)->create();
+        $comprador = Comprador::factory()->for($this->finca)->create();
         $this->venta = $this->venta + ['ganado_id' => $ganado->id, 'comprador_id' => $comprador->id];
 
         $otroUsuario = User::factory()->create();
@@ -238,7 +246,7 @@ class VentaTest extends TestCase
         $this->generarVentas();
 
 
-        $response = $this->actingAs($this->user)->putJson(route('ventas.update', ['venta' => $idVentaOtroUsuario]), $this->venta);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(route('ventas.update', ['venta' => $idVentaOtroUsuario]), $this->venta);
 
         $response->assertStatus(403);
     }

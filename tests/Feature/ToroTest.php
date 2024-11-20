@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Finca;
 use App\Models\Ganado;
 use App\Models\Toro;
 use App\Models\User;
@@ -31,6 +32,7 @@ class ToroTest extends TestCase
     private int $cantidad_toro = 10;
 
     private $user;
+    private $finca;
 
     protected function setUp(): void
     {
@@ -38,14 +40,20 @@ class ToroTest extends TestCase
 
         $this->user
             = User::factory()->create();
+
+
+            $this->finca
+            = Finca::factory()
+            ->for($this->user)
+            ->create();
     }
 
     private function generarToros(): Collection
     {
         return Toro::factory()
             ->count(10)
-            ->for($this->user)
-            ->forGanado(['user_id' => $this->user->id, 'sexo' => 'M', 'tipo_id' => 4])
+            ->for($this->finca)
+            ->forGanado(['finca_id' => $this->finca->id, 'sexo' => 'M', 'tipo_id' => 4])
             ->create();
     }
     public static function ErrorInputProvider(): array
@@ -87,8 +95,8 @@ class ToroTest extends TestCase
     {
         $this->generarToros();
 
-        $response = $this->actingAs($this->user)->getJson('api/toro');
-       
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson('api/toro');
+
         $response->assertStatus(200)
             ->assertJson(
                 fn (AssertableJson $json) => $json->has(
@@ -107,7 +115,7 @@ class ToroTest extends TestCase
                             'efectividad'=>'double|null',
                             'padre_en_partos'=>'integer',
                             'servicios'=>'integer|null',
-                            
+
                         ])
                     ->where('sexo','M')
                     ->where('tipo', 'adulto')
@@ -119,7 +127,7 @@ class ToroTest extends TestCase
     public function test_creacion_toro(): void
     {
 
-        $response = $this->actingAs($this->user)->postJson('api/toro', $this->toro);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->postJson('api/toro', $this->toro);
 
         $response->assertStatus(201)
             ->assertJson(
@@ -153,7 +161,7 @@ class ToroTest extends TestCase
         $idToro = $toros[$idRandom]->id;
 
 
-        $response = $this->actingAs($this->user)->getJson(sprintf('api/toro/%s', $idToro));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(sprintf('api/toro/%s', $idToro));
 
         $response->assertStatus(200)
             ->assertJson(
@@ -178,14 +186,14 @@ class ToroTest extends TestCase
                 )
             );
     }
-   
+
     public function test_actualizar_toro(): void
     {
         $toros = $this->generarToros();
         $idRandom = rand(0, $this->cantidad_toro - 1);
         $idToroEditar = $toros[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->putJson(sprintf('api/toro/%s', $idToroEditar), $this->toro);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(sprintf('api/toro/%s', $idToroEditar), $this->toro);
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) =>
@@ -202,15 +210,15 @@ class ToroTest extends TestCase
     public function test_actualizar_toro_con_otro_existente_repitiendo_campos_unicos(): void
     {
         Toro::factory()
-            ->for($this->user)
-            ->for(Ganado::factory()->for($this->user)->create(['nombre' => 'test', 'numero' => 392]))
+            ->for($this->finca)
+            ->for(Ganado::factory()->for($this->finca)->create(['nombre' => 'test', 'numero' => 392]))
             ->create();
 
         $toros = $this->generarToros();
         $idRandom = rand(0, $this->cantidad_toro - 1);
         $idToroEditar = $toros[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->putJson(sprintf('api/toro/%s', $idToroEditar), $this->toro);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(sprintf('api/toro/%s', $idToroEditar), $this->toro);
 
         $response->assertStatus(422)->assertJson(fn (AssertableJson $json) =>
         $json->hasAll(['errors.nombre', 'errors.numero'])
@@ -220,11 +228,11 @@ class ToroTest extends TestCase
     public function test_actualizar_toro_sin_modificar_campos_unicos(): void
     {
         $toro =Toro::factory()
-            ->for($this->user)
-            ->for(Ganado::factory()->for($this->user)->create(['nombre' => 'test', 'numero' => 392]))
+            ->for($this->finca)
+            ->for(Ganado::factory()->for($this->finca)->create(['nombre' => 'test', 'numero' => 392]))
             ->create();
 
-        $response = $this->actingAs($this->user)->putJson(sprintf('api/toro/%s', $toro->id), $this->toro);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(sprintf('api/toro/%s', $toro->id), $this->toro);
 
         $response->assertStatus(200)->assertJson(['toro' => true]);
     }
@@ -237,7 +245,7 @@ class ToroTest extends TestCase
         $idToDelete = $toros[$idRandom]->id;
 
 
-        $response = $this->actingAs($this->user)->deleteJson(sprintf('api/toro/%s', $idToDelete));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->deleteJson(sprintf('api/toro/%s', $idToDelete));
 
         $response->assertStatus(200)->assertJson(['toroID' => $idToDelete]);
     }
@@ -248,11 +256,11 @@ class ToroTest extends TestCase
     public function test_error_validacion_registro_toro($toro, $errores): void
     {
         Toro::factory()
-            ->for($this->user)
-            ->for(Ganado::factory()->for($this->user)->create(['nombre' => 'test', 'numero' => 300]))
+            ->for($this->finca)
+            ->for(Ganado::factory()->for($this->finca)->create(['nombre' => 'test', 'numero' => 300]))
             ->create();
 
-        $response = $this->actingAs($this->user)->postJson('api/toro', $toro);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->postJson('api/toro', $toro);
 
         $response->assertStatus(422)->assertInvalid($errores);
     }
@@ -270,7 +278,7 @@ class ToroTest extends TestCase
 
         $this->generarToros();
 
-        $response = $this->actingAs($this->user)->putJson(sprintf('api/toro/%s', $idToroOtroUsuario), $this->toro);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(sprintf('api/toro/%s', $idToroOtroUsuario), $this->toro);
 
         $response->assertStatus(403);
     }

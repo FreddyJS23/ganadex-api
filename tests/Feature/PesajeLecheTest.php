@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Estado;
+use App\Models\Finca;
 use App\Models\Ganado;
 use App\Models\Leche;
 use App\Models\User;
@@ -27,6 +28,7 @@ class PesajeLecheTest extends TestCase
     private $ganado;
     private $estado;
     private $url;
+    private $finca;
 
     protected function setUp(): void
     {
@@ -37,12 +39,18 @@ class PesajeLecheTest extends TestCase
         $this->user
             = User::factory()->create();
 
+
+            $this->finca
+            = Finca::factory()
+            ->for($this->user)
+            ->create();
+
         $this->ganado
             = Ganado::factory()
             ->hasPeso(1)
             ->hasEvento(1)
             ->hasAttached($this->estado)
-            ->for($this->user)
+            ->for($this->finca)
             ->create();
 
         $this->url = sprintf('api/ganado/%s/pesaje_leche', $this->ganado->id);
@@ -53,7 +61,7 @@ class PesajeLecheTest extends TestCase
         return Leche::factory()
             ->count($this->cantidad_pesoLeche)
             ->for($this->ganado)
-            ->for($this->user)
+            ->for($this->finca)
             ->create();
     }
     public static function ErrorInputProvider(): array
@@ -81,8 +89,8 @@ class PesajeLecheTest extends TestCase
     {
         $this->generarPesajesLeche();
 
-        $response = $this->actingAs($this->user)->getJson($this->url);
-       
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson($this->url);
+
         $response->assertStatus(200)
             ->assertJson(
                 fn (AssertableJson $json) => $json->has(
@@ -101,7 +109,7 @@ class PesajeLecheTest extends TestCase
     public function test_creacion_pesaje_leche(): void
     {
 
-        $response = $this->actingAs($this->user)->postJson($this->url, $this->pesoLeche);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->postJson($this->url, $this->pesoLeche);
 
         $response->assertStatus(201)
             ->assertJson(
@@ -123,7 +131,7 @@ class PesajeLecheTest extends TestCase
 
         $idRandom = rand(0, $this->cantidad_pesoLeche - 1);
         $idPesoLeche = $pesajesDeLeche[$idRandom]->id;
-        $response = $this->actingAs($this->user)->getJson(sprintf($this->url . '/%s', $idPesoLeche));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(sprintf($this->url . '/%s', $idPesoLeche));
 
         $response->assertStatus(200)
             ->assertJson(
@@ -143,7 +151,7 @@ class PesajeLecheTest extends TestCase
         $idRandom = rand(0, $this->cantidad_pesoLeche - 1);
         $idPesoLecheEditar = $pesajesDeLeche[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->putJson(sprintf($this->url . '/%s', $idPesoLecheEditar), $this->pesoLeche);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(sprintf($this->url . '/%s', $idPesoLecheEditar), $this->pesoLeche);
 
         $response->assertStatus(200)
             ->assertJson(
@@ -163,7 +171,7 @@ class PesajeLecheTest extends TestCase
         $idToDelete = $pesajesDeLeche[$idRandom]->id;
 
 
-        $response = $this->actingAs($this->user)->deleteJson(sprintf($this->url . '/%s', $idToDelete));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->deleteJson(sprintf($this->url . '/%s', $idToDelete));
 
         $response->assertStatus(200)->assertJson(['pesajeLecheID' => $idToDelete]);
     }
@@ -173,13 +181,13 @@ class PesajeLecheTest extends TestCase
         Ganado::factory()
             ->count(10)
             ->hasPeso(1)
-            ->has(Leche::factory()->for($this->user)->count(3), 'pesajes_leche')
+            ->has(Leche::factory()->for($this->finca)->count(3), 'pesajes_leche')
             ->hasEvento(1)
             ->hasAttached($this->estado)
-            ->for($this->user)
+            ->for($this->finca)
             ->create();
 
-        $response = $this->actingAs($this->user)->getJson(route('todosPesajesLeche'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('todosPesajesLeche'));
 
         $response->assertStatus(200)
             ->assertJson(
@@ -199,7 +207,7 @@ class PesajeLecheTest extends TestCase
     public function test_error_validacion_registro_pesoLeche($pesoLeche, $errores): void
     {
 
-        $response = $this->actingAs($this->user)->postJson($this->url, $pesoLeche);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->postJson($this->url, $pesoLeche);
 
         $response->assertStatus(422)->assertInvalid($errores);
     }

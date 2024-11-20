@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Comprador;
 use App\Models\Estado;
+use App\Models\Finca;
 use App\Models\Ganado;
 use App\Models\User;
 use App\Models\Venta;
@@ -22,6 +23,7 @@ class DashboardVentaGanadoTest extends TestCase
     private $precios;
     private $estado;
     private int $cantidad_ventas = 10;
+    private $finca;
 
     private $user;
 
@@ -33,16 +35,21 @@ class DashboardVentaGanadoTest extends TestCase
             = User::factory()->create();
 
         $this->estado = Estado::all();
+
+        $this->finca
+            = Finca::factory()
+            ->for($this->user)
+            ->create();
     }
 
     private function generarVentas(): Collection
     {
-        $compradores = Comprador::factory()->for($this->user)->count(5)->create();
+        $compradores = Comprador::factory()->for($this->finca)->count(5)->create();
 
         return Venta::factory()
             ->count($this->cantidad_ventas)
-            ->for($this->user)
-            ->for(Ganado::factory()->for($this->user)->hasPeso(1)->hasAttached($this->estado)->create())
+            ->for($this->finca)
+            ->for(Ganado::factory()->for($this->finca)->hasPeso(1)->hasAttached($this->estado)->create())
             ->sequence(
                 ['comprador_id' => $compradores->random()->id],
                 ['comprador_id' => $compradores->random()->id],
@@ -59,7 +66,7 @@ class DashboardVentaGanadoTest extends TestCase
     {
         $this->generarVentas();
 
-        $response = $this->actingAs($this->user)->getJson(route('dashboardVentaGanado.mejorComprador'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('dashboardVentaGanado.mejorComprador'));
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJSon $json) =>
@@ -73,7 +80,7 @@ class DashboardVentaGanadoTest extends TestCase
     public function test_error_no_haya_compradores_registrados_para_obtener_mejor_comprador(): void
     {
 
-        $response = $this->actingAs($this->user)->getJson(route('dashboardVentaGanado.mejorComprador'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('dashboardVentaGanado.mejorComprador'));
 
         $response->assertJson(['comprador' => null]);
     }
@@ -82,7 +89,7 @@ class DashboardVentaGanadoTest extends TestCase
     {
         $this->generarVentas();
 
-        $response = $this->actingAs($this->user)->getJson(route('dashboardVentaGanado.mejorVenta'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('dashboardVentaGanado.mejorVenta'));
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJSon $json) =>
@@ -106,7 +113,7 @@ class DashboardVentaGanadoTest extends TestCase
 
    /*  public function test_error_no_haya_ventas_registrados_para_obtener_mejor_venta(): void
     {
-        $response = $this->actingAs($this->user)->getJson(route('dashboardVentaGanado.mejorVenta'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('dashboardVentaGanado.mejorVenta'));
 
         $response->assertJson(['venta' => null]);
     }
@@ -115,7 +122,7 @@ class DashboardVentaGanadoTest extends TestCase
     {
         $this->generarVentas();
 
-        $response = $this->actingAs($this->user)->getJson(route('dashboardVentaGanado.peorVenta'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('dashboardVentaGanado.peorVenta'));
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJSon $json) =>
@@ -142,14 +149,14 @@ class DashboardVentaGanadoTest extends TestCase
     {
         Venta::factory()
             ->count($this->cantidad_ventas)
-            ->for($this->user)
-            ->for(Ganado::factory()->for($this->user)->hasPeso(1)->hasAttached($this->estado)->create())
-            ->for(Comprador::factory()->for($this->user)->create())
+            ->for($this->finca)
+            ->for(Ganado::factory()->for($this->finca)->hasPeso(1)->hasAttached($this->estado)->create())
+            ->for(Comprador::factory()->for($this->finca)->create())
             ->create(['fecha' => now()->format('Y-m-d')]);
 
         $this->generarVentas();
 
-        $response = $this->actingAs($this->user)->getJson(route('dashboardVentaGanado.ventasDelMes'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('dashboardVentaGanado.ventasDelMes'));
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) =>
@@ -180,7 +187,7 @@ class DashboardVentaGanadoTest extends TestCase
     {
         $this->generarVentas();
 
-        $response = $this->actingAs($this->user)->getJson(route('dashboardVentaGanado.balanceAnualVentas'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('dashboardVentaGanado.balanceAnualVentas'));
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJSon $json) =>
@@ -191,13 +198,13 @@ class DashboardVentaGanadoTest extends TestCase
     {
         $this->generarVentas();
 
-        $response = $this->actingAs($this->user)->getJson(route('dashboardVentaGanado.balanceAnualVentas',['year' => 2022,]));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('dashboardVentaGanado.balanceAnualVentas',['year' => 2022,]));
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJSon $json) =>
             $json->has('balance_anual',
             12,
-            fn (AssertableJson $json) 
+            fn (AssertableJson $json)
             => $json->whereAllType(['mes' => 'string', 'ventas' => 'integer'])
             ->where('ventas',0))
         );

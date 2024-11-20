@@ -11,17 +11,17 @@ use Illuminate\Support\Facades\Auth;
 
 class PajuelaToroController extends Controller
 {
-public function __construct()
+/* public function __construct()
     {
         $this->authorizeResource(PajuelaToro::class,'pajuela_toro');
-    }
+    } */
 
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return new PajuelaToroCollection(PajuelaToro::where('user_id',Auth::id())->get());
+        return new PajuelaToroCollection(PajuelaToro::whereIn('finca_id',session('finca_id'))->get());
     }
 
     /**
@@ -31,7 +31,7 @@ public function __construct()
     {
         $pajuelaToro = new PajuelaToro();
         $pajuelaToro->fill($request->all());
-        $pajuelaToro->user_id = Auth::id();
+        $pajuelaToro->finca_id = session('finca_id')[0];
         $pajuelaToro->save();
 
         return response()->json(['pajuela_toro' => new PajuelaToroResource($pajuelaToro)], 201);

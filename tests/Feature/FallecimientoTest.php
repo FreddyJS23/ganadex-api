@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Estado;
 use App\Models\Fallecimiento;
+use App\Models\Finca;
 use App\Models\Ganado;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
@@ -25,6 +26,7 @@ class FallecimientoTest extends TestCase
     private int $cantidad_fallecimientos = 10;
     private $estado;
     private $user;
+    private $finca;
 
     protected function setUp(): void
     {
@@ -33,6 +35,11 @@ class FallecimientoTest extends TestCase
         $this->user
             = User::factory()->create();
 
+            $this->finca
+            = Finca::factory()
+            ->for($this->user)
+            ->create();
+
         $this->estado = Estado::all();
     }
 
@@ -40,7 +47,7 @@ class FallecimientoTest extends TestCase
     {
         return Fallecimiento::factory()
             ->count($this->cantidad_fallecimientos)
-            ->for(Ganado::factory()->for($this->user)->hasAttached($this->estado))
+            ->for(Ganado::factory()->for($this->finca)->hasAttached($this->estado))
             ->create();
     }
     public static function ErrorInputProvider(): array
@@ -75,8 +82,8 @@ class FallecimientoTest extends TestCase
     {
         $this->generarFallecimiento();
 
-        $response = $this->actingAs($this->user)->getJson('api/fallecimientos');
-        
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson('api/fallecimientos');
+
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) =>
             $json->whereType('fallecidos', 'array')
@@ -104,10 +111,10 @@ class FallecimientoTest extends TestCase
         $ganado = Ganado::factory()
             ->hasPeso(1)
             ->hasAttached($this->estado)
-            ->for($this->user)
+            ->for($this->finca)
             ->create();
 
-        $response = $this->actingAs($this->user)->postJson('api/fallecimientos', $this->fallecimiento + ['ganado_id' => $ganado->id]);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->postJson('api/fallecimientos', $this->fallecimiento + ['ganado_id' => $ganado->id]);
 
         $response->assertStatus(201)->assertJson(
             fn (AssertableJson $json) => $json->whereAllType([
@@ -129,7 +136,7 @@ class FallecimientoTest extends TestCase
         $idRandom = rand(0, $this->cantidad_fallecimientos - 1);
         $idfallecimientos = $fallecimientos[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->getJson(sprintf('api/fallecimientos/%s', $idfallecimientos), $this->fallecimiento);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(sprintf('api/fallecimientos/%s', $idfallecimientos), $this->fallecimiento);
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) => $json->whereAllType([
@@ -150,7 +157,7 @@ class FallecimientoTest extends TestCase
         $idRandom = rand(0, $this->cantidad_fallecimientos - 1);
         $idfallecimientosEditar = $fallecimientos[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->putJson(sprintf('api/fallecimientos/%s', $idfallecimientosEditar), $this->fallecimiento);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(sprintf('api/fallecimientos/%s', $idfallecimientosEditar), $this->fallecimiento);
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) =>
@@ -178,7 +185,7 @@ class FallecimientoTest extends TestCase
         $idToDelete = $fallecimientos[$idRandom]->id;
 
 
-        $response = $this->actingAs($this->user)->deleteJson(sprintf('api/fallecimientos/%s', $idToDelete));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->deleteJson(sprintf('api/fallecimientos/%s', $idToDelete));
 
         $response->assertStatus(200)->assertJson(['fallecimientoID' => $idToDelete]);
     }
@@ -188,7 +195,7 @@ class FallecimientoTest extends TestCase
      */
     public function test_error_validacion_registro_fallecimiento($fallecimientos, $errores): void
     {
-        $response = $this->actingAs($this->user)->postJson('api/fallecimientos', $fallecimientos);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->postJson('api/fallecimientos', $fallecimientos);
 
         $response->assertStatus(422)->assertInvalid($errores);
     }

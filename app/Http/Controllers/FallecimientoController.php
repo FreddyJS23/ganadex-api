@@ -19,7 +19,7 @@ class FallecimientoController extends Controller
      */
     public function index()
     {
-        return new FallecimientoCollection(Fallecimiento::whereRelation('ganado','user_id',Auth::id())->with('ganado:id,numero')->get());
+        return new FallecimientoCollection(Fallecimiento::whereRelation('ganado','finca_id',session('finca_id')[0])->with('ganado:id,numero')->get());
     }
 
     /**
@@ -53,7 +53,7 @@ class FallecimientoController extends Controller
      */
     public function update(UpdateFallecimientoRequest $request, Fallecimiento $fallecimiento)
     {
-      
+
         $fallecimiento->fill($request->only('causa'));
         $fallecimiento->fecha=$request->input('fecha');
         $fallecimiento->save();

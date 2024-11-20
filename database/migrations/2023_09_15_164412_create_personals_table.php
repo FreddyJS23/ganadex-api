@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('telefono',12);
            /*  $table->integer('sueldo'); */
            $table->foreignId('cargo_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('finca_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }

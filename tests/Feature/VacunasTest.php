@@ -41,7 +41,7 @@ class VacunasTest extends TestCase
     public static function ErrorInputProvider(): array
     {
         return [
-          
+
             'caso de insertar datos erróneos' => [
                 [
                     'nombre' => 'te',
@@ -150,7 +150,7 @@ class VacunasTest extends TestCase
         );
     }
 
- 
+
     public function test_eliminar_vacuna(): void
     {
         $vacunas = $this->generarVacunas();

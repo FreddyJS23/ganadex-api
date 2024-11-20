@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Estado;
 use App\Models\Fallecimiento;
+use App\Models\Finca;
 use App\Models\Ganado;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
@@ -19,6 +20,7 @@ class DashboardFallecimientosTest extends TestCase
     private int $cantidad_fallecimientos = 50;
     private $estado;
     private $user;
+    private $finca;
 
     protected function setUp(): void
     {
@@ -27,6 +29,11 @@ class DashboardFallecimientosTest extends TestCase
         $this->user
             = User::factory()->create();
 
+            $this->finca
+            = Finca::factory()
+            ->for($this->user)
+            ->create();
+
         $this->estado = Estado::all();
     }
 
@@ -34,9 +41,9 @@ class DashboardFallecimientosTest extends TestCase
     {
         return Fallecimiento::factory()
             ->count($this->cantidad_fallecimientos)
-            ->for(Ganado::factory()->for($this->user)->hasAttached($this->estado))
+            ->for(Ganado::factory()->for($this->finca)->hasAttached($this->estado))
             ->sequence(
-                ['causa' => 'enferma'], 
+                ['causa' => 'enferma'],
                 ['causa' => 'accidente'],
                 ['causa' => 'accidente2'],
                 ['causa' => 'accidente3'],
@@ -57,7 +64,7 @@ class DashboardFallecimientosTest extends TestCase
     {
         $this->generarFallecimiento();
 
-        $response = $this->actingAs($this->user)->getJson(route('dashboardFallecimientos.causasMuertesFrecuentes'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('dashboardFallecimientos.causasMuertesFrecuentes'));
         $response->assertStatus(200)
             ->assertJson(
                 fn (AssertableJson $json) =>  $json
@@ -76,7 +83,7 @@ class DashboardFallecimientosTest extends TestCase
     public function test_error_caso_que_no_haya_muertes_para_sacar_causas_de_muertes_mas_frecuentes(): void
     {
 
-        $response = $this->actingAs($this->user)->getJson(route('dashboardFallecimientos.causasMuertesFrecuentes'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('dashboardFallecimientos.causasMuertesFrecuentes'));
         $response->assertStatus(200);
     }
 }

@@ -18,17 +18,17 @@ use function Laravel\Prompts\select;
 class ToroController extends Controller
 {
     public array $peso = ['peso_nacimiento', 'peso_destete', 'peso_2year', 'peso_actual'];
-    public function __construct()
+  /*   public function __construct()
     {
         $this->authorizeResource(Toro::class, 'toro');
-    }
+    } */
 
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $toros = Toro::where('user_id', Auth::id())
+        $toros = Toro ::whereIn('finca_id', session('finca_id'))
             ->with([
                 'ganado' => function (Builder $query) {
                     $query->doesntHave('ganadoDescarte');
@@ -80,14 +80,14 @@ class ToroController extends Controller
     public function store(StoreToroRequest $request)
     {
         $ganado = new Ganado($request->all());
-        $ganado->user_id = Auth::id();
+        $ganado->finca_id = session('finca_id')[0];
         $ganado->tipo_id = GanadoTipo::where('tipo', 'adulto')->first()->id;
         $ganado->sexo = "M";
         $ganado->save();
         $ganado->peso()->create($request->only($this->peso));
 
         $toro = new Toro;
-        $toro->user_id = Auth::id();
+        $toro->finca_id = session('finca_id')[0];
         $toro->ganado()->associate($ganado)->save();
 
         return response()->json(['toro' => new ToroResource($toro)], 201);
