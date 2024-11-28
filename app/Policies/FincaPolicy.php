@@ -13,7 +13,7 @@ class FincaPolicy
      */
     public function viewAny(User $user): bool
     {
-        //
+        return $user->hasRole('admin');
     }
 
     /**
@@ -21,7 +21,7 @@ class FincaPolicy
      */
     public function view(User $user, Finca $finca): bool
     {
-        //
+        return session('finca_id')[0] === $finca->id ;
     }
 
     /**
@@ -29,7 +29,7 @@ class FincaPolicy
      */
     public function create(User $user): bool
     {
-        //
+        return $user->hasRole('admin');
     }
 
     /**
@@ -37,7 +37,7 @@ class FincaPolicy
      */
     public function update(User $user, Finca $finca): bool
     {
-        //
+        return session('finca_id')[0] === $finca->id && $user->hasRole('admin');
     }
 
     /**
@@ -45,7 +45,7 @@ class FincaPolicy
      */
     public function delete(User $user, Finca $finca): bool
     {
-        //
+        return session('finca_id')[0] === $finca->id && $user->hasRole('admin');
     }
 
     /**
@@ -53,7 +53,7 @@ class FincaPolicy
      */
     public function restore(User $user, Finca $finca): bool
     {
-        //
+        return false;
     }
 
     /**
@@ -61,6 +61,6 @@ class FincaPolicy
      */
     public function forceDelete(User $user, Finca $finca): bool
     {
-        //
+        return false;
     }
 }

@@ -21,7 +21,7 @@ class VentaPolicy
      */
     public function view(User $user, Venta $venta): bool
     {
-        return $user->id == $venta->user_id;
+        return session('finca_id')[0] === $venta->finca->id ;
     }
 
     /**
@@ -29,7 +29,7 @@ class VentaPolicy
      */
     public function create(User $user): bool
     {
-        return true;
+        return $user->hasRole('admin');
     }
 
     /**
@@ -37,7 +37,7 @@ class VentaPolicy
      */
     public function update(User $user, Venta $venta): bool
     {
-        return $user->id == $venta->user_id;
+        return session('finca_id')[0] === $venta->finca->id && $user->hasRole('admin');
     }
 
     /**
@@ -45,7 +45,7 @@ class VentaPolicy
      */
     public function delete(User $user, Venta $venta): bool
     {
-        return $user->id == $venta->user_id;
+        return session('finca_id')[0] === $venta->finca->id && $user->hasRole('admin');
     }
 
     /**

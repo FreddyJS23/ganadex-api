@@ -21,7 +21,7 @@ class InsumoPolicy
      */
     public function view(User $user, Insumo $insumo): bool
     {
-        return $user->id == $insumo->user_id;
+        return session('finca_id')[0] === $insumo->finca->id ;
     }
 
     /**
@@ -29,7 +29,7 @@ class InsumoPolicy
      */
     public function create(User $user): bool
     {
-        return true;
+        return $user->hasRole('admin');
     }
 
     /**
@@ -37,7 +37,7 @@ class InsumoPolicy
      */
     public function update(User $user, Insumo $insumo): bool
     {
-        return $user->id== $insumo->user_id;
+        return session('finca_id')[0] === $insumo->finca->id && $user->hasRole('admin');
     }
 
     /**
@@ -45,7 +45,7 @@ class InsumoPolicy
      */
     public function delete(User $user, Insumo $insumo): bool
     {
-        return $user->id== $insumo->user_id;
+        return session('finca_id')[0] === $insumo->finca->id && $user->hasRole('admin');
     }
 
     /**
