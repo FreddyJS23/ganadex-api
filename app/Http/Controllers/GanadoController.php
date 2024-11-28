@@ -23,10 +23,10 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class GanadoController extends Controller
 {
-   /*  public function __construct()
+    public function __construct()
     {
         $this->authorizeResource(Ganado::class,'ganado');
-    } */
+    }
 
 
     public array $estado=['estado_id'];

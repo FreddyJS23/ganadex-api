@@ -15,10 +15,10 @@ use Illuminate\Support\Facades\Auth;
 class JornadaVacunacionController extends Controller
 {
 
- /*    public function __construct() {
+     public function __construct() {
         $this->authorizeResource(Jornada_vacunacion::class,'jornada_vacunacion');
     }
- */
+
     /**
      * Display a listing of the resource.
      */

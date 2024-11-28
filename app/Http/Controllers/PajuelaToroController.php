@@ -11,10 +11,10 @@ use Illuminate\Support\Facades\Auth;
 
 class PajuelaToroController extends Controller
 {
-/* public function __construct()
+ public function __construct()
     {
         $this->authorizeResource(PajuelaToro::class,'pajuela_toro');
-    } */
+    } 
 
     /**
      * Display a listing of the resource.
