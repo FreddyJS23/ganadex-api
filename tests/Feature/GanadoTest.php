@@ -57,6 +57,8 @@ class GanadoTest extends TestCase
         $this->user
             = User::factory()->create();
 
+        $this->user->assignRole('admin');
+
         $this->finca
             = Finca::factory()
             ->for($this->user)
@@ -76,6 +78,13 @@ class GanadoTest extends TestCase
             ->for($this->finca)
             ->create();
     }
+
+    private function cambiarRol(User $user): void
+    {
+        $user->syncRoles('veterinario');
+    }
+
+
     public static function ErrorInputProvider(): array
     {
         return [
@@ -329,14 +338,16 @@ class GanadoTest extends TestCase
         $response->assertStatus(422)->assertInvalid($errores);
     }
 
-  /*   public function test_autorizacion_maniupular__cabeza_ganado_otro_usuario(): void
+     public function test_autorizacion_maniupular_cabeza_ganado_otra_finca(): void
     {
-        $otroUsuario = User::factory()->create();
+        $otroFinca = Finca::factory()
+        ->for($this->user)
+        ->create(['nombre' => 'otro_finca']);
 
         $ganadoOtroUsuario = Ganado::factory()
             ->hasPeso(1)->hasEvento(1)
             ->hasAttached($this->estado)
-            ->for($otroUsuario)
+            ->for($otroFinca)
             ->create();
 
         $idGanadoOtroUsuario = $ganadoOtroUsuario->id;
@@ -346,5 +357,45 @@ class GanadoTest extends TestCase
         $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(sprintf('api/ganado/%s', $idGanadoOtroUsuario), $this->cabeza_ganado);
 
         $response->assertStatus(403);
-    } */
+    }
+
+
+    public function test_veterinario_no_autorizado_a_crear_cabeza_ganado(): void
+    {
+        $this->cambiarRol($this->user);
+
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->postJson('api/ganado', $this->cabeza_ganado);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_veterinario_no_autorizado_a_actualizar_cabeza_ganado(): void
+    {
+        $this->cambiarRol($this->user);
+
+        $cabezasGanado = $this->generarGanado();
+        $idRandom = rand(0, $this->cantidad_ganado - 1);
+        $idGanadoEditar = $cabezasGanado[$idRandom]->id;
+
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(sprintf('api/ganado/%s', $idGanadoEditar), $this->cabeza_ganado);
+
+        $response->assertStatus(403);
+    }
+
+
+    public function test_veterinario_no_autorizado_a_eliminar_cabeza_ganado(): void
+    {
+        $this->cambiarRol($this->user);
+
+        $cabezasGanado = $this->generarGanado();
+        $idRandom = rand(0, $this->cantidad_ganado - 1);
+        $idToDelete = $cabezasGanado[$idRandom]->id;
+
+
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->deleteJson(sprintf('api/ganado/%s', $idToDelete));
+
+        $response->assertStatus(403);
+    }
+
+
 }

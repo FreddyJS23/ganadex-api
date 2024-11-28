@@ -31,19 +31,28 @@ class PajuelaToroTest extends TestCase
         $this->user
             = User::factory()->create();
 
+        $this->user->assignRole('admin');
+
             $this->finca
             = Finca::factory()
             ->for($this->user)
             ->create();
     }
 
-    private function generarPersonal(): Collection
+    private function generarPajuelasToros(): Collection
     {
         return PajuelaToro::factory()
             ->count($this->cantidad_pajuelaToro)
             ->for($this->finca)
             ->create();
     }
+
+    private function cambiarRol(User $user): void
+    {
+        $user->syncRoles('veterinario');
+    }
+
+
     public static function ErrorInputProvider(): array
     {
         return [
@@ -66,7 +75,7 @@ class PajuelaToroTest extends TestCase
 
     public function test_obtener_todo_pajuelas_toro(): void
     {
-        $this->generarPersonal();
+        $this->generarPajuelasToros();
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('pajuela_toros.index'));
         $response->assertStatus(200)
@@ -103,7 +112,7 @@ class PajuelaToroTest extends TestCase
 
     public function test_obtener_pajuela_toro(): void
     {
-        $pajuela_torols = $this->generarPersonal();
+        $pajuela_torols = $this->generarPajuelasToros();
         $idRandom = rand(0, $this->cantidad_pajuelaToro - 1);
         $idPajuelaToro = $pajuela_torols[$idRandom]->id;
 
@@ -123,7 +132,7 @@ class PajuelaToroTest extends TestCase
 
     public function test_actualizar_pajuela_toro(): void
     {
-        $pajuela_toro = $this->generarPersonal();
+        $pajuela_toro = $this->generarPajuelasToros();
         $idRandom = rand(0, $this->cantidad_pajuelaToro - 1);
         $idPajuelaToroEditar = $pajuela_toro[$idRandom]->id;
 
@@ -143,7 +152,7 @@ class PajuelaToroTest extends TestCase
 
     public function test_eliminar_personal(): void
     {
-        $pajuela_toro = $this->generarPersonal();
+        $pajuela_toro = $this->generarPajuelasToros();
         $idRandom = rand(0, $this->cantidad_pajuelaToro - 1);
         $idToDelete = $pajuela_toro[$idRandom]->id;
 
@@ -165,17 +174,55 @@ class PajuelaToroTest extends TestCase
         $response->assertStatus(422)->assertInvalid($errores);
     }
 
-    public function test_autorizacion_maniupular__personal_otro_usuario(): void
+    public function test_autorizacion_maniupular__pajuela_otro_finca(): void
     {
-        $otroUsuario = User::factory()->create();
+        $otroFinca = Finca::factory()
+        ->for($this->user)
+        ->create(['nombre' => 'otro_finca']);
 
-        $pajuela_torolOtroUsuario = PajuelaToro::factory()->for($otroUsuario)->create();
+        $pajuela_torolOtroFinca = PajuelaToro::factory()->for($otroFinca)->create();
 
-        $idPersonalOtroUsuario = $pajuela_torolOtroUsuario->id;
+        $idPajuelaOtroFinca = $pajuela_torolOtroFinca->id;
 
-        $this->generarPersonal();
+        $this->generarPajuelasToros();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(route('pajuela_toros.update',['pajuela_toro'=>$idPersonalOtroUsuario]), $this->pajuela_toro);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(route('pajuela_toros.update',['pajuela_toro'=>$idPajuelaOtroFinca]), $this->pajuela_toro);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_veterinario_no_autorizado_a_crear_pajuela_toro(): void
+    {
+        $this->cambiarRol($this->user);
+
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->postJson(route('pajuela_toros.store'), $this->pajuela_toro);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_veterinario_no_autorizado_a_actualizar_pajuela_toro(): void
+    {
+        $this->cambiarRol($this->user);
+
+        $pajuelasToro = $this->generarPajuelasToros();
+        $idRandom = rand(0, $this->cantidad_pajuelaToro - 1);
+        $idPajuelaToroEditar = $pajuelasToro[$idRandom]->id;
+
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(route('pajuela_toros.update',['pajuela_toro'=>$idPajuelaToroEditar]), $this->pajuela_toro);
+
+        $response->assertStatus(403);
+    }
+
+
+    public function test_veterinario_no_autorizado_a_eliminar_pajuela_toro(): void
+    {
+        $this->cambiarRol($this->user);
+
+        $pajuelasToro = $this->generarPajuelasToros();
+        $idRandom = rand(0, $this->cantidad_pajuelaToro - 1);
+        $idPajuelaToroEliminar = $pajuelasToro[$idRandom]->id;
+
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->deleteJson(route('pajuela_toros.destroy',['pajuela_toro'=>$idPajuelaToroEliminar]));
 
         $response->assertStatus(403);
     }

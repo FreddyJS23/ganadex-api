@@ -89,6 +89,8 @@ class EventosGanadoTest extends TestCase
             ->for($this->user)
             ->create();
 
+        $this->user->assignRole('admin');
+
         $this->estado = Estado::all();
 
         $this->veterinario

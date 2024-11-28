@@ -41,6 +41,7 @@ class ToroTest extends TestCase
         $this->user
             = User::factory()->create();
 
+            $this->user->assignRole('admin');
 
             $this->finca
             = Finca::factory()
@@ -56,6 +57,13 @@ class ToroTest extends TestCase
             ->forGanado(['finca_id' => $this->finca->id, 'sexo' => 'M', 'tipo_id' => 4])
             ->create();
     }
+
+    private function cambiarRol(User $user): void
+    {
+        $user->syncRoles('veterinario');
+    }
+
+
     public static function ErrorInputProvider(): array
     {
         return [
@@ -265,20 +273,58 @@ class ToroTest extends TestCase
         $response->assertStatus(422)->assertInvalid($errores);
     }
 
-    public function test_autorizacion_maniupular__toro_otro_usuario(): void
+    public function test_autorizacion_maniupular__toro_otro_finca(): void
     {
-        $otroUsuario = User::factory()->create();
+        $otroFinca = Finca::factory()
+        ->for($this->user)
+        ->create(['nombre' => 'otro_finca']);
 
-        $toroOtroUsuario = Toro::factory()
-            ->for($otroUsuario)
-            ->for(Ganado::factory()->for($otroUsuario))
+        $toroOtroFinca = Toro::factory()
+            ->for($otroFinca)
+            ->for(Ganado::factory()->for($otroFinca))
             ->create();
 
-        $idToroOtroUsuario = $toroOtroUsuario->id;
+        $idToroOtroFinca = $toroOtroFinca->id;
 
         $this->generarToros();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(sprintf('api/toro/%s', $idToroOtroUsuario), $this->toro);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(sprintf('api/toro/%s', $idToroOtroFinca), $this->toro);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_veterinario_no_autorizado_a_crear_toro(): void
+    {
+        $this->cambiarRol($this->user);
+
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->postJson(route('toro.store'), $this->toro);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_veterinario_no_autorizado_a_actualizar_toro(): void
+    {
+        $this->cambiarRol($this->user);
+
+        $toro = $this->generarToros();
+        $idRandom = rand(0, $this->cantidad_toro - 1);
+        $idToroEditar = $toro[$idRandom]->id;
+
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(route('toro.update',['toro'=>$idToroEditar]), $this->toro);
+
+        $response->assertStatus(403);
+    }
+
+
+    public function test_veterinario_no_autorizado_a_eliminar_toro(): void
+    {
+        $this->cambiarRol($this->user);
+
+        $toro = $this->generarToros();
+        $idRandom = rand(0, $this->cantidad_toro - 1);
+        $idToroEliminar = $toro[$idRandom]->id;
+
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->deleteJson(route('toro.destroy',['toro'=>$idToroEliminar]));
 
         $response->assertStatus(403);
     }

@@ -34,6 +34,8 @@ class JornadaVacunacionTest extends TestCase
         $this->user
             = User::factory()->create();
 
+            $this->user->assignRole('admin');
+
             $this->finca
             = Finca::factory()
             ->for($this->user)

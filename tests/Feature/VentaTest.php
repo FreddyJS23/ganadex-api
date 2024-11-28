@@ -38,6 +38,9 @@ class VentaTest extends TestCase
         $this->user
             = User::factory()->create();
 
+        $this->user->assignRole('admin');
+
+
             $this->finca
             = Finca::factory()
             ->for($this->user)
@@ -53,6 +56,14 @@ class VentaTest extends TestCase
             ->for(Comprador::factory()->for($this->finca)->create())
             ->create();
     }
+
+
+    private function cambiarRol(User $user): void
+    {
+        $user->syncRoles('veterinario');
+    }
+
+
     public static function ErrorInputProvider(): array
     {
         return [
@@ -227,26 +238,65 @@ class VentaTest extends TestCase
         $response->assertStatus(422)->assertInvalid($errores);
     }
 
-    public function test_autorizacion_maniupular__venta_otro_usuario(): void
+    public function test_autorizacion_maniupular__venta_otro_finca(): void
     {
         $ganado = Ganado::factory()->for($this->finca)->hasAttached($this->estado)->hasPeso(1)->create();
         $comprador = Comprador::factory()->for($this->finca)->create();
         $this->venta = $this->venta + ['ganado_id' => $ganado->id, 'comprador_id' => $comprador->id];
 
-        $otroUsuario = User::factory()->create();
+        $otroFinca = Finca::factory()
+        ->for($this->user)
+        ->create(['nombre' => 'otro_finca']);
 
-        $ventaOtroUsuario =  Venta::factory()
-            ->for($otroUsuario)
-            ->for(Ganado::factory()->for($otroUsuario)->hasAttached($this->estado)->hasPeso(1)->create())
-            ->for(Comprador::factory()->for($otroUsuario)->create())
+        $ventaOtroFinca =  Venta::factory()
+            ->for($otroFinca)
+            ->for(Ganado::factory()->for($otroFinca)->hasAttached($this->estado)->hasPeso(1)->create())
+            ->for(Comprador::factory()->for($otroFinca)->create())
             ->create();
 
-        $idVentaOtroUsuario = $ventaOtroUsuario->id;
+        $idVentaOtroFinca = $ventaOtroFinca->id;
 
         $this->generarVentas();
 
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(route('ventas.update', ['venta' => $idVentaOtroUsuario]), $this->venta);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(route('ventas.update', ['venta' => $idVentaOtroFinca]), $this->venta);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_veterinario_no_autorizado_a_crear_venta(): void
+    {
+        $this->cambiarRol($this->user);
+
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->postJson(route('ventas.store'), $this->venta);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_veterinario_no_autorizado_a_actualizar_venta(): void
+    {
+        $this->cambiarRol($this->user);
+
+        $ventas = $this->generarVentas();
+        $idRandom = rand(0, $this->cantidad_ventas - 1);
+        $idVentaEditar = $ventas[$idRandom]->id;
+
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(route('ventas.update',['venta'=>$idVentaEditar]), $this->venta);
+
+        $response->assertStatus(403);
+    }
+
+
+    public function test_veterinario_no_autorizado_a_eliminar_venta(): void
+    {
+        $this->cambiarRol($this->user);
+
+
+        $ventas = $this->generarVentas();
+        $idRandom = rand(0, $this->cantidad_ventas - 1);
+        $idVentaEditar = $ventas[$idRandom]->id;
+
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->deleteJson(route('ventas.destroy',['venta'=>$idVentaEditar]));
 
         $response->assertStatus(403);
     }

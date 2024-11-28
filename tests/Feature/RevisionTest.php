@@ -41,6 +41,7 @@ class RevisionTest extends TestCase
         $this->user
             = User::factory()->create();
 
+        $this->user->assignRole('admin');
 
             $this->finca
             = Finca::factory()
