@@ -39,6 +39,7 @@ class PesajeLecheTest extends TestCase
         $this->user
             = User::factory()->create();
 
+        $this->user->assignRole('admin');
 
             $this->finca
             = Finca::factory()
@@ -64,6 +65,13 @@ class PesajeLecheTest extends TestCase
             ->for($this->finca)
             ->create();
     }
+
+    private function cambiarRol(User $user): void
+    {
+        $user->syncRoles('veterinario');
+    }
+
+
     public static function ErrorInputProvider(): array
     {
         return [
@@ -210,5 +218,41 @@ class PesajeLecheTest extends TestCase
         $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->postJson($this->url, $pesoLeche);
 
         $response->assertStatus(422)->assertInvalid($errores);
+    }
+
+    public function test_veterinario_no_autorizado_a_crear_pajuela_pesaje_leche(): void
+    {
+        $this->cambiarRol($this->user);
+
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->postJson(route('pesaje_leche.store',['ganado'=>$this->ganado->id]), $this->pesoLeche);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_veterinario_no_autorizado_a_actualizar_pajuela_pesaje_leche(): void
+    {
+        $this->cambiarRol($this->user);
+
+        $pajuelasToro = $this->generarPesajesLeche();
+        $idRandom = rand(0, $this->cantidad_pesoLeche - 1);
+        $idPesoLecheEditar = $pajuelasToro[$idRandom]->id;
+
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(route('pesaje_leche.update',['ganado'=>$this->ganado->id,'pesaje_leche'=>$idPesoLecheEditar]), $this->pesoLeche);
+
+        $response->assertStatus(403);
+    }
+
+
+    public function test_veterinario_no_autorizado_a_eliminar_pajuela_pesaje_leche(): void
+    {
+        $this->cambiarRol($this->user);
+
+        $pajuelasToro = $this->generarPesajesLeche();
+        $idRandom = rand(0, $this->cantidad_pesoLeche - 1);
+        $idPajuelaToroEliminar = $pajuelasToro[$idRandom]->id;
+
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->deleteJson(route('pesaje_leche.destroy',['ganado'=>$this->ganado->id,'pesaje_leche'=>$idPajuelaToroEliminar]));
+
+        $response->assertStatus(403);
     }
 }

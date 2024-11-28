@@ -14,10 +14,10 @@ use Illuminate\Support\Facades\Auth;
 
 class LecheController extends Controller
 {
-   /*  public function __construct()
+     public function __construct()
     {
         $this->authorizeResource(Leche::class,'pesaje_leche');
-    } */
+    } 
 
     /**
      * Display a listing of the resource.

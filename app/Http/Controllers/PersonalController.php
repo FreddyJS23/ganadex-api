@@ -11,9 +11,9 @@ use Illuminate\Support\Facades\Auth;
 
 class PersonalController extends Controller
 {
-  /*   public function __construct() {
+     public function __construct() {
         $this->authorizeResource(Personal::class,'personal');
-    } */
+    }
     /**
      * Display a listing of the resource.
      */

@@ -11,10 +11,10 @@ use Illuminate\Support\Facades\Auth;
 
 class CompradorController extends Controller
 {
-  /*   public function __construct()
+     public function __construct()
     {
         $this->authorizeResource(Comprador::class, 'comprador');
-    } */
+    } 
 
     /**
      * Display a listing of the resource.

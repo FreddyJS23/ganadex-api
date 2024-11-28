@@ -38,6 +38,8 @@ class PersonalTest extends TestCase
         $this->user
             = User::factory()->create();
 
+            $this->user->assignRole('admin');
+
             $this->finca
             = Finca::factory()
             ->for($this->user)
@@ -51,6 +53,12 @@ class PersonalTest extends TestCase
             ->for($this->finca)
             ->create();
     }
+
+    private function cambiarRol(User $user): void
+    {
+        $user->syncRoles('veterinario');
+    }
+
     public static function ErrorInputProvider(): array
     {
         return [
@@ -241,17 +249,55 @@ class PersonalTest extends TestCase
         $response->assertStatus(422)->assertInvalid($errores);
     }
 
-    public function test_autorizacion_maniupular__personal_otro_usuario(): void
+    public function test_autorizacion_maniupular__personal_otro_finca(): void
     {
-        $otroUsuario = User::factory()->create();
+        $otroFinca = Finca::factory()
+        ->for($this->user)
+        ->create(['nombre' => 'otro_finca']);
 
-        $personalOtroUsuario = personal::factory()->for($otroUsuario)->create();
+        $personalOtroFinca = personal::factory()->for($otroFinca)->create();
 
-        $idPersonalOtroUsuario = $personalOtroUsuario->id;
+        $idPersonalOtroFinca = $personalOtroFinca->id;
 
         $this->generarPersonal();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(sprintf('api/personal/%s', $idPersonalOtroUsuario), $this->personal);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(sprintf('api/personal/%s', $idPersonalOtroFinca), $this->personal);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_veterinario_no_autorizado_a_crear_personal(): void
+    {
+        $this->cambiarRol($this->user);
+
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->postJson(route('personal.store'), $this->personal);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_veterinario_no_autorizado_a_actualizar_personal(): void
+    {
+        $this->cambiarRol($this->user);
+
+        $personal = $this->generarPersonal();
+        $idRandom = rand(0, $this->cantidad_personal - 1);
+        $idPersonalEditar = $personal[$idRandom]->id;
+
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(route('personal.update',['personal'=>$idPersonalEditar]), $this->personal);
+
+        $response->assertStatus(403);
+    }
+
+
+    public function test_veterinario_no_autorizado_a_eliminar_personal(): void
+    {
+        $this->cambiarRol($this->user);
+
+        $personal = $this->generarPersonal();
+        $idRandom = rand(0, $this->cantidad_personal - 1);
+        $idPersonalEditar = $personal[$idRandom]->id;
+
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->deleteJson(route('personal.destroy',['personal'=>$idPersonalEditar]));
 
         $response->assertStatus(403);
     }

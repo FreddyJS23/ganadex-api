@@ -21,7 +21,7 @@ class PersonalPolicy
      */
     public function view(User $user, Personal $personal): bool
     {
-        return $user->id == $personal->user_id;
+        return session('finca_id')[0] === $personal->finca->id ;
     }
 
     /**
@@ -29,7 +29,7 @@ class PersonalPolicy
      */
     public function create(User $user): bool
     {
-        return true;
+        return $user->hasRole('admin');
     }
 
     /**
@@ -37,7 +37,7 @@ class PersonalPolicy
      */
     public function update(User $user, Personal $personal): bool
     {
-        return $user->id == $personal->user_id;
+        return session('finca_id')[0] === $personal->finca->id && $user->hasRole('admin');
     }
 
     /**
@@ -45,7 +45,7 @@ class PersonalPolicy
      */
     public function delete(User $user, Personal $personal): bool
     {
-        return $user->id == $personal->user_id;
+        return session('finca_id')[0] === $personal->finca->id && $user->hasRole('admin');
     }
 
     /**

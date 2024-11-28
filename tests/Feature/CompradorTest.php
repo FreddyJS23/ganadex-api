@@ -30,6 +30,8 @@ class CompradorTest extends TestCase
         $this->user
             = User::factory()->create();
 
+            $this->user->assignRole('admin');
+
             $this->finca
             = Finca::factory()
             ->for($this->user)
@@ -43,6 +45,12 @@ class CompradorTest extends TestCase
             ->for($this->finca)
             ->create();
     }
+
+    private function cambiarRol(User $user): void
+    {
+        $user->syncRoles('veterinario');
+    }
+
     public static function ErrorInputProvider(): array
     {
         return [
@@ -188,15 +196,57 @@ class CompradorTest extends TestCase
 
     public function test_autorizacion_maniupular__comprador_otro_usuario(): void
     {
-        $otroUsuario = User::factory()->create();
+        $this->cambiarRol($this->user);
 
-        $compradorOtroUsuario = Comprador::factory()->for($otroUsuario)->create();
+        $otroFinca = Finca::factory()
+        ->for($this->user)
+        ->create(['nombre' => 'otro_finca']);
+
+        $compradorOtroUsuario = Comprador::factory()->for($otroFinca)->create();
 
         $idCompradorOtroUsuario = $compradorOtroUsuario->id;
 
         $this->generarComprador();
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(sprintf('api/comprador/%s', $idCompradorOtroUsuario), $this->comprador);
+
+        $response->assertStatus(403);
+    }
+
+
+    public function test_veterinario_no_autorizado_a_crear_comprador(): void
+    {
+        $this->cambiarRol($this->user);
+
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->postJson('api/comprador', $this->comprador);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_veterinario_no_autorizado_a_actualizar_comprador(): void
+    {
+        $this->cambiarRol($this->user);
+
+        $compradores = $this->generarComprador();
+        $idRandom = rand(0, $this->cantidad_comprador - 1);
+        $idCompradorEditar = $compradores[$idRandom]->id;
+
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(sprintf('api/comprador/%s', $idCompradorEditar), $this->comprador);
+
+        $response->assertStatus(403);
+    }
+
+
+    public function test_veterinario_no_autorizado_a_eliminar_comprador(): void
+    {
+        $this->cambiarRol($this->user);
+
+        $compradores = $this->generarComprador();
+        $idRandom = rand(0, $this->cantidad_comprador - 1);
+        $idToDelete = $compradores[$idRandom]->id;
+
+
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->deleteJson(sprintf('api/comprador/%s', $idToDelete));
 
         $response->assertStatus(403);
     }

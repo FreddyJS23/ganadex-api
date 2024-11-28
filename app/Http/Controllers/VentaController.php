@@ -15,10 +15,10 @@ use Illuminate\Support\Facades\Auth;
 class VentaController extends Controller
 {
 
-    /*  public function __construct()
+      public function __construct()
     {
         $this->authorizeResource(Venta::class,'venta');
-    } */
+    }
 
     /**
      * Display a listing of the resource.

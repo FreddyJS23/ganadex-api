@@ -13,8 +13,8 @@ class UserController extends Controller
     public function __construct()
     {
         $this->authorizeResource(User::class,'user');
-    }   
-    
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -30,10 +30,9 @@ class UserController extends Controller
     {
         $user= new User;
         $user->password=hash::make($request->password);
-        $user->role_id=1;
         $user->fill($request->except('password'));
         $user->save();
-       
+
         return response()->json(['message'=>'usuario creado'],201);
     }
 

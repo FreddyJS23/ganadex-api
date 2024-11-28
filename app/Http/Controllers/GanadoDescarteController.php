@@ -20,10 +20,10 @@ class GanadoDescarteController extends Controller
 {
     public array $peso = ['peso_nacimiento', 'peso_destete', 'peso_2year', 'peso_actual'];
 
-   /*  public function __construct()
+     public function __construct()
     {
         $this->authorizeResource(GanadoDescarte::class, 'ganado_descarte');
-    } */
+    }
 
     /**
      * Display a listing of the resource.
