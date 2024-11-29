@@ -23,21 +23,13 @@ use Illuminate\Support\Arr;
 
 class DashboardPrincipalController extends Controller
 {
-public function fincasOnline()
-{
-    $convertirNumero=fn(string $numero)=>intval($numero);
-    $fincasOnline =explode('-',session('finca_id'));
-    array_map($convertirNumero,$fincasOnline);
-    return $fincasOnline;
-}
-
+ 
     public function totalGanadoTipo()
     {
 
         $totalGanadoPorTiposMacho = GanadoTipo::withCount(['ganado' => function (Builder $query) {
-            $lista=[1];
             $query->where('sexo','M')
-            ->where('finca_id',$lista )
+            ->where('finca_id', session('finca_id') )
             ->doesntHave('fallecimiento')
             ->doesntHave('venta')
             ->doesntHave('ganadodescarte');
@@ -45,7 +37,7 @@ public function fincasOnline()
 
         $totalGanadoPorTiposHembra = GanadoTipo::withCount(['ganado' => function (Builder $query) {
             $query->where('sexo','H')
-            ->whereIntegerInRaw('finca_id', [session('finca_id')])
+            ->where('finca_id', session('finca_id'))
             ->doesntHave('fallecimiento')
             ->doesntHave('venta')
             ->doesntHave('ganadodescarte');
@@ -57,7 +49,7 @@ public function fincasOnline()
             return $item;
         });
 
-        $totalGanadoDescarte = GanadoDescarte::whereIntegerInRaw('finca_id', [session('finca_id')])->count();
+        $totalGanadoDescarte = GanadoDescarte::where('finca_id', session('finca_id'))->count();
         $totalGanadoDescarte=collect(
            [[  'tipo'=>'descarte',
             'ganado_count' => $totalGanadoDescarte]]);
@@ -67,12 +59,12 @@ public function fincasOnline()
 
     public function totalPersonal(Request $request)
     {
-        return response()->json(['total_personal' => Personal::whereIntegerInRaw('finca_id',[session('finca_id')])->count()]);
+        return response()->json(['total_personal' => Personal::where('finca_id',session('finca_id'))->count()]);
     }
 
     public function vacasEnGestacion(Request $request)
     {
-        $totalVacasEnGestacion = Ganado::whereIntegerInRaw('finca_id',[session('finca_id')])
+        $totalVacasEnGestacion = Ganado::where('finca_id',session('finca_id'))
             ->whereRelation('estados', 'estado', 'gestacion')
             ->count();
 
@@ -84,7 +76,7 @@ public function fincasOnline()
         $fechaActual = new DateTime();
         $mesActual = $fechaActual->format('m');
         $topVacasProductoras = Leche::withWhereHas('ganado', function ( $query) {
-            $query->whereIntegerInRaw('finca_id', [session('finca_id')])->select('id','numero');
+            $query->where('finca_id', session('finca_id'))->select('id','numero');
         })->orderBy('peso_leche', 'desc')->whereMonth('fecha', $mesActual)->limit(3)->get();
 
 
@@ -97,7 +89,7 @@ public function fincasOnline()
         $fechaActual = new DateTime;
         $mesActual = $fechaActual->format('m');
         $topVacasMenosProductoras = Leche::withWhereHas('ganado', function ($query) {
-            $query->whereIntegerInRaw('finca_id', [session('finca_id')])->select('id', 'numero');
+            $query->where('finca_id', session('finca_id'))->select('id', 'numero');
         })->orderBy('peso_leche', 'asc')->whereMonth('fecha', $mesActual)->limit(3)->get();
 
         return new TopVacasMenosProductorasCollection($topVacasMenosProductoras);
@@ -106,7 +98,7 @@ public function fincasOnline()
     public function totalGanadoPendienteRevision(Request $request)
     {
 
-        $totalGanadoPendienteRevision = Ganado::whereIntegerInRaw('finca_id',[session('finca_id')])
+        $totalGanadoPendienteRevision = Ganado::where('finca_id',session('finca_id'))
             ->whereRelation('estados', 'estado', 'pendiente_revision')
             ->count();
 
@@ -116,7 +108,7 @@ public function fincasOnline()
     public function cantidadVacasParaServir()
     {
         $novillasAmontar = Peso::whereHas('ganado', function (Builder $query) {
-            $query->where('finca_id', [session('finca_id')]);
+            $query->where('finca_id', session('finca_id'));
         })->where('peso_actual', '>=', 330)->count();
 
         return response()->json(['cantidad_vacas_para_servir' => $novillasAmontar], 200);
@@ -124,14 +116,14 @@ public function fincasOnline()
 
     public function insumoMenorExistencia()
     {
-        $menorCantidadInsumo = Insumo::whereIntegerInRaw('finca_id',[session('finca_id')])->orderBy('cantidad', 'asc')->first();
+        $menorCantidadInsumo = Insumo::where('finca_id',session('finca_id'))->orderBy('cantidad', 'asc')->first();
 
         return response()->json(['menor_cantidad_insumo' =>$menorCantidadInsumo ? new CantidadInsumoResource($menorCantidadInsumo) : null]);
     }
 
     public function insumoMayorExistencia()
     {
-        $mayorCantidadInsumo = Insumo::whereIntegerInRaw('finca_id',[session('finca_id')])->orderBy('cantidad', 'desc')->first();
+        $mayorCantidadInsumo = Insumo::where('finca_id',session('finca_id'))->orderBy('cantidad', 'desc')->first();
 
         return response()->json(['mayor_cantidad_insumo' =>$mayorCantidadInsumo ? new CantidadInsumoResource($mayorCantidadInsumo) : null]);
     }

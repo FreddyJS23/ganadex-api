@@ -20,7 +20,7 @@ class DatosParaFormulariosController extends Controller
     public function novillasParaMontar()
     {
         $novillasAmontar = Peso::whereHas('ganado', function (Builder $query) {
-            $query->where('finca_id', [session('finca_id')]);
+            $query->where('finca_id', session('finca_id'));
         })->where('peso_actual', '>=', 330)->get();
 
         return new NovillaAMontarCollection($novillasAmontar);
@@ -35,7 +35,7 @@ class DatosParaFormulariosController extends Controller
     {
         return new VeterinariosDisponiblesCollection(Personal::select('id','nombre')
         ->where('cargo_id',2)
-        ->where('finca_id',[session('finca_id')])
+        ->where('finca_id',session('finca_id'))
         ->get());
     }
 
