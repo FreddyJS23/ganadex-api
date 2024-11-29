@@ -35,7 +35,7 @@ class PajuelaToroTest extends TestCase
 
             $this->finca
             = Finca::factory()
-            ->for($this->user)
+            ->hasAttached($this->user)
             ->create();
     }
 
@@ -177,7 +177,7 @@ class PajuelaToroTest extends TestCase
     public function test_autorizacion_maniupular__pajuela_otro_finca(): void
     {
         $otroFinca = Finca::factory()
-        ->for($this->user)
+        ->hasAttached($this->user)
         ->create(['nombre' => 'otro_finca']);
 
         $pajuela_torolOtroFinca = PajuelaToro::factory()->for($otroFinca)->create();

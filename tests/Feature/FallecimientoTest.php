@@ -37,7 +37,7 @@ class FallecimientoTest extends TestCase
 
             $this->finca
             = Finca::factory()
-            ->for($this->user)
+            ->hasAttached($this->user)
             ->create();
 
         $this->estado = Estado::all();

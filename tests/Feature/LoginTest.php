@@ -21,26 +21,23 @@ class LoginTest extends TestCase
     {
         parent::setUp();
 
+        $this->finca
+        = Finca::factory()
+        ->create();
+
         $this->userAdmin
-            = User::factory()->create(['usuario' => 'admin', 'password' => Hash::make('admin')]);
+            = User::factory()
+            ->hasAttached($this->finca)
+            ->create(['usuario' => 'admin', 'password' => Hash::make('admin')]);
 
             $this->userAdmin->assignRole('admin');
 
         $this->userVeterinario
-            = User::factory()->create(['usuario' => 'veterinario', 'password' => Hash::make('veterinario')]);
+            = User::factory()
+            ->hasAttached($this->finca)
+            ->create(['usuario' => 'veterinario', 'password' => Hash::make('veterinario')]);
 
             $this->userVeterinario->assignRole('veterinario');
-
-            $this->finca
-            = Finca::factory()
-            ->for($this->userAdmin)
-            ->create();
-
-            $this->finca
-            = Finca::factory()
-            ->for($this->userVeterinario)
-            ->create();
-
 
     }
 

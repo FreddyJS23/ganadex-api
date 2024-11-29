@@ -61,7 +61,7 @@ class GanadoTest extends TestCase
 
         $this->finca
             = Finca::factory()
-            ->for($this->user)
+            ->hasAttached($this->user)
             ->create();
 
             $this->estado = Estado::all();
@@ -341,7 +341,7 @@ class GanadoTest extends TestCase
      public function test_autorizacion_maniupular_cabeza_ganado_otra_finca(): void
     {
         $otroFinca = Finca::factory()
-        ->for($this->user)
+        ->hasAttached($this->user)
         ->create(['nombre' => 'otro_finca']);
 
         $ganadoOtroUsuario = Ganado::factory()
