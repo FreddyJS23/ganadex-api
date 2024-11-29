@@ -14,14 +14,14 @@ class PajuelaToroController extends Controller
  public function __construct()
     {
         $this->authorizeResource(PajuelaToro::class,'pajuela_toro');
-    } 
+    }
 
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return new PajuelaToroCollection(PajuelaToro::whereIn('finca_id',session('finca_id'))->get());
+        return new PajuelaToroCollection(PajuelaToro::where('finca_id',session('finca_id'))->get());
     }
 
     /**
@@ -31,7 +31,7 @@ class PajuelaToroController extends Controller
     {
         $pajuelaToro = new PajuelaToro();
         $pajuelaToro->fill($request->all());
-        $pajuelaToro->finca_id = session('finca_id')[0];
+        $pajuelaToro->finca_id = session('finca_id');
         $pajuelaToro->save();
 
         return response()->json(['pajuela_toro' => new PajuelaToroResource($pajuelaToro)], 201);

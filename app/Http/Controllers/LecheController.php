@@ -17,7 +17,7 @@ class LecheController extends Controller
      public function __construct()
     {
         $this->authorizeResource(Leche::class,'pesaje_leche');
-    } 
+    }
 
     /**
      * Display a listing of the resource.
@@ -35,7 +35,7 @@ class LecheController extends Controller
         $fecha=new DateTime();
         $leche=new Leche;
         $leche->fill($request->all());
-        $leche->finca_id=session('finca_id')[0];
+        $leche->finca_id=session('finca_id');
         $leche->fecha=$fecha->format('Y-m-d');
         $leche->ganado()->associate($ganado);
         $leche->save();

@@ -66,7 +66,7 @@ class DashboardVentaGanadoTest extends TestCase
     {
         $this->generarVentas();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('dashboardVentaGanado.mejorComprador'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(route('dashboardVentaGanado.mejorComprador'));
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJSon $json) =>
@@ -80,7 +80,7 @@ class DashboardVentaGanadoTest extends TestCase
     public function test_error_no_haya_compradores_registrados_para_obtener_mejor_comprador(): void
     {
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('dashboardVentaGanado.mejorComprador'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(route('dashboardVentaGanado.mejorComprador'));
 
         $response->assertJson(['comprador' => null]);
     }
@@ -89,7 +89,7 @@ class DashboardVentaGanadoTest extends TestCase
     {
         $this->generarVentas();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('dashboardVentaGanado.mejorVenta'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(route('dashboardVentaGanado.mejorVenta'));
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJSon $json) =>
@@ -113,7 +113,7 @@ class DashboardVentaGanadoTest extends TestCase
 
    /*  public function test_error_no_haya_ventas_registrados_para_obtener_mejor_venta(): void
     {
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('dashboardVentaGanado.mejorVenta'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(route('dashboardVentaGanado.mejorVenta'));
 
         $response->assertJson(['venta' => null]);
     }
@@ -122,7 +122,7 @@ class DashboardVentaGanadoTest extends TestCase
     {
         $this->generarVentas();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('dashboardVentaGanado.peorVenta'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(route('dashboardVentaGanado.peorVenta'));
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJSon $json) =>
@@ -156,7 +156,7 @@ class DashboardVentaGanadoTest extends TestCase
 
         $this->generarVentas();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('dashboardVentaGanado.ventasDelMes'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(route('dashboardVentaGanado.ventasDelMes'));
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) =>
@@ -187,7 +187,7 @@ class DashboardVentaGanadoTest extends TestCase
     {
         $this->generarVentas();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('dashboardVentaGanado.balanceAnualVentas'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(route('dashboardVentaGanado.balanceAnualVentas'));
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJSon $json) =>
@@ -198,7 +198,7 @@ class DashboardVentaGanadoTest extends TestCase
     {
         $this->generarVentas();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('dashboardVentaGanado.balanceAnualVentas',['year' => 2022,]));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(route('dashboardVentaGanado.balanceAnualVentas',['year' => 2022,]));
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJSon $json) =>

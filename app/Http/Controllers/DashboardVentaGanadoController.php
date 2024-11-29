@@ -17,7 +17,7 @@ class DashboardVentaGanadoController extends Controller
 {
     public function mejorComprador()
     {
-        $mejorComprador= Comprador::whereIn('finca_id',session('finca_id'))
+        $mejorComprador= Comprador::where('finca_id',session('finca_id'))
         ->withCount('ventas')
         ->orderByDesc('ventas_count')
         ->first();
@@ -27,7 +27,7 @@ class DashboardVentaGanadoController extends Controller
 
     public function mejorVenta()
     {
-        $mejorVenta=Venta::whereIn('finca_id',session('finca_id'))
+        $mejorVenta=Venta::where('finca_id',session('finca_id'))
         ->with('ganado:id,numero')
         ->orderByDesc('precio')
         ->first();
@@ -36,7 +36,7 @@ class DashboardVentaGanadoController extends Controller
 
     public function peorVenta()
     {
-    $peorVenta=Venta::whereIn('finca_id',session('finca_id'))
+    $peorVenta=Venta::where('finca_id',session('finca_id'))
         ->orderBy('precio')
         ->with('ganado:id,numero')
         ->first();
@@ -47,7 +47,7 @@ class DashboardVentaGanadoController extends Controller
     public function ventasDelMes()
     {
         $ventasDelMes
-        = Venta::whereIn('finca_id',session('finca_id'))
+        = Venta::where('finca_id',session('finca_id'))
             ->whereMonth('fecha', now()->month)
             ->whereYear('fecha', now()->year)
             ->with('ganado:id,numero')
@@ -64,7 +64,7 @@ class DashboardVentaGanadoController extends Controller
 
         $meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
 
-    $balanceMesesVentas = Venta::whereIn('finca_id',session('finca_id'))
+    $balanceMesesVentas = Venta::where('finca_id',session('finca_id'))
     ->selectRaw("DATE_FORMAT(fecha,'%m') as mes, COUNT(id) as ventas")
         ->whereYear('fecha', $year)
             ->groupBy('mes')

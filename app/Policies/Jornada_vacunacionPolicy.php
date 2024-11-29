@@ -21,7 +21,7 @@ class Jornada_vacunacionPolicy
      */
     public function view(User $user, Jornada_vacunacion $jornadaVacunacion): bool
     {
-        return session('finca_id')[0] === $jornadaVacunacion->finca->id;
+        return session('finca_id') === $jornadaVacunacion->finca->id;
     }
 
     /**
@@ -37,7 +37,7 @@ class Jornada_vacunacionPolicy
      */
     public function update(User $user, Jornada_vacunacion $jornadaVacunacion): bool
     {
-        return session('finca_id')[0] === $jornadaVacunacion->finca->id && $user->hasRole('admin');
+        return session('finca_id') === $jornadaVacunacion->finca->id && $user->hasRole('admin');
     }
 
     /**
@@ -45,7 +45,7 @@ class Jornada_vacunacionPolicy
      */
     public function delete(User $user, Jornada_vacunacion $jornadaVacunacion): bool
     {
-        return session('finca_id')[0] === $jornadaVacunacion->finca->id && $user->hasRole('admin');
+        return session('finca_id') === $jornadaVacunacion->finca->id && $user->hasRole('admin');
     }
 
     /**

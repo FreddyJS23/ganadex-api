@@ -16,7 +16,7 @@ class TodosPesajeLeche extends Controller
     {
         return new TodosPesajeLecheCollection(Ganado::doesntHave('toro')
         ->has('pesajes_leche')
-        ->whereIn('finca_id', session('finca_id'))
+        ->where('finca_id', session('finca_id'))
         ->get());
 
     }

@@ -21,7 +21,7 @@ class GanadoDescartePolicy
      */
     public function view(User $user, GanadoDescarte $ganadoDescarte): bool
     {
-        return session('finca_id')[0] === $ganadoDescarte->finca->id ;
+        return session('finca_id') === $ganadoDescarte->finca->id ;
     }
 
     /**
@@ -37,7 +37,7 @@ class GanadoDescartePolicy
      */
     public function update(User $user, GanadoDescarte $ganadoDescarte): bool
     {
-        return session('finca_id')[0] === $ganadoDescarte->finca->id && $user->hasRole('admin');
+        return session('finca_id') === $ganadoDescarte->finca->id && $user->hasRole('admin');
     }
 
     /**
@@ -45,9 +45,9 @@ class GanadoDescartePolicy
      */
     public function delete(User $user, GanadoDescarte $ganadoDescarte): bool
     {
-        return session('finca_id')[0] === $ganadoDescarte->finca->id && $user->hasRole('admin');
+        return session('finca_id') === $ganadoDescarte->finca->id && $user->hasRole('admin');
     }
-    
+
 
     /**
      * Determine whether the user can restore the model.

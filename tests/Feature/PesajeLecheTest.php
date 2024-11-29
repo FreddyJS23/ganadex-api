@@ -97,7 +97,7 @@ class PesajeLecheTest extends TestCase
     {
         $this->generarPesajesLeche();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson($this->url);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson($this->url);
 
         $response->assertStatus(200)
             ->assertJson(
@@ -117,7 +117,7 @@ class PesajeLecheTest extends TestCase
     public function test_creacion_pesaje_leche(): void
     {
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->postJson($this->url, $this->pesoLeche);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->postJson($this->url, $this->pesoLeche);
 
         $response->assertStatus(201)
             ->assertJson(
@@ -139,7 +139,7 @@ class PesajeLecheTest extends TestCase
 
         $idRandom = rand(0, $this->cantidad_pesoLeche - 1);
         $idPesoLeche = $pesajesDeLeche[$idRandom]->id;
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(sprintf($this->url . '/%s', $idPesoLeche));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(sprintf($this->url . '/%s', $idPesoLeche));
 
         $response->assertStatus(200)
             ->assertJson(
@@ -159,7 +159,7 @@ class PesajeLecheTest extends TestCase
         $idRandom = rand(0, $this->cantidad_pesoLeche - 1);
         $idPesoLecheEditar = $pesajesDeLeche[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(sprintf($this->url . '/%s', $idPesoLecheEditar), $this->pesoLeche);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->putJson(sprintf($this->url . '/%s', $idPesoLecheEditar), $this->pesoLeche);
 
         $response->assertStatus(200)
             ->assertJson(
@@ -179,7 +179,7 @@ class PesajeLecheTest extends TestCase
         $idToDelete = $pesajesDeLeche[$idRandom]->id;
 
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->deleteJson(sprintf($this->url . '/%s', $idToDelete));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->deleteJson(sprintf($this->url . '/%s', $idToDelete));
 
         $response->assertStatus(200)->assertJson(['pesajeLecheID' => $idToDelete]);
     }
@@ -195,7 +195,7 @@ class PesajeLecheTest extends TestCase
             ->for($this->finca)
             ->create();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('todosPesajesLeche'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(route('todosPesajesLeche'));
 
         $response->assertStatus(200)
             ->assertJson(
@@ -215,7 +215,7 @@ class PesajeLecheTest extends TestCase
     public function test_error_validacion_registro_pesoLeche($pesoLeche, $errores): void
     {
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->postJson($this->url, $pesoLeche);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->postJson($this->url, $pesoLeche);
 
         $response->assertStatus(422)->assertInvalid($errores);
     }
@@ -224,7 +224,7 @@ class PesajeLecheTest extends TestCase
     {
         $this->cambiarRol($this->user);
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->postJson(route('pesaje_leche.store',['ganado'=>$this->ganado->id]), $this->pesoLeche);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->postJson(route('pesaje_leche.store',['ganado'=>$this->ganado->id]), $this->pesoLeche);
 
         $response->assertStatus(403);
     }
@@ -237,7 +237,7 @@ class PesajeLecheTest extends TestCase
         $idRandom = rand(0, $this->cantidad_pesoLeche - 1);
         $idPesoLecheEditar = $pajuelasToro[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(route('pesaje_leche.update',['ganado'=>$this->ganado->id,'pesaje_leche'=>$idPesoLecheEditar]), $this->pesoLeche);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->putJson(route('pesaje_leche.update',['ganado'=>$this->ganado->id,'pesaje_leche'=>$idPesoLecheEditar]), $this->pesoLeche);
 
         $response->assertStatus(403);
     }
@@ -251,7 +251,7 @@ class PesajeLecheTest extends TestCase
         $idRandom = rand(0, $this->cantidad_pesoLeche - 1);
         $idPajuelaToroEliminar = $pajuelasToro[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->deleteJson(route('pesaje_leche.destroy',['ganado'=>$this->ganado->id,'pesaje_leche'=>$idPajuelaToroEliminar]));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->deleteJson(route('pesaje_leche.destroy',['ganado'=>$this->ganado->id,'pesaje_leche'=>$idPajuelaToroEliminar]));
 
         $response->assertStatus(403);
     }

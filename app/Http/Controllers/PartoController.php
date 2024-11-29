@@ -59,12 +59,12 @@ class PartoController extends Controller
         $cria->fecha_nacimiento=$fecha->format('Y-m-d');
         $cria->tipo_id=GanadoTipo::where('tipo','becerro')->first()->id;
         $cria->origen='local';
-        $cria->finca_id=session('finca_id')[0];
+        $cria->finca_id=session('finca_id');
         $cria->save();
         $cria->evento()->create();
 
         $estados=Estado::select('id')
-        ->whereIn('estado',['sano','pendiente_numeracion'])
+        ->where('estado',['sano','pendiente_numeracion'])
         ->get()
         ->modelKeys();
         $cria->estados()->sync($estados);

@@ -128,7 +128,7 @@ class DashboardTest extends TestCase
     public function test_total_ganado_por_tipo(): void
     {
         $this->generarGanado();
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('dashboardPrincipal.totalGanadoTipo'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(route('dashboardPrincipal.totalGanadoTipo'));
 
         $response->assertStatus(200)->assertJson(fn (AssertableJson $json) =>
         $json->whereType('total_tipos_ganado', 'array')
@@ -149,7 +149,7 @@ class DashboardTest extends TestCase
     public function test_total_personal(): void
     {
         $this->generarPersonal();
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('dashboardPrincipal.totalPersonal'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(route('dashboardPrincipal.totalPersonal'));
 
         $response->assertStatus(200)->assertJson(['total_personal' => $this->cantidad_elementos]);
     }
@@ -157,7 +157,7 @@ class DashboardTest extends TestCase
     public function test_total_vacas_en_gestacion(): void
     {
         $this->generarGanado();
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('dashboardPrincipal.vacasEnGestacion'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(route('dashboardPrincipal.vacasEnGestacion'));
 
         $response->assertStatus(200)->assertJson(fn (AssertableJson $json) => $json->whereType('vacas_en_gestacion', 'integer'));
     }
@@ -165,7 +165,7 @@ class DashboardTest extends TestCase
     public function test_ranking_top_3_vacas_mas_productoras(): void
     {
         $this->generarGanado();
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('dashboardPrincipal.topVacasProductoras'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(route('dashboardPrincipal.topVacasProductoras'));
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) =>
@@ -188,7 +188,7 @@ class DashboardTest extends TestCase
     public function test_ranking_top_3_vacas_menos_productoras(): void
     {
         $this->generarGanado();
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('dashboardPrincipal.topVacasMenosProductoras'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(route('dashboardPrincipal.topVacasMenosProductoras'));
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) =>
@@ -211,7 +211,7 @@ class DashboardTest extends TestCase
     public function test_total_vacas_pendientes_de_revision(): void
     {
         $this->generarGanado();
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('dashboardPrincipal.totalGanadoPendienteRevision'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(route('dashboardPrincipal.totalGanadoPendienteRevision'));
 
         $response->assertStatus(200)->assertJson(fn (AssertableJson $json) => $json->whereType('ganado_pendiente_revision', 'integer'));
     }
@@ -219,7 +219,7 @@ class DashboardTest extends TestCase
     public function test_total_novillas_pendientes_de_servicio_o_monta(): void
     {
         $this->generarGanado();
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('dashboardPrincipal.cantidadVacasParaServir'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(route('dashboardPrincipal.cantidadVacasParaServir'));
 
         $response->assertStatus(200)->assertJson(fn (AssertableJson $json) => $json->whereType('cantidad_vacas_para_servir', 'integer'));
     }
@@ -227,7 +227,7 @@ class DashboardTest extends TestCase
     public function test_menor_cantidad_insumo(): void
     {
         $this->generarInsumos();
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('dashboardPrincipal.insumoMenorExistencia'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(route('dashboardPrincipal.insumoMenorExistencia'));
 
         $response->assertStatus(200)->assertJson(fn (AssertableJSon $json) =>
         $json->whereAllType([
@@ -240,7 +240,7 @@ class DashboardTest extends TestCase
     public function test_mayor_cantidad_insumo(): void
     {
         $this->generarInsumos();
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('dashboardPrincipal.insumoMayorExistencia'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(route('dashboardPrincipal.insumoMayorExistencia'));
 
         $response->assertStatus(200)->assertJson(fn (AssertableJSon $json) =>
         $json->whereAllType([
@@ -253,7 +253,7 @@ class DashboardTest extends TestCase
     public function test_balance_anual_leche(): void
     {
         $this->generarGanadoPesajeLecheAnual(now()->format('Y'));
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('dashboardPrincipal.balanceAnualProduccionLeche'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(route('dashboardPrincipal.balanceAnualProduccionLeche'));
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) => $json->has('balance_anual', 12)
@@ -268,7 +268,7 @@ class DashboardTest extends TestCase
      public function test_balance_anual_leche_con_parametro(): void
     {
         $this->generarGanadoPesajeLecheAnual(now()->addYear()->format('Y'));
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('dashboardPrincipal.balanceAnualProduccionLeche',['year'=>now()->addYear()->format('Y')]));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(route('dashboardPrincipal.balanceAnualProduccionLeche',['year'=>now()->addYear()->format('Y')]));
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) => $json->has('balance_anual', 12)

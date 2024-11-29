@@ -77,7 +77,7 @@ class PajuelaToroTest extends TestCase
     {
         $this->generarPajuelasToros();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('pajuela_toros.index'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(route('pajuela_toros.index'));
         $response->assertStatus(200)
             ->assertJson(
                 fn (AssertableJson $json) => $json->has(
@@ -95,7 +95,7 @@ class PajuelaToroTest extends TestCase
     public function test_creacion_pajuela_toro(): void
     {
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->postJson(route('pajuela_toros.store'), $this->pajuela_toro);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->postJson(route('pajuela_toros.store'), $this->pajuela_toro);
 
         $response->assertStatus(201)
             ->assertJson(
@@ -116,7 +116,7 @@ class PajuelaToroTest extends TestCase
         $idRandom = rand(0, $this->cantidad_pajuelaToro - 1);
         $idPajuelaToro = $pajuela_torols[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('pajuela_toros.show',['pajuela_toro'=>$idPajuelaToro]));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(route('pajuela_toros.show',['pajuela_toro'=>$idPajuelaToro]));
 
         $response->assertStatus(200)
             ->assertJson(
@@ -136,7 +136,7 @@ class PajuelaToroTest extends TestCase
         $idRandom = rand(0, $this->cantidad_pajuelaToro - 1);
         $idPajuelaToroEditar = $pajuela_toro[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(route('pajuela_toros.update',['pajuela_toro'=>$idPajuelaToroEditar]), $this->pajuela_toro);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->putJson(route('pajuela_toros.update',['pajuela_toro'=>$idPajuelaToroEditar]), $this->pajuela_toro);
 
         $response->assertStatus(200)
             ->assertJson(
@@ -157,7 +157,7 @@ class PajuelaToroTest extends TestCase
         $idToDelete = $pajuela_toro[$idRandom]->id;
 
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->deleteJson(route('pajuela_toros.destroy',['pajuela_toro'=>$idToDelete]));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->deleteJson(route('pajuela_toros.destroy',['pajuela_toro'=>$idToDelete]));
 
         $response->assertStatus(200)->assertJson(['pajuela_toroID' => $idToDelete]);
     }
@@ -169,7 +169,7 @@ class PajuelaToroTest extends TestCase
     {
         PajuelaToro::factory()->for($this->finca)->create(['codigo' => 28472738]);
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->postJson(route('pajuela_toros.store'), $pajuela_toro);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->postJson(route('pajuela_toros.store'), $pajuela_toro);
 
         $response->assertStatus(422)->assertInvalid($errores);
     }
@@ -186,7 +186,7 @@ class PajuelaToroTest extends TestCase
 
         $this->generarPajuelasToros();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(route('pajuela_toros.update',['pajuela_toro'=>$idPajuelaOtroFinca]), $this->pajuela_toro);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->putJson(route('pajuela_toros.update',['pajuela_toro'=>$idPajuelaOtroFinca]), $this->pajuela_toro);
 
         $response->assertStatus(403);
     }
@@ -195,7 +195,7 @@ class PajuelaToroTest extends TestCase
     {
         $this->cambiarRol($this->user);
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->postJson(route('pajuela_toros.store'), $this->pajuela_toro);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->postJson(route('pajuela_toros.store'), $this->pajuela_toro);
 
         $response->assertStatus(403);
     }
@@ -208,7 +208,7 @@ class PajuelaToroTest extends TestCase
         $idRandom = rand(0, $this->cantidad_pajuelaToro - 1);
         $idPajuelaToroEditar = $pajuelasToro[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(route('pajuela_toros.update',['pajuela_toro'=>$idPajuelaToroEditar]), $this->pajuela_toro);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->putJson(route('pajuela_toros.update',['pajuela_toro'=>$idPajuelaToroEditar]), $this->pajuela_toro);
 
         $response->assertStatus(403);
     }
@@ -222,7 +222,7 @@ class PajuelaToroTest extends TestCase
         $idRandom = rand(0, $this->cantidad_pajuelaToro - 1);
         $idPajuelaToroEliminar = $pajuelasToro[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->deleteJson(route('pajuela_toros.destroy',['pajuela_toro'=>$idPajuelaToroEliminar]));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->deleteJson(route('pajuela_toros.destroy',['pajuela_toro'=>$idPajuelaToroEliminar]));
 
         $response->assertStatus(403);
     }

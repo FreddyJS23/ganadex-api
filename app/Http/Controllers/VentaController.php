@@ -25,7 +25,7 @@ class VentaController extends Controller
      */
     public function index()
     {
-        return new VentaCollection(Venta::whereIn('finca_id',session('finca_id'))->with('ganado:id,numero')->get());
+        return new VentaCollection(Venta::where('finca_id',session('finca_id'))->with('ganado:id,numero')->get());
     }
 
     /**
@@ -35,7 +35,7 @@ class VentaController extends Controller
     {
         $venta = new Venta;
         $venta->fill($request->all());
-        $venta->finca_id = session('finca_id')[0];
+        $venta->finca_id = session('finca_id');
         $venta->fecha = Carbon::now()->format('Y-m-d');
         $venta->save();
 

@@ -47,7 +47,7 @@ class NotificacionTest extends TestCase
     {
         $this->generarNotificaciones();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('notificaciones.index'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(route('notificaciones.index'));
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) =>
             $json->whereType('notificaciones', 'array')
@@ -91,7 +91,7 @@ class NotificacionTest extends TestCase
         $idRandom = rand(0, $this->cantidad_notificaciones - 1);
         $idToDelete = $notificacions[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->deleteJson(route('notificaciones.destroy', ['notificacion' => $idToDelete]));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->deleteJson(route('notificaciones.destroy', ['notificacion' => $idToDelete]));
 
         $response->assertStatus(200)->assertJson(['notificacionID' => $idToDelete]);
     }
@@ -101,9 +101,9 @@ class NotificacionTest extends TestCase
         $this->generarNotificaciones();
 
         //eliminar todas las notificaciones
-        $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('notificaciones.destroyAll'));
+        $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(route('notificaciones.destroyAll'));
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('notificaciones.index'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(route('notificaciones.index'));
         $response->assertStatus(200)->assertJson(fn (AssertableJson $json) => $json->has('notificaciones', 0));
     }
 }

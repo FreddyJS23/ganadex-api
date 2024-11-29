@@ -14,14 +14,14 @@ class InsumoController extends Controller
 
      public function __construct() {
         $this->authorizeResource(Insumo::class,'insumo');
-    } 
+    }
 
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return new InsumoCollection(Insumo::whereIn('finca_id',session('finca_id'))->get());
+        return new InsumoCollection(Insumo::where('finca_id',session('finca_id'))->get());
     }
 
     /**
@@ -31,7 +31,7 @@ class InsumoController extends Controller
     {
         $insumo=new Insumo;
         $insumo->fill($request->all());
-        $insumo->finca_id=session('finca_id')[0];
+        $insumo->finca_id=session('finca_id');
         $insumo->save();
 
         return response()->json(['insumo'=>new InsumoResource($insumo)],201);

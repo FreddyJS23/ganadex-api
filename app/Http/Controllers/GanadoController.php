@@ -42,7 +42,7 @@ class GanadoController extends Controller
             ->doesntHave('fallecimiento')
             ->doesntHave('venta')
             ->doesntHave('ganadoDescarte')
-            ->where('finca_id',session('finca_id'))
+            ->where('finca_id',[session('finca_id')])
             ->with(['peso','evento','estados'])
             ->get());
     }
@@ -55,7 +55,7 @@ class GanadoController extends Controller
       $ganado=new Ganado;
       $ganado->sexo = "H";
       $ganado->fill($request->except($this->estado + $this->peso));
-      $ganado->finca_id=session('finca_id')[0];
+      $ganado->finca_id=session('finca_id');
 
     try {
                 DB::transaction(function () use ($ganado, $request) {
@@ -105,7 +105,7 @@ class GanadoController extends Controller
     public function show(Ganado $ganado)
     {
 
-        $jornadasVacunacionAnteriores =  Jornada_vacunacion::where('finca_id',session('finca_id'))
+        $jornadasVacunacionAnteriores =  Jornada_vacunacion::where('finca_id',[session('finca_id')])
         ->select('jornada_vacunacions.id','nombre as vacuna', 'fecha_inicio as fecha','prox_dosis')
         ->join('vacunas', 'jornada_vacunacions.vacuna_id', 'vacunas.id')
         ->orderBy('fecha', 'desc')

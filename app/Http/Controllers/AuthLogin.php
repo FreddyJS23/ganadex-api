@@ -26,7 +26,7 @@ class AuthLogin extends Controller
         if (Auth::attempt($request->only(['usuario', 'password']))) {
             $request->session()->regenerate();
             $finca=$user->fincas->first()->id;
-            $request->session()->put('finca_id', [$finca]);
+            session()->put('finca_id', $finca);
             $rol = $user->hasRole('admin') ? 'admin' : 'veterinario';
 
             return response()

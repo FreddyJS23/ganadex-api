@@ -35,7 +35,7 @@ class VerificarEdadGanado
         $fincaId = $event->user->fincas;
 
         if (Ganado::where('finca_id', $fincaId)->count() > 0) {
-            $becerros = Ganado::whereIn('finca_id', $fincaId)
+            $becerros = Ganado::where('finca_id', $fincaId)
                 ->where('tipo_id', 1)
                 ->select('tipo_id')
                 ->selectRaw($sentenciaSqlDiferenciaDias)
@@ -45,7 +45,7 @@ class VerificarEdadGanado
 
            $becerros->count() > 0 && $becerros->toQuery()->update(['tipo_id' => 2]);
 
-            $mautes = Ganado::whereIn('finca_id', $fincaId)
+            $mautes = Ganado::where('finca_id', $fincaId)
                 ->where('tipo_id', 2)
                 ->select('tipo_id')
                 ->selectRaw($sentenciaSqlDiferenciaDias)

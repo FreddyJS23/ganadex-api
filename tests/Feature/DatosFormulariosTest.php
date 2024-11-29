@@ -56,7 +56,7 @@ class DatosFormulariosTest extends TestCase
      public function test_obtener_novillas_que_se_pueden_servir()
      {
         $this->generarGanado();
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('datosParaFormularios.novillasParaMontar'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(route('datosParaFormularios.novillasParaMontar'));
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) =>
@@ -83,7 +83,7 @@ class DatosFormulariosTest extends TestCase
             ->for(Comprador::factory()->for($this->finca)->create())
             ->create();
 
-            $response=$this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('datosParaFormularios.añosVentasGanado'));
+            $response=$this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(route('datosParaFormularios.añosVentasGanado'));
 
             $response->assertStatus(200)->assertJson(
                 fn (AssertableJson $json) =>
@@ -105,7 +105,7 @@ class DatosFormulariosTest extends TestCase
         ->for($this->finca)
         ->create();
 
-            $response=$this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('datosParaFormularios.añosProduccionLeche'));
+            $response=$this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(route('datosParaFormularios.añosProduccionLeche'));
 
             $response->assertStatus(200)->assertJson(
                 fn (AssertableJson $json) =>
@@ -125,7 +125,7 @@ class DatosFormulariosTest extends TestCase
         ->count(10)
         ->create();
 
-        $response=$this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(route('datosParaFormularios.vacunasDisponibles'));
+        $response=$this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(route('datosParaFormularios.vacunasDisponibles'));
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) =>

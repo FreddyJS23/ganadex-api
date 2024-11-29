@@ -21,14 +21,14 @@ class ToroController extends Controller
      public function __construct()
     {
         $this->authorizeResource(Toro::class, 'toro');
-    } 
+    }
 
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $toros = Toro ::whereIn('finca_id', session('finca_id'))
+        $toros = Toro::where('finca_id', session('finca_id'))
             ->with([
                 'ganado' => function (Builder $query) {
                     $query->doesntHave('ganadoDescarte');
@@ -80,14 +80,14 @@ class ToroController extends Controller
     public function store(StoreToroRequest $request)
     {
         $ganado = new Ganado($request->all());
-        $ganado->finca_id = session('finca_id')[0];
+        $ganado->finca_id = session('finca_id');
         $ganado->tipo_id = GanadoTipo::where('tipo', 'adulto')->first()->id;
         $ganado->sexo = "M";
         $ganado->save();
         $ganado->peso()->create($request->only($this->peso));
 
         $toro = new Toro;
-        $toro->finca_id = session('finca_id')[0];
+        $toro->finca_id = session('finca_id');
         $toro->ganado()->associate($ganado)->save();
 
         return response()->json(['toro' => new ToroResource($toro)], 201);

@@ -27,7 +27,7 @@ class DescartarGanado
     {
         $ganadoDescarte = new GanadoDescarte();
         $ganadoDescarte->ganado_id = $event->revision->ganado_id;
-        $ganadoDescarte->finca_id = session('finca_id')[0];
+        $ganadoDescarte->finca_id = session('finca_id');
         $ganadoDescarte->save();
     }
 }

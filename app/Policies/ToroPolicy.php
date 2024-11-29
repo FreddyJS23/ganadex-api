@@ -21,7 +21,7 @@ class ToroPolicy
      */
     public function view(User $user, Toro $toro): bool
     {
-        return session('finca_id')[0] === $toro->finca->id ;
+        return session('finca_id') === $toro->finca->id ;
     }
 
     /**
@@ -37,7 +37,7 @@ class ToroPolicy
      */
     public function update(User $user, Toro $toro): bool
     {
-        return session('finca_id')[0] === $toro->finca->id && $user->hasRole('admin');
+        return session('finca_id') === $toro->finca->id && $user->hasRole('admin');
     }
 
     /**
@@ -45,7 +45,7 @@ class ToroPolicy
      */
     public function delete(User $user, Toro $toro): bool
     {
-        return session('finca_id')[0] === $toro->finca->id && $user->hasRole('admin');
+        return session('finca_id') === $toro->finca->id && $user->hasRole('admin');
     }
 
     /**

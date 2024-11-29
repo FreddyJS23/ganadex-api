@@ -20,7 +20,7 @@ class DatosParaFormulariosController extends Controller
     public function novillasParaMontar()
     {
         $novillasAmontar = Peso::whereHas('ganado', function (Builder $query) {
-            $query->where('finca_id', session('finca_id'));
+            $query->where('finca_id', [session('finca_id')]);
         })->where('peso_actual', '>=', 330)->get();
 
         return new NovillaAMontarCollection($novillasAmontar);
@@ -35,13 +35,13 @@ class DatosParaFormulariosController extends Controller
     {
         return new VeterinariosDisponiblesCollection(Personal::select('id','nombre')
         ->where('cargo_id',2)
-        ->whereIn('finca_id',session('finca_id'))
+        ->where('finca_id',[session('finca_id')])
         ->get());
     }
 
     public function añosVentasGanado()
     {
-        $añosVentasGanado = Venta::whereIn('finca_id',session('finca_id'))
+        $añosVentasGanado = Venta::where('finca_id',session('finca_id'))
             ->selectRaw('DATE_FORMAT(fecha,"%Y") as año')
             ->groupBy('año')
             ->orderBy('año', 'desc')
@@ -56,7 +56,7 @@ class DatosParaFormulariosController extends Controller
     }
     public function añosProduccionLeche()
     {
-        $añosVentaProduccionLeche = Leche::whereIn('finca_id',session('finca_id'))
+        $añosVentaProduccionLeche = Leche::where('finca_id',session('finca_id'))
             ->selectRaw('DATE_FORMAT(fecha,"%Y") as año')
             ->groupBy('año')
             ->orderBy('año', 'desc')

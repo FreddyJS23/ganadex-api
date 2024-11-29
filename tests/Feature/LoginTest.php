@@ -56,7 +56,7 @@ class LoginTest extends TestCase
             'login.id' => 'integer',
             'login.usuario' => 'string',
             'login.token' => 'string',
-            'login.finca'=>'array'
+            'login.finca'=>'integer'
         ]));
     }
 
@@ -72,7 +72,7 @@ class LoginTest extends TestCase
             'login.id' => 'integer',
             'login.usuario' => 'string',
             'login.token' => 'string',
-            'login.finca'=>'array'
+            'login.finca'=>'integer'
         ]));
     }
 }

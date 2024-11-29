@@ -17,7 +17,7 @@ class PrecioController extends Controller
      */
     public function index()
     {
-        return new PrecioCollection(Precio::whereIn('finca_id',session('finca_id'))->latest('fecha')->get());
+        return new PrecioCollection(Precio::where('finca_id',session('finca_id'))->latest('fecha')->get());
     }
 
     /**
@@ -27,7 +27,7 @@ class PrecioController extends Controller
     {
         $precio = new Precio;
         $precio->fill($request->only('precio'));
-        $precio->finca_id = session('finca_id')[0];
+        $precio->finca_id = session('finca_id');
         $precio->fecha = Carbon::now()->format('Y-m-d');
         $precio->save();
         return response()->json(['precio' => new PrecioResource($precio)], 201);

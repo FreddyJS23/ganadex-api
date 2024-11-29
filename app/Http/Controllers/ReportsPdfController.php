@@ -89,7 +89,7 @@ $estadoProduccionLeche= $ganado->estados->contains('estado','lactancia') ? "En p
     $fechaActual = new DateTime();
     $mesActual = $fechaActual->format('m');
 
-    $TotalGanadoPorTiposMacho = Ganado ::whereIn('finca_id', session('finca_id'))
+    $TotalGanadoPorTiposMacho = Ganado::where('finca_id', session('finca_id'))
       ->where('sexo', 'M')
       ->selectRaw('tipo, COUNT(tipo) as cantidad')
       ->join('ganado_tipos', 'tipo_id', 'ganado_tipos.id')
@@ -103,7 +103,7 @@ $estadoProduccionLeche= $ganado->estados->contains('estado','lactancia') ? "En p
     array_push($TotalGanadoPorTiposMacho, ['tipo' => 'total', 'cantidad' => $totalMacho]);
 
     $TotalGanadoPorTiposHembra
-      = Ganado ::whereIn('finca_id', session('finca_id'))
+      = Ganado::where('finca_id', session('finca_id'))
       ->where('sexo', 'H')
       ->selectRaw('tipo, COUNT(tipo) as cantidad')
       ->join('ganado_tipos', 'tipo_id', 'ganado_tipos.id')
@@ -150,11 +150,11 @@ $estadoProduccionLeche= $ganado->estados->contains('estado','lactancia') ? "En p
     }
     $topVacasMenosProductoras = $ordernarArrayVacasMenosProductoras;
 
-    $totalVacasEnGestacion = Ganado::whereIn('finca_id',session('finca_id'))
+    $totalVacasEnGestacion = Ganado::where('finca_id',session('finca_id'))
       ->whereRelation('estados', 'estado', 'gestacion')
       ->count();
 
-    $totalGanadoPendienteRevision = Ganado::whereIn('finca_id',session('finca_id'))
+    $totalGanadoPendienteRevision = Ganado::where('finca_id',session('finca_id'))
       ->whereRelation('estados', 'estado', 'pendiente_revision')
       ->count();
 
@@ -169,7 +169,7 @@ $estadoProduccionLeche= $ganado->estados->contains('estado','lactancia') ? "En p
     ];
 
 
-    $totalPersonal = Personal::whereIn('finca_id',session('finca_id'))
+    $totalPersonal = Personal::where('finca_id',session('finca_id'))
       ->selectRaw('cargo, COUNT(cargo) as cantidad')
       ->join('cargos', 'cargo_id', 'cargos.id')
       ->groupBy('cargo')
@@ -222,7 +222,7 @@ $estadoProduccionLeche= $ganado->estados->contains('estado','lactancia') ? "En p
 $inicio=$request->query('start');
 $fin=$request->query('end');
 
-    $ventasLeche = VentaLeche::whereIn('finca_id',session('finca_id'))
+    $ventasLeche = VentaLeche::where('finca_id',session('finca_id'))
       ->oldest('fecha')
       ->select('venta_leches.fecha', 'cantidad', 'precio')
       ->selectRaw('(cantidad * precio) AS ganancia_total')
@@ -246,7 +246,7 @@ $fin=$request->query('end');
 
     $year = $request->query('year');
 
-  $ventasGanado = Venta::whereIn('finca_id',session('finca_id'))
+  $ventasGanado = Venta::where('finca_id',session('finca_id'))
       ->join('ganados', 'ganado_id', 'ganados.id')
       //->selectRaw("DATE_FORMAT(fecha,'%m') as mes,numero,precio")
       ->selectRaw("DATE_FORMAT(fecha,'%m') as mes,numero")
@@ -302,7 +302,7 @@ $fin=$request->query('end');
 
   public function facturaVentaGanado(){
 
-    $ventaGanado = Venta::whereIn('finca_id',session('finca_id'))
+    $ventaGanado = Venta::where('finca_id',session('finca_id'))
     ->with(['ganado'=>['peso'],'comprador'])
       ->orderBy('fecha', 'desc')
       ->first();

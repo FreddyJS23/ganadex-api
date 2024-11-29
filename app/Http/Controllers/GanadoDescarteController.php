@@ -30,7 +30,7 @@ class GanadoDescarteController extends Controller
      */
     public function index()
     {
-        return new GanadoDescarteCollection(GanadoDescarte::whereIn('finca_id', session('finca_id'))->get());
+        return new GanadoDescarteCollection(GanadoDescarte::where('finca_id', session('finca_id'))->get());
     }
 
 
@@ -40,14 +40,14 @@ class GanadoDescarteController extends Controller
     public function store(StoreGanadoDescarteRequest $request)
     {
         $ganado = new Ganado($request->all());
-        $ganado->finca_id = session('finca_id')[0];
+        $ganado->finca_id = session('finca_id');
         $ganado->tipo_id = determinar_edad_res($ganado->fecha_nacimiento);
         $ganado->sexo = "M";
         $ganado->save();
         $ganado->peso()->create($request->only($this->peso));
 
         $ganadoDescarte = new GanadoDescarte;
-        $ganadoDescarte->finca_id = session('finca_id')[0];
+        $ganadoDescarte->finca_id = session('finca_id');
         $ganadoDescarte->ganado()->associate($ganado)->save();
 
         return response()->json(['ganado_descarte' => new GanadoDescarteResource($ganadoDescarte)], 201);
@@ -85,7 +85,7 @@ class GanadoDescarteController extends Controller
     {
         $ganadoDescarte=new GanadoDescarte;
         $ganadoDescarte->ganado_id=$request->ganado_id;
-        $ganadoDescarte->finca_id=session('finca_id')[0];
+        $ganadoDescarte->finca_id=session('finca_id');
         $ganadoDescarte->save();
         return response()->json(['ganado_descarte' => new GanadoDescarteResource($ganadoDescarte)], 201);
     }

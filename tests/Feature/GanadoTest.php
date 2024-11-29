@@ -144,7 +144,7 @@ class GanadoTest extends TestCase
     {
         $this->generarGanado();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->withSession(['finca_id' => [$this->finca->id]])->getJson('api/ganado');
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->withSession(['finca_id' => $this->finca->id])->getJson('api/ganado');
         $response->assertStatus(200)
             ->assertJson(
                 fn (AssertableJson $json) =>
@@ -193,7 +193,7 @@ class GanadoTest extends TestCase
     public function test_creacion_cabeza_ganado(): void
     {
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->postJson('api/ganado', $this->cabeza_ganado);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->postJson('api/ganado', $this->cabeza_ganado);
 
         $response->assertStatus(201)
             ->assertJson(
@@ -241,7 +241,7 @@ class GanadoTest extends TestCase
         $idRandom = rand(0, $this->cantidad_ganado - 1);
         $idGanado = $cabezasGanado[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->getJson(sprintf('api/ganado/%s', $idGanado), $this->cabeza_ganado);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(sprintf('api/ganado/%s', $idGanado), $this->cabeza_ganado);
 
         $response->assertStatus(200)
             ->assertJson(
@@ -265,7 +265,7 @@ class GanadoTest extends TestCase
         $idRandom = rand(0, $this->cantidad_ganado - 1);
         $idGanadoEditar = $cabezasGanado[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(sprintf('api/ganado/%s', $idGanadoEditar), $this->cabeza_ganado);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->putJson(sprintf('api/ganado/%s', $idGanadoEditar), $this->cabeza_ganado);
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) =>
@@ -294,7 +294,7 @@ class GanadoTest extends TestCase
         $idRandom = rand(0, $this->cantidad_ganado - 1);
         $idGanadoEditar = $cabezasGanado[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(sprintf('api/ganado/%s', $idGanadoEditar), $this->cabeza_ganado);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->putJson(sprintf('api/ganado/%s', $idGanadoEditar), $this->cabeza_ganado);
 
         $response->assertStatus(422)->assertJson(fn (AssertableJson $json) =>
         $json->hasAll(['errors.nombre', 'errors.numero'])
@@ -309,7 +309,7 @@ class GanadoTest extends TestCase
             ->for($this->finca)
             ->create(['nombre' => 'test', 'numero' => 392]);
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(sprintf('api/ganado/%s', $ganado->id), $this->cabeza_ganado);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->putJson(sprintf('api/ganado/%s', $ganado->id), $this->cabeza_ganado);
 
         $response->assertStatus(200)->assertJson(['ganado' => true]);
     }
@@ -321,7 +321,7 @@ class GanadoTest extends TestCase
         $idToDelete = $cabezasGanado[$idRandom]->id;
 
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->deleteJson(sprintf('api/ganado/%s', $idToDelete));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->deleteJson(sprintf('api/ganado/%s', $idToDelete));
 
         $response->assertStatus(200)->assertJson(['ganadoID' => $idToDelete]);
     }
@@ -333,7 +333,7 @@ class GanadoTest extends TestCase
     {
         Ganado::factory()->for($this->finca)->create(['nombre' => 'test', 'numero' => 300]);
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->postJson('api/ganado', $ganado);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->postJson('api/ganado', $ganado);
 
         $response->assertStatus(422)->assertInvalid($errores);
     }
@@ -354,7 +354,7 @@ class GanadoTest extends TestCase
 
         $this->generarGanado();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(sprintf('api/ganado/%s', $idGanadoOtroUsuario), $this->cabeza_ganado);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->putJson(sprintf('api/ganado/%s', $idGanadoOtroUsuario), $this->cabeza_ganado);
 
         $response->assertStatus(403);
     }
@@ -364,7 +364,7 @@ class GanadoTest extends TestCase
     {
         $this->cambiarRol($this->user);
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->postJson('api/ganado', $this->cabeza_ganado);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->postJson('api/ganado', $this->cabeza_ganado);
 
         $response->assertStatus(403);
     }
@@ -377,7 +377,7 @@ class GanadoTest extends TestCase
         $idRandom = rand(0, $this->cantidad_ganado - 1);
         $idGanadoEditar = $cabezasGanado[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->putJson(sprintf('api/ganado/%s', $idGanadoEditar), $this->cabeza_ganado);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->putJson(sprintf('api/ganado/%s', $idGanadoEditar), $this->cabeza_ganado);
 
         $response->assertStatus(403);
     }
@@ -392,7 +392,7 @@ class GanadoTest extends TestCase
         $idToDelete = $cabezasGanado[$idRandom]->id;
 
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => [$this->finca->id]])->deleteJson(sprintf('api/ganado/%s', $idToDelete));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->deleteJson(sprintf('api/ganado/%s', $idToDelete));
 
         $response->assertStatus(403);
     }

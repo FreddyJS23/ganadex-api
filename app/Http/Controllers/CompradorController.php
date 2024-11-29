@@ -14,14 +14,14 @@ class CompradorController extends Controller
      public function __construct()
     {
         $this->authorizeResource(Comprador::class, 'comprador');
-    } 
+    }
 
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return new CompradorCollection(Comprador::whereIn('finca_id',session('finca_id'))->get());
+        return new CompradorCollection(Comprador::where('finca_id',session('finca_id'))->get());
     }
 
     /**
@@ -31,7 +31,7 @@ class CompradorController extends Controller
     {
         $comprador = new Comprador;
         $comprador->fill($request->all());
-        $comprador->finca_id = session('finca_id')[0];
+        $comprador->finca_id = session('finca_id');
         $comprador->save();
 
         return response()->json(['comprador' => new CompradorResource($comprador)], 201);

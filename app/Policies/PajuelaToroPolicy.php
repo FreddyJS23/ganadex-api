@@ -21,7 +21,7 @@ class PajuelaToroPolicy
      */
     public function view(User $user, PajuelaToro $pajuelaToro): bool
     {
-        return session('finca_id')[0] === $pajuelaToro->finca->id;
+        return session('finca_id') === $pajuelaToro->finca->id;
     }
 
     /**
@@ -37,7 +37,7 @@ class PajuelaToroPolicy
      */
     public function update(User $user, PajuelaToro $pajuelaToro): bool
     {
-        return session('finca_id')[0] === $pajuelaToro->finca->id && $user->hasRole('admin');
+        return session('finca_id') === $pajuelaToro->finca->id && $user->hasRole('admin');
     }
 
     /**
@@ -45,7 +45,7 @@ class PajuelaToroPolicy
      */
     public function delete(User $user, PajuelaToro $pajuelaToro): bool
     {
-        return session('finca_id')[0] === $pajuelaToro->finca->id && $user->hasRole('admin');
+        return session('finca_id') === $pajuelaToro->finca->id && $user->hasRole('admin');
     }
 
     /**

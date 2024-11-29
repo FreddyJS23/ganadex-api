@@ -14,7 +14,7 @@ class VacasEnGestacion extends Controller
      */
     public function __invoke(Request $request)
     {
-           $totalVacasEnGestacion =Ganado::whereIn('finca_id',session('finca_id'))
+           $totalVacasEnGestacion =Ganado::where('finca_id',session('finca_id'))
            ->whereRelation('estados','estado','gestacion')
            ->count();
 
