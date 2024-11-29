@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -16,7 +17,7 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable,HasRoles;
 
-    
+
     /**
      * The attributes that are mass assignable.
      *
@@ -61,10 +62,10 @@ class User extends Authenticatable
  /**
   * Get all of the fincas for the User
   *
-  * @return \Illuminate\Database\Eloquent\Relations\HasMany
+  * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
   */
- public function fincas(): HasMany
+ public function fincas(): BelongsToMany
  {
-     return $this->hasMany(Finca::class);
+     return $this->belongsToMany(Finca::class);
  }
 }
