@@ -58,7 +58,8 @@ class LoginTest extends TestCase
         $json->where('login.rol', 'admin')->whereAllType([
             'login.id' => 'integer',
             'login.usuario' => 'string',
-            'login.token' => 'string'
+            'login.token' => 'string',
+            'login.finca'=>'array'
         ]));
     }
 
@@ -73,7 +74,8 @@ class LoginTest extends TestCase
         $json->where('login.rol', 'veterinario')->whereAllType([
             'login.id' => 'integer',
             'login.usuario' => 'string',
-            'login.token' => 'string'
+            'login.token' => 'string',
+            'login.finca'=>'array'
         ]));
     }
 }
