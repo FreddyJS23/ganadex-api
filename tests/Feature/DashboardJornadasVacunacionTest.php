@@ -58,7 +58,7 @@ class DashboardJornadasVacunacionTest extends TestCase
                     => $json->whereAllType([
                         'vacuna' => 'string',
                         'prox_dosis' => 'string',
-                        'tipo_animal' => 'string',
+                        'ganado_vacunado' => 'array',
                     ])
                 )
         );
