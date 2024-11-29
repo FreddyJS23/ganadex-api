@@ -42,7 +42,7 @@ class DemostracionSeeder extends Seeder
 
         $finca
         = Finca::factory()
-        ->for($user)
+        ->hasAttached($user)
         ->create();
 
         $userVeterinario=User::factory()->create(['usuario' => 'veterinario', 'password' => Hash::make('veterinario')]);

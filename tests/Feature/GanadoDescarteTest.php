@@ -45,7 +45,7 @@ class GanadoDescarteTest extends TestCase
 
             $this->finca
             = Finca::factory()
-            ->for($this->user)
+            ->hasAttached($this->user)
             ->create();
     }
 
@@ -299,7 +299,7 @@ class GanadoDescarteTest extends TestCase
     public function test_autorizacion_maniupular__res_otro_usuario(): void
     {
         $otroFinca = Finca::factory()
-        ->for($this->user)
+        ->hasAttached($this->user)
         ->create(['nombre' => 'otro_finca']);
 
         $resOtroFinca = GanadoDescarte::factory()

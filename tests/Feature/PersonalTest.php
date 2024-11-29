@@ -42,7 +42,7 @@ class PersonalTest extends TestCase
 
             $this->finca
             = Finca::factory()
-            ->for($this->user)
+            ->hasAttached($this->user)
             ->create();
     }
 
@@ -252,7 +252,7 @@ class PersonalTest extends TestCase
     public function test_autorizacion_maniupular__personal_otro_finca(): void
     {
         $otroFinca = Finca::factory()
-        ->for($this->user)
+        ->hasAttached($this->user)
         ->create(['nombre' => 'otro_finca']);
 
         $personalOtroFinca = personal::factory()->for($otroFinca)->create();
