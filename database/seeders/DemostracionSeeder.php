@@ -36,16 +36,18 @@ class DemostracionSeeder extends Seeder
         $elementos = 30;
         $cantidadGanados = 10;
 
-        $user =User::factory()->create();
-        $user->assignRole('admin');
-
-
         $finca
         = Finca::factory()
-        ->hasAttached($user)
         ->create();
 
-        $userVeterinario=User::factory()->create(['usuario' => 'veterinario', 'password' => Hash::make('veterinario')]);
+        $user =User::factory()
+        ->hasAttached($finca)
+        ->create();
+        $user->assignRole('admin');
+
+        $userVeterinario=User::factory()
+        ->hasAttached($finca)
+        ->create(['usuario' => 'veterinario', 'password' => Hash::make('veterinario')]);
 
         $userVeterinario->assignRole('veterinario');
 
