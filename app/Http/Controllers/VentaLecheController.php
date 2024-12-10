@@ -25,7 +25,6 @@ class VentaLecheController extends Controller
      */
     public function store(StoreVentaLecheRequest $request)
     {
-        dd(4);
         $ventaLeche=new VentaLeche;
         $ventaLeche->fill($request->only('cantidad','precio_id'));
         $ventaLeche->finca_id=session('finca_id');

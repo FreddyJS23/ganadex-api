@@ -150,7 +150,7 @@ class EventosGanadoTest extends TestCase
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(sprintf('api/ganado/%s', $this->ganado->id));
 
-        $response->dd()->assertStatus(200)->assertJson(
+        $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) => $json->whereAllType(
                 [
                     'ganado.eventos.prox_parto' => 'string',
