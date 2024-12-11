@@ -15,6 +15,7 @@ class Servicio extends Model
     protected $fillable = [
         'observacion',
         'tipo',
+        'fecha',
         'personal_id',
     ];
     /**

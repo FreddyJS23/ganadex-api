@@ -14,6 +14,7 @@ class Parto extends Model
     protected $fillable = [
         'fecha',
         'observacion',
+        'fecha',
         'personal_id'
     ];
 
