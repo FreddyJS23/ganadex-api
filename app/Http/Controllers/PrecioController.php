@@ -26,9 +26,8 @@ class PrecioController extends Controller
     public function store(StorePrecioRequest $request)
     {
         $precio = new Precio;
-        $precio->fill($request->only('precio'));
+        $precio->fill($request->only('precio','fecha'));
         $precio->finca_id = session('finca_id');
-        $precio->fecha = Carbon::now()->format('Y-m-d');
         $precio->save();
         return response()->json(['precio' => new PrecioResource($precio)], 201);
     }
