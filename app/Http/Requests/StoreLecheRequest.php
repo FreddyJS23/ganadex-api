@@ -23,6 +23,8 @@ class StoreLecheRequest extends FormRequest
     {
         return [
             'peso_leche'=>'required|max_digits:6|numeric',
+            'fecha' => 'date_format:Y-m-d',
+
         ];
     }
 }

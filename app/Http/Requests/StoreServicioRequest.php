@@ -28,6 +28,7 @@ class StoreServicioRequest extends FormRequest
         return [
             'observacion' => 'required|min:3|max:255',
             'tipo' => 'required|in:monta,inseminacion',
+            'fecha' => 'date_format:Y-m-d',
             'toro_id' => [
                 Rule::requiredIf($this->tipo == 'monta'), Rule::exists('toros', 'id')
                 ->where(

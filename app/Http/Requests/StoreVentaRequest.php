@@ -26,6 +26,7 @@ class StoreVentaRequest extends FormRequest
     {
         return [
             //'precio' => 'required|numeric',
+            'fecha' => 'date_format:Y-m-d',
             'ganado_id' => [
                 'required', 'numeric', Rule::exists('ganados', 'id')
                     ->where(

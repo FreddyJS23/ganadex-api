@@ -29,9 +29,10 @@ class StorePartoRequest extends FormRequest
             'nombre'=>'required|min:3|max:255|unique:ganados,nombre',
             'numero'=>'numeric|between:1,32767|unique:ganados,numero|nullable',
             'sexo'=>'required|in:H,M',
+            'fecha' => 'date_format:Y-m-d',
             'peso_nacimiento'=>'numeric|between:1,32767',
             'personal_id' => ['required', new ComprobarVeterianario]
-            
+
         ];
     }
 }
