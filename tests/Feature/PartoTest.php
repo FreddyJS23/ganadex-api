@@ -25,6 +25,8 @@ class PartoTest extends TestCase
         'observacion' => 'bien',
         'nombre' => 'test',
         'numero' => 33,
+        'fecha' => '2020-10-02',
+
         'sexo' => 'H',
         'peso_nacimiento' => 33,
 

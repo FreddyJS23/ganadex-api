@@ -20,6 +20,8 @@ class VentaTest extends TestCase
 
     private array $venta = [
         //'precio' => 350,
+        'fecha' => '2020-10-02',
+
     ];
 
     private int $cantidad_ventas = 10;

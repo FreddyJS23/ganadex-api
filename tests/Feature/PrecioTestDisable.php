@@ -15,7 +15,9 @@ class PrecioTest extends TestCase
     use RefreshDatabase;
 
     private array $precio = [
-        'precio' => 30
+        'precio' => 30,
+        'fecha' => '2020-10-02',
+
     ];
 
     private int $cantidad_precio = 10;

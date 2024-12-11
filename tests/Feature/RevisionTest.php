@@ -21,6 +21,8 @@ class RevisionTest extends TestCase
     private array $revision = [
         'diagnostico' => 'revisar',
         'tratamiento' => 'medicina',
+        'fecha' => '2020-10-02',
+
     ];
 
     private int $cantidad_revision = 10;

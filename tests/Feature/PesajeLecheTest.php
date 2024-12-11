@@ -19,6 +19,8 @@ class PesajeLecheTest extends TestCase
 
     private array $pesoLeche = [
         'peso_leche' => '30',
+        'fecha' => '2020-10-02',
+
 
     ];
 
