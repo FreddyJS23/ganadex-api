@@ -44,10 +44,8 @@ class PartoController extends Controller
      */
     public function store(StorePartoRequest $request, Ganado $ganado)
     {
-        $fecha=new DateTime();
         $parto=new Parto;
-        $parto->fill($request->only(['observacion','personal_id']));
-        $parto->fecha=$fecha->format('Y-m-d');
+        $parto->fill($request->only(['observacion','personal_id','fecha']));
         $servicio=$ganado->servicioReciente->servicioable;
 
         $parto->ganado()->associate($ganado);
@@ -56,7 +54,7 @@ class PartoController extends Controller
         $cria=new Ganado;
 
         $cria->fill($request->except(['observacion','peso_nacimiento']));
-        $cria->fecha_nacimiento=$fecha->format('Y-m-d');
+        $cria->fecha_nacimiento=$request->input('fecha');
         $cria->tipo_id=GanadoTipo::where('tipo','becerro')->first()->id;
         $cria->origen='local';
         $cria->finca_id=session('finca_id');
