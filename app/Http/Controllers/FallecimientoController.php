@@ -29,8 +29,7 @@ class FallecimientoController extends Controller
     {
         $fallecimiento=new Fallecimiento;
         $ganado = Ganado::find($request->input('ganado_id'));
-        $fallecimiento->fill($request->only('causa'));
-        $fallecimiento->fecha=Carbon::now()->format('Y-m-d');
+        $fallecimiento->fill($request->only('causa','fecha'));
         $fallecimiento->ganado()->associate($ganado);
         $fallecimiento->save();
 

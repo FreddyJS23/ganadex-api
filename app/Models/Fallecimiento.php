@@ -12,7 +12,8 @@ class Fallecimiento extends Model
 
     protected $fillable=
     [
-        'causa'
+        'causa',
+        'fecha'
     ];
 
     /**

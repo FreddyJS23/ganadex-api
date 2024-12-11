@@ -42,10 +42,8 @@ class ServicioController extends Controller
      */
     public function store(StoreServicioRequest $request,Ganado $ganado)
     {
-        $fecha=new DateTime();
         $servicio=new Servicio;
         $servicio->fill($request->except(['toro_id','pajuela_toro_id']));
-        $servicio->fecha=$fecha->format('Y-m-d');
         $servicio->ganado()->associate($ganado);
         /**
          *@var 'monta' | 'inseminacion'  */

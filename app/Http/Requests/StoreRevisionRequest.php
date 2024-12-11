@@ -26,6 +26,7 @@ class StoreRevisionRequest extends FormRequest
         return [
             'diagnostico'=>'required|min:3,|max:255',
             'tratamiento'=>'required|min:3,|max:255',
+            'fecha' => 'date_format:Y-m-d',
             'personal_id'=>['required',new ComprobarVeterianario]
         ];
     }

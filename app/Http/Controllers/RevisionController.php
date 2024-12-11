@@ -35,10 +35,8 @@ class RevisionController extends Controller
      */
     public function store(StoreRevisionRequest $request, Ganado $ganado)
     {
-        $fecha=new DateTime();
         $revision= new Revision;
         $revision->fill($request->all());
-        $revision->fecha=$fecha->format('Y-m-d');
         $revision->ganado()->associate($ganado)->save();
 
 

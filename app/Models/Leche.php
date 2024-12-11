@@ -12,6 +12,7 @@ class Leche extends Model
 
     protected $fillable=[
         'peso_leche',
+        'fecha'
     ];
 
     /**

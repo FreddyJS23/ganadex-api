@@ -25,6 +25,7 @@ class StoreFallecimientoRequest extends FormRequest
     {
         return [
             'causa' => 'required|min:3|max:255|string',
+            'fecha' => 'date_format:Y-m-d',
             'ganado_id' => [
                 'required', 'numeric', Rule::exists('ganados', 'id')
                 ->where(

@@ -22,7 +22,8 @@ class StorePrecioRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'precio'=>'required|numeric'
+            'precio'=>'required|numeric',
+            'fecha' => 'date_format:Y-m-d',
         ];
     }
 }

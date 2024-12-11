@@ -23,10 +23,13 @@ class ServicioTest extends TestCase
 
     private array $servicioMonta = [
         'observacion' => 'bien',
-        'tipo' => 'monta'
+        'tipo' => 'monta',
+        'fecha' => '2020-10-02',
+
     ];
     private array $servicioInseminacion = [
         'observacion' => 'bien',
+        'fecha' => '2020-10-02',
         'tipo' => 'inseminacion'
     ];
 

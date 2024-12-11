@@ -32,11 +32,9 @@ class LecheController extends Controller
      */
     public function store(StoreLecheRequest $request, Ganado $ganado)
     {
-        $fecha=new DateTime();
         $leche=new Leche;
         $leche->fill($request->all());
         $leche->finca_id=session('finca_id');
-        $leche->fecha=$fecha->format('Y-m-d');
         $leche->ganado()->associate($ganado);
         $leche->save();
 

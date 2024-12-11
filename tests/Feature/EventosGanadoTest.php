@@ -40,12 +40,14 @@ class EventosGanadoTest extends TestCase
 
     private array $servicio = [
         'observacion' => 'bien',
+        'fecha' => '2020-10-02',
         'tipo' => 'monta'
     ];
 
     private $parto = [
         'observacion' => 'bien',
         'nombre' => 'test',
+        'fecha' => '2020-10-02',
         'numero' => 33,
         'peso_nacimiento' => 50,
     ];
@@ -56,24 +58,29 @@ class EventosGanadoTest extends TestCase
 
     private array $revision = [
         'diagnostico' => 'prenada',
+        'fecha' => '2020-10-02',
         'tratamiento' => 'medicina',
     ];
 
     private array $revisionDescarte = [
         'diagnostico' => 'descartar',
+        'fecha' => '2020-10-02',
         'tratamiento' => 'ninguno',
     ];
 
     private array $venta = [
         'precio' => 350,
+        'fecha' => '2020-10-02',
     ];
 
     private array $fallecimiento = [
         'causa' => 'enferma',
+        'fecha' => '2020-10-02',
     ];
 
     private array $pesoLeche = [
         'peso_leche' => 30,
+        'fecha' => '2020-10-02',
 
     ];
 
@@ -150,7 +157,7 @@ class EventosGanadoTest extends TestCase
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(sprintf('api/ganado/%s', $this->ganado->id));
 
-        $response->dd()->assertStatus(200)->assertJson(
+        $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) => $json->whereAllType(
                 [
                     'ganado.eventos.prox_parto' => 'string',

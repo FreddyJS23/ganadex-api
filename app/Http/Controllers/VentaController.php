@@ -36,7 +36,6 @@ class VentaController extends Controller
         $venta = new Venta;
         $venta->fill($request->all());
         $venta->finca_id = session('finca_id');
-        $venta->fecha = Carbon::now()->format('Y-m-d');
         $venta->save();
 
         VentaGanado::dispatch($venta);
