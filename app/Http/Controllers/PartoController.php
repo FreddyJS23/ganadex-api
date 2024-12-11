@@ -64,7 +64,7 @@ class PartoController extends Controller
         $cria->evento()->create();
 
         $estados=Estado::select('id')
-        ->where('estado',['sano','pendiente_numeracion'])
+        ->whereIn('estado',['sano','pendiente_numeracion'])
         ->get()
         ->modelKeys();
         $cria->estados()->sync($estados);
