@@ -135,7 +135,9 @@ class DatosFormulariosTest extends TestCase
                     fn (AssertableJson $json)
                     => $json->whereAllType([
                         'id'=>'integer',
-                        'nombre'=>'string'
+                        'nombre'=>'string',
+                        'intervalo_dosis'=>'integer',
+                        'tipo_animal'=>'array'
                     ])
                 )
         );
