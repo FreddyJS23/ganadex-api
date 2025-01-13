@@ -72,7 +72,7 @@ class DatosParaFormulariosController extends Controller
 
     public function vacunasDisponibles()
     {
-        $vacunasDisponibles = Vacuna::select('id','nombre')
+        $vacunasDisponibles = Vacuna::select('id','nombre','intervalo_dosis','tipo_animal')
             ->get();
 
         return response()->json(['vacunas_disponibles' => $vacunasDisponibles]);
