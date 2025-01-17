@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreGanadoDescarteRequest extends FormRequest
 {
@@ -29,7 +30,10 @@ class StoreGanadoDescarteRequest extends FormRequest
             'peso_destete' => 'numeric|between:1,32767',
             'peso_2year' => 'numeric|between:1,32767',
             'peso_actual' => 'numeric|between:1,32767',
-            'fecha_nacimiento'=>'date_format:Y-m-d'
+            'fecha_nacimiento'=>'date_format:Y-m-d',
+            'estado_id' => Rule::foreach(function ($value, $attrubute) {
+                return Rule::exists('estados', 'id');
+            }),
         ];
     }
 }
