@@ -14,7 +14,8 @@ class Venta extends Model
         //'precio',
         'fecha',
         'ganado_id',
-        'comprador_id'
+        'comprador_id',
+        'finca_id'
     ];
 
     /**
