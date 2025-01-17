@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Comprador;
 use App\Models\Estado;
 use App\Models\Finca;
 use App\Models\Ganado;
@@ -30,7 +31,6 @@ class GanadoTest extends TestCase
         'peso_destete' => 130,
         'peso_2year' => 300,
         'peso_actual' => 60,
-        'estado_id' => [1],
         'vacunas' => [
             [
                 'fecha' => '2015-02-17',
@@ -46,6 +46,8 @@ class GanadoTest extends TestCase
     ];
 
     private int $cantidad_ganado = 10;
+    private $cabeza_ganado_fallecida;
+    private $cabeza_ganado_vendida;
     private $estado;
     private $user;
     private $finca;
@@ -65,6 +67,12 @@ class GanadoTest extends TestCase
             ->create();
 
             $this->estado = Estado::all();
+
+
+            $comprador = Comprador::factory()->for($this->finca)->create()->id;
+            $this->cabeza_ganado_fallecida= array_merge($this->cabeza_ganado,['estado_id'=>[2,3,4],'fecha_fallecimiento'=>'2020-10-02','causa'=>'enferma']);
+            $this->cabeza_ganado_vendida =array_merge($this->cabeza_ganado,['estado_id'=>[5,6,7],'fecha_venta'=>'2020-10-02','precio'=>100,'comprador_id'=>$comprador]);
+            $this->cabeza_ganado=array_merge($this->cabeza_ganado,['estado_id'=>[1]]);
     }
 
     private function generarGanado(): Collection
@@ -230,6 +238,40 @@ class GanadoTest extends TestCase
                         'prox_parto' => 'string|null',
                         'prox_secado' => 'string|null',]))
                             )
+            );
+    }
+
+    public function test_creacion_cabeza_ganado_fallecida(): void
+    {
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->postJson('api/ganado', $this->cabeza_ganado_fallecida);
+
+        $response->assertStatus(201)
+            ->assertJson(
+                fn (AssertableJson $json) =>
+                $json->has(
+                        'ganado',
+                        fn (AssertableJson $json) =>
+                        $json
+                            ->where('estados.0.estado','fallecido')
+                            ->etc()
+                )
+            );
+    }
+
+    public function test_creacion_cabeza_ganado_vendido(): void
+    {
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->postJson('api/ganado', $this->cabeza_ganado_vendida);
+
+        $response->assertStatus(201)
+            ->assertJson(
+                fn (AssertableJson $json) =>
+                $json->has(
+                        'ganado',
+                        fn (AssertableJson $json) =>
+                        $json
+                            ->where('estados.0.estado','vendido')
+                            ->etc()
+                )
             );
     }
 
