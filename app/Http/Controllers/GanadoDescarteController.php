@@ -15,6 +15,7 @@ use App\Models\GanadoTipo;
 use App\Models\GanadoDescarte;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class GanadoDescarteController extends Controller
 {
@@ -43,8 +44,34 @@ class GanadoDescarteController extends Controller
         $ganado->finca_id = session('finca_id');
         $ganado->tipo_id = determinar_edad_res($ganado->fecha_nacimiento);
         $ganado->sexo = "M";
-        $ganado->save();
-        $ganado->peso()->create($request->only($this->peso));
+
+        try {
+            DB::transaction(function () use ($ganado, $request) {
+                $ganado->save();
+                //estado fallecido
+                $request->only('estado_id')['estado_id'][0] == 2 && $ganado->fallecimiento()->create(
+                    [
+                        'fecha' => $request->input('fecha_fallecimiento'),
+                        'causa' => $request->input('causa')
+                    ]
+                );
+
+                //estado vendido
+                $request->only('estado_id')['estado_id'][0] == 5 && $ganado->venta()->create([
+                    'fecha' => $request->input('fecha_venta'),
+                    'precio' => $request->input('precio'),
+                    'comprador_id' => $request->input('comprador_id'),
+                    'finca_id' => session('finca_id')
+                ]);
+
+                $ganado->estados()->sync($request->only('estado_id')['estado_id']);
+                $ganado->peso()->create($request->only($this->peso));
+
+                $ganado->evento()->create();
+            });
+} catch (\Throwable $error) {
+    return response()->json(['error'=>'error al insertar datos'], 501);
+}
 
         $ganadoDescarte = new GanadoDescarte;
         $ganadoDescarte->finca_id = session('finca_id');
