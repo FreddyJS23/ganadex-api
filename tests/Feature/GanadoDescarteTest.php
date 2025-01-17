@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Comprador;
 use App\Models\Finca;
 use App\Models\Ganado;
 use App\Models\GanadoDescarte;
@@ -33,6 +34,8 @@ class GanadoDescarteTest extends TestCase
 
     private $user;
     private $finca;
+    private $descarte_fallecido;
+    private $descarte_vendido;
 
     protected function setUp(): void
     {
@@ -47,6 +50,11 @@ class GanadoDescarteTest extends TestCase
             = Finca::factory()
             ->hasAttached($this->user)
             ->create();
+
+            $comprador = Comprador::factory()->for($this->finca)->create()->id;
+            $this->descarte_fallecido= array_merge($this->ganadoDescarte,['estado_id'=>[2,3,4],'fecha_fallecimiento'=>'2020-10-02','causa'=>'enferma']);
+            $this->descarte_vendido =array_merge($this->ganadoDescarte,['estado_id'=>[5,6,7],'fecha_venta'=>'2020-10-02','precio'=>100,'comprador_id'=>$comprador]);
+            $this->ganadoDescarte=array_merge($this->ganadoDescarte,['estado_id'=>[1]]);
     }
 
     private function generarGanadoDescartes(): Collection
@@ -153,6 +161,43 @@ class GanadoDescarteTest extends TestCase
                 )
             );
     }
+
+    public function test_creacion_descarte_fallecido(): void
+    {
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->postJson('api/ganado_descarte', $this->descarte_fallecido);
+
+        $response->assertStatus(201)
+            ->assertJson(
+                fn (AssertableJson $json) =>
+                $json->has(
+                        'ganado_descarte',
+                        fn (AssertableJson $json) =>
+                        $json
+                            ->where('estados.0.estado','fallecido')
+                            ->etc()
+                )
+            );
+    }
+
+    public function test_creacion_descarte_vendido(): void
+    {
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->postJson('api/ganado_descarte', $this->descarte_vendido);
+
+        $response->assertStatus(201)
+            ->assertJson(
+                fn (AssertableJson $json) =>
+                $json->has(
+                        'ganado_descarte',
+                        fn (AssertableJson $json) =>
+                        $json
+                            ->where('estados.0.estado','vendido')
+                            ->etc()
+                )
+            );
+    }
+
+
+
     public function test_descartar_ganado(): void
     {
         $ganado =Ganado::factory()
