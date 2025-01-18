@@ -6,6 +6,7 @@ use App\Http\Resources\CargosPersonalCollection;
 use App\Http\Resources\NovillaAMontarCollection;
 use App\Http\Resources\VeterinariosDisponiblesCollection;
 use App\Models\Cargo;
+use App\Models\Ganado;
 use App\Models\Leche;
 use App\Models\Personal;
 use App\Models\Peso;
@@ -76,5 +77,34 @@ class DatosParaFormulariosController extends Controller
             ->get();
 
         return response()->json(['vacunas_disponibles' => $vacunasDisponibles]);
+    }
+
+    public function sugerirNumeroDisponibleEnBD()
+    {
+        $numeroSugerido=null;
+        $intervalos=[1,500,501,5000,5001,10000,10001,15000,15001,25000,25001,32767];
+        $iteracciones=0;
+        $maximaInteraciones=100;
+        $punteroInicial=0;
+
+        while($numeroSugerido == null){
+
+            $numeroRandom=rand($intervalos[$punteroInicial],$intervalos[$punteroInicial+1]);
+            $numeroYaRegistrado=Ganado::select('numero')
+            ->where('numero',$numeroRandom)->first();
+
+            if($numeroYaRegistrado == null) {
+                $numeroSugerido=$numeroRandom;
+                break;
+            }
+            $iteracciones++;
+
+            if($iteracciones>=$maximaInteraciones){
+                $iteracciones=0;
+                $punteroInicial++;
+            }
+        }
+        return response()->json(['numero_disponible'=>$numeroSugerido]);
+
     }
 }
