@@ -143,4 +143,17 @@ class DatosFormulariosTest extends TestCase
         );
 
      }
+
+     public function test_obtener_numero_disponible_en_DB()
+     {
+        $this->generarGanado();
+
+        $response=$this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(route('datosParaFormularios.sugerirNumeroDisponibleEnBD'));
+
+        $response->assertStatus(200)->assertJson(
+            fn(AssertableJson $json)=>
+            $json->whereType('numero_disponible', 'integer')
+        );
+
+     }
 }
