@@ -13,6 +13,8 @@ class PajuelaToro extends Model
 
     protected $fillable = [
         'codigo',
+        'descripcion',
+        'fecha',
     ];
 
     /**
