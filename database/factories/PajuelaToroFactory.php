@@ -17,7 +17,9 @@ class PajuelaToroFactory extends Factory
     public function definition(): array
     {
         return [
-            'codigo' => $this->faker->regexify('[A-Z]{5}[0-4]{3}'),
+            'codigo' => fake()->regexify('[A-Z]{5}[0-4]{3}'),
+            'descripcion' => fake()->sentence(),
+            'fecha' => fake()->dateTimeThisYear()->format('Y-m-d'),
         ];
     }
 }
