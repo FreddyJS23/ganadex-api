@@ -17,6 +17,8 @@ class PajuelaToroTest extends TestCase
 
     private array $pajuela_toro = [
         'codigo' => '21DDSQ7',
+        'descripcion' => 'Toro de prueba',
+        'fecha' => '2023-09-12',
     ];
 
     private int $cantidad_pajuelaToro = 10;
@@ -59,11 +61,13 @@ class PajuelaToroTest extends TestCase
             'caso de insertar datos erróneos' => [
                 [
                     'codigo' => 33284,
-                ], ['codigo',]
+                    'descripcion' => 231,
+                    'fecha' => '09-12-2023',
+                ], ['codigo', 'descripcion', 'fecha']
             ],
             'caso de no insertar datos requeridos' => [
                 [],
-                ['codigo',]
+                ['codigo','fecha']
             ],
         ];
     }
@@ -86,6 +90,8 @@ class PajuelaToroTest extends TestCase
                     fn (AssertableJson $json) => $json->whereAllType([
                         'id' => 'integer',
                         'codigo' => 'string',
+                        'descripcion' => 'string',
+                        'fecha' => 'string',
                     ])
                 )
             );
@@ -104,6 +110,8 @@ class PajuelaToroTest extends TestCase
                     fn (AssertableJson $json) => $json->whereAllType([
                         'id' => 'integer',
                         'codigo' => 'string',
+                        'descripcion' => 'string',
+                        'fecha' => 'string',
                     ])
                 )
             );
@@ -125,6 +133,8 @@ class PajuelaToroTest extends TestCase
                     fn (AssertableJson $json) => $json->whereAllType([
                         'id' => 'integer',
                         'codigo' => 'string',
+                        'descripcion' => 'string',
+                        'fecha' => 'string',
                     ])
                 )
             );
@@ -144,6 +154,8 @@ class PajuelaToroTest extends TestCase
                     'pajuela_toro',
                     fn (AssertableJson $json) => $json
                         ->where('codigo', $this->pajuela_toro['codigo'])
+                        ->where('descripcion', $this->pajuela_toro['descripcion'])
+                        ->where('fecha', $this->pajuela_toro['fecha'])
                         ->etc()
                 )
             );
