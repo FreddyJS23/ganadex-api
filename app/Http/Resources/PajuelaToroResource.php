@@ -17,6 +17,8 @@ class PajuelaToroResource extends JsonResource
         return [
             'id' => $this->id,
             'codigo' => $this->codigo,
+            'descripcion' => $this->descripcion,
+            'fecha' => $this->fecha,
         ];
     }
 }

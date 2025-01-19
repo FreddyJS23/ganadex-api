@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdatePajuelaToroRequest extends FormRequest
 {
@@ -21,8 +22,17 @@ class UpdatePajuelaToroRequest extends FormRequest
      */
     public function rules(): array
     {
+         /**
+         * Gets the route parameter.
+         *
+         * @return string
+         */
+        $parametroPath=preg_replace("/[^0-9]/", "", request()->path());
+
         return [
-            'codigo' => 'required|string|max:255',
+            'codigo' => ['required','string','max:255', Rule::unique('pajuela_toros')->ignore(intval($parametroPath))],
+            'descripcion' => 'string|max:255',
+            'fecha' => 'required|date_format:Y-m-d',
         ];
     }
 }
