@@ -22,7 +22,9 @@ class StorePajuelaToroRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'codigo' => 'required|string|max:255',
+            'codigo' => 'required|string|max:255|unique:pajuela_toros,codigo',
+            'descripcion' => 'string|max:255',
+            'fecha' => 'required|date_format:Y-m-d',
         ];
     }
 }
