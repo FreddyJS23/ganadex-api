@@ -162,7 +162,7 @@ class PajuelaToroTest extends TestCase
     }
 
 
-    public function test_eliminar_personal(): void
+    public function test_eliminar_pajuela_toro(): void
     {
         $pajuela_toro = $this->generarPajuelasToros();
         $idRandom = rand(0, $this->cantidad_pajuelaToro - 1);
@@ -177,7 +177,7 @@ class PajuelaToroTest extends TestCase
     /**
      * @dataProvider ErrorinputProvider
      */
-    public function test_error_validacion_registro_personal($pajuela_toro, $errores): void
+    public function test_error_validacion_registro_pajuela_toro($pajuela_toro, $errores): void
     {
         PajuelaToro::factory()->for($this->finca)->create(['codigo' => 28472738]);
 
