@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('pajuela_toros', function (Blueprint $table) {
             $table->id();
-            $table->string('codigo');
+            $table->string('codigo')->unique();
             $table->foreignId('finca_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
