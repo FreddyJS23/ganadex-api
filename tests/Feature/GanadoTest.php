@@ -289,14 +289,25 @@ class GanadoTest extends TestCase
             ->assertJson(
                 fn(AssertableJson $json) =>
                 $json->has(
-                    'vacunaciones.0',
+                    'vacunaciones',
                     fn(AssertableJson $json) =>
-                    $json->whereAllType([
-                        'id' => 'integer',
-                        'vacuna' => 'string',
-                        'fecha' => 'string',
-                        'prox_dosis' => 'string',
-                    ])
+                    $json->has('vacunas.0',fn(AssertableJson $json)=>
+                        $json->whereAllType([
+                            'vacuna' => 'string',
+                            'cantidad' => 'integer',
+                            'ultima_dosis' => 'string',
+                            'prox_dosis' => 'string',
+                        ])
+                        ->where('cantidad',fn(int $cantidad)=>$cantidad <= 3)
+                    )
+                    ->has('historial.0',fn(AssertableJson $json)=>
+                        $json->whereAllType([
+                            'id' => 'integer',
+                            'vacuna' => 'string',
+                            'fecha' => 'string',
+                            'prox_dosis' => 'string',
+                        ])
+                        )
                 )->etc()
             );
     }
