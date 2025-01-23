@@ -21,7 +21,17 @@ class RoleSeeder extends Seeder
         $permissionAdmin = Permission::create(['name' => 'todos']);
 
         $permissionVerTodasFincas = Permission::create(['name' => 'observacion fincas']);
-    
+
+        /*
+        puede crear,ver partos
+        puede crear,ver revisiones
+        puede crear,ver servicios
+        puede ver ganado
+        puede ver toro
+        puede ver descartes
+        puede ver jornadas vacunacion
+        editar su usuario
+         */
         $permissionVeterinario = Permission::create(['name' => 'limitado']);
 
         $roleAdmin->givePermissionTo($permissionAdmin);
