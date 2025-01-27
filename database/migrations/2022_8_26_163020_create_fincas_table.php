@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('fincas', function (Blueprint $table) {
             $table->id();
             $table->string('nombre');
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }

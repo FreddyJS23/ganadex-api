@@ -25,9 +25,14 @@ class AuthLogin extends Controller
         //intentar autenticar
         if (Auth::attempt($request->only(['usuario', 'password']))) {
             $request->session()->regenerate();
-            $finca=$user->fincas->first();
+
+            $fincas=$user->fincas->count();
+
+            //si solo existe una finca, se asigna esa a la sesion
+            if($fincas == 1) session()->put('finca_id', $user->fincas->first()->id);
+            /* En caso que haya mas fincas creadas se debera asignar manualmente en el contralador finca */
+
             $rol = $user->hasRole('admin') ? 'admin' : 'veterinario';
-            session()->put('finca_id', $finca->id);
 
             return response()
                 ->json(
@@ -38,7 +43,6 @@ class AuthLogin extends Controller
                             'usuario' => $user->usuario,
                             'rol' => $rol,
                             'token' => $user->createToken('API_TOKEN')->plainTextToken,
-                            'finca'=>$finca,
                         ]
                     ],
                     200

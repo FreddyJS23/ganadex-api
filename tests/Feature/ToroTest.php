@@ -48,7 +48,7 @@ class ToroTest extends TestCase
 
             $this->finca
             = Finca::factory()
-            ->hasAttached($this->user)
+            ->for($this->user)
             ->create();
 
             $comprador = Comprador::factory()->for($this->finca)->create()->id;
@@ -318,7 +318,7 @@ class ToroTest extends TestCase
     public function test_autorizacion_maniupular__toro_otro_finca(): void
     {
         $otroFinca = Finca::factory()
-        ->hasAttached($this->user)
+        ->for($this->user)
         ->create(['nombre' => 'otro_finca']);
 
         $toroOtroFinca = Toro::factory()

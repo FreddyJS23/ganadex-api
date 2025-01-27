@@ -16,6 +16,16 @@ class FincaPolicy
         return $user->hasRole('admin');
     }
 
+    public function crear_sesion_finca(User $user, Finca $finca): bool
+    {
+        return $user->hasRole('admin') && $user->id == $finca->user_id ;
+    }
+
+    public function verificar_sesion_finca(User $user): bool
+    {
+        return $user->hasRole('admin');
+    }
+
     /**
      * Determine whether the user can view the model.
      */
@@ -37,7 +47,7 @@ class FincaPolicy
      */
     public function update(User $user, Finca $finca): bool
     {
-        return session('finca_id') === $finca->id && $user->hasRole('admin');
+        return session('finca_id') === $finca->id && $user->id === $finca->user_id && $user->hasRole('admin');
     }
 
     /**

@@ -22,6 +22,7 @@ use App\Models\Revision;
 use App\Models\Servicio;
 use App\Models\Toro;
 use App\Models\User;
+use App\Models\UsuarioVeterinario;
 use App\Models\Venta;
 use App\Models\VentaLeche;
 use Illuminate\Support\Facades\Hash;
@@ -36,18 +37,23 @@ class DemostracionSeeder extends Seeder
         $elementos = 30;
         $cantidadGanados = 10;
 
-        $finca
-        = Finca::factory()
+        $user =User::factory()
         ->create();
 
-        $user =User::factory()
-        ->hasAttached($finca)
-        ->create();
         $user->assignRole('admin');
 
-        $userVeterinario=User::factory()
-        ->hasAttached($finca)
-        ->create(['usuario' => 'veterinario', 'password' => Hash::make('veterinario')]);
+
+        $finca
+        = Finca::factory()
+        ->for($user)
+        ->create();
+
+
+        $crearUsuarioVeterinario=UsuarioVeterinario::factory()
+        ->for(Personal::factory()->for($finca)->create(['cargo_id' => 2]), 'veterinario')
+        ->create(['admin_id' => $user->id]);
+
+        $userVeterinario=User::find($crearUsuarioVeterinario->user_id)->first();
 
         $userVeterinario->assignRole('veterinario');
 

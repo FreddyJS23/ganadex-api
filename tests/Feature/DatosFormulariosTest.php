@@ -35,7 +35,7 @@ class DatosFormulariosTest extends TestCase
 
             $this->finca
             = Finca::factory()
-            ->hasAttached($this->user)
+            ->for($this->user)
             ->create();
 
         $this->estado = Estado::all();

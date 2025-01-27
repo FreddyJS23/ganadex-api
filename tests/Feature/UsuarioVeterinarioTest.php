@@ -33,7 +33,7 @@ class UsuarioVeterinarioTest extends TestCase
 
         $this->finca
             = Finca::factory()
-            ->hasAttached($this->user)
+            ->for($this->user)
             ->create();
 
         $this->personal
@@ -160,7 +160,7 @@ class UsuarioVeterinarioTest extends TestCase
     public function test_sin_autorizacion_eliminar_usuario_otro_administrador(): void
     {
         $otroFinca = Finca::factory()
-            ->hasAttached($this->user)
+            ->for($this->user)
             ->create(['nombre' => 'otro_finca']);
 
         $otroAdmin = User::factory()->create(['usuario' => 'test']);

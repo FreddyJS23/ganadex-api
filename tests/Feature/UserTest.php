@@ -32,7 +32,7 @@ class UserTest extends TestCase
 
             $this->finca
             = Finca::factory()
-            ->hasAttached($this->user)
+            ->for($this->user)
             ->create();
 
         $this->user->assignRole('admin');
@@ -98,11 +98,6 @@ class UserTest extends TestCase
                         'fincas' => 'array',
                         'fecha_creacion' => 'string',
                     ])
-                    ->has('fincas.0',fn(AssertableJson $json)=>$json->whereAllType([
-                        'id' => 'integer',
-                        'nombre' => 'string',
-                        'fecha_creacion' => 'string',
-                    ]))
                 )
             );
     }

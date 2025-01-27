@@ -15,15 +15,14 @@ class Finca extends Model
         'nombre'
     ];
 
-    /**
-     * Get the user that owns the Finca
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-     */
-    public function users(): BelongsToMany
-    {
-        return $this->belongsToMany(User::class);
-    }
+   /**
+    * Get the user that owns the Finca
+    *
+    * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+    */
+   public function user(): BelongsTo
+   {
+       return $this->belongsTo(User::class);
+   }
 
-    protected $hidden = ['ganado_id', 'created_at', 'updated_at','pivot'];
 }

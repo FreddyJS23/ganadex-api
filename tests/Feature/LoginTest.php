@@ -21,20 +21,15 @@ class LoginTest extends TestCase
     {
         parent::setUp();
 
-        $this->finca
-        = Finca::factory()
-        ->create();
 
         $this->userAdmin
             = User::factory()
-            ->hasAttached($this->finca)
             ->create(['usuario' => 'admin', 'password' => Hash::make('admin')]);
 
             $this->userAdmin->assignRole('admin');
 
         $this->userVeterinario
             = User::factory()
-            ->hasAttached($this->finca)
             ->create(['usuario' => 'veterinario', 'password' => Hash::make('veterinario')]);
 
             $this->userVeterinario->assignRole('veterinario');
@@ -56,7 +51,6 @@ class LoginTest extends TestCase
             'login.id' => 'integer',
             'login.usuario' => 'string',
             'login.token' => 'string',
-            'login.finca'=>'integer'
         ]));
     }
 
@@ -72,7 +66,6 @@ class LoginTest extends TestCase
             'login.id' => 'integer',
             'login.usuario' => 'string',
             'login.token' => 'string',
-            'login.finca'=>'integer'
         ]));
     }
 }

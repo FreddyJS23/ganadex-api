@@ -93,7 +93,7 @@ class EventosGanadoTest extends TestCase
 
             $this->finca
             = Finca::factory()
-            ->hasAttached($this->user)
+            ->for($this->user)
             ->create();
 
         $this->user->assignRole('admin');
@@ -367,8 +367,8 @@ class EventosGanadoTest extends TestCase
             ->hasEvento(1)
             ->has(
                 Leche::factory()->for($this->finca)->state(
-                    function (array $attributes, Ganado $ganado) {
-                        return ['ganado_id' => $ganado->id, 'fecha' => now()->subMonths(2)->format('Y-m-d')];
+                    function (array $attributes, Ganado $ganado) use ($fecha) {
+                        return ['ganado_id' => $ganado->id, 'fecha' =>$fecha->format('Y-m-d')];
                     }
                 ),
                 'pesajes_leche'
@@ -392,8 +392,8 @@ class EventosGanadoTest extends TestCase
             ->for($this->finca)
             ->create();
 
-        //evento login
-        Auth::login($this->user);
+        //evento iniciar sesion finca
+        $this->actingAs($this->user)->getJson(route('crear_sesion_finca',['finca'=>$this->finca->id]));
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(route('ganado.index'));
 
@@ -446,8 +446,8 @@ class EventosGanadoTest extends TestCase
             ->create();
 
 
-        //evento login
-        Auth::login($this->user);
+       //evento iniciar sesion finca
+        $this->actingAs($this->user)->getJson(route('crear_sesion_finca',['finca'=>$this->finca->id])); 
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(route('notificaciones.index'));
 

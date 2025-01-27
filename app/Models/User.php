@@ -59,15 +59,15 @@ class User extends Authenticatable
      return $this->hasOne(Configuracion::class);
  }
 
- /**
-  * Get all of the fincas for the User
-  *
-  * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-  */
- public function fincas(): BelongsToMany
- {
-     return $this->belongsToMany(Finca::class);
- }
+/**
+ * Get all of the fincas for the User
+ *
+ * @return \Illuminate\Database\Eloquent\Relations\HasMany
+ */
+public function fincas(): HasMany
+{
+    return $this->hasMany(Finca::class,);
+}
 
  /**
   * Get all of the usuariosVeterinario for the User

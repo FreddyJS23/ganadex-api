@@ -14,6 +14,7 @@ use App\Http\Controllers\DashboardVentaGanadoController;
 use App\Http\Controllers\DashboardVentaLecheController;
 use App\Http\Controllers\DatosParaFormulariosController;
 use App\Http\Controllers\FallecimientoController;
+use App\Http\Controllers\FincaController;
 use App\Http\Controllers\GanadoController;
 use App\Http\Controllers\InsumoController;
 use App\Http\Controllers\LecheController;
@@ -80,6 +81,9 @@ Route::middleware('auth:sanctum')->group(function(){
    Route::apiResource('/jornada_vacunacion',JornadaVacunacionController::class);
    Route::apiResource('/notificaciones',NotificacionController::class)->only(['index','destroy'])->parameters(['notificaciones' => 'notificacion']);;
    Route::get('/borrar_notificaciones',[NotificacionController::class,'destroyAll'])->name('notificaciones.destroyAll');
+   Route::apiResource('/finca',FincaController::class)->only(['index','store','update']);
+   Route::get('/crear_sesion_finca/{finca}',[FincaController::class,'crear_sesion_finca'])->name('crear_sesion_finca');
+   Route::get('/verificar_sesion_finca',[FincaController::class,'verificar_sesion_finca'])->name('verificar_sesion_finca');
 
     Route::get('/crias_pendiente_capar',[CaparCriaController::class,'index'])->name('capar.index');
     Route::get('/capar_cria/{ganado}',[CaparCriaController::class,'capar'])->name('capar.capar');
