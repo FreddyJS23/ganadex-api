@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Personal extends Model
 {
@@ -67,6 +68,16 @@ class Personal extends Model
     public function partosAtendidos(): HasMany
     {
         return $this->hasMany(Revision::class);
+    }
+
+    /**
+     * Get the usuarioVeterinario associated with the Personal
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function usuarioVeterinario(): HasOne
+    {
+        return $this->hasOne(UsuarioVeterinario::class);
     }
 
     protected $hidden = ['created_at','updated_at','user_id','cargo_id'];
