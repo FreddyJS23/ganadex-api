@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginRequest;
+use App\Models\Finca;
 use App\Models\User;
+use App\Models\UsuarioVeterinario;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -25,14 +27,24 @@ class AuthLogin extends Controller
         //intentar autenticar
         if (Auth::attempt($request->only(['usuario', 'password']))) {
             $request->session()->regenerate();
+            $rol = $user->hasRole('admin') ? 'admin' : 'veterinario';
+            //notificar en el client si el login incluye inicio de sesion finca
+            $sesion_finca=false;
 
-            $fincas=$user->fincas->count();
-
-            //si solo existe una finca, se asigna esa a la sesion
-            if($fincas == 1) session()->put('finca_id', $user->fincas->first()->id);
+            if($rol == 'admin'){
+                if($user->fincas->count() == 1){
+                    $finca=$user->fincas->first()->id;
+                    session()->put('finca_id',$finca );
+                    $sesion_finca=true;
+                }
+            } else if($rol == 'veterinario'){
+                $usuario_veterinario=UsuarioVeterinario::where('user_id',$user->id)->first();
+                $finca=Finca::find($usuario_veterinario->veterinario->finca_id)->first()->id;
+                session()->put('finca_id',$finca );
+                $sesion_finca=true;
+            }
             /* En caso que haya mas fincas creadas se debera asignar manualmente en el contralador finca */
 
-            $rol = $user->hasRole('admin') ? 'admin' : 'veterinario';
 
             return response()
                 ->json(
@@ -43,6 +55,7 @@ class AuthLogin extends Controller
                             'usuario' => $user->usuario,
                             'rol' => $rol,
                             'token' => $user->createToken('API_TOKEN')->plainTextToken,
+                            'sesion_finca'=>$sesion_finca
                         ]
                     ],
                     200
