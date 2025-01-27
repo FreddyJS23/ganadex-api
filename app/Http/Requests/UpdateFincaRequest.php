@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateFincaRequest extends FormRequest
 {
@@ -11,7 +12,7 @@ class UpdateFincaRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,8 +22,10 @@ class UpdateFincaRequest extends FormRequest
      */
     public function rules(): array
     {
+        $parametroPath = preg_replace("/[^0-9]/", "", request()->path());
+
         return [
-            //
+            'nombre'=>['required','min:3','max:255',Rule::unique('fincas')->ignore($parametroPath)],
         ];
     }
 }
