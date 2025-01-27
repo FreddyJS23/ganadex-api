@@ -2,6 +2,7 @@
 
 namespace App\Listeners;
 
+use App\Events\CrearSesionFinca;
 use App\Models\Evento;
 use App\Models\Ganado;
 use App\Models\Notificacion;
@@ -66,9 +67,9 @@ class GenerarNotificaciones
      * Handle the event.
      *
      */
-    public function handle(Login $event): void
+    public function handle(CrearSesionFinca $event): void
     {
-        $fincaId = $event->user->fincas->first()->id;
+        $fincaId = $event->finca->id;
         $fechaActual = now()->format('Y-m-d');
         if (Ganado::where('finca_id', $fincaId)->count() > 0) {
 
@@ -82,7 +83,7 @@ class GenerarNotificaciones
 
             //iterar columnas
             foreach ($columnasTablaEvento as $columna => $key) {
-                $this->VerificarEventoCercano($columna, $event->user->id,$fincaId, $fechaActual);
+                $this->VerificarEventoCercano($columna, $event->finca->user_id,$fincaId, $fechaActual);
             }
         }
     }

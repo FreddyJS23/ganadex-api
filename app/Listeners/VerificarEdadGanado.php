@@ -2,6 +2,7 @@
 
 namespace App\Listeners;
 
+use App\Events\CrearSesionFinca;
 use App\Models\Finca;
 use App\Models\Ganado;
 use App\Models\User;
@@ -24,7 +25,7 @@ class VerificarEdadGanado
     /**
      * Handle the event.
      */
-    public function handle(Login $event): void
+    public function handle(CrearSesionFinca $event): void
     {
         $incializarFecha = new DateTime();
         $fechaActual = $incializarFecha->format('Y-m-d');
@@ -32,7 +33,7 @@ class VerificarEdadGanado
         $sentenciaSqlDiferenciaDias = "DATEDIFF('$fechaActual',fecha_nacimiento) as diferencia";
 
 
-        $fincaId = $event->user->fincas;
+        $fincaId = $event->finca->id;
 
         if (Ganado::where('finca_id', $fincaId)->count() > 0) {
             $becerros = Ganado::where('finca_id', $fincaId)

@@ -2,6 +2,7 @@
 
 namespace App\Listeners;
 
+use App\Events\CrearSesionFinca;
 use App\Models\Estado;
 use App\Models\Ganado;
 use Illuminate\Auth\Events\Login;
@@ -23,12 +24,11 @@ class VerificarPesajeMensualLeche
     /**
      * Handle the event.
      */
-    public function handle(Login $event): void
+    public function handle(CrearSesionFinca $event): void
     {
         $estado = Estado::firstWhere('estado', 'pendiente_pesaje_leche');
 
-        //no se obtiene la finca de la sesion ya que se esta logeando manualmente
-        $fincaId = $event->user->fincas->first()->id;
+        $fincaId = $event->finca->id;
 
         if (Ganado::where('finca_id', $fincaId)->count() > 0) {
 
@@ -42,7 +42,6 @@ class VerificarPesajeMensualLeche
                     }
                 )
                 ->get();
-
 
             foreach ($vacasSinPesarEsteMes as $vacaSinPesarEsteMes) {
                 $vacaSinPesarEsteMes->estados()->attach($estado->id);
