@@ -14,10 +14,22 @@ class UserResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return [
-            'id'=>$this->id,
-            'usuario'=>$this->usuario,
-            
+        $usuario = [
+            'id' => $this->id,
+            'usuario' => $this->usuario,
+            'email' => $this->email,
+            'rol' => $this->getRoleNames()[0],
+            'fecha_creacion' => $this->created_at->format('d-m-Y'),
         ];
+
+        $usuarioAdmin = array_merge($usuario, [
+            'fincas' => $this->fincas,
+            ]);
+
+        if ($this->hasRole('admin')) {
+            return $usuarioAdmin;
+        } else {
+            return $usuario;
+        }
     }
 }
