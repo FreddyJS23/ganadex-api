@@ -17,7 +17,7 @@ class FincaFactory extends Factory
     public function definition(): array
     {
         return [
-            'nombre' => 'finca medellin',
+            'nombre' => fake()->name(),
         ];
     }
 }
