@@ -31,6 +31,7 @@ class UserController extends Controller
         $user= new User;
         $user->password=hash::make($request->password);
         $user->fill($request->except('password'));
+        $user->assignRole('admin');
         $user->save();
 
         return response()->json(['message'=>'usuario creado'],201);
