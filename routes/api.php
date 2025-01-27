@@ -33,6 +33,7 @@ use App\Http\Controllers\TodosRevisiones;
 use App\Http\Controllers\TodosServicios;
 use App\Http\Controllers\ToroController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\UsuarioVeterinarioController;
 use App\Http\Controllers\VacunaController;
 use App\Http\Controllers\VentaController;
 use App\Http\Controllers\VentaLecheController;
@@ -56,6 +57,7 @@ Route::middleware('auth:sanctum')->group(function(){
 
     Route::get('/logout',Logout::class);
 
+    Route::apiResource('usuarios_veterinarios',UsuarioVeterinarioController::class)->only(['index','store','update','destroy']);
     Route::apiResource('/comprador',CompradorController::class);
     Route::apiResource('/ventas',VentaController::class);
     Route::apiResource('/toro',ToroController::class);
