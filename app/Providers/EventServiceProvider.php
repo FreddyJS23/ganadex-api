@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Events\CrearSesionFinca;
 use App\Events\NaceMacho;
 use App\Events\PartoHecho;
 use App\Events\RevisionPrenada;
@@ -49,7 +50,8 @@ class EventServiceProvider extends ServiceProvider
         RevisionDescarte::class => [DescartarGanado::class],
         PartoHecho::class => [RevisionPosParto::class,EstadoPosParto::class,CambiaAVaca::class],
         NaceMacho::class => [CaparBecerro::class,],
-        Login::class=>[ VerificarEdadGanado::class,VerificarPesajeMensualLeche::class,GenerarNotificaciones::class],
+        //Login::class=>[],
+        CrearSesionFinca::class=>[VerificarEdadGanado::class,VerificarPesajeMensualLeche::class,GenerarNotificaciones::class],
         PesajeLecheHecho::class=>[EstadoPosPesajeMensualLeche::class],
         VentaGanado::class=>[EstadoPosVenta::class],
         FallecimientoGanado::class=>[EstadoPosFallecimiento::class],
