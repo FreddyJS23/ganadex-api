@@ -3,7 +3,10 @@
 namespace Tests\Feature;
 
 use App\Models\Finca;
+use App\Models\Personal;
 use App\Models\User;
+use App\Models\UsuarioVeterinario;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Testing\Fluent\AssertableJson;
@@ -28,18 +31,36 @@ class LoginTest extends TestCase
 
             $this->userAdmin->assignRole('admin');
 
+            $this->finca
+            = Finca::factory()
+            ->for($this->userAdmin)
+            ->create();
+
         $this->userVeterinario
             = User::factory()
             ->create(['usuario' => 'veterinario', 'password' => Hash::make('veterinario')]);
+
+            UsuarioVeterinario::factory()
+            ->for(Personal::factory()->for($this->finca)->create(['cargo_id' => 2]), 'veterinario')
+            ->create(['admin_id' => $this->userAdmin->id,
+            'user_id'=>$this->userVeterinario->id]);
 
             $this->userVeterinario->assignRole('veterinario');
 
     }
 
+    private function generarFincas(): Collection
+    {
+        return Finca::factory()
+            ->count(10)
+            ->for($this->userAdmin)
+            ->create();
+    }
+
     /**
      * A basic feature test example.
      */
-    public function test_logear_usuario_admin(): void
+     public function test_logear_usuario_admin_tiene_una_finca(): void
     {
         $response = $this->withHeader('origin', config('app.url'))->postJson('api/login', [
             'usuario' => 'admin',
@@ -51,10 +72,52 @@ class LoginTest extends TestCase
             'login.id' => 'integer',
             'login.usuario' => 'string',
             'login.token' => 'string',
-        ]));
+            'login.sesion_finca' => 'boolean',
+        ])->where('login.sesion_finca', true)
+
+        )->assertSessionHas('finca_id', $this->finca->id);
     }
 
-    public function test_logear_usuario_veterinario(): void
+
+    public function test_logear_usuario_admin_tiene_varias_fincas(): void
+    {
+      $this->generarFincas();
+
+        $response = $this->withHeader('origin', config('app.url'))->postJson('api/login', [
+            'usuario' => 'admin',
+            'password' => 'admin',
+        ]);
+
+        $response->assertStatus(200)->assertJson(fn (AssertableJson $json) =>
+        $json->where('login.rol', 'admin')->whereAllType([
+            'login.id' => 'integer',
+            'login.usuario' => 'string',
+            'login.token' => 'string',
+        ])
+        ->where('login.sesion_finca', false)
+    )->assertSessionMissing('finca_id', null);
+    }
+
+
+    public function test_logear_usuario_veterinario_con_admin_tiene_varias_fincas(): void
+    {
+        $this->generarFincas();
+        $response = $this->withHeader('origin', config('app.url'))->postJson('api/login', [
+            'usuario' => 'veterinario',
+            'password' => 'veterinario',
+        ]);
+
+        $response->assertStatus(200)->assertJson(fn (AssertableJson $json) =>
+        $json->where('login.rol', 'veterinario')->whereAllType([
+            'login.id' => 'integer',
+            'login.usuario' => 'string',
+            'login.token' => 'string',
+        ])
+            ->where('login.sesion_finca', true)
+    )->assertSessionHas('finca_id', $this->finca->id);
+    }
+
+    public function test_logear_usuario_veterinario_con_admin_tiene_una_finca(): void
     {
         $response = $this->withHeader('origin', config('app.url'))->postJson('api/login', [
             'usuario' => 'veterinario',
@@ -66,6 +129,8 @@ class LoginTest extends TestCase
             'login.id' => 'integer',
             'login.usuario' => 'string',
             'login.token' => 'string',
-        ]));
+        ])
+            ->where('login.sesion_finca', true)
+    )->assertSessionHas('finca_id', $this->finca->id);
     }
 }
