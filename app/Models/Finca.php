@@ -24,4 +24,6 @@ class Finca extends Model
     {
         return $this->belongsToMany(User::class);
     }
+
+    protected $hidden = ['ganado_id', 'created_at', 'updated_at','pivot'];
 }
