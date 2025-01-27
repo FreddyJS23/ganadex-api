@@ -361,6 +361,15 @@ class EventosGanadoTest extends TestCase
     public function test_verificacion_vaca_pendiente_pesaje_leche_este_mes(): void
     {
         $estado = Estado::firstWhere('estado', 'sano');
+        $numeroMes=now()->month;
+        $fecha=now();
+
+        if($numeroMes==1){
+            $fecha=now()->addMonths(2);
+        }
+        else if($numeroMes==12){
+            $fecha=now()->subMonths(2);
+        }
 
         $ganadoPendientePesajeLeche = Ganado::factory()
             ->hasPeso(1)
