@@ -68,4 +68,14 @@ class User extends Authenticatable
  {
      return $this->belongsToMany(Finca::class);
  }
+
+ /**
+  * Get all of the usuariosVeterinario for the User
+  *
+  * @return \Illuminate\Database\Eloquent\Relations\HasMany
+  */
+ public function usuariosVeterinario(): HasMany
+ {
+     return $this->hasMany(UsuarioVeterinario::class,'admin_id')->with('veterinario');
+ }
 }

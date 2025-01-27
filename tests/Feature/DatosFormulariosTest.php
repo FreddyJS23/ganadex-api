@@ -7,7 +7,9 @@ use App\Models\Estado;
 use App\Models\Finca;
 use App\Models\Ganado;
 use App\Models\Leche;
+use App\Models\Personal;
 use App\Models\User;
+use App\Models\UsuarioVeterinario;
 use App\Models\Vacuna;
 use App\Models\Venta;
 use Illuminate\Database\Eloquent\Collection;
@@ -155,5 +157,34 @@ class DatosFormulariosTest extends TestCase
             $json->whereType('numero_disponible', 'integer')
         );
 
+     }
+
+     public function test_obtener_veterinarios_sin_usuario(): void{
+
+        UsuarioVeterinario::factory()
+        ->count(10)
+        ->for(Personal::factory()->for($this->finca)->create(['cargo_id' => 2]), 'veterinario')
+        ->create(['admin_id' => $this->user->id]);
+
+        Personal::factory()
+            ->count(10)
+            ->for($this->finca)
+            ->create(['cargo_id' => 2]);
+
+        $response=$this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(route('datosParaFormularios.veterinariosSinUsuario'));
+
+        $response->assertStatus(200)->assertJson(
+            fn(AssertableJson $json)=>
+            $json->whereType('veterinarios_sin_usuario', 'array')
+                ->has(
+                    'veterinarios_sin_usuario',
+                    10,
+                    fn (AssertableJson $json)
+                    => $json->whereAllType([
+                        'id'=>'integer',
+                        'nombre'=>'string',
+                    ])
+                )
+        );
      }
 }

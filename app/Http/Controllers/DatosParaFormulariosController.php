@@ -105,6 +105,16 @@ class DatosParaFormulariosController extends Controller
             }
         }
         return response()->json(['numero_disponible'=>$numeroSugerido]);
+    }
 
+    public function veterinariosSinUsuario()
+    {
+        $veterinariosSinUsuario = Personal::where('cargo_id',2)
+        ->select('id','nombre')
+        ->where('finca_id',session('finca_id'))
+        ->whereDoesntHave('usuarioVeterinario')
+        ->get();
+
+        return response()->json(['veterinarios_sin_usuario'=>$veterinariosSinUsuario]);
     }
 }
