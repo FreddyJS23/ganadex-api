@@ -25,9 +25,9 @@ class AuthLogin extends Controller
         //intentar autenticar
         if (Auth::attempt($request->only(['usuario', 'password']))) {
             $request->session()->regenerate();
-            $finca=$user->fincas->first()->id;
+            $finca=$user->fincas->first();
             $rol = $user->hasRole('admin') ? 'admin' : 'veterinario';
-            session()->put('finca_id', $finca);
+            session()->put('finca_id', $finca->id);
 
             return response()
                 ->json(
@@ -38,7 +38,7 @@ class AuthLogin extends Controller
                             'usuario' => $user->usuario,
                             'rol' => $rol,
                             'token' => $user->createToken('API_TOKEN')->plainTextToken,
-                            'finca'=>session('finca_id')
+                            'finca'=>$finca,
                         ]
                     ],
                     200
