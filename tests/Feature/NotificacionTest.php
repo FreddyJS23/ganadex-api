@@ -29,7 +29,7 @@ class NotificacionTest extends TestCase
 
             $this->finca
             = Finca::factory()
-            ->hasAttached($this->user)
+            ->for($this->user)
             ->create();
     }
     private function generarNotificaciones(): Collection

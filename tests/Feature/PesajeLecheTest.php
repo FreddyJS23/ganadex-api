@@ -45,7 +45,7 @@ class PesajeLecheTest extends TestCase
 
             $this->finca
             = Finca::factory()
-            ->hasAttached($this->user)
+            ->for($this->user)
             ->create();
 
         $this->ganado

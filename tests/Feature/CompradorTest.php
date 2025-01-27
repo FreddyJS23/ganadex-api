@@ -34,7 +34,7 @@ class CompradorTest extends TestCase
 
             $this->finca
             = Finca::factory()
-            ->hasAttached($this->user)
+            ->for($this->user)
             ->create();
     }
 
@@ -199,7 +199,7 @@ class CompradorTest extends TestCase
         $this->cambiarRol($this->user);
 
         $otroFinca = Finca::factory()
-        ->hasAttached($this->user)
+        ->for($this->user)
         ->create(['nombre' => 'otro_finca']);
 
         $compradorOtroUsuario = Comprador::factory()->for($otroFinca)->create();

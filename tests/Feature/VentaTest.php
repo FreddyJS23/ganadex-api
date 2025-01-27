@@ -45,7 +45,7 @@ class VentaTest extends TestCase
 
             $this->finca
             = Finca::factory()
-            ->hasAttached($this->user)
+            ->for($this->user)
             ->create();
     }
 
@@ -247,7 +247,7 @@ class VentaTest extends TestCase
         $this->venta = $this->venta + ['ganado_id' => $ganado->id, 'comprador_id' => $comprador->id];
 
         $otroFinca = Finca::factory()
-        ->hasAttached($this->user)
+        ->for($this->user)
         ->create(['nombre' => 'otro_finca']);
 
         $ventaOtroFinca =  Venta::factory()
