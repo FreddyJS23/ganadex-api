@@ -82,6 +82,7 @@ Route::middleware('auth:sanctum')->group(function(){
    Route::apiResource('/notificaciones',NotificacionController::class)->only(['index','destroy'])->parameters(['notificaciones' => 'notificacion']);;
    Route::get('/borrar_notificaciones',[NotificacionController::class,'destroyAll'])->name('notificaciones.destroyAll');
    Route::apiResource('/finca',FincaController::class)->only(['index','store','update']);
+   Route::get('/crear_sesion_finca/{finca}',[FincaController::class,'crear_sesion_finca'])->name('crear_sesion_finca');
 
     Route::get('/crias_pendiente_capar',[CaparCriaController::class,'index'])->name('capar.index');
     Route::get('/capar_cria/{ganado}',[CaparCriaController::class,'capar'])->name('capar.capar');
