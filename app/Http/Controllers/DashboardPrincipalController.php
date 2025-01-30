@@ -108,7 +108,7 @@ class DashboardPrincipalController extends Controller
     public function cantidadVacasParaServir()
     {
         $novillasAmontar = Peso::whereHas('ganado', function (Builder $query) {
-            $query->where('finca_id', session('finca_id'));
+            $query->where('finca_id', session('finca_id'))->where('sexo','H');
         })->where('peso_actual', '>=', 330)->count();
 
         return response()->json(['cantidad_vacas_para_servir' => $novillasAmontar], 200);
