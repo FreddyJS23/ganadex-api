@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\CrearSesionFinca;
 use App\Http\Requests\LoginRequest;
 use App\Models\Configuracion;
 use App\Models\Finca;
@@ -41,20 +42,22 @@ class AuthLogin extends Controller
                     'dias_diferencia_vacuna'=>$configuracion->dias_diferencia_vacuna,
                 ]);
                 if($user->fincas->count() == 1){
-                    $finca=$user->fincas->first()->id;
-                    session()->put('finca_id',$finca);
+                    $finca=$user->fincas->first();
+                    session()->put('finca_id',$finca->id);
+                    event(new CrearSesionFinca($finca));
                     $sesion_finca=true;
                 }
             } else if($rol == 'veterinario'){
                 $usuario_veterinario=UsuarioVeterinario::where('user_id',$user->id)->first();
                 $configuracion=Configuracion::firstWhere('user_id',$usuario_veterinario->admin_id);
-                $finca=Finca::find($usuario_veterinario->veterinario->finca_id)->first()->id;
+                $finca=Finca::find($usuario_veterinario->veterinario->finca_id)->first();
                 session()->put([
-                    'finca_id'=>$finca,
+                    'finca_id'=>$finca->id,
                     'peso_servicio'=>$configuracion->peso_servicio,
                     'dias_evento_notificacion'=>$configuracion->dias_evento_notificacion,
                     'dias_diferencia_vacuna'=>$configuracion->dias_diferencia_vacuna,
                 ]);
+                event(new CrearSesionFinca($finca));
                 $sesion_finca=true;
             }
             /* En caso que haya mas fincas creadas se debera asignar manualmente en el contralador finca */
