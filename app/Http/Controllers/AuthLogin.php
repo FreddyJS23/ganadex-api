@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginRequest;
+use App\Models\Configuracion;
 use App\Models\Finca;
 use App\Models\User;
 use App\Models\UsuarioVeterinario;
@@ -30,17 +31,30 @@ class AuthLogin extends Controller
             $rol = $user->hasRole('admin') ? 'admin' : 'veterinario';
             //notificar en el client si el login incluye inicio de sesion finca
             $sesion_finca=false;
+            $configuracion=null;
 
             if($rol == 'admin'){
+                $configuracion=Configuracion::firstWhere('user_id',$user->id);
+                session()->put([
+                    'peso_servicio'=>$configuracion->peso_servicio,
+                    'dias_evento_notificacion'=>$configuracion->dias_evento_notificacion,
+                    'dias_diferencia_vacuna'=>$configuracion->dias_diferencia_vacuna,
+                ]);
                 if($user->fincas->count() == 1){
                     $finca=$user->fincas->first()->id;
-                    session()->put('finca_id',$finca );
+                    session()->put('finca_id',$finca);
                     $sesion_finca=true;
                 }
             } else if($rol == 'veterinario'){
                 $usuario_veterinario=UsuarioVeterinario::where('user_id',$user->id)->first();
+                $configuracion=Configuracion::firstWhere('user_id',$usuario_veterinario->admin_id);
                 $finca=Finca::find($usuario_veterinario->veterinario->finca_id)->first()->id;
-                session()->put('finca_id',$finca );
+                session()->put([
+                    'finca_id'=>$finca,
+                    'peso_servicio'=>$configuracion->peso_servicio,
+                    'dias_evento_notificacion'=>$configuracion->dias_evento_notificacion,
+                    'dias_diferencia_vacuna'=>$configuracion->dias_diferencia_vacuna,
+                ]);
                 $sesion_finca=true;
             }
             /* En caso que haya mas fincas creadas se debera asignar manualmente en el contralador finca */
