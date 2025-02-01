@@ -28,7 +28,7 @@ class UserTest extends TestCase
         parent::setUp();
 
         $this->user
-            = User::factory()->create();
+            = User::factory()->hasConfiguracion()->create();
 
             $this->finca
             = Finca::factory()
@@ -97,6 +97,7 @@ class UserTest extends TestCase
                         'rol' => 'string',
                         'fincas' => 'array',
                         'fecha_creacion' => 'string',
+                        'configuracion'=>'array',
                     ])
                 )
             );

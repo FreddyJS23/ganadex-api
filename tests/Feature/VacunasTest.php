@@ -29,7 +29,7 @@ class VacunasTest extends TestCase
         parent::setUp();
 
         $this->user
-            = User::factory()->create();
+            = User::factory()->hasConfiguracion()->create();
     }
 
     private function generarVacunas(): Collection

@@ -29,7 +29,7 @@ class FincaTest extends TestCase
         parent::setUp();
 
         $this->user
-            = User::factory()->create();
+            = User::factory()->hasConfiguracion()->create();
 
             $this->user->assignRole('admin');
 

@@ -30,7 +30,7 @@ class CaparCriaTest extends TestCase
         parent::setUp();
 
         $this->user
-            = User::factory()->create();
+            = User::factory()->hasConfiguracion()->create();
 
             $this->finca
             = Finca::factory()
@@ -58,7 +58,7 @@ class CaparCriaTest extends TestCase
     {
         $this->generarGanado();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(route('capar.index'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->getJson(route('capar.index'));
         $response->assertStatus(200)
             ->assertJson(fn (AssertableJson $json) => $json->has('crias_pendiente_capar', $this->cantidad_ganado));
     }
@@ -70,9 +70,9 @@ class CaparCriaTest extends TestCase
         $idCria = $criasGanado[$idRandom]->id;
 
         //capar
-        $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(route('capar.capar', ['ganado' => $idCria]));
+        $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->getJson(route('capar.capar', ['ganado' => $idCria]));
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(sprintf('api/ganado/%s', $idCria));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf('api/ganado/%s', $idCria));
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) => $json

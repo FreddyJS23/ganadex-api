@@ -27,6 +27,7 @@ class LoginTest extends TestCase
 
         $this->userAdmin
             = User::factory()
+            ->hasConfiguracion()
             ->create(['usuario' => 'admin', 'password' => Hash::make('admin')]);
 
             $this->userAdmin->assignRole('admin');
@@ -75,7 +76,10 @@ class LoginTest extends TestCase
             'login.sesion_finca' => 'boolean',
         ])->where('login.sesion_finca', true)
 
-        )->assertSessionHas('finca_id', $this->finca->id);
+        )->assertSessionHas('finca_id', $this->finca->id)
+        ->assertSessionHas('peso_servicio',$this->userAdmin->configuracion->peso_servicio)
+        ->assertSessionHas('dias_evento_notificacion',$this->userAdmin->configuracion->dias_evento_notificacion)
+        ->assertSessionHas('dias_diferencia_vacuna',$this->userAdmin->configuracion->dias_diferencia_vacuna);
     }
 
 
@@ -95,7 +99,10 @@ class LoginTest extends TestCase
             'login.token' => 'string',
         ])
         ->where('login.sesion_finca', false)
-    )->assertSessionMissing('finca_id', null);
+    )->assertSessionMissing('finca_id', null)
+    ->assertSessionHas('peso_servicio',$this->userAdmin->configuracion->peso_servicio)
+    ->assertSessionHas('dias_evento_notificacion',$this->userAdmin->configuracion->dias_evento_notificacion)
+    ->assertSessionHas('dias_diferencia_vacuna',$this->userAdmin->configuracion->dias_diferencia_vacuna);
     }
 
 
@@ -114,7 +121,10 @@ class LoginTest extends TestCase
             'login.token' => 'string',
         ])
             ->where('login.sesion_finca', true)
-    )->assertSessionHas('finca_id', $this->finca->id);
+    )->assertSessionHas('finca_id', $this->finca->id)
+    ->assertSessionHas('peso_servicio',$this->userAdmin->configuracion->peso_servicio)
+    ->assertSessionHas('dias_evento_notificacion',$this->userAdmin->configuracion->dias_evento_notificacion)
+    ->assertSessionHas('dias_diferencia_vacuna',$this->userAdmin->configuracion->dias_diferencia_vacuna);
     }
 
     public function test_logear_usuario_veterinario_con_admin_tiene_una_finca(): void
@@ -131,6 +141,9 @@ class LoginTest extends TestCase
             'login.token' => 'string',
         ])
             ->where('login.sesion_finca', true)
-    )->assertSessionHas('finca_id', $this->finca->id);
+    )->assertSessionHas('finca_id', $this->finca->id)
+    ->assertSessionHas('peso_servicio',$this->userAdmin->configuracion->peso_servicio)
+    ->assertSessionHas('dias_evento_notificacion',$this->userAdmin->configuracion->dias_evento_notificacion)
+    ->assertSessionHas('dias_diferencia_vacuna',$this->userAdmin->configuracion->dias_diferencia_vacuna);
     }
 }

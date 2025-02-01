@@ -33,7 +33,7 @@ class EfectividadTest extends TestCase
         parent::setUp();
 
         $this->user
-            = User::factory()->create();
+            = User::factory()->hasConfiguracion()->create();
 
         $this->estado = Estado::all();
 
@@ -82,7 +82,7 @@ class EfectividadTest extends TestCase
             ->for($this->toro,'partoable')
             ->create(['personal_id' => $this->veterinario]);
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(sprintf('api/ganado/%s', $this->ganado->id));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf('api/ganado/%s', $this->ganado->id));
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) => $json->where(
@@ -110,7 +110,7 @@ class EfectividadTest extends TestCase
             ->for($this->toro,'partoable')
             ->create(['personal_id' => $this->veterinario]);
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(sprintf('api/toro/%s', $this->toro->id));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf('api/toro/%s', $this->toro->id));
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) => $json->where(
