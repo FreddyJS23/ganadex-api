@@ -13,24 +13,28 @@ class ConfiguracionController extends Controller
 
      public function __construct() {
         $this->authorizeResource(Configuracion::class,'configuracion');
-    }
+    } 
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $configuracion=Configuracion::firstWhere('user_id', Auth::id());
-
-        return response()->json(['configuracion' => new ConfiguracionResource($configuracion)], 200);
-
+        return Configuracion::firstWhere('user_id', Auth::id())
+        ? response()->json(['configuracion' => new ConfiguracionResource(Configuracion::firstWhere('user_id', Auth::id()))], 200)
+        : response()->json(['configuracion' => ''], 404);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store()
+    public function store(StoreConfiguracionRequest $request)
     {
+        $configuracion = new Configuracion;
+        $configuracion->fill($request->all());
+        $configuracion->user_id =Auth::id();
+        $configuracion->save();
 
+        return response()->json(['configuracion' => new ConfiguracionResource($configuracion)], 201);
     }
 
     /**
@@ -44,13 +48,9 @@ class ConfiguracionController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateConfiguracionRequest $request)
+    public function update(UpdateConfiguracionRequest $request, Configuracion $configuracion)
     {
-
-        $configuracion=Configuracion::firstWhere('user_id', Auth::id());
-        $configuracion->peso_servicio=$request->input('peso_servicio');
-        $configuracion->dias_evento_notificacion=$request->input('dias_evento_notificacion');
-        $configuracion->dias_diferencia_vacuna=$request->input('dias_diferencia_vacuna');
+        $configuracion->fill($request->all());
         $configuracion->save();
 
         return response()->json(['configuracion' => new ConfiguracionResource($configuracion)], 200);
