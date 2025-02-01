@@ -38,7 +38,7 @@ class VentaTest extends TestCase
 
 
         $this->user
-            = User::factory()->create();
+            = User::factory()->hasConfiguracion()->create();
 
         $this->user->assignRole('admin');
 
@@ -100,7 +100,7 @@ class VentaTest extends TestCase
     {
         $this->generarVentas();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(route('ventas.index'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->getJson(route('ventas.index'));
 
         $response->assertStatus(200)
             ->assertJson(
@@ -134,7 +134,7 @@ class VentaTest extends TestCase
         $comprador = Comprador::factory()->for($this->finca)->create();
         $this->venta = $this->venta + ['ganado_id' => $ganado->id, 'comprador_id' => $comprador->id];
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->postJson(route('ventas.store'), $this->venta);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->postJson(route('ventas.store'), $this->venta);
 
         $response->assertStatus(201)
             ->assertJson(
@@ -167,7 +167,7 @@ class VentaTest extends TestCase
         $idRandom = rand(0, $this->cantidad_ventas - 1);
         $idVenta = $venta[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(route('ventas.show', ['venta' => $idVenta]));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->getJson(route('ventas.show', ['venta' => $idVenta]));
 
         $response->assertStatus(200)
             ->assertJson(
@@ -204,7 +204,7 @@ class VentaTest extends TestCase
         $comprador = Comprador::factory()->for($this->finca)->create();
         $this->venta = $this->venta + ['ganado_id' => $ganado->id, 'comprador_id' => $comprador->id];
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->putJson(route('ventas.update', ['venta' => $idVentaEditar]), $this->venta);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->putJson(route('ventas.update', ['venta' => $idVentaEditar]), $this->venta);
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) =>
@@ -224,7 +224,7 @@ class VentaTest extends TestCase
         $idToDelete = $venta[$idRandom]->id;
 
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->deleteJson(route('ventas.destroy', ['venta' => $idToDelete]));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->deleteJson(route('ventas.destroy', ['venta' => $idToDelete]));
 
         $response->assertStatus(200)->assertJson(['ventaID' => $idToDelete]);
     }
@@ -235,7 +235,7 @@ class VentaTest extends TestCase
     public function test_error_validacion_registro_venta($venta, $errores): void
     {
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->postJson(route('ventas.store'), $venta);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->postJson(route('ventas.store'), $venta);
 
         $response->assertStatus(422)->assertInvalid($errores);
     }
@@ -261,7 +261,7 @@ class VentaTest extends TestCase
         $this->generarVentas();
 
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->putJson(route('ventas.update', ['venta' => $idVentaOtroFinca]), $this->venta);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->putJson(route('ventas.update', ['venta' => $idVentaOtroFinca]), $this->venta);
 
         $response->assertStatus(403);
     }
@@ -270,7 +270,7 @@ class VentaTest extends TestCase
     {
         $this->cambiarRol($this->user);
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->postJson(route('ventas.store'), $this->venta);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->postJson(route('ventas.store'), $this->venta);
 
         $response->assertStatus(403);
     }
@@ -283,7 +283,7 @@ class VentaTest extends TestCase
         $idRandom = rand(0, $this->cantidad_ventas - 1);
         $idVentaEditar = $ventas[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->putJson(route('ventas.update',['venta'=>$idVentaEditar]), $this->venta);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->putJson(route('ventas.update',['venta'=>$idVentaEditar]), $this->venta);
 
         $response->assertStatus(403);
     }
@@ -298,7 +298,7 @@ class VentaTest extends TestCase
         $idRandom = rand(0, $this->cantidad_ventas - 1);
         $idVentaEditar = $ventas[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->deleteJson(route('ventas.destroy',['venta'=>$idVentaEditar]));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->deleteJson(route('ventas.destroy',['venta'=>$idVentaEditar]));
 
         $response->assertStatus(403);
     }

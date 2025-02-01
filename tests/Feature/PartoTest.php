@@ -56,7 +56,7 @@ class PartoTest extends TestCase
         $this->estado = Estado::all();
 
         $this->user
-            = User::factory()->create();
+            = User::factory()->hasConfiguracion()->create();
 
             $this->finca
             = Finca::factory()
@@ -172,7 +172,7 @@ class PartoTest extends TestCase
 
         $this->generarpartosMonta();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson($this->urlServicioMonta);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->getJson($this->urlServicioMonta);
 
         $response->assertStatus(200)
             ->assertJson(
@@ -208,7 +208,7 @@ class PartoTest extends TestCase
     public function test_creacion_parto_monta(): void
     {
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->postJson($this->urlServicioMonta, $this->parto + ['personal_id'=>$this->veterinario->id]);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->postJson($this->urlServicioMonta, $this->parto + ['personal_id'=>$this->veterinario->id]);
 
         $response->assertStatus(201)
             ->assertJson(
@@ -246,7 +246,7 @@ class PartoTest extends TestCase
 
         $idRandom = rand(0, $this->cantidad_parto - 1);
         $idparto = $partos[$idRandom]->id;
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(sprintf($this->urlServicioMonta . '/%s', $idparto));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf($this->urlServicioMonta . '/%s', $idparto));
 
         $response->assertStatus(200)
             ->assertJson(
@@ -282,7 +282,7 @@ class PartoTest extends TestCase
         $idRandom = rand(0, $this->cantidad_parto - 1);
         $idpartoEditar = $partos[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->putJson(sprintf($this->urlServicioMonta . '/%s', $idpartoEditar), $this->parto + ['numero_toro' => $this->numero_toro]);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf($this->urlServicioMonta . '/%s', $idpartoEditar), $this->parto + ['numero_toro' => $this->numero_toro]);
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) =>
@@ -305,7 +305,7 @@ class PartoTest extends TestCase
         $idToDelete = $partos[$idRandom]->id;
 
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->deleteJson(sprintf($this->urlServicioMonta . '/%s', $idToDelete));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->deleteJson(sprintf($this->urlServicioMonta . '/%s', $idToDelete));
 
         $response->assertStatus(200)->assertJson(['partoID' => $idToDelete]);
     }
@@ -318,7 +318,7 @@ class PartoTest extends TestCase
 
         $this->generarpartosInseminacion();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson($this->urlServicioMonta);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->getJson($this->urlServicioMonta);
 
         $response->assertStatus(200)
             ->assertJson(
@@ -354,7 +354,7 @@ class PartoTest extends TestCase
     public function test_creacion_parto_inseminacion(): void
     {
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->postJson($this->urlServicioInseminacion, $this->parto + ['personal_id'=>$this->veterinario->id]);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->postJson($this->urlServicioInseminacion, $this->parto + ['personal_id'=>$this->veterinario->id]);
 
         $response->assertStatus(201)
             ->assertJson(
@@ -392,7 +392,7 @@ class PartoTest extends TestCase
 
         $idRandom = rand(0, $this->cantidad_parto - 1);
         $idparto = $partos[$idRandom]->id;
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(sprintf($this->urlServicioInseminacion . '/%s', $idparto));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf($this->urlServicioInseminacion . '/%s', $idparto));
 
         $response->assertStatus(200)
             ->assertJson(
@@ -429,7 +429,7 @@ class PartoTest extends TestCase
         $idRandom = rand(0, $this->cantidad_parto - 1);
         $idpartoEditar = $partos[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->putJson(sprintf($this->urlServicioInseminacion . '/%s', $idpartoEditar), $this->parto + ['numero_toro' => $this->numero_toro]);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf($this->urlServicioInseminacion . '/%s', $idpartoEditar), $this->parto + ['numero_toro' => $this->numero_toro]);
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) =>
@@ -452,7 +452,7 @@ class PartoTest extends TestCase
         $idToDelete = $partos[$idRandom]->id;
 
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->deleteJson(sprintf($this->urlServicioInseminacion . '/%s', $idToDelete));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->deleteJson(sprintf($this->urlServicioInseminacion . '/%s', $idToDelete));
 
         $response->assertStatus(200)->assertJson(['partoID' => $idToDelete]);
     }
@@ -483,7 +483,7 @@ class PartoTest extends TestCase
             ->for($this->finca)
             ->create(['nombre' => 'test', 'numero' => 33]);
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->postJson($this->urlServicioInseminacion, $parto);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->postJson($this->urlServicioInseminacion, $parto);
 
         $response->assertStatus(422)->assertInvalid($errores);
     }
@@ -524,7 +524,7 @@ class PartoTest extends TestCase
             ->for($this->finca)
             ->create();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(route('todosPartos'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->getJson(route('todosPartos'));
 
         $response->assertStatus(200)
             ->assertJson(

@@ -28,7 +28,7 @@ class CompradorTest extends TestCase
         parent::setUp();
 
         $this->user
-            = User::factory()->create();
+            = User::factory()->hasConfiguracion()->create();
 
             $this->user->assignRole('admin');
 
@@ -80,7 +80,7 @@ class CompradorTest extends TestCase
     {
         $this->generarComprador();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson('api/comprador');
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->getJson('api/comprador');
         $response->assertStatus(200)
             ->assertJson(
                 fn (AssertableJson $json) => $json->has(
@@ -100,7 +100,7 @@ class CompradorTest extends TestCase
     public function test_creacion_comprador(): void
     {
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->postJson('api/comprador', $this->comprador);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->postJson('api/comprador', $this->comprador);
 
         $response->assertStatus(201)->assertJson(
             fn (AssertableJson $json) =>
@@ -116,7 +116,7 @@ class CompradorTest extends TestCase
         $idRandom = rand(0, $this->cantidad_comprador - 1);
         $idComprador = $comprador[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(sprintf('api/comprador/%s', $idComprador));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf('api/comprador/%s', $idComprador));
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) =>
@@ -133,7 +133,7 @@ class CompradorTest extends TestCase
         $idRandom = rand(0, $this->cantidad_comprador - 1);
         $idCompradorEditar = $comprador[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->putJson(sprintf('api/comprador/%s', $idCompradorEditar), $this->comprador);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/comprador/%s', $idCompradorEditar), $this->comprador);
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) =>
@@ -150,7 +150,7 @@ class CompradorTest extends TestCase
         $idRandom = rand(0, $this->cantidad_comprador - 1);
         $idCompradorEditar = $comprador[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->putJson(sprintf('api/comprador/%s', $idCompradorEditar), $this->comprador);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/comprador/%s', $idCompradorEditar), $this->comprador);
 
         $response->assertStatus(422)->assertJson(fn (AssertableJson $json) =>
         $json->hasAll(['errors.nombre'])
@@ -161,7 +161,7 @@ class CompradorTest extends TestCase
     {
         $compradorExistente = Comprador::factory()->for($this->finca)->create(['nombre' => 'test']);
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->putJson(sprintf('api/comprador/%s', $compradorExistente->id), $this->comprador);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/comprador/%s', $compradorExistente->id), $this->comprador);
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) =>
@@ -177,7 +177,7 @@ class CompradorTest extends TestCase
         $idToDelete = $comprador[$idRandom]->id;
 
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->deleteJson(sprintf('api/comprador/%s', $idToDelete));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->deleteJson(sprintf('api/comprador/%s', $idToDelete));
 
         $response->assertStatus(200)->assertJson(['compradorID' => $idToDelete]);
     }
@@ -189,7 +189,7 @@ class CompradorTest extends TestCase
     {
         Comprador::factory()->for($this->finca)->create(['nombre' => 'test']);
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->postJson('api/comprador', $comprador);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->postJson('api/comprador', $comprador);
 
         $response->assertStatus(422)->assertInvalid($errores);
     }
@@ -208,7 +208,7 @@ class CompradorTest extends TestCase
 
         $this->generarComprador();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->putJson(sprintf('api/comprador/%s', $idCompradorOtroUsuario), $this->comprador);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/comprador/%s', $idCompradorOtroUsuario), $this->comprador);
 
         $response->assertStatus(403);
     }
@@ -218,7 +218,7 @@ class CompradorTest extends TestCase
     {
         $this->cambiarRol($this->user);
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->postJson('api/comprador', $this->comprador);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->postJson('api/comprador', $this->comprador);
 
         $response->assertStatus(403);
     }
@@ -231,7 +231,7 @@ class CompradorTest extends TestCase
         $idRandom = rand(0, $this->cantidad_comprador - 1);
         $idCompradorEditar = $compradores[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->putJson(sprintf('api/comprador/%s', $idCompradorEditar), $this->comprador);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/comprador/%s', $idCompradorEditar), $this->comprador);
 
         $response->assertStatus(403);
     }
@@ -246,7 +246,7 @@ class CompradorTest extends TestCase
         $idToDelete = $compradores[$idRandom]->id;
 
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->deleteJson(sprintf('api/comprador/%s', $idToDelete));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->deleteJson(sprintf('api/comprador/%s', $idToDelete));
 
         $response->assertStatus(403);
     }

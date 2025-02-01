@@ -22,8 +22,9 @@ class UpdateConfiguracionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'dark_mode'=>'required|boolean',
-            'moneda'=>'required|string',
+            'peso_servicio' => 'numeric|between:1,32767',
+            'dias_diferencia_vacuna' => 'numeric|between:1,32767',
+            'dias_evento_notificacion' => 'numeric|between:1,32767',
         ];
     }
 }

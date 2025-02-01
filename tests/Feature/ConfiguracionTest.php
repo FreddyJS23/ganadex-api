@@ -16,8 +16,9 @@ class ConfiguracionTest extends TestCase
     use RefreshDatabase;
 
     private array $configuracion = [
-        'dark_mode' => true,
-        'moneda' => '$',
+        'dias_diferencia_vacuna' => 10,
+        'dias_evento_notificacion' => 10,
+        'peso_servicio' => 10,
     ];
 
     private int $cantidad_configuracion = 10;
@@ -29,28 +30,21 @@ class ConfiguracionTest extends TestCase
         parent::setUp();
 
         $this->user
-            = User::factory()->create();
+            = User::factory()->hasConfiguracion()->create();
+
+        $this->user->assignRole('admin');
     }
 
-    private function generarConfiguracion(): Configuracion
-    {
-        return Configuracion::factory()
-            ->for($this->user)
-            ->create();
-    }
     public static function ErrorInputProvider(): array
     {
         return [
 
             'caso de insertar datos erróneos' => [
                 [
-                    'dark_mode' => 'te',
-                    'moneda' => 1,
-
-                ], ['dark_mode', 'moneda']
-            ],
-            'caso de no insertar datos requeridos' => [
-                [], ['dark_mode', 'moneda']
+                'peso_servicio' => 0,
+                'dias_evento_notificacion' => 23243483384,
+                'dias_diferencia_vacuna' => 'ssss',
+                ], ['peso_servicio', 'dias_evento_notificacion', 'dias_diferencia_vacuna']
             ],
         ];
     }
@@ -63,7 +57,6 @@ class ConfiguracionTest extends TestCase
 
     public function test_obtener_configuracion(): void
     {
-        $this->generarConfiguracion();
 
         $response = $this->actingAs($this->user)->getJson('api/configuracion');
 
@@ -71,41 +64,23 @@ class ConfiguracionTest extends TestCase
             fn (AssertableJson $json) => $json->whereAllType(
                 [
                     'configuracion.id' => 'integer',
-                    'configuracion.dark_mode' => 'boolean',
-                    'configuracion.moneda' => 'string'
+                    'configuracion.peso_servicio' => 'integer',
+                    'configuracion.dias_evento_notificacion' => 'integer',
+                    'configuracion.dias_diferencia_vacuna' => 'integer',
                 ]
             )
         );
     }
 
-    public function test_usuario_no_tiene_configuracion(): void
-    {
-
-        $response = $this->actingAs($this->user)->getJson('api/configuracion');
-
-        $response->assertStatus(404)->assertJson(['configuracion' => '']);
-    }
-
-
-    public function test_creacion_configuracion(): void
-    {
-
-        $response = $this->actingAs($this->user)->postJson('api/configuracion', $this->configuracion);
-
-        $response->assertStatus(201)->assertJson(['configuracion' => true]);
-    }
-
 
     public function test_actualizar_configuracion(): void
     {
-        $configuracion = $this->generarConfiguracion();
-        $idConfiguracionEditar = $configuracion->id;
-
-        $response = $this->actingAs($this->user)->putJson(sprintf('api/configuracion/%s', $idConfiguracionEditar), $this->configuracion);
+        $response = $this->actingAs($this->user)->putJson(route('configuracion.update'),$this->configuracion);
 
         $response->assertStatus(200)->assertJson(
-            fn (AssertableJson $json) => $json->where('configuracion.dark_mode',$this->configuracion['dark_mode'])
-            ->where('configuracion.moneda', $this->configuracion['moneda'])
+            fn (AssertableJson $json) => $json->where('configuracion.peso_servicio',$this->configuracion['peso_servicio'])
+            ->where('configuracion.dias_evento_notificacion',$this->configuracion['dias_evento_notificacion'])
+            ->where('configuracion.dias_diferencia_vacuna',$this->configuracion['dias_diferencia_vacuna'])
             ->etc()
         );
     }
@@ -117,22 +92,19 @@ class ConfiguracionTest extends TestCase
     public function test_error_validacion_registro_configuracion($configuracion, $errores): void
     {
 
-        $response = $this->actingAs($this->user)->postJson('api/configuracion', $configuracion);
+        $response = $this->actingAs($this->user)->putJson('api/configuracion', $configuracion);
 
         $response->assertStatus(422)->assertInvalid($errores);
     }
 
-    public function test_autorizacion_maniupular__configuracion_otro_usuario(): void
+
+    public function test_autorizacion_usuario_veterinario_maniupular_configuracion(): void
     {
-        $otroUsuario = User::factory()->create();
+        $usuarioVeterinario = User::factory()->hasConfiguracion()->create();
 
-        $configuracionOtroUsuario = configuracion::factory()->for($otroUsuario)->create();
+        $usuarioVeterinario->syncRoles('veterinario');
 
-        $idConfiguracionOtroUsuario = $configuracionOtroUsuario->id;
-
-        $this->generarConfiguracion();
-
-        $response = $this->actingAs($this->user)->putJson(sprintf('api/configuracion/%s', $idConfiguracionOtroUsuario), $this->configuracion);
+        $response = $this->actingAs($usuarioVeterinario)->putJson(route('configuracion.update'),$this->configuracion);
 
         $response->assertStatus(403);
     }

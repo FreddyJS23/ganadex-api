@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Http\Resources\UserResource;
+use App\Models\Configuracion;
 use App\Models\Finca;
 use App\Models\User;
 use App\Models\UsuarioVeterinario;
@@ -35,6 +36,7 @@ class UserController extends Controller
         $user->password=hash::make($request->password);
         $user->fill($request->except('password'));
         $user->assignRole('admin');
+        Configuracion::factory()->for($user);
         $user->save();
 
         return response()->json(['message'=>'usuario creado'],201);

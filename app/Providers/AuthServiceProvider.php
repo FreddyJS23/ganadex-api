@@ -4,6 +4,7 @@ namespace App\Providers;
 
 // use Illuminate\Support\Facades\Gate;
 
+use App\Policies\ConfiguracionPolicy;
 use App\Policies\FincaPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
@@ -26,5 +27,6 @@ class AuthServiceProvider extends ServiceProvider
     {
         Gate::define('verificar_sesion_finca',[FincaPolicy::class,'verificar_sesion_finca']);
         Gate::define('crear_sesion_finca',[FincaPolicy::class,'crear_sesion_finca']);
+        Gate::define('update',[ConfiguracionPolicy::class,'update']);
     }
 }
