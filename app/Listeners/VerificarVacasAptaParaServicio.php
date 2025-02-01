@@ -35,14 +35,18 @@ class VerificarVacasAptaParaServicio
 
         if (Ganado::where('finca_id', $fincaId)->count() > 0) {
 
-                $vacasAptasParaServicio = Peso::whereHas('ganado', function (Builder $query) {
-                    $query->where('finca_id', session('finca_id'))
-                    ->where('sexo','H')
-                    ->doesntHave('toro')
-                    ->doesntHave('ganado_descarte');
-                })
-                ->where('peso_actual', '>=', session('peso_servicio'))
-                ->get();
+            $vacasAptasParaServicio = Ganado::doesntHave('toro')
+            ->doesntHave('ganadoDescarte')
+            ->doesntHave('fallecimiento')
+            ->doesntHave('venta')
+            ->where('finca_id', $fincaId)
+            ->whereHas(
+                'peso',
+                function (Builder $query) {
+                    $query->where('peso_actual', '>=', session('peso_servicio'));
+                }
+            )
+            ->get();
 
             foreach ($vacasAptasParaServicio as $vacaAptaParaServicio) {
                 $vacaAptaParaServicio->estados()->attach($estado->id);
