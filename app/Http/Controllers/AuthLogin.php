@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Events\CrearSesionFinca;
 use App\Http\Requests\LoginRequest;
+use App\Http\Resources\ConfiguracionResource;
 use App\Models\Configuracion;
 use App\Models\Finca;
 use App\Models\User;
@@ -72,7 +73,8 @@ class AuthLogin extends Controller
                             'usuario' => $user->usuario,
                             'rol' => $rol,
                             'token' => $user->createToken('API_TOKEN')->plainTextToken,
-                            'sesion_finca'=>$sesion_finca
+                            'sesion_finca'=>$sesion_finca,
+                            'configuracion'=>new ConfiguracionResource($configuracion),
                         ]
                     ],
                     200
