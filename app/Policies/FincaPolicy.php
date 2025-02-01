@@ -32,7 +32,7 @@ class FincaPolicy
 
     public function verificar_sesion_finca(User $user): bool
     {
-        return $user->hasRole('admin') || $user->hasRole('veterinario');
+        return $user->hasRole('admin');
     }
 
     /**
