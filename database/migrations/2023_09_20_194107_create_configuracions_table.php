@@ -13,8 +13,9 @@ return new class extends Migration
     {
         Schema::create('configuracions', function (Blueprint $table) {
             $table->id();
-            $table->boolean('dark_mode');
-            $table->string('moneda');
+            $table->smallInteger('peso_servicio');
+            $table->smallInteger('dias_evento_notificacion');
+            $table->smallInteger('dias_diferencia_vacuna');
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
