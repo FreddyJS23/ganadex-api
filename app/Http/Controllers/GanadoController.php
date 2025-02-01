@@ -41,8 +41,6 @@ class GanadoController extends Controller
     {
         return new GanadoCollection(
             Ganado::doesntHave('toro')
-            ->doesntHave('fallecimiento')
-            ->doesntHave('venta')
             ->doesntHave('ganadoDescarte')
             ->where('finca_id',[session('finca_id')])
             ->with(['peso','evento','estados'])
