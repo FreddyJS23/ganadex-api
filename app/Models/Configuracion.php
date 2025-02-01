@@ -11,8 +11,9 @@ class Configuracion extends Model
     use HasFactory;
 
     protected $fillable=[
-        'dark_mode',
-        'moneda',
+       'peso_servicio',
+       'dias_evento_notificacion',
+       'dias_diferencia_vacuna',
     ];
 
     /**
