@@ -69,12 +69,15 @@ class LoginTest extends TestCase
         ]);
 
         $response->assertStatus(200)->assertJson(fn (AssertableJson $json) =>
-        $json->where('login.rol', 'admin')->whereAllType([
-            'login.id' => 'integer',
-            'login.usuario' => 'string',
-            'login.token' => 'string',
-            'login.sesion_finca' => 'boolean',
-        ])->where('login.sesion_finca', true)
+        $json->has('login',fn(AssertableJson $json)=>
+            $json->where('rol', 'admin')->whereAllType([
+            'id' => 'integer',
+            'usuario' => 'string',
+            'token' => 'string',
+            'configuracion.peso_servicio' => 'integer',
+            'configuracion.dias_evento_notificacion' => 'integer',
+            'configuracion.dias_diferencia_vacuna' => 'integer',
+        ])->where('sesion_finca', true))
 
         )->assertSessionHas('finca_id', $this->finca->id)
         ->assertSessionHas('peso_servicio',$this->userAdmin->configuracion->peso_servicio)
@@ -93,12 +96,15 @@ class LoginTest extends TestCase
         ]);
 
         $response->assertStatus(200)->assertJson(fn (AssertableJson $json) =>
-        $json->where('login.rol', 'admin')->whereAllType([
-            'login.id' => 'integer',
-            'login.usuario' => 'string',
-            'login.token' => 'string',
-        ])
-        ->where('login.sesion_finca', false)
+        $json->has('login',fn(AssertableJson $json)=>
+            $json->where('rol', 'admin')->whereAllType([
+            'id' => 'integer',
+            'usuario' => 'string',
+            'token' => 'string',
+            'configuracion.peso_servicio' => 'integer',
+            'configuracion.dias_evento_notificacion' => 'integer',
+            'configuracion.dias_diferencia_vacuna' => 'integer',
+        ])->where('sesion_finca', false))
     )->assertSessionMissing('finca_id', null)
     ->assertSessionHas('peso_servicio',$this->userAdmin->configuracion->peso_servicio)
     ->assertSessionHas('dias_evento_notificacion',$this->userAdmin->configuracion->dias_evento_notificacion)
@@ -115,11 +121,15 @@ class LoginTest extends TestCase
         ]);
 
         $response->assertStatus(200)->assertJson(fn (AssertableJson $json) =>
-        $json->where('login.rol', 'veterinario')->whereAllType([
-            'login.id' => 'integer',
-            'login.usuario' => 'string',
-            'login.token' => 'string',
-        ])
+        $json->has('login',fn(AssertableJson $json)=>
+            $json->where('rol', 'veterinario')->whereAllType([
+            'id' => 'integer',
+            'usuario' => 'string',
+            'token' => 'string',
+            'configuracion.peso_servicio' => 'integer',
+            'configuracion.dias_evento_notificacion' => 'integer',
+            'configuracion.dias_diferencia_vacuna' => 'integer',
+        ])->where('sesion_finca', true))
             ->where('login.sesion_finca', true)
     )->assertSessionHas('finca_id', $this->finca->id)
     ->assertSessionHas('peso_servicio',$this->userAdmin->configuracion->peso_servicio)
@@ -135,12 +145,15 @@ class LoginTest extends TestCase
         ]);
 
         $response->assertStatus(200)->assertJson(fn (AssertableJson $json) =>
-        $json->where('login.rol', 'veterinario')->whereAllType([
-            'login.id' => 'integer',
-            'login.usuario' => 'string',
-            'login.token' => 'string',
-        ])
-            ->where('login.sesion_finca', true)
+        $json->has('login',fn(AssertableJson $json)=>
+        $json->where('rol', 'veterinario')->whereAllType([
+        'id' => 'integer',
+        'usuario' => 'string',
+        'token' => 'string',
+        'configuracion.peso_servicio' => 'integer',
+        'configuracion.dias_evento_notificacion' => 'integer',
+        'configuracion.dias_diferencia_vacuna' => 'integer',
+    ])->where('sesion_finca', true))
     )->assertSessionHas('finca_id', $this->finca->id)
     ->assertSessionHas('peso_servicio',$this->userAdmin->configuracion->peso_servicio)
     ->assertSessionHas('dias_evento_notificacion',$this->userAdmin->configuracion->dias_evento_notificacion)
