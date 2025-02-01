@@ -13,7 +13,7 @@ class ConfiguracionPolicy
      */
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->hasRole('admin');
     }
 
     /**
@@ -29,15 +29,15 @@ class ConfiguracionPolicy
      */
     public function create(User $user): bool
     {
-        return boolval($user->configuracion) ? false : true;
+        return false;
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Configuracion $configuracion): bool
+    public function update(User $user): bool
     {
-       return $user->id == $configuracion->user_id;
+       return $user->hasRole('admin');
     }
 
     /**
