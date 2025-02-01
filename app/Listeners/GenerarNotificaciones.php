@@ -45,7 +45,7 @@ class GenerarNotificaciones
         $eventosProximos = Evento::whereRelation('ganado', 'finca_id', $fincaId)
             ->select('id', 'ganado_id')
             ->selectRaw("DATEDIFF($evento,'$fechaActual') AS $nombreColumna")
-            ->having("dias_para_$tipoEvento", '<=', 7)->get();
+            ->having("dias_para_$tipoEvento", '<=', session('dias_evento_notificacion'))->get();
 
         //interactuar con una coleccion de eventos para crear notificacion
         if ($eventosProximos->count() > 0) {

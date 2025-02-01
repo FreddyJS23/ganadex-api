@@ -118,7 +118,7 @@ class GanadoController extends Controller
 
 
         //diferencia dias entre proxima vacunacion individual y jornada vacunacion
-        $diferencia=15;
+        $diferencia=session('dias_diferencia_vacuna');
         $setenciaDiferenciaDias="DATEDIFF(MAX(jornada_vacunacions.prox_dosis),MAX(vacunacions.prox_dosis))";
 
         /* Explicacion consulta
