@@ -19,22 +19,14 @@ class ConfiguracionController extends Controller
      */
     public function index()
     {
-        return Configuracion::firstWhere('user_id', Auth::id())
-        ? response()->json(['configuracion' => new ConfiguracionResource(Configuracion::firstWhere('user_id', Auth::id()))], 200)
-        : response()->json(['configuracion' => ''], 404);
+        return response()->json(['configuracion' => new ConfiguracionResource(Configuracion::firstWhere('user_id', Auth::id()))], 200);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreConfiguracionRequest $request)
+    public function store()
     {
-        $configuracion = new Configuracion;
-        $configuracion->fill($request->all());
-        $configuracion->user_id =Auth::id();
-        $configuracion->save();
-
-        return response()->json(['configuracion' => new ConfiguracionResource($configuracion)], 201);
     }
 
     /**
@@ -48,8 +40,9 @@ class ConfiguracionController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateConfiguracionRequest $request, Configuracion $configuracion)
+    public function update(UpdateConfiguracionRequest $request)
     {
+        $configuracion=Configuracion::firstWhere('user_id', Auth::id());
         $configuracion->fill($request->all());
         $configuracion->save();
 
