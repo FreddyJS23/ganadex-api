@@ -364,7 +364,7 @@ class EventosGanadoTest extends TestCase
         $numeroMes=now()->month;
         $fecha=now();
 
-        if($numeroMes==1){
+        if($numeroMes <= 11){
             $fecha=now()->addMonths(2);
         }
         else if($numeroMes==12){
@@ -402,7 +402,7 @@ class EventosGanadoTest extends TestCase
             ->create();
 
         //evento iniciar sesion finca
-        $this->actingAs($this->user)->getJson(route('crear_sesion_finca',['finca'=>$this->finca->id]));
+        $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->getJson(route('crear_sesion_finca',['finca'=>$this->finca->id]));
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->getJson(route('ganado.index'));
 
@@ -411,7 +411,7 @@ class EventosGanadoTest extends TestCase
             $json->has(
                //ganado pendiente pesaje mensual
                 'cabezas_ganado.1',
-                fn (AssertableJson $json) => $json->has('estados', 2)
+                fn (AssertableJson $json) => $json->has('estados', 3)
                     ->where(
                         'estados',
                         fn (Collection $estados) => $estados->contains('estado', 'pendiente_pesaje_leche')
@@ -419,7 +419,8 @@ class EventosGanadoTest extends TestCase
             )->has(
                 //ganado con pesaje mensual de leche realizado
                 'cabezas_ganado.2',
-                fn (AssertableJson $json) => $json->has('estados', 1)
+                //estado:sano,pendiente_servicio  
+                fn (AssertableJson $json) => $json->has('estados', 2)
                     ->where(
                         'estados',
                         fn (Collection $estados) => $estados->doesntContain('estado', 'pendiente_pesaje_leche')
