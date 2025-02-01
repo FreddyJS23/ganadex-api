@@ -25,6 +25,7 @@ use App\Listeners\VerificarPesajeMensualLeche;
 use App\Listeners\EstadoPosPesajeMensualLeche;
 use App\Listeners\GenerarNotificaciones;
 use App\Listeners\DescartarGanado;
+use App\Listeners\VerificarVacasAptaParaServicio;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
@@ -51,7 +52,7 @@ class EventServiceProvider extends ServiceProvider
         PartoHecho::class => [RevisionPosParto::class,EstadoPosParto::class,CambiaAVaca::class],
         NaceMacho::class => [CaparBecerro::class,],
         //Login::class=>[],
-        CrearSesionFinca::class=>[VerificarEdadGanado::class,VerificarPesajeMensualLeche::class,GenerarNotificaciones::class],
+        CrearSesionFinca::class=>[VerificarEdadGanado::class,VerificarPesajeMensualLeche::class,GenerarNotificaciones::class,VerificarVacasAptaParaServicio::class],
         PesajeLecheHecho::class=>[EstadoPosPesajeMensualLeche::class],
         VentaGanado::class=>[EstadoPosVenta::class],
         FallecimientoGanado::class=>[EstadoPosFallecimiento::class],
