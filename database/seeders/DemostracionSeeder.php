@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Comprador;
+use App\Models\Configuracion;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Estado;
@@ -42,6 +43,7 @@ class DemostracionSeeder extends Seeder
 
         $user->assignRole('admin');
 
+        Configuracion::factory()->for($user)->create();
 
         $finca
         = Finca::factory()
