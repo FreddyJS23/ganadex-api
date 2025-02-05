@@ -30,6 +30,16 @@ class ToroTest extends TestCase
 
     ];
 
+    private array $toroActualizado= [
+        'nombre' => 'actualizado',
+        'origen' => 'externo',
+        'fecha_nacimiento' => '2010-02-17',
+        'peso_nacimiento' => 50,
+        'peso_destete' => 70,
+        'peso_2year' => 90,
+        'peso_actual' => 100,
+    ];
+
     private int $cantidad_toro = 10;
 
     private $user;
@@ -239,20 +249,32 @@ class ToroTest extends TestCase
 
     public function test_actualizar_toro(): void
     {
-        $toros = $this->generarToros();
-        $idRandom = rand(0, $this->cantidad_toro - 1);
-        $idToroEditar = $toros[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/toro/%s', $idToroEditar), $this->toro);
+        $toroActual= Toro::factory()
+        ->for($this->finca)
+        ->for(Ganado::factory()->hasPeso()->create(['finca_id' => $this->finca->id,
+        'sexo' => 'M',
+        'tipo_id' => 4,
+        'nombre' => 'test',
+        'numero' => 392,
+        'origen' => 'local',
+        'fecha_nacimiento' => '2015-02-17']))
+        ->create();
+
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/toro/%s', $toroActual->id), $this->toroActualizado);
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) =>
             $json
-                ->where('toro.nombre', $this->toro['nombre'])
-                ->where('toro.numero', $this->toro['numero'])
-                ->where('toro.origen', $this->toro['origen'])
-                ->where('toro.sexo', $this->toro['sexo'])
-                ->where('toro.fecha_nacimiento', $this->toro['fecha_nacimiento'])
+                ->where('toro.nombre', $this->toroActualizado['nombre'])
+                ->where('toro.numero', $toroActual['ganado']['numero'])
+                ->where('toro.origen', $this->toroActualizado['origen'])
+                ->where('toro.sexo', $toroActual['ganado']['sexo'])
+                ->where('toro.fecha_nacimiento', $this->toroActualizado['fecha_nacimiento'])
+                ->where('toro.pesos.peso_nacimiento', $this->toroActualizado['peso_nacimiento'] . 'KG')
+                ->where('toro.pesos.peso_destete', $this->toroActualizado['peso_destete'] . 'KG')
+                ->where('toro.pesos.peso_2year', $this->toroActualizado['peso_2year'] . 'KG')
+                ->where('toro.pesos.peso_actual', $this->toroActualizado['peso_actual'] . 'KG')
                 ->etc()
         );
     }
@@ -279,7 +301,7 @@ class ToroTest extends TestCase
     {
         $toro =Toro::factory()
             ->for($this->finca)
-            ->for(Ganado::factory()->for($this->finca)->create(['nombre' => 'test', 'numero' => 392]))
+            ->for(Ganado::factory()->hasPeso()->for($this->finca)->create(['nombre' => 'test', 'numero' => 392]))
             ->create();
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/toro/%s', $toro->id), $this->toro);
