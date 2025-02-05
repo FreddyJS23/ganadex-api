@@ -35,7 +35,11 @@ class UpdateToroRequest extends FormRequest
             'nombre'=>['min:3','max:255',Rule::unique('ganados')->ignore($ganadoId)],
             'numero'=>['numeric','between:1,32767',Rule::unique('ganados')->ignore($ganadoId)],
             'origen'=>'min:3,|max:255',
-            'fecha_nacimiento'=>'date_format:Y-m-d'
+            'fecha_nacimiento'=>'date_format:Y-m-d',
+            'peso_nacimiento' => 'numeric|between:1,32767',
+            'peso_destete' => 'numeric|between:1,32767',
+            'peso_2year' => 'numeric|between:1,32767',
+            'peso_actual' => 'numeric|between:1,32767',
         ];
     }
 }
