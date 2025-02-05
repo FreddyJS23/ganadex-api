@@ -39,7 +39,7 @@ class UpdateGanadoRequest extends FormRequest
             'peso_2year' => 'numeric|between:1,32767',
             'peso_actual' => 'numeric|between:1,32767',
 
-            'estado_id' => Rule::foreach(function ($value, $attrubute) {
+            'estado_id' =>['exclude', Rule::foreach(function ($value, $attrubute) {
                 return Rule::exists('estados', 'id');
             }),]
 
