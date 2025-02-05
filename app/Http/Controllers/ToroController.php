@@ -167,8 +167,8 @@ class ToroController extends Controller
      */
     public function update(UpdateToroRequest $request, Toro $toro)
     {
-
-        $toro->ganado->fill($request->all())->save();
+        $toro->ganado->fill($request->except($this->peso))->save();
+        $toro->ganado->peso->fill($request->only($this->peso))->save();
 
         return response()->json(['toro' => new ToroResource($toro)], 200);
     }
