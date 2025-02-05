@@ -27,7 +27,16 @@ class GanadoDescarteTest extends TestCase
         'origen' => 'local',
         'sexo' => 'M',
         'fecha_nacimiento' => '2015-02-17',
+    ];
 
+    private array $ganadoDescarteActualizado= [
+        'nombre' => 'actualizado',
+        'origen' => 'externo',
+        'fecha_nacimiento' => '2010-02-17',
+        'peso_nacimiento' => 50,
+        'peso_destete' => 70,
+        'peso_2year' => 90,
+        'peso_actual' => 100,
     ];
 
     private int $cantidad_ganadoDescarte = 10;
@@ -264,20 +273,31 @@ class GanadoDescarteTest extends TestCase
 
     public function test_actualizar_ganadoDescarte(): void
     {
-        $ress = $this->generarGanadoDescartes();
-        $idRandom = rand(0, $this->cantidad_ganadoDescarte - 1);
-        $idResEditar = $ress[$idRandom]->id;
+        $ganadoDescarteActual = GanadoDescarte::factory()
+        ->for($this->finca)
+        ->for(Ganado::factory()->hasPeso()->create(['finca_id' => $this->finca->id,
+        'sexo' => 'M',
+        'tipo_id' => 4,
+        'nombre' => 'test',
+        'numero' => 392,
+        'origen' => 'local',
+        'fecha_nacimiento' => '2015-02-17']))
+        ->create();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/ganado_descarte/%s', $idResEditar), $this->ganadoDescarte);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/ganado_descarte/%s', $ganadoDescarteActual->id), $this->ganadoDescarteActualizado);
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) =>
             $json
-                ->where('ganado_descarte.nombre', $this->ganadoDescarte['nombre'])
-                ->where('ganado_descarte.numero', $this->ganadoDescarte['numero'])
-                ->where('ganado_descarte.origen', $this->ganadoDescarte['origen'])
-                ->where('ganado_descarte.sexo', $this->ganadoDescarte['sexo'])
-                ->where('ganado_descarte.fecha_nacimiento', $this->ganadoDescarte['fecha_nacimiento'])
+                ->where('ganado_descarte.nombre', $this->ganadoDescarteActualizado['nombre'])
+                ->where('ganado_descarte.numero', $ganadoDescarteActual['ganado']['numero'])
+                ->where('ganado_descarte.origen', $this->ganadoDescarteActualizado['origen'])
+                ->where('ganado_descarte.sexo', $ganadoDescarteActual['ganado']['sexo'])
+                ->where('ganado_descarte.pesos.peso_nacimiento', $this->ganadoDescarteActualizado['peso_nacimiento'] . 'KG')
+                ->where('ganado_descarte.pesos.peso_destete', $this->ganadoDescarteActualizado['peso_destete'] . 'KG')
+                ->where('ganado_descarte.pesos.peso_2year', $this->ganadoDescarteActualizado['peso_2year'] . 'KG')
+                ->where('ganado_descarte.pesos.peso_actual', $this->ganadoDescarteActualizado['peso_actual'] . 'KG')
+                ->where('ganado_descarte.fecha_nacimiento', $this->ganadoDescarteActualizado['fecha_nacimiento'])
                 ->where('ganado_descarte.tipo', fn (string $tipoGanado) => Str::contains($tipoGanado, ['becerro', 'maute', 'novillo', 'adulto']))
                 ->etc()
         );
@@ -305,7 +325,7 @@ class GanadoDescarteTest extends TestCase
     {
         $ganadoDescarte = GanadoDescarte::factory()
             ->for($this->finca)
-            ->for(Ganado::factory()->for($this->finca)->create(['nombre' => 'test', 'numero' => 392]))
+            ->for(Ganado::factory()->hasPeso()->for($this->finca)->create(['nombre' => 'test', 'numero' => 392]))
             ->create();
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/ganado_descarte/%s', $ganadoDescarte->id), $this->ganadoDescarte);

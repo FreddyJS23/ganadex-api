@@ -94,8 +94,8 @@ class GanadoDescarteController extends Controller
      */
     public function update(UpdateGanadoDescarteRequest $request, GanadoDescarte $ganadoDescarte)
     {
-
-        $ganadoDescarte->ganado->fill($request->all())->save();
+        $ganadoDescarte->ganado->fill($request->except($this->peso))->save();
+        $ganadoDescarte->ganado->peso->fill($request->only($this->peso))->save();
 
         return response()->json(['ganado_descarte' => new GanadoDescarteResource($ganadoDescarte)], 200);
     }
