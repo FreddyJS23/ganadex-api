@@ -44,6 +44,15 @@ class GanadoTest extends TestCase
             ],
         ],
     ];
+    private array $cabeza_ganado_actualizada = [
+        'nombre' => 'actualizado',
+        'origen' => 'externo',
+        'fecha_nacimiento' => '2010-02-17',
+        'peso_nacimiento' => 50,
+        'peso_destete' => 70,
+        'peso_2year' => 90,
+        'peso_actual' => 100,
+    ];
 
     private int $cantidad_ganado = 10;
     private $cabeza_ganado_fallecida;
@@ -314,24 +323,33 @@ class GanadoTest extends TestCase
 
     public function test_actualizar_cabeza_ganado(): void
     {
-        $cabezasGanado = $this->generarGanado();
-        $idRandom = rand(0, $this->cantidad_ganado - 1);
-        $idGanadoEditar = $cabezasGanado[$idRandom]->id;
+    $ganadoEditar=Ganado::factory()
+    ->hasPeso(1)
+    ->hasEvento(1)
+    ->hasAttached($this->estado)
+    ->hasVacunaciones(3,['finca_id'=>$this->finca->id])
+    ->for($this->finca)
+    ->create([
+    'nombre' => 'test',
+    'numero' => 392,
+    'origen' => 'local',
+    'sexo' => 'H',]);
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/ganado/%s', $idGanadoEditar), $this->cabeza_ganado);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/ganado/%s', $ganadoEditar->id), $this->cabeza_ganado_actualizada);
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) =>
             $json
-                ->where('ganado.nombre', $this->cabeza_ganado['nombre'])
-                ->where('ganado.numero', $this->cabeza_ganado['numero'])
-                ->where('ganado.origen', $this->cabeza_ganado['origen'])
-                ->where('ganado.sexo', $this->cabeza_ganado['sexo'])
-                ->where('ganado.fecha_nacimiento', $this->cabeza_ganado['fecha_nacimiento'])
-                ->where('ganado.pesos.peso_nacimiento', $this->cabeza_ganado['peso_nacimiento'] . 'KG')
-                ->where('ganado.pesos.peso_destete', $this->cabeza_ganado['peso_destete'] . 'KG')
-                ->where('ganado.pesos.peso_2year', $this->cabeza_ganado['peso_2year'] . 'KG')
-                ->where('ganado.pesos.peso_actual', $this->cabeza_ganado['peso_actual'] . 'KG')
+                ->where('ganado.nombre', $this->cabeza_ganado_actualizada['nombre'])
+                ->where('ganado.numero', $ganadoEditar['numero'])
+                ->where('ganado.origen', $this->cabeza_ganado_actualizada['origen'])
+                ->where('ganado.sexo', $ganadoEditar['sexo'])
+                ->where('ganado.fecha_nacimiento', $this->cabeza_ganado_actualizada['fecha_nacimiento'])
+                ->where('ganado.pesos.peso_nacimiento', $this->cabeza_ganado_actualizada['peso_nacimiento'] . 'KG')
+                ->where('ganado.pesos.peso_destete', $this->cabeza_ganado_actualizada['peso_destete'] . 'KG')
+                ->where('ganado.pesos.peso_2year', $this->cabeza_ganado_actualizada['peso_2year'] . 'KG')
+                ->where('ganado.pesos.peso_actual', $this->cabeza_ganado_actualizada['peso_actual'] . 'KG')
+                ->etc()
         );
     }
 
