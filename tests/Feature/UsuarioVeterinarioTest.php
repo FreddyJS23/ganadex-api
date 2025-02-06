@@ -85,6 +85,8 @@ class UsuarioVeterinarioTest extends TestCase
                         'id' => 'integer',
                         'usuario' => 'string',
                         'nombre' => 'string',
+                        'fecha_creacion' => 'string',
+                        'telefono'=>'string'
                     ])->where('rol', 'veterinario')
                 )
             );
@@ -102,6 +104,8 @@ class UsuarioVeterinarioTest extends TestCase
                     'id' => 'integer',
                     'usuario' => 'string',
                     'nombre' => 'string',
+                    'fecha_creacion' => 'string',
+                    'telefono'=>'string'
                 ])
                     ->where('rol', 'veterinario')
             )
