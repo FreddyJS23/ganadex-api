@@ -30,6 +30,7 @@ class AuthLogin extends Controller
         //intentar autenticar
         if (Auth::attempt($request->only(['usuario', 'password']))) {
             $request->session()->regenerate();
+            activity('Login')->log('Login');
             $rol = $user->hasRole('admin') ? 'admin' : 'veterinario';
             //notificar en el client si el login incluye inicio de sesion finca
             $sesion_finca=false;
