@@ -13,7 +13,7 @@ class ConfiguracionController extends Controller
 
      public function __construct() {
         $this->authorizeResource(Configuracion::class,'configuracion');
-    } 
+    }
     /**
      * Display a listing of the resource.
      */
@@ -45,6 +45,10 @@ class ConfiguracionController extends Controller
         $configuracion=Configuracion::firstWhere('user_id', Auth::id());
         $configuracion->fill($request->all());
         $configuracion->save();
+
+        session()->put('peso_servicio', $configuracion->peso_servicio);
+        session()->put('dias_evento_notificacion', $configuracion->dias_evento_notificacion);
+        session()->put('dias_diferencia_vacuna', $configuracion->dias_diferencia_vacuna);
 
         return response()->json(['configuracion' => new ConfiguracionResource($configuracion)], 200);
     }

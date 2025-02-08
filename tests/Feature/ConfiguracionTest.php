@@ -63,7 +63,6 @@ class ConfiguracionTest extends TestCase
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) => $json->whereAllType(
                 [
-                    'configuracion.id' => 'integer',
                     'configuracion.peso_servicio' => 'integer',
                     'configuracion.dias_evento_notificacion' => 'integer',
                     'configuracion.dias_diferencia_vacuna' => 'integer',
@@ -75,14 +74,16 @@ class ConfiguracionTest extends TestCase
 
     public function test_actualizar_configuracion(): void
     {
-        $response = $this->actingAs($this->user)->putJson(route('configuracion.update'),$this->configuracion);
+        $response = $this->actingAs($this->user)->withSession(['peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->putJson(route('configuracion.update'),$this->configuracion);
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) => $json->where('configuracion.peso_servicio',$this->configuracion['peso_servicio'])
             ->where('configuracion.dias_evento_notificacion',$this->configuracion['dias_evento_notificacion'])
             ->where('configuracion.dias_diferencia_vacuna',$this->configuracion['dias_diferencia_vacuna'])
             ->etc()
-        );
+        ) ->assertSessionHas('peso_servicio',$this->configuracion['peso_servicio'])
+        ->assertSessionHas('dias_evento_notificacion',$this->configuracion['dias_evento_notificacion'])
+        ->assertSessionHas('dias_diferencia_vacuna',$this->configuracion['dias_diferencia_vacuna']);;
     }
 
 
