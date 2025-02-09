@@ -228,7 +228,9 @@ class EventosGanadoTest extends TestCase
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->getJson('api/ganado_descarte');
 
         $response->assertStatus(200)->AssertJson( fn (AssertableJson $json) => $json
-                ->has('ganado_descartes', 1));
+                ->has('ganado_descartes', 1,fn (AssertableJson $json) => $json
+                    ->has('estados',1,fn(AssertableJson $json)=>$json
+                        ->where('estado','sano')->etc())->etc()));
     }
 
 
