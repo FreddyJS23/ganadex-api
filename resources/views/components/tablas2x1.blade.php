@@ -10,9 +10,10 @@
         </thead>
 
         <tbody>
+            @if(is_array($detalles1))
             <tr class="fila_celdas">
                 @forelse ($detalles1 as $detalle)
-                    @php
+                   @php
                         $titulo = ucfirst(array_keys($detalles1)[$loop->index]);
                         $titulo = str_replace('_', ' ', $titulo);
                         //transformar columna de tabla pesos
@@ -30,6 +31,13 @@
                     </td>
                 @endforelse
             </tr>
+            @else
+                <tr class="fila_celdas">
+                    <td colspan="3" class="celda_tabla">
+                        <h4>{{ $detalles1 }}</h4>
+                    </td>
+                </tr>
+            @endif
         </tbody>
     </table>
     <table class="tabla_informacion_pequeña">
@@ -42,28 +50,35 @@
         </thead>
 
         <tbody>
+
+            @if(is_array($detalles2))
             <tr class="fila_celdas">
                 @forelse ($detalles2 as $detalle)
-                  @php
-                        $titulo = ucfirst(array_values($detalle)[0]);
-                        $detalle = array_values($detalle)[1];
-                        $titulo = str_replace('_', ' ', $titulo);
+                   @php
+                         $titulo = ucfirst(array_keys($detalles2)[$loop->index]);
+                         $titulo = str_replace('_', ' ', $titulo);
                         //transformar columna de tabla pesos
                         $titulo = str_replace('2year', '2 años', $titulo);
-                        //pluralizar palabras cantidad ganado exeptuando total
-                        $titulo = $titulo == 'Total' ? $titulo : $titulo . 's';
+                        $caracterEspecial = $titulo == 'Efectividad' ? '%' : '';
 
                     @endphp
 
                     <td class="celda_tabla">
                         <h4>{{ $titulo }}</h4>
-                        <p>{{ $detalle }} </p>
+                        <p>{{ $detalle . $caracterEspecial }} </p>
                     </td>
                 @empty <td class="celda_sin_info">
                         <p>No tiene</p>
                     </td>
                 @endforelse
             </tr>
+            @else
+                <tr class="fila_celdas">
+                    <td colspan="3" class="celda_tabla">
+                        <h4>{{ $detalles2 }}</h4>
+                    </td>
+                </tr>
+            @endif
         </tbody>
     </table>
 </div>
