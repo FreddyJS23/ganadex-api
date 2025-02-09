@@ -85,37 +85,77 @@ $estadoProduccionLeche= $ganado->estados->contains('estado','lactancia') ? "En p
 
   public function resumenGeneral()
   {
+    function obtenerSumaTotalPorTipo(array $tipo):int{
+        $sumaTotalPorTipo = 0;
+        foreach ($tipo as $key => $value) $sumaTotalPorTipo += $value['cantidad'];
+        return $sumaTotalPorTipo;
+    }
+
 
     $fechaActual = new DateTime();
     $mesActual = $fechaActual->format('m');
+    session()->put('finca_id', 1);
 
-    $TotalGanadoPorTiposMacho = Ganado::where('finca_id', session('finca_id'))
-      ->where('sexo', 'M')
+    /* ------------------------------ obtene vacas ------------------------------ */
+    //tambien abarca las que seran futuras vacas
+    $vacas = Ganado::where('finca_id', session('finca_id'))
+      ->doesntHave('toro')
+      ->doesntHave('ganadoDescarte')
       ->selectRaw('tipo, COUNT(tipo) as cantidad')
       ->join('ganado_tipos', 'tipo_id', 'ganado_tipos.id')
+      ->orderBy('tipo_id')
       ->groupBy('tipo')
       ->get()
       ->toArray();
 
-    //total de ganado macho
-    $totalMacho = 0;
-    foreach ($TotalGanadoPorTiposMacho as $key => $value) $totalMacho += $value['cantidad'];
-    array_push($TotalGanadoPorTiposMacho, ['tipo' => 'total', 'cantidad' => $totalMacho]);
-
-    $TotalGanadoPorTiposHembra
+      $totalVacasEnProduccion = Ganado::select('id')->where('finca_id',session('finca_id'))
+            ->whereRelation('estados', 'estado', 'lactancia')
+            ->count();
+    array_push($vacas, ['tipo' => 'total','cantidad' => obtenerSumaTotalPorTipo($vacas)]);
+    array_push($vacas, ['tipo' => 'productiva','cantidad' => $totalVacasEnProduccion]);
+    /* ------------------------------ obtene toros ------------------------------ */
+    //tambien abacar los que seran futuros toros
+    $toros
       = Ganado::where('finca_id', session('finca_id'))
-      ->where('sexo', 'H')
+      ->has('toro')
+      ->doesntHave('ganadoDescarte')
       ->selectRaw('tipo, COUNT(tipo) as cantidad')
       ->join('ganado_tipos', 'tipo_id', 'ganado_tipos.id')
+      ->orderBy('tipo_id')
       ->groupBy('tipo')
       ->get()
       ->toArray();
 
-    //total de ganado hembra
-    $totalHembra = 0;
-    foreach ($TotalGanadoPorTiposHembra as $key => $value) $totalHembra += $value['cantidad'];
-    array_push($TotalGanadoPorTiposHembra, ['tipo' => 'total', 'cantidad' => $totalHembra]);
+    //total de ganado toro
+    array_push($toros, ['tipo' => 'total', 'cantidad' => obtenerSumaTotalPorTipo($toros)]);
 
+    /* ------------------------------ obtene descartes ------------------------------ */
+    $ganadoDescarte
+      = Ganado::where('finca_id', session('finca_id'))
+      ->doesntHave('toro')
+      ->has('ganadoDescarte')
+      ->selectRaw('tipo, COUNT(tipo) as cantidad')
+      ->join('ganado_tipos', 'tipo_id', 'ganado_tipos.id')
+      ->orderBy('tipo_id')
+      ->groupBy('tipo')
+      ->get()
+      ->toArray();
+
+    //total de descartes
+    array_push($ganadoDescarte, ['tipo' => 'total', 'cantidad' => obtenerSumaTotalPorTipo($ganadoDescarte)]);
+
+    /* --------------------- obtener natalidad y mortalidad --------------------- */
+    $ganadoMortalida =Fallecimiento::selectRaw('COUNT(id) as total')->whereRelation('ganado','finca_id',session('finca_id'))
+    ->whereYear('fecha',$fechaActual->format('Y'))
+    ->first()
+    ->total;
+
+   $ganadoNatalidad =Ganado::selectRaw('COUNT(id) as total')
+   ->whereYear('fecha_nacimiento',$fechaActual->format('Y'))
+   ->where('finca_id', session('finca_id'))
+   ->first()->total;
+
+   /* ------------------------ obtener top vacas productoras y menos productoras ------------------------- */
     $topVacasProductoras = Leche::withWhereHas('ganado', function ($query) {
       $query->where('finca_id', session('finca_id'))
         ->select('id', 'numero');
@@ -150,6 +190,7 @@ $estadoProduccionLeche= $ganado->estados->contains('estado','lactancia') ? "En p
     }
     $topVacasMenosProductoras = $ordernarArrayVacasMenosProductoras;
 
+    /* ------------------------ obtener total vacas en gestacio,revision y servicio ------------------------- */
     $totalVacasEnGestacion = Ganado::where('finca_id',session('finca_id'))
       ->whereRelation('estados', 'estado', 'gestacion')
       ->count();
@@ -158,9 +199,9 @@ $estadoProduccionLeche= $ganado->estados->contains('estado','lactancia') ? "En p
       ->whereRelation('estados', 'estado', 'pendiente_revision')
       ->count();
 
-    $novillasAmontar = Peso::whereHas('ganado', function (Builder $query) {
-      $query->where('finca_id', session('finca_id'));
-    })->where('peso_actual', '>=', 330)->count();
+    $novillasAmontar =Ganado::where('finca_id',session('finca_id'))
+    ->whereRelation('estados', 'estado', 'pendiente_servicio')
+    ->count();
 
     $ganadoPendienteAcciones = [
       'revision' => $totalGanadoPendienteRevision,
@@ -168,7 +209,7 @@ $estadoProduccionLeche= $ganado->estados->contains('estado','lactancia') ? "En p
       'preñadas' => $totalVacasEnGestacion,
     ];
 
-
+    /* ------------------------ obtener total personal ------------------------- */
     $totalPersonal = Personal::where('finca_id',session('finca_id'))
       ->selectRaw('cargo, COUNT(cargo) as cantidad')
       ->join('cargos', 'cargo_id', 'cargos.id')
@@ -176,9 +217,17 @@ $estadoProduccionLeche= $ganado->estados->contains('estado','lactancia') ? "En p
       ->get()
       ->toArray();
 
+      $personal=[];
+      $cantidadTotalPersonal=0;
+      foreach ($totalPersonal as $key => $value) {
+        $cantidadTotalPersonal+=$value['cantidad'];
+        $personal=array_merge($personal,[$value['cargo'] =>$value['cantidad']]);
+      }
+      $personal=array_merge($personal,['total'=>$cantidadTotalPersonal]);
+      /* ------------------------ obtener balance anual de leche ------------------------- */
     $balanceAnualLeche = Leche::selectRaw("DATE_FORMAT(fecha,'%m') as mes")
       ->selectRaw("AVG(peso_leche) as promedio_pesaje")
-      ->groupBy('fecha')
+      ->groupBy('mes')
       ->orderBy('mes', 'asc')
       ->whereYear('fecha', now()->format('Y'))
       ->get()
@@ -201,18 +250,23 @@ $estadoProduccionLeche= $ganado->estados->contains('estado','lactancia') ? "En p
       $mesPrimerSemestre ? array_push($balancePrimerSemestre, $infoMesFormateado) : array_push($balanceSegundoSemestre, $infoMesFormateado);
     }
 
+    /* -------------------- relleno de datos para el reporte -------------------- */
     $dataPdf = [
-      'tiposGanadoMacho' => $TotalGanadoPorTiposMacho,
-      'tiposGanadoHembra' => $TotalGanadoPorTiposHembra,
+      'vacas' => $vacas,
+      'toros' => $toros,
+      'ganadoDescarte' => $ganadoDescarte,
+      'natalidad'=>strval($ganadoNatalidad),
+      'mortalidad'=>strval($ganadoMortalida),
       'topVacasProductoras' => $topVacasProductoras,
       'topVacasMenosProductoras' => $topVacasMenosProductoras,
       'ganadoPendienteAcciones' => $ganadoPendienteAcciones,
-      'totalPersonal' => $totalPersonal,
+      'totalPersonal' => $personal,
       'balancePrimerSemestre' => $balancePrimerSemestre,
       'balanceSegundoSemestre' => $balanceSegundoSemestre
     ];
 
-    $pdf = Pdf::loadView('resumenGeneralReporte', $dataPdf);
+    //return view('resumenGeneralReporte', $dataPdf);
+      $pdf = Pdf::loadView('resumenGeneralReporte', $dataPdf);
 
     return $pdf->stream();
   }
