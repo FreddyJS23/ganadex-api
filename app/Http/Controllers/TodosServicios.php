@@ -17,6 +17,7 @@ class TodosServicios extends Controller
     {
 
         $ganados = Ganado::doesntHave('toro')
+            ->doesntHave('ganadoDescarte')
             ->has('servicios')
             ->with([
                 'parto' => function (Builder $query) {

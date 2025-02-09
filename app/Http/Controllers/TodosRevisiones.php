@@ -14,6 +14,6 @@ class TodosRevisiones extends Controller
      */
     public function __invoke()
     {
-        return new TodosRevisionesCollection(Ganado::doesntHave('toro')->withCount('revision')->where('finca_id', session('finca_id'))->get());
+        return new TodosRevisionesCollection(Ganado::doesntHave('toro')->doesntHave('ganadoDescarte')->withCount('revision')->where('finca_id', session('finca_id'))->get());
     }
 }
