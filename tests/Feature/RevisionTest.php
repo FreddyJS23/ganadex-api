@@ -7,7 +7,10 @@ use App\Models\Finca;
 use App\Models\Ganado;
 use App\Models\Personal;
 use App\Models\Revision;
+use App\Models\Servicio;
+use App\Models\Toro;
 use App\Models\User;
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -154,6 +157,60 @@ class RevisionTest extends TestCase
                 )
                 )
             );
+    }
+
+    public function test_creacion_revision_y_vaca_no_cumple_requisito_peso_para_diagnosticar_preñada(): void
+    {
+        $ganadoNoRequisito=Ganado::factory()
+        ->hasPeso(['peso_actual'=>200])
+        ->hasEvento(1)
+        ->hasAttached($this->estado)
+        ->for($this->finca)
+        ->create();
+
+        $veterinario
+        = Personal::factory()
+            ->for($this->finca)
+            ->create(['cargo_id' => 2]);
+
+            $toro = Toro::factory()
+            ->for($this->finca)
+            ->for(Ganado::factory()->for($this->finca)->create(['sexo' => 'M']))->create();
+
+            Servicio::factory()
+            ->count(1)
+            ->for($ganadoNoRequisito)
+            ->for($toro,'servicioable')
+            ->create(['personal_id' => $this->veterinario]);
+
+
+
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])
+        ->postJson(route('revision.store',['ganado'=>$ganadoNoRequisito->id]),['diagnostico' => 'prenada','tratamiento' => 'medicina', 'fecha' => '2020-10-02','personal_id'=>$this->veterinario->id]);
+
+        $response->assertStatus(422)
+            ->assertJson(
+                fn (AssertableJson $json) => $json->where('errors.diagnostico.0',fn(string $message)=>Str::contains($message,'La vaca debe tener un peso mayor a'))
+            ->etc());
+    }
+
+    public function test_creacion_revision_y_vaca_no_cumple_requisito_servicio_para_diagnosticar_preñada(): void
+    {
+        $ganadoNoRequisito=Ganado::factory()
+        ->hasPeso(['peso_actual'=>500])
+        ->hasEvento(1)
+        ->hasAttached($this->estado)
+        ->for($this->finca)
+        ->create();
+
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])
+        ->postJson(route('revision.store',['ganado'=>$ganadoNoRequisito->id]),['diagnostico' => 'prenada','tratamiento' => 'medicina', 'fecha' => '2020-10-02','personal_id'=>$this->veterinario->id]);
+
+        $response->assertStatus(422)
+            ->assertJson(
+                fn (AssertableJson $json) => $json->where('errors.diagnostico.0','La vaca debe de tener un servicio previo')
+                ->etc())
+            ;
     }
 
 

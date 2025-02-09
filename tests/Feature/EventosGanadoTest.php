@@ -108,7 +108,7 @@ class EventosGanadoTest extends TestCase
         $this->ganado
             = Ganado::factory()
             ->hasPeso(1)
-            ->hasEvento(1)
+            ->hasEvento(['prox_revision'=>null,'prox_parto'=>null,'prox_secado'=>null])
             ->hasAttached($this->estado)
             ->for($this->finca)
             ->create(['sexo' => 'H', 'tipo_id' => 3]);
@@ -141,14 +141,53 @@ class EventosGanadoTest extends TestCase
         );
     }
 
-    public function test_cuando_se_realiza_una_revision_y_sale_preñada(): void
+    public function test_cuando_se_realiza_una_revision_y_sale_preñada_y_es_primer_parto(): void
     {
+
         //realizar servicio
         $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->postJson(
             sprintf('api/ganado/%s/servicio', $this->ganado->id),
             $this->servicio + ['toro_id' => $this->toro->id,'personal_id' => $this->veterinario->id]
         );
 
+        //realizar revision
+        $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->postJson(
+            sprintf('api/ganado/%s/revision', $this->ganado->id),
+            $this->revision + ['personal_id' => $this->veterinario->id]
+        );
+
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf('api/ganado/%s', $this->ganado->id));
+
+        $response->assertStatus(200)->assertJson(
+            fn (AssertableJson $json) => $json->whereAllType(
+                [
+                    'ganado.eventos.prox_parto' => 'string',
+                    'ganado.eventos.prox_secado' => 'null',
+                    'revision_reciente' => 'array',
+                    'total_revisiones' => 'integer',
+                ]
+            )->has('ganado.estados', 2)
+                ->where(
+                    'ganado.estados',
+                    fn (Collection $estados) => $estados->contains('estado', 'gestacion')
+                )
+                ->etc()
+        );
+    }
+
+    public function test_cuando_se_realiza_una_revision_y_sale_preñada_ya_tuvo_parto(): void
+    {
+
+        //realizar servicio
+        $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->postJson(
+            sprintf('api/ganado/%s/servicio', $this->ganado->id),
+            $this->servicio + ['toro_id' => $this->toro->id,'personal_id' => $this->veterinario->id]
+        );
+        //realizar parto
+        $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->postJson(
+            sprintf('api/ganado/%s/parto', $this->ganado->id),
+            $this->parto + $this->hembra + ['personal_id' => $this->veterinario->id]
+        );
         //realizar revision
         $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->postJson(
             sprintf('api/ganado/%s/revision', $this->ganado->id),
@@ -177,6 +216,7 @@ class EventosGanadoTest extends TestCase
                 ->etc()
         );
     }
+
     public function test_cuando_se_realiza_una_revision_y_se_descarta(): void
     {
         //realizar revision
@@ -419,7 +459,7 @@ class EventosGanadoTest extends TestCase
             )->has(
                 //ganado con pesaje mensual de leche realizado
                 'cabezas_ganado.2',
-                //estado:sano,pendiente_servicio  
+                //estado:sano,pendiente_servicio
                 fn (AssertableJson $json) => $json->has('estados', 2)
                     ->where(
                         'estados',
@@ -441,7 +481,7 @@ class EventosGanadoTest extends TestCase
             ->create();
 
             //11 por que se suma tambien el que se crea en setUp
-            $cantidadGanadoEventoProximo=11;
+            $cantidadGanadoEventoProximo=10;
 
         //ganado con un evento lejano
         Ganado::factory()
@@ -471,11 +511,11 @@ class EventosGanadoTest extends TestCase
                     ->has('secado', $cantidadGanadoEventoProximo)
                     ->has('parto', $cantidadGanadoEventoProximo)
             ));
-    } 
+    }
 
     public function test_verificacion_vaca_apta_para_servicio(): void
     {
-        $estado = Estado::firstWhere('estado', 'sano');        
+        $estado = Estado::firstWhere('estado', 'sano');
 
         $ganadoAptoServicio = Ganado::factory()
             ->hasPeso(1,['peso_actual'=>350])
@@ -516,5 +556,5 @@ class EventosGanadoTest extends TestCase
                     )->etc()
             )
         );
-    }   
+    }
 }
