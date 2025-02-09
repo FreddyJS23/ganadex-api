@@ -5,6 +5,7 @@ namespace App\Listeners;
 use App\Events\RevisionDescarte;
 use App\Http\Controllers\GanadoController;
 use App\Http\Controllers\GanadoDescarteController;
+use App\Models\Estado;
 use App\Models\GanadoDescarte;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -27,6 +28,8 @@ class DescartarGanado
     {
         $ganadoDescarte = new GanadoDescarte();
         $ganadoDescarte->ganado_id = $event->revision->ganado_id;
+        $estado = Estado::firstWhere('estado', 'sano');
+        $event->revision->ganado->estados()->sync($estado->id);
         $ganadoDescarte->finca_id = session('finca_id');
         $ganadoDescarte->save();
     }
