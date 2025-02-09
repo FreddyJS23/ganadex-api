@@ -13,9 +13,11 @@ class Tablas2x1 extends Component
      */
     public function __construct(
         public string $titulo1,
-        public array $detalles1,
+        /** @var array{string:string} */
+        public array | string $detalles1,
         public string $titulo2,
-        public array $detalles2,
+        /** @var array{string:string} */
+        public array | string $detalles2,
     )
     {
         //
