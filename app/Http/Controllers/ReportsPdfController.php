@@ -432,6 +432,7 @@ $fin=$request->query('end');
       ->orderBy('fecha', 'desc')
       ->first();
 
+    $ganado=$ventaGanado->ganado;
     $dataPdf = [
       'numero' => $ventaGanado->ganado->numero ?? '',
       'tipo' => $ventaGanado->ganado->tipo->tipo,
