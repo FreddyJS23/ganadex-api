@@ -424,6 +424,62 @@ $fin=$request->query('end');
 
   }
 
+  public function resumenNatalidad(Request $request)
+  {
+    session()->put('finca_id', 1);
+    $year = $request->query('year');
+
+    //obtener conteo nacimients ultimos 5 años
+    $nacimientosAnuales = Ganado::where('finca_id',session('finca_id'))
+      ->selectRaw("DATE_FORMAT(fecha_nacimiento,'%Y') as año, COUNT(fecha_nacimiento) as total")
+      ->orderBy('año', 'desc')
+      ->whereRaw("DATE_FORMAT(fecha_nacimiento,'%Y') >= ? ",[$year-5])
+      ->groupBy('año')
+      ->get()
+      ->toArray();
+
+    //obetner conteo agrupado por mes ademas de la cantidad de machos y hembras en ese mes
+    $consultaSql="DATE_FORMAT(fecha_nacimiento,'%m') as mes, COUNT(fecha_nacimiento) as total,
+        COUNT(CASE WHEN sexo = 'M' THEN 1 END) as machos,
+        COUNT(CASE WHEN sexo = 'H' THEN 1 END) as hembras";
+
+  $nacimientosPorMeses = Ganado::where('finca_id',session('finca_id'))
+      ->selectRaw($consultaSql)
+      ->orderBy('mes', 'asc')
+      ->groupBy('mes')
+      ->whereYear('fecha_nacimiento', $year)
+      ->get();
+
+      $totalPartos=0;
+      $totalPartosMachos=0;
+      $totalPartosHembras=0;
+
+      $nacimientosPorMeses->transform(function (Ganado $item, int $key) {
+        $meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+        $item->mes = $meses[intval($item->mes)];
+        return $item;
+      });
+
+      foreach ($nacimientosPorMeses as $key => $value) {
+        $totalPartos+=$value['total'];
+        $totalPartosMachos+=$value['machos'];
+        $totalPartosHembras+=$value['hembras'];
+      }
+
+    $dataPdf = [
+      'totalPartos' => $totalPartos,
+      'totalPartosMachos' => $totalPartosMachos,
+      'totalPartosHembras' => $totalPartosHembras,
+      'nacimientosPorMeses' => $nacimientosPorMeses->toArray(),
+      'nacimientosAnuales'=>$nacimientosAnuales,
+      'year'=>$year
+    ];
+
+    $pdf = Pdf::loadView('resumenNatalidad', $dataPdf);
+
+    return $pdf->stream();
+  }
+
   public function facturaVentaGanado(){
     session()->put('finca_id', 1);
 
