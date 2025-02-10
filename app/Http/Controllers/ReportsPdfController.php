@@ -433,11 +433,54 @@ $fin=$request->query('end');
       ->first();
 
     $ganado=$ventaGanado->ganado;
+
+    $sentenciaSql="nombre as vacuna,
+    CASE
+        WHEN vacunacions.fecha  IS NULL THEN jornada_vacunacions.fecha_inicio
+        ELSE vacunacions.fecha
+        END as fecha";
+    /*  se utilizas el leftJoin para traer resultado independientemente si existen resultados en una tabla u otra,
+       si se usa inner join se obtendra resultados precisos ya solo traera resultados cuando existan en las dos tablas relacionadas.
+       Los ultimos dos wheres se utilizan para omitir los resultados de la tabla vacuna, ya que por defecto los trae y aumentaria el contador
+       de aplicaciones de vacunas aplicada
+        */
+        $historialVacunas=Vacuna::selectRaw($sentenciaSql)
+        ->leftJoin('vacunacions',function(JoinClause $join)use($ganado){
+            $join->on('vacunas.id','=','vacunacions.vacuna_id')
+            ->where('vacunacions.ganado_id',$ganado->id);}
+            )
+        ->leftJoin('jornada_vacunacions',function(JoinClause $join)use($ganado)
+        {
+            $join->on('vacunas.id','=','jornada_vacunacions.vacuna_id')
+            ->where('jornada_vacunacions.finca_id',session('finca_id'))
+            ->where('fecha_inicio','>',$ganado->fecha_nacimiento ?? $ganado->created_at);
+            }
+            )
+        ->where('jornada_vacunacions.prox_dosis','!=','null')
+        ->orWhere('vacunacions.fecha','!=','null')
+        ->orderBy('fecha','desc')
+        ->get()
+        ->toArray();
+
+        /** @var array<string,<array{string}>> $vacunas */
+        $vacunas = [];
+        //agrupas vacunas por nombre y obtener todas las fechas de aplicacion de las fismas
+        /** return   */
+        foreach ($historialVacunas as $key => $vacuna) {
+            $nombreVacuna = $vacuna['vacuna'];
+            if(!array_key_exists($nombreVacuna,$vacunas)){
+               $vacunas=array_merge($vacunas,[$nombreVacuna=>[]]);
+                array_push($vacunas[$nombreVacuna],$vacuna['fecha']);
+            }
+            else array_push($vacunas[$nombreVacuna],$vacuna['fecha']);
+        }
+
     $dataPdf = [
       'numero' => $ventaGanado->ganado->numero ?? '',
       'tipo' => $ventaGanado->ganado->tipo->tipo,
       'peso' => $ventaGanado->ganado->peso->peso_actual,
       'comprador' => $ventaGanado->comprador->nombre,
+      'vacunas'=>$vacunas
      /*  'precio' => $ventaGanado->precio,
       'precioKg' => round($ventaGanado->precio / intval($ventaGanado->ganado->peso->peso_actual), 2), */
   ];
