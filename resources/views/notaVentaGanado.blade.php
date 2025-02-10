@@ -14,8 +14,8 @@
             box-sizing: border-box;
             border-spacing: 0;
         }
-        
-        
+
+
         .header_nota_venta {
             margin: auto;
             width: 195px;
@@ -91,7 +91,7 @@
                 <td class="header_vertical">Peso</td>
                 <td></td>
                 <td></td>
-                <td>{{$peso}} kg</td>
+                <td>{{$peso}}</td>
             </tr>
             <tr>
                 <td class="header_vertical">Comprador</td>
@@ -99,7 +99,7 @@
                 <td></td>
                 <td>{{$comprador}}</td>
             </tr>
-            <tr>
+            {{-- <tr>
                 <td class="header_vertical">Precio</td>
                 <td></td>
                 <td></td>
@@ -110,7 +110,7 @@
                 <td></td>
                 <td></td>
                 <td>{{$precioKg}} $</td>
-            </tr>
+            </tr> --}}
         </tbody>
     </table>
     <footer class="footer_nota_venta">

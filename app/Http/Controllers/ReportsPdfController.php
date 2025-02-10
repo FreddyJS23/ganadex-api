@@ -392,6 +392,7 @@ $fin=$request->query('end');
 
   public function resumenCausasFallecimientos(Request $request)
   {
+    session()->put('finca_id', 1);
     $inicio = $request->query('start');
     $fin = $request->query('end');
 
@@ -424,20 +425,20 @@ $fin=$request->query('end');
   }
 
   public function facturaVentaGanado(){
+    session()->put('finca_id', 1);
 
     $ventaGanado = Venta::where('finca_id',session('finca_id'))
     ->with(['ganado'=>['peso'],'comprador'])
       ->orderBy('fecha', 'desc')
       ->first();
 
-
     $dataPdf = [
-      'numero' => $ventaGanado->ganado->numero,
+      'numero' => $ventaGanado->ganado->numero ?? '',
       'tipo' => $ventaGanado->ganado->tipo->tipo,
       'peso' => $ventaGanado->ganado->peso->peso_actual,
       'comprador' => $ventaGanado->comprador->nombre,
-      'precio' => $ventaGanado->precio,
-      'precioKg' => round($ventaGanado->precio / intval($ventaGanado->ganado->peso->peso_actual), 2),
+     /*  'precio' => $ventaGanado->precio,
+      'precioKg' => round($ventaGanado->precio / intval($ventaGanado->ganado->peso->peso_actual), 2), */
   ];
 
     $pdf = Pdf::loadView('notaVentaGanado', $dataPdf);
