@@ -147,7 +147,7 @@ $estadoProduccionLeche= $ganado->estados->contains('estado','lactancia') ? "En p
 
       $pdf = Pdf::loadView('ganadoReporte', $dataPdf);
 
-    return $pdf->stream(); 
+    return $pdf->stream();
   }
 
 
@@ -366,9 +366,10 @@ $fin=$request->query('end');
   public function resumenVentaGanadoAnual(Request $request)
   {
 
+    session()->put('finca_id', 1);
     $year = $request->query('year');
 
-  $ventasGanado = Venta::where('finca_id',session('finca_id'))
+  $ventasGanado = Venta::where('ventas.finca_id',session('finca_id'))
       ->join('ganados', 'ganado_id', 'ganados.id')
       //->selectRaw("DATE_FORMAT(fecha,'%m') as mes,numero,precio")
       ->selectRaw("DATE_FORMAT(fecha,'%m') as mes,numero")
