@@ -8,11 +8,13 @@ use App\Models\GanadoTipo;
 use App\Models\Leche;
 use App\Models\Personal;
 use App\Models\Peso;
+use App\Models\Vacuna;
 use App\Models\Venta;
 use App\Models\VentaLeche;
 use Barryvdh\DomPDF\Facade\Pdf;
 use DateTime;
 use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Database\Query\JoinClause;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
@@ -31,17 +33,82 @@ class ReportsPdfController extends Controller
 
     $ganadoInfo = $ganado->only(['nombre', 'numero', 'sexo', 'origen', 'fecha_nacimiento']);
     $ganadoInfo = array_merge($ganadoInfo, ['tipo' => $ganado->tipo->tipo]);
+    $ganadoPeso =$ganado->peso ? Arr::except($ganado->peso->toArray(), ['id']) : [];
 
-    $ganadoPeso = Arr::except($ganado->peso->toArray(), ['id']);
+    $resumenServicio=[];
+    if($ultimoServicio){
+        //servicio monta
+        if($ultimoServicio->servicioable_type == 'App\Models\Toro')    {
 
-    $resumenServicio = $ultimoServicio ? [
-      'ultimo' => $ultimoServicio->fecha,
-      'toro' => $ultimoServicio->toro->ganado->numero,
-      'efectividad' => $ganado->parto_count ? round($efectividad($ganado->parto_count, $ganado->servicios_count), 2) : null,
-      'total' => $ganado->servicios_count,
-    ] : [];
+        $resumenServicio=['ultimo' => $ultimoServicio->fecha,
+        'toro' => $ultimoServicio->servicioable->ganado->numero,
+        'efectividad' => $ganado->parto_count ? round($efectividad($ganado->parto_count, $ganado->servicios_count), 2) : null,
+        'total' => $ganado->servicios_count,
+        ];}
+        //servicio inseminacion
+        if($ultimoServicio->servicioable_type == 'App\Models\PajuelaToro')    {
 
+        $resumenServicio=['ultimo' => $ultimoServicio->fecha,
+        'codigo pajuela' => $ultimoServicio->servicioable->codigo,
+        'efectividad' => $ganado->parto_count ? round($efectividad($ganado->parto_count, $ganado->servicios_count), 2) : null,
+        'total' => $ganado->servicios_count,
+        ];}
 
+    }
+
+//diferencia dias entre proxima vacunacion individual y jornada vacunacion
+$diferencia=15;
+$setenciaDiferenciaDias="DATEDIFF(MAX(jornada_vacunacions.prox_dosis),MAX(vacunacions.prox_dosis))";
+
+/* Explicacion consulta
+usar un alias para las vacunas.
+primer case: para comprobar ver si alguna de las tablas relacionadas no existe registro,
+si existe registro en las dos se hace una suma de +1 ya que al contar los registros al existir en las dos tablas hace el conteo como 1.
+segundo case: determinar la proxima dosis dependiendo la existencia de registros en las tablas relacionadas,
+si existen registros en las dos tablas se comprueba que proxima dosis se le debe dar prioridad
+tercer case: determinar la ultima vacunacion dependiendo la existencia de registros en las tablas relacionadas,
+si existen registros en las dos tablas se comprueba que ultima dosis es la mas reciente*/
+$sentenciaSqlAgruparVacunas="nombre as vacuna,
+CASE
+    WHEN MAX(vacunacions.prox_dosis) IS NULL OR MAX(jornada_vacunacions.prox_dosis) IS NULL THEN COUNT(nombre)
+    ELSE COUNT(nombre) + 1
+    END as cantidad,
+CASE
+    WHEN MAX(vacunacions.prox_dosis) IS NULL THEN MAX(jornada_vacunacions.prox_dosis)
+    WHEN MAX(jornada_vacunacions.prox_dosis) IS NULL THEN MAX(vacunacions.prox_dosis)
+    WHEN $setenciaDiferenciaDias >= $diferencia THEN MAX(vacunacions.prox_dosis)
+    ELSE MAX(jornada_vacunacions.prox_dosis)
+END as prox_dosis,
+CASE
+    WHEN MAX(vacunacions.fecha) IS NULL THEN MAX(jornada_vacunacions.fecha_inicio)
+    WHEN MAX(jornada_vacunacions.fecha_inicio) IS NULL THEN MAX(vacunacions.fecha)
+    WHEN MAX(jornada_vacunacions.fecha_inicio) > MAX(vacunacions.fecha) THEN MAX(jornada_vacunacions.fecha_inicio)
+    ELSE MAX(vacunacions.fecha)
+END as ultima_dosis
+";
+
+/*  se utilizas el leftJoin para traer resultado independientemente si existen resultados en una tabla u otra,
+si se usa inner join se obtendra resultados precisos ya solo traera resultados cuando existan en las dos tablas relacionadas.
+Los ultimos dos wheres se utilizan para omitir los resultados de la tabla vacuna, ya que por defecto los trae y aumentaria el contador
+de aplicaciones de vacunas aplicada
+*/
+$resumenVacunas=Vacuna::selectRaw($sentenciaSqlAgruparVacunas)
+->leftJoin('vacunacions',function(JoinClause $join)use($ganado){
+    $join->on('vacunas.id','=','vacunacions.vacuna_id')
+    ->where('vacunacions.ganado_id',$ganado->id);}
+    )
+->leftJoin('jornada_vacunacions',function(JoinClause $join)use($ganado)
+{
+    $join->on('vacunas.id','=','jornada_vacunacions.vacuna_id')
+    ->where('jornada_vacunacions.finca_id',session('finca_id'))
+    ->where('fecha_inicio','>',$ganado->fecha_nacimiento ?? $ganado->created_at);
+    }
+    )
+->where('jornada_vacunacions.prox_dosis','!=','null')
+->orWhere('vacunacions.prox_dosis','!=','null')
+->groupBy('nombre')
+->get()
+->toArray();
 
 
 $resumenRevision = $ultimaRevision ? [
@@ -54,7 +121,7 @@ $resumenRevision = $ultimaRevision ? [
     $resumenParto = $ultimoParto ? [
       'ultimo' => $ultimoParto->fecha,
       'peso_cria' => $ultimoParto->ganado_cria->peso->peso_nacimiento,
-      'nombre/numero' => $ultimoParto->ganado_cria->numero ? $ultimoParto->ganado_cria->numero : $ultimoParto->ganado_cria->nombre,
+      'numero' => $ultimoParto->ganado_cria->numero ? $ultimoParto->ganado_cria->numero : $ultimoParto->ganado_cria->nombre,
       'total' => $ganado->parto_count,
     ] : [];
 
@@ -75,11 +142,12 @@ $estadoProduccionLeche= $ganado->estados->contains('estado','lactancia') ? "En p
       'ganadoServicio' => $resumenServicio,
       'ganadoParto' => $resumenParto,
       'ganadoPesajeLeche' => $resumenPesajeLeche,
+      'vacunas'=>$resumenVacunas,
     ];
 
-    $pdf = Pdf::loadView('ganadoReporte', $dataPdf);
+      $pdf = Pdf::loadView('ganadoReporte', $dataPdf);
 
-    return $pdf->stream();
+    return $pdf->stream(); 
   }
 
 
