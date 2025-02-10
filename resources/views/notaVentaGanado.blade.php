@@ -14,8 +14,8 @@
             box-sizing: border-box;
             border-spacing: 0;
         }
-        
-        
+
+
         .header_nota_venta {
             margin: auto;
             width: 195px;
@@ -45,6 +45,24 @@
 
         .tabla_nota_venta td {
             padding-top: 5px;
+        }
+
+        .titulo_lista_vacunas{
+            margin-top: 20px;
+            margin-bottom: 10px;
+            margin:auto;
+            width:300px
+        }
+
+        .contenedor_lista_vacunas{
+            width: 300px;
+            margin:auto;
+            margin-top: 5px
+        }
+        .elemento_lista_vacunas{
+            display:block;
+            margin-bottom:2px;
+            font-weight: bold
         }
 
         .footer_nota_venta {
@@ -91,7 +109,7 @@
                 <td class="header_vertical">Peso</td>
                 <td></td>
                 <td></td>
-                <td>{{$peso}} kg</td>
+                <td>{{$peso}}</td>
             </tr>
             <tr>
                 <td class="header_vertical">Comprador</td>
@@ -99,7 +117,7 @@
                 <td></td>
                 <td>{{$comprador}}</td>
             </tr>
-            <tr>
+            {{-- <tr>
                 <td class="header_vertical">Precio</td>
                 <td></td>
                 <td></td>
@@ -110,9 +128,36 @@
                 <td></td>
                 <td></td>
                 <td>{{$precioKg}} $</td>
-            </tr>
+            </tr> --}}
         </tbody>
     </table>
+
+    <div class="titulo_lista_vacunas">
+        <h3>Vacunas aplicadas</h3>
+    </div>
+
+    @forelse ($vacunas as $vacuna )
+    @php
+        $nombreVacuna = ucfirst(array_keys($vacunas)[$loop->index]);
+    @endphp
+
+    <div class="contenedor_lista_vacunas">
+        <span class="elemento_lista_vacunas">
+            {{$nombreVacuna}}
+        </span>
+        <span>
+            @foreach ($vacuna as $fecha )
+            @if($loop->last)
+                &bull; {{$fecha}}.
+                @else  &bull; {{$fecha}},
+                @endif
+            @endforeach
+        </span>
+    </div>
+    @empty
+
+    @endforelse
+
     <footer class="footer_nota_venta">
         <p style="margin-top: 8px; text-align: center">Fecha: @php
             $fechaActual = new DateTime();

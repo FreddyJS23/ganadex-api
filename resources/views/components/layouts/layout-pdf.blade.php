@@ -107,21 +107,25 @@
         }
 
         .tabla_ventas_leche,
-        .tabla_ventas_ganado {
+        .tabla_ventas_ganado,
+        .tabla_natalidad {
             width: 496px;
             margin: auto
         }
 
-        .tabla_ventas_leche thead, 
-        .tabla_ventas_ganado thead {
+        .tabla_ventas_leche thead,
+        .tabla_ventas_ganado thead,
+        .tabla_natalidad thead {
             background: rgb(0, 0, 0, .10);
-           
+
         }
 
         .tabla_ventas_leche th,
-        .tabla_ventas_leche td, 
+        .tabla_ventas_leche td,
         .tabla_ventas_ganado th,
-        .tabla_ventas_ganado td {
+        .tabla_ventas_ganado td,
+        .tabla_natalidad th ,
+        .tabla_natalidad td {
             height: 20px;
             font-size: 12px;
             border: 1px solid #B9B9B9;
@@ -130,7 +134,7 @@
         .tabla_ventas_ganado th,
         .tabla_ventas_ganado td{
             height: 35px;
-            
+
         }
 
         .tabla_ventas_leche th:nth-child(1) {
