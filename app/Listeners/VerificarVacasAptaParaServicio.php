@@ -39,6 +39,7 @@ class VerificarVacasAptaParaServicio
             ->doesntHave('ganadoDescarte')
             ->doesntHave('fallecimiento')
             ->doesntHave('venta')
+            ->whereRelation('estados','estado','sano')
             ->where('finca_id', $fincaId)
             ->whereHas(
                 'peso',
@@ -52,6 +53,9 @@ class VerificarVacasAptaParaServicio
                 $vacaAptaParaServicio->estados()->attach($estado->id);
             }
         }
+        activity('servicio')
+        ->withProperties('evento')
+        ->log("Verificado si hay vacas aptas para un  servicio");
     }
 
 }

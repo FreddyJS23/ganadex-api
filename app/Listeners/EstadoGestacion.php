@@ -34,5 +34,10 @@ class EstadoGestacion
         $estado = Estado::whereIn('estado', ['sano','gestacion'])->get();
 
         $event->revision->ganado->estados()->sync($estado);
+
+        $numero = $event->revision->ganado->numero;
+        activity("revision")
+        ->withProperties('evento')
+        ->log("Animal $numero ahora esta en gestacion");
     }
 }

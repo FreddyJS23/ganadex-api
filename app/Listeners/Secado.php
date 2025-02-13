@@ -37,5 +37,10 @@ class Secado
         $estado = Estado::firstWhere('estado','pendiente_secar');
 
         $event->revision->ganado->estados()->attach($estado->id);
+
+        $numero = $event->revision->ganado->numero;
+        activity('revision')
+        ->withProperties('evento')
+        ->log("Animal $numero ahora tiene fecha de secado");
     }
 }

@@ -85,6 +85,11 @@ class GenerarNotificaciones
             foreach ($columnasTablaEvento as $columna => $key) {
                 $this->VerificarEventoCercano($columna, $event->finca->user_id,$fincaId, $fechaActual);
             }
+
+
+        activity("notificaciones")
+        ->withProperties('evento')
+        ->log('Se han generado las notificaciones');
         }
     }
 }

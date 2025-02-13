@@ -18,9 +18,9 @@ class RevisionServicio
     {
         //
     }
-    
+
     /**
-     * Handle the event. 
+     * Handle the event.
      */
     public function handle(ServicioHecho $event): void
     {
@@ -30,6 +30,9 @@ class RevisionServicio
         $eventoGanado->prox_revision=$proxRevision;
         $eventoGanado->save();
 
-        
+        $numero = $event->servicio->ganado->numero;
+        activity("servicio")
+        ->withProperties('evento')
+        ->log("Animal $numero tiene una proxima revision despues del servicio");
     }
 }
