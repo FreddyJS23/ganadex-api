@@ -162,6 +162,32 @@
         .celda_tabla h4 {
             font-weight: bold;
         }
+
+        /* estilos graficos */
+        .contenedor_dos_graficos{
+            margin: auto;
+            width: 860px;
+            margin-top:2rem;
+            margin-bottom: 1rem;
+        }
+        .contenedor_dos_graficos :nth-child(1) {
+            margin-right: 10px;
+        }
+
+        .container_grafico_torta{
+            width: 300px;
+            margin: auto;
+        }
+
+        .container_grafico_lineal,
+        .container_grafico_barra {
+            margin: auto;
+        }
+        .container_grafico_lineal,
+        .container_grafico_barra {
+
+            display: inline-block;
+        }
     </style>
 </head>
 
