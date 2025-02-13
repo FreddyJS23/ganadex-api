@@ -29,5 +29,10 @@ class RevisionPosParto
         $proxRevision=$fechaParto->add(new DateInterval('P30D'))->format('Y-m-d');
         $eventoGanado->prox_revision=$proxRevision;
         $eventoGanado->save();
+
+        $numero = $event->parto->ganado->numero;
+        activity("parto")
+        ->withProperties('evento')
+        ->log("Animal $numero tiene una fecha de revision despues del parto");
     }
 }

@@ -26,6 +26,11 @@ class EstadoPosVenta
 
         $estado = Estado::firstWhere('estado', 'vendido');
 
+        $numero = $event->venta->ganado->numero;
+        activity('venta')
+        ->withProperties('evento')
+        ->log("Animal $numero ha sido vendido");
+
         $event->venta->ganado->estados()->sync($estado->id);
     }
 }

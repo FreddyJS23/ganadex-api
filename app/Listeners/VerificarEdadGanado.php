@@ -55,5 +55,9 @@ class VerificarEdadGanado
 
             $mautes->count() > 0 && $mautes->toQuery()->update(['tipo_id' => 3]);
         }
+
+        activity('edad ganado')
+        ->withProperties('evento')
+        ->log("Verificada edad de todos los animales");
     }
 }

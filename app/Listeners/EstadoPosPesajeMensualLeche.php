@@ -25,5 +25,10 @@ class EstadoPosPesajeMensualLeche
         $estado = Estado::firstWhere('estado', 'pendiente_pesaje_leche');
 
         $event->ganado->estados()->detach($estado->id);
+
+        $numero = $event->ganado->numero;
+        activity("pesaje de leche")
+        ->withProperties('evento')
+        ->log("Animal $numero ya no esta pendiente de pesaje de leche");
     }
 }

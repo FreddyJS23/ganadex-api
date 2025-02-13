@@ -32,5 +32,9 @@ class DescartarGanado
         $event->revision->ganado->estados()->sync($estado->id);
         $ganadoDescarte->finca_id = session('finca_id');
         $ganadoDescarte->save();
+
+        $numero = $event->revision->ganado->numero;
+        activity("revision")
+        ->log("Animal $numero descartado");
     }
 }
