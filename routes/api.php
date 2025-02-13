@@ -27,6 +27,8 @@ use App\Http\Controllers\GanadoDescarteController;
 use App\Http\Controllers\JornadaVacunacionController;
 use App\Http\Controllers\ObtenerLogsVeterinario;
 use App\Http\Controllers\PajuelaToroController;
+use App\Http\Controllers\ResumenesAnual;
+use App\Http\Controllers\ResumenNatalidad;
 use App\Http\Controllers\RevisionController;
 use App\Http\Controllers\ServicioController;
 use App\Http\Controllers\TodosPartos;
@@ -98,6 +100,9 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::get('/servicios', TodosServicios::class)->name('todasServicios');
     Route::get('/pesaje_leche', TodosPesajeLeche::class)->name('todosPesajesLeche');
     Route::get('/partos', TodosPartos::class)->name('todosPartos');
+
+    //rutas peticiones resumenes
+    Route::get('/resumen_natalidad',[ResumenesAnual::class,'resumenNatalidad'])->name('resumenesAnual.resumenNatalidad');
 
     //rutas peticiones de datos dashboard
      Route::get('dashboard_principal/total_ganado_tipo',[DashboardPrincipalController::class,'totalGanadoTipo'])->name('dashboardPrincipal.totalGanadoTipo');
