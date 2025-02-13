@@ -428,21 +428,18 @@ $fin=$request->query('end');
   {
     session()->put('finca_id', 1);
     $year = $request->query('year');
+    // Recibir las imágenes en base64 desde la solicitud
+    //eliminar comillas ya que viene con comilas por el formdata, para poder usarlo en el src de la etiqueta html img
+        $graficoTorta = str_replace("'","",$request->input('graficoTorta'));
+        $graficoLineal = str_replace("'","",$request->input('graficoLineal'));
+        $graficoBarra = str_replace("'","",$request->input('graficoBarra'));
 
-    //obtener conteo nacimients ultimos 5 años
-    $nacimientosAnuales = Ganado::where('finca_id',session('finca_id'))
-      ->selectRaw("DATE_FORMAT(fecha_nacimiento,'%Y') as año, COUNT(fecha_nacimiento) as total")
-      ->orderBy('año', 'desc')
-      ->whereRaw("DATE_FORMAT(fecha_nacimiento,'%Y') >= ? ",[$year-5])
-      ->groupBy('año')
-      ->get()
-      ->toArray();
-
-    //obetner conteo agrupado por mes ademas de la cantidad de machos y hembras en ese mes
+        //obetner conteo agrupado por mes ademas de la cantidad de machos y hembras en ese mes
     $consultaSql="DATE_FORMAT(fecha_nacimiento,'%m') as mes, COUNT(fecha_nacimiento) as total,
         COUNT(CASE WHEN sexo = 'M' THEN 1 END) as machos,
         COUNT(CASE WHEN sexo = 'H' THEN 1 END) as hembras";
 
+        //obtener conteo agrupado por mes ademas de la cantidad de machos y hembras en ese mes
   $nacimientosPorMeses = Ganado::where('finca_id',session('finca_id'))
       ->selectRaw($consultaSql)
       ->orderBy('mes', 'asc')
@@ -450,34 +447,27 @@ $fin=$request->query('end');
       ->whereYear('fecha_nacimiento', $year)
       ->get();
 
-      $totalPartos=0;
-      $totalPartosMachos=0;
-      $totalPartosHembras=0;
 
+      //transformar la coleccion para obtener el mes en formato texto
       $nacimientosPorMeses->transform(function (Ganado $item, int $key) {
         $meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
         $item->mes = $meses[intval($item->mes)];
         return $item;
       });
 
-      foreach ($nacimientosPorMeses as $key => $value) {
-        $totalPartos+=$value['total'];
-        $totalPartosMachos+=$value['machos'];
-        $totalPartosHembras+=$value['hembras'];
-      }
 
     $dataPdf = [
-      'totalPartos' => $totalPartos,
-      'totalPartosMachos' => $totalPartosMachos,
-      'totalPartosHembras' => $totalPartosHembras,
       'nacimientosPorMeses' => $nacimientosPorMeses->toArray(),
-      'nacimientosAnuales'=>$nacimientosAnuales,
+      'graficoTorta' => $graficoTorta,
+      'graficoLineal' => $graficoLineal,
+      'graficoBarra' => $graficoBarra,
       'year'=>$year
     ];
 
-    $pdf = Pdf::loadView('resumenNatalidad', $dataPdf);
+   // return view('resumenNatalidad', $dataPdf);
+     $pdf = Pdf::loadView('resumenNatalidad', $dataPdf);
 
-    return $pdf->stream();
+    return $pdf->stream('resumenNatalidad.pdf');
   }
 
   public function facturaVentaGanado(){
