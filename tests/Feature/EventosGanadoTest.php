@@ -123,7 +123,7 @@ class EventosGanadoTest extends TestCase
     /**
      * A basic feature test example.
      */
-    public function test_cuando_se_realiza_un_servicio(): void
+    public function test_cuando_se_realiza_un_servicio_tiene_proxima_revision_y_no_esta_pendiente_de_servicio(): void
     {
         //realizar servicio
         $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->postJson(
@@ -137,7 +137,13 @@ class EventosGanadoTest extends TestCase
                 'ganado.eventos.prox_revision' => 'string',
                 'servicio_reciente' => 'array',
                 'total_servicios' => 'integer'
-            ])->etc()
+            ])
+            ->where(
+                'ganado.estados',
+                fn (Collection $estados) => $estados->doesntContain('estado', 'pendiente_servicio')
+
+            )
+            ->etc()
         );
     }
 

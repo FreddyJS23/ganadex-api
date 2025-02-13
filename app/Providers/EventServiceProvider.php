@@ -16,6 +16,7 @@ use App\Listeners\EstadoPosVenta;
 use App\Listeners\EstadoGestacion;
 use App\Listeners\RevisionPosParto;
 use App\Listeners\RevisionServicio;
+use App\Listeners\EstadoDespuesServicio;
 use App\Listeners\Secado;
 use App\Listeners\EstadoPosParto;
 use App\Listeners\EstadoPosFallecimiento;
@@ -46,7 +47,7 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
-        ServicioHecho::class => [RevisionServicio::class,],
+        ServicioHecho::class => [RevisionServicio::class,EstadoDespuesServicio::class],
         RevisionPrenada::class => [EstadoGestacion::class, Secado::class,],
         RevisionDescarte::class => [DescartarGanado::class],
         PartoHecho::class => [RevisionPosParto::class,EstadoPosParto::class,CambiaAVaca::class],
