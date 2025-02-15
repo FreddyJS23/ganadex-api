@@ -10,7 +10,7 @@ class Venta extends Model
 {
     use HasFactory;
 
-    protected $fillable=[
+    protected $fillable = [
         //'precio',
         'fecha',
         'ganado_id',
@@ -47,5 +47,4 @@ class Venta extends Model
     {
         return $this->belongsTo(Finca::class);
     }
-
 }

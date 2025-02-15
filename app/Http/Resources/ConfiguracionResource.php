@@ -15,9 +15,9 @@ class ConfiguracionResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'peso_servicio'=>$this->peso_servicio,
-            'dias_evento_notificacion'=>$this->dias_evento_notificacion,
-            'dias_diferencia_vacuna'=>$this->dias_diferencia_vacuna,
+            'peso_servicio' => $this->peso_servicio,
+            'dias_evento_notificacion' => $this->dias_evento_notificacion,
+            'dias_diferencia_vacuna' => $this->dias_diferencia_vacuna,
         ];
     }
 }

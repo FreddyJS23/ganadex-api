@@ -23,14 +23,14 @@ class StoreGanadoDescarteRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nombre'=>'required|min:3|max:255|unique:ganados,nombre',
-            'numero'=>'numeric|between:1,32767|unique:ganados,numero',
-            'origen'=>'min:3,|max:255',
+            'nombre' => 'required|min:3|max:255|unique:ganados,nombre',
+            'numero' => 'numeric|between:1,32767|unique:ganados,numero',
+            'origen' => 'min:3,|max:255',
             'peso_nacimiento' => 'numeric|between:1,32767',
             'peso_destete' => 'numeric|between:1,32767',
             'peso_2year' => 'numeric|between:1,32767',
             'peso_actual' => 'numeric|between:1,32767',
-            'fecha_nacimiento'=>'date_format:Y-m-d',
+            'fecha_nacimiento' => 'date_format:Y-m-d',
             'estado_id' => Rule::foreach(
                 function ($value, $attrubute) {
                     return Rule::exists('estados', 'id');

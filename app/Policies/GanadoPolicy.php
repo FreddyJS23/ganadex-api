@@ -37,7 +37,7 @@ class GanadoPolicy
      */
     public function update(User $user, Ganado $ganado): bool
     {
-        return session('finca_id')=== $ganado->finca->id && $user->hasRole('admin');
+        return session('finca_id') === $ganado->finca->id && $user->hasRole('admin');
     }
 
     /**
@@ -45,7 +45,7 @@ class GanadoPolicy
      */
     public function delete(User $user, Ganado $ganado): bool
     {
-        return session('finca_id')=== $ganado->finca->id && $user->hasRole('admin');
+        return session('finca_id') === $ganado->finca->id && $user->hasRole('admin');
     }
 
     /**

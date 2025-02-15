@@ -52,7 +52,6 @@ class ToroController extends Controller
                 $efectividad = fn (int $resultadoAlcanzado) => round(1 / $resultadoAlcanzado * 100, 2);
 
                 if ($toro->padreEnPartos->count() == 1) {
-
                     $toro->load('servicios');
 
                     $toro->efectividad = $toro->servicios->count() >= 1 ? $efectividad($toro->servicios->count()) : null;
@@ -118,10 +117,10 @@ class ToroController extends Controller
                 }
             );
         } catch (\Throwable $error) {
-            return response()->json(['error'=>'error al insertar datos'], 501);
+            return response()->json(['error' => 'error al insertar datos'], 501);
         }
 
-        $toro = new Toro;
+        $toro = new Toro();
         $toro->finca_id = session('finca_id');
         $toro->ganado()->associate($ganado)->save();
 
@@ -148,7 +147,6 @@ class ToroController extends Controller
         $efectividad = fn (int $resultadoAlcanzado) => round(1 / $resultadoAlcanzado * 100, 2);
 
         if ($toro->padreEnPartos->count() == 1) {
-
             $toro->load('servicios');
 
             $toro->efectividad = $efectividad($toro->servicios->count());
@@ -171,7 +169,8 @@ class ToroController extends Controller
         return response()->json(
             [
             'toro' => new ToroResource($toro),
-            ], 200
+            ],
+            200
         );
     }
 

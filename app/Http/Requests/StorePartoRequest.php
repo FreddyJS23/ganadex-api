@@ -25,13 +25,13 @@ class StorePartoRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'observacion'=>'required|min:3|max:255',
-            'nombre'=>'required|min:3|max:255|unique:ganados,nombre',
-            'numero'=>'numeric|between:1,32767|unique:ganados,numero|nullable',
-            'sexo'=>'required|in:H,M',
+            'observacion' => 'required|min:3|max:255',
+            'nombre' => 'required|min:3|max:255|unique:ganados,nombre',
+            'numero' => 'numeric|between:1,32767|unique:ganados,numero|nullable',
+            'sexo' => 'required|in:H,M',
             'fecha' => 'date_format:Y-m-d',
-            'peso_nacimiento'=>'numeric|between:1,32767',
-            'personal_id' => ['required', new ComprobarVeterianario]
+            'peso_nacimiento' => 'numeric|between:1,32767',
+            'personal_id' => ['required', new ComprobarVeterianario()]
 
         ];
     }

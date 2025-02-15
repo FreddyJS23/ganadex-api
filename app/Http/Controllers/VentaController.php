@@ -14,7 +14,6 @@ use Illuminate\Support\Facades\Auth;
 
 class VentaController extends Controller
 {
-
     public function __construct()
     {
         $this->authorizeResource(Venta::class, 'venta');
@@ -33,7 +32,7 @@ class VentaController extends Controller
      */
     public function store(StoreVentaRequest $request)
     {
-        $venta = new Venta;
+        $venta = new Venta();
         $venta->fill($request->all());
         $venta->finca_id = session('finca_id');
         $venta->save();

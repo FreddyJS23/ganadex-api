@@ -28,11 +28,11 @@ class UpdateInsumoRequest extends FormRequest
          * @return string
          */
         $parametroPath = preg_replace("/[^0-9]/", "", request()->path());
-        
+
         return [
-            'insumo'=>['required','string',Rule::unique('insumos')->ignore($parametroPath)],
-            'cantidad'=>'required|numeric|between:1,999',
-            'precio'=>'required|numeric'
+            'insumo' => ['required','string',Rule::unique('insumos')->ignore($parametroPath)],
+            'cantidad' => 'required|numeric|between:1,999',
+            'precio' => 'required|numeric'
         ];
     }
 }

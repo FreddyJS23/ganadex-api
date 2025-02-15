@@ -10,7 +10,7 @@ class Configuracion extends Model
 {
     use HasFactory;
 
-    protected $fillable=[
+    protected $fillable = [
        'peso_servicio',
        'dias_evento_notificacion',
        'dias_diferencia_vacuna',

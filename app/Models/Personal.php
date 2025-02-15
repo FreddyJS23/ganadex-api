@@ -12,7 +12,7 @@ class Personal extends Model
 {
     use HasFactory;
 
-    protected $fillable=[
+    protected $fillable = [
         'ci',
         'nombre',
         'apellido',
@@ -81,5 +81,4 @@ class Personal extends Model
     }
 
     protected $hidden = ['created_at','updated_at','user_id','cargo_id'];
-
 }

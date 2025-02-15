@@ -16,7 +16,7 @@ class TodosPartosResource extends JsonResource
     {
 
         $existeParto = $this->partoReciente ? true : false;
-        $resource =[
+        $resource = [
             'id' => $this->id,
             'numero' => $this->numero,
             "ultimo_parto" => $existeParto ? $this->partoReciente->fecha : 'desconocido',

@@ -15,8 +15,8 @@ class CargosPersonalResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'=>$this->id,
-            'cargo'=>$this->cargo,
+            'id' => $this->id,
+            'cargo' => $this->cargo,
         ];
     }
 }

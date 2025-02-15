@@ -23,7 +23,7 @@ class UpdateFallecimientoRequest extends FormRequest
     {
         return [
             'causa' => 'required|min:3|max:255|string',
-            'fecha'=>'required|date_format:Y-m-d'
+            'fecha' => 'required|date_format:Y-m-d'
         ];
     }
 }

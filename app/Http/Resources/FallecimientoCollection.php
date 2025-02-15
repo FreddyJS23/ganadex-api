@@ -7,8 +7,7 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class FallecimientoCollection extends ResourceCollection
 {
-    
-    public static $wrap='fallecidos';
+    public static $wrap = 'fallecidos';
     /**
      * Transform the resource collection into an array.
      *

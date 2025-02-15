@@ -26,13 +26,14 @@ class Secado
     public function handle(RevisionPrenada $event): void
     {
         //desactivar secado si no hay parto reciente
-        if($event->revision->ganado->partoReciente == null) { return ;
+        if ($event->revision->ganado->partoReciente == null) {
+            return ;
         }
 
-        $eventoGanado=Evento::firstWhere('ganado_id', $event->revision->ganado->id);
-        $fechaServicio=new DateTime($event->revision->ganado->servicioReciente->fecha);
-        $fechaSecado=$fechaServicio->add(new DateInterval('P210D'))->format('Y-m-d');
-        $eventoGanado->prox_secado=$fechaSecado;
+        $eventoGanado = Evento::firstWhere('ganado_id', $event->revision->ganado->id);
+        $fechaServicio = new DateTime($event->revision->ganado->servicioReciente->fecha);
+        $fechaSecado = $fechaServicio->add(new DateInterval('P210D'))->format('Y-m-d');
+        $eventoGanado->prox_secado = $fechaSecado;
         $eventoGanado->save();
 
         $estado = Estado::firstWhere('estado', 'pendiente_secar');

@@ -15,9 +15,9 @@ class CantidadInsumoResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'=>$this->id,
-            'insumo'=>$this->insumo,
-            'cantidad'=>$this->cantidad
+            'id' => $this->id,
+            'insumo' => $this->insumo,
+            'cantidad' => $this->cantidad
         ];
     }
 }

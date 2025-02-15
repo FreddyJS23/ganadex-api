@@ -7,7 +7,7 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class PersonalCollection extends ResourceCollection
 {
-    public static $wrap='todo_personal';
+    public static $wrap = 'todo_personal';
     /**
      * Transform the resource collection into an array.
      *

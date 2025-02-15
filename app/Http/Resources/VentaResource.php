@@ -15,13 +15,13 @@ class VentaResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'=>$this->id,
-            'fecha'=>$this->fecha,
-            'ganado'=>$this->ganado->makeHidden('peso'),
-            'peso'=>$this->ganado->peso->peso_actual,
+            'id' => $this->id,
+            'fecha' => $this->fecha,
+            'ganado' => $this->ganado->makeHidden('peso'),
+            'peso' => $this->ganado->peso->peso_actual,
             //'precio'=>$this->precio,
             //'precio_kg'=>round($this->precio / intval($this->ganado->peso->peso_actual),2 ),
-            'comprador'=>$this->comprador->nombre,
+            'comprador' => $this->comprador->nombre,
         ];
     }
 }

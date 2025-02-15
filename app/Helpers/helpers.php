@@ -15,13 +15,17 @@ if (!function_exists('determinar_edad_res')) {
 
         $diferencia = $fechaNacimiento->diffInDays($fechaActual);
 
-        if ($diferencia < 365) { return 1;
+        if ($diferencia < 365) {
+            return 1;
         }
-        if ($diferencia >= 365 && $diferencia < 729) { return 2;
+        if ($diferencia >= 365 && $diferencia < 729) {
+            return 2;
         }
-        if ($diferencia >= 730 && $diferencia < 999) { return 3;
+        if ($diferencia >= 730 && $diferencia < 999) {
+            return 3;
         }
-        if ($diferencia >= 1000) { return 4;
+        if ($diferencia >= 1000) {
+            return 4;
         }
     }
 }

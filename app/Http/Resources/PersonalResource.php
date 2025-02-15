@@ -15,13 +15,13 @@ class PersonalResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-        "id"=> $this->id,
-        "ci"=> $this->ci,
-        "nombre"=> $this->nombre,
-        "apellido"=> $this->apellido,
-        "fecha_nacimiento"=>$this->fecha_nacimiento,
-        "telefono"=> $this->telefono,
-        "cargo"=> $this->cargo->cargo,
+        "id" => $this->id,
+        "ci" => $this->ci,
+        "nombre" => $this->nombre,
+        "apellido" => $this->apellido,
+        "fecha_nacimiento" => $this->fecha_nacimiento,
+        "telefono" => $this->telefono,
+        "cargo" => $this->cargo->cargo,
         /*  "sueldo"=> $this->sueldo, */
         ];
     }

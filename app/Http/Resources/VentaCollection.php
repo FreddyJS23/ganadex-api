@@ -8,7 +8,7 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 class VentaCollection extends ResourceCollection
 {
     public static $wrap = 'ventas';
-    
+
     /**
      * Transform the resource collection into an array.
      *

@@ -45,7 +45,7 @@ class StoreServicioRequest extends FormRequest
                         }
                     )
             ],
-            'personal_id' => ['required', new ComprobarVeterianario]
+            'personal_id' => ['required', new ComprobarVeterianario()]
         ];
     }
 }

@@ -22,12 +22,12 @@ class StorePersonalRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'ci'=>'required|numeric|digits_between:7,8|unique:personals,ci',
-            'nombre'=>'required|string|min:3',
-            'apellido'=>'required|string|min:3',
-            'fecha_nacimiento'=>'required|date_format:Y-m-d',
-            'telefono'=> 'required|regex:/^\d{4}-\d{7,7}$/',
-            'cargo_id'=> 'required|numeric|exists:cargos,id',
+            'ci' => 'required|numeric|digits_between:7,8|unique:personals,ci',
+            'nombre' => 'required|string|min:3',
+            'apellido' => 'required|string|min:3',
+            'fecha_nacimiento' => 'required|date_format:Y-m-d',
+            'telefono' => 'required|regex:/^\d{4}-\d{7,7}$/',
+            'cargo_id' => 'required|numeric|exists:cargos,id',
             /* 'sueldo'=>'required|numeric', */
         ];
     }

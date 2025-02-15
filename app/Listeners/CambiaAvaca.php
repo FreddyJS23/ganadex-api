@@ -23,8 +23,8 @@ class CambiaAvaca
      */
     public function handle(PartoHecho $event): void
     {
-        $novilla=Ganado::find($event->parto->ganado->id);
-        $novilla->tipo_id=GanadoTipo::where('tipo', 'adulto')->first()->id;
+        $novilla = Ganado::find($event->parto->ganado->id);
+        $novilla->tipo_id = GanadoTipo::where('tipo', 'adulto')->first()->id;
         $novilla->save();
 
         $numero = $event->parto->ganado->numero;

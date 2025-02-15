@@ -21,7 +21,8 @@ class DatosParaFormulariosController extends Controller
     public function novillasParaMontar()
     {
         $novillasAmontar = Peso::whereHas(
-            'ganado', function (Builder $query) {
+            'ganado',
+            function (Builder $query) {
                 $query->where('finca_id', session('finca_id'));
             }
         )->where('peso_actual', '>=', 330)->get();
@@ -54,7 +55,7 @@ class DatosParaFormulariosController extends Controller
 
         $añosVentasGanado->transform(
             function ($item, $key) {
-                $item->año=intval($item->año);
+                $item->año = intval($item->año);
                 return $item;
             }
         );
@@ -71,7 +72,7 @@ class DatosParaFormulariosController extends Controller
 
         $añosVentaProduccionLeche->transform(
             function ($item, $key) {
-                $item->año=intval($item->año);
+                $item->año = intval($item->año);
                 return $item;
             }
         );
@@ -89,30 +90,29 @@ class DatosParaFormulariosController extends Controller
 
     public function sugerirNumeroDisponibleEnBD()
     {
-        $numeroSugerido=null;
-        $intervalos=[1,500,501,5000,5001,10000,10001,15000,15001,25000,25001,32767];
-        $iteracciones=0;
-        $maximaInteraciones=100;
-        $punteroInicial=0;
+        $numeroSugerido = null;
+        $intervalos = [1,500,501,5000,5001,10000,10001,15000,15001,25000,25001,32767];
+        $iteracciones = 0;
+        $maximaInteraciones = 100;
+        $punteroInicial = 0;
 
-        while($numeroSugerido == null){
-
-            $numeroRandom=rand($intervalos[$punteroInicial], $intervalos[$punteroInicial+1]);
-            $numeroYaRegistrado=Ganado::select('numero')
+        while ($numeroSugerido == null) {
+            $numeroRandom = rand($intervalos[$punteroInicial], $intervalos[$punteroInicial + 1]);
+            $numeroYaRegistrado = Ganado::select('numero')
                 ->where('numero', $numeroRandom)->first();
 
-            if($numeroYaRegistrado == null) {
-                $numeroSugerido=$numeroRandom;
+            if ($numeroYaRegistrado == null) {
+                $numeroSugerido = $numeroRandom;
                 break;
             }
             $iteracciones++;
 
-            if($iteracciones>=$maximaInteraciones) {
-                $iteracciones=0;
+            if ($iteracciones >= $maximaInteraciones) {
+                $iteracciones = 0;
                 $punteroInicial++;
             }
         }
-        return response()->json(['numero_disponible'=>$numeroSugerido]);
+        return response()->json(['numero_disponible' => $numeroSugerido]);
     }
 
     public function veterinariosSinUsuario()
@@ -123,6 +123,6 @@ class DatosParaFormulariosController extends Controller
             ->whereDoesntHave('usuarioVeterinario')
             ->get();
 
-        return response()->json(['veterinarios_sin_usuario'=>$veterinariosSinUsuario]);
+        return response()->json(['veterinarios_sin_usuario' => $veterinariosSinUsuario]);
     }
 }

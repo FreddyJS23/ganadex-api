@@ -19,15 +19,13 @@ class FincaPolicy
 
     public function crear_sesion_finca(User $user, Finca $finca): bool
     {
-        if($user->hasRole('admin')) {
+        if ($user->hasRole('admin')) {
             return $user->id == $finca->user_id;
-        }
-        else if($user->hasRole('veterinario')) {
-            $usuario_veterinario=UsuarioVeterinario::where('admin_id', $user->id)->first();
+        } elseif ($user->hasRole('veterinario')) {
+            $usuario_veterinario = UsuarioVeterinario::where('admin_id', $user->id)->first();
             return $usuario_veterinario->admin_id == $finca->user_id
             && $usuario_veterinario->veterinario->finca_id ==  $finca->id;
         }
-
     }
 
     public function verificar_sesion_finca(User $user): bool

@@ -14,7 +14,6 @@ use Illuminate\Support\Facades\Hash;
 
 class UsuarioVeterinarioController extends Controller
 {
-
     public function __construct()
     {
         $this->authorizeResource(UsuarioVeterinario::class, 'usuarios_veterinario');
@@ -33,27 +32,26 @@ class UsuarioVeterinarioController extends Controller
      */
     public function store(StoreUsuarioVeterinarioRequest $request)
     {
-        $nameUsuarioAleatorio=fn()=> 'usuario'.rand(1, 100) . rand(1, 100);
+        $nameUsuarioAleatorio = fn()=> 'usuario' . rand(1, 100) . rand(1, 100);
 
-        $veterinario=Personal::where('id', $request->input('personal_id'))->first();
-        $usuarioVeterinario = new UsuarioVeterinario;
-        $usuario=new User();
-        $usuario->usuario=explode(' ', $veterinario->nombre)[0] . rand(1, 100);
+        $veterinario = Personal::where('id', $request->input('personal_id'))->first();
+        $usuarioVeterinario = new UsuarioVeterinario();
+        $usuario = new User();
+        $usuario->usuario = explode(' ', $veterinario->nombre)[0] . rand(1, 100);
 
-        if(strlen($usuario->usuario) < 5 || strlen($usuario->usuario) > 20) {
-            $usuario->usuario=$nameUsuarioAleatorio();
+        if (strlen($usuario->usuario) < 5 || strlen($usuario->usuario) > 20) {
+            $usuario->usuario = $nameUsuarioAleatorio();
         }
 
-        $usuario->password=Hash::make('123456');
+        $usuario->password = Hash::make('123456');
         $usuario->assignRole('veterinario');
         $usuario->save();
 
-        $usuarioVeterinario->admin_id=Auth::id();
-        $usuarioVeterinario->user_id=$usuario->id;
-        $usuarioVeterinario->personal_id=$request->input('personal_id');
+        $usuarioVeterinario->admin_id = Auth::id();
+        $usuarioVeterinario->user_id = $usuario->id;
+        $usuarioVeterinario->personal_id = $request->input('personal_id');
         $usuarioVeterinario->save();
         return response()->json(['usuario_veterinario' => new UsuarioVeterinarioResource($usuarioVeterinario)], 201);
-
     }
 
     /**

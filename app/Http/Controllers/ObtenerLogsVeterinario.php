@@ -10,7 +10,6 @@ use Spatie\Activitylog\Models\Activity;
 
 class ObtenerLogsVeterinario extends Controller
 {
-
     /**
      * Handle the incoming request.
      */

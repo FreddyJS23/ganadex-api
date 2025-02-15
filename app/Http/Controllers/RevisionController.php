@@ -39,7 +39,7 @@ class RevisionController extends Controller
      */
     public function store(StoreRevisionRequest $request, Ganado $ganado)
     {
-        $revision= new Revision;
+        $revision = new Revision();
         $revision->fill($request->all());
         $revision->ganado()->associate($ganado)->save();
 
@@ -49,23 +49,24 @@ class RevisionController extends Controller
          RevisionDescarte::dispatchIf($revision->diagnostico == 'descartar', $revision);
 
         return response()->json(
-            ['revision'=>new RevisionResource(
+            ['revision' => new RevisionResource(
                 $revision->load(
                     ['veterinario' => function (Builder $query) {
                         $query->select('personals.id', 'nombre');
                     }]
                 )
-            )], 201
+            )],
+            201
         );
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Ganado $ganado,Revision $revision)
+    public function show(Ganado $ganado, Revision $revision)
     {
         return response()->json(
-            ['revision'=>new RevisionResource(
+            ['revision' => new RevisionResource(
                 $revision->load(
                     ['veterinario' => function (Builder $query) {
                         $query->select('personals.id', 'nombre');
@@ -78,19 +79,20 @@ class RevisionController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateRevisionRequest $request,Ganado $ganado, Revision $revision)
+    public function update(UpdateRevisionRequest $request, Ganado $ganado, Revision $revision)
     {
         $revision->fill($request->all());
         $revision->save();
 
         return response()->json(
-            ['revision'=>new RevisionResource(
+            ['revision' => new RevisionResource(
                 $revision->load(
                     ['veterinario' => function (Builder $query) {
                         $query->select('personals.id', 'nombre');
                     }]
                 )
-            )], 200
+            )],
+            200
         );
     }
 

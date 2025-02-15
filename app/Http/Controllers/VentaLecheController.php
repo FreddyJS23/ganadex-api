@@ -25,12 +25,12 @@ class VentaLecheController extends Controller
      */
     public function store(StoreVentaLecheRequest $request)
     {
-        $ventaLeche=new VentaLeche;
+        $ventaLeche = new VentaLeche();
         $ventaLeche->fill($request->only('cantidad', 'precio_id'));
-        $ventaLeche->finca_id=session('finca_id');
+        $ventaLeche->finca_id = session('finca_id');
         $ventaLeche->save();
 
-        return response()->json(['venta_leche'=> new VentaLecheResource($ventaLeche)], 201);
+        return response()->json(['venta_leche' => new VentaLecheResource($ventaLeche)], 201);
     }
 
     /**

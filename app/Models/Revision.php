@@ -14,7 +14,7 @@ class Revision extends Model
 {
     use HasFactory;
 
-    protected $fillable=[
+    protected $fillable = [
         'diagnostico',
         'tratamiento',
         'fecha',
@@ -54,6 +54,5 @@ class Revision extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults();
-
     }
 }

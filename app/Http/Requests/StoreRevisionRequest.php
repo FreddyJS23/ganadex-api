@@ -25,10 +25,10 @@ class StoreRevisionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'diagnostico'=>['required','min:3','max:255', new ComprobarRequisitosPrenada],
-            'tratamiento'=>'required|min:3,|max:255',
+            'diagnostico' => ['required','min:3','max:255', new ComprobarRequisitosPrenada()],
+            'tratamiento' => 'required|min:3,|max:255',
             'fecha' => 'date_format:Y-m-d',
-            'personal_id'=>['required',new ComprobarVeterianario]
+            'personal_id' => ['required',new ComprobarVeterianario()]
         ];
     }
 }

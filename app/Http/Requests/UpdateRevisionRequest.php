@@ -22,8 +22,8 @@ class UpdateRevisionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'diagnostico'=>'required|min:3,|max:255',
-            'tratamiento'=>'required|min:3,|max:255'
+            'diagnostico' => 'required|min:3,|max:255',
+            'tratamiento' => 'required|min:3,|max:255'
         ];
     }
 }

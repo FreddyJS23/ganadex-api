@@ -7,8 +7,8 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class ToroCollection extends ResourceCollection
 {
-    public static $wrap='toros';
-    
+    public static $wrap = 'toros';
+
     /**
      * Transform the resource collection into an array.
      *

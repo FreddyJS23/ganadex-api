@@ -33,9 +33,6 @@ use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
 
-
-
-
 class EventServiceProvider extends ServiceProvider
 {
     /**
@@ -53,10 +50,10 @@ class EventServiceProvider extends ServiceProvider
         PartoHecho::class => [RevisionPosParto::class,EstadoPosParto::class,CambiaAVaca::class],
         NaceMacho::class => [CaparBecerro::class,],
         //Login::class=>[],
-        CrearSesionFinca::class=>[VerificarEdadGanado::class,VerificarPesajeMensualLeche::class,GenerarNotificaciones::class,VerificarVacasAptaParaServicio::class],
-        PesajeLecheHecho::class=>[EstadoPosPesajeMensualLeche::class],
-        VentaGanado::class=>[EstadoPosVenta::class],
-        FallecimientoGanado::class=>[EstadoPosFallecimiento::class],
+        CrearSesionFinca::class => [VerificarEdadGanado::class,VerificarPesajeMensualLeche::class,GenerarNotificaciones::class,VerificarVacasAptaParaServicio::class],
+        PesajeLecheHecho::class => [EstadoPosPesajeMensualLeche::class],
+        VentaGanado::class => [EstadoPosVenta::class],
+        FallecimientoGanado::class => [EstadoPosFallecimiento::class],
     ];
 
     /**

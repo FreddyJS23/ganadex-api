@@ -46,7 +46,7 @@ class RevisionPolicy
      */
     public function delete(User $user, Revision $revision): bool
     {
-        return session('finca_id') ===$revision->ganado->finca->id ;
+        return session('finca_id') === $revision->ganado->finca->id ;
     }
 
     /**

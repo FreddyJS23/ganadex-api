@@ -15,14 +15,14 @@ class TodosPesajeLecheResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $pendientePesaje=new Carbon($this->pesajeLecheReciente->fecha);
-     
+        $pendientePesaje = new Carbon($this->pesajeLecheReciente->fecha);
+
         return [
-            'id'=>$this->id,
-            'nombre'=>$this->nombre,
-            'numero'=>$this->numero,
-            'ultimo_pesaje'=>$this->pesajeLecheReciente->peso_leche . "KG", 
-            'pesaje_este_mes'=>$pendientePesaje->isCurrentMonth(),
+            'id' => $this->id,
+            'nombre' => $this->nombre,
+            'numero' => $this->numero,
+            'ultimo_pesaje' => $this->pesajeLecheReciente->peso_leche . "KG",
+            'pesaje_este_mes' => $pendientePesaje->isCurrentMonth(),
         ];
     }
 }

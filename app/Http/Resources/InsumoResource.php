@@ -15,10 +15,10 @@ class InsumoResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'=>$this->id,
-            'insumo'=>$this->insumo,
-            'cantidad'=>$this->cantidad,
-            'precio'=> round($this->precio, 2)
+            'id' => $this->id,
+            'insumo' => $this->insumo,
+            'cantidad' => $this->cantidad,
+            'precio' => round($this->precio, 2)
         ];
     }
 }

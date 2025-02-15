@@ -24,8 +24,8 @@ class StoreVacunaRequest extends FormRequest
     {
         return [
             'nombre' => 'required|min:3|max:255',
-            'tipo_animal'=>['array','required',Rule::in(['rebano', 'becerro', 'maute', 'novillo', 'adulto'])],
-            'intervalo_dosis'=> 'required|numeric|between:1,32767',
+            'tipo_animal' => ['array','required',Rule::in(['rebano', 'becerro', 'maute', 'novillo', 'adulto'])],
+            'intervalo_dosis' => 'required|numeric|between:1,32767',
         ];
     }
 }

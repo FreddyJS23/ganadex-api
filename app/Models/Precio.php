@@ -11,7 +11,7 @@ class Precio extends Model
 {
     use HasFactory;
 
-    protected $fillable=[
+    protected $fillable = [
         'precio'
     ];
 
@@ -34,5 +34,4 @@ class Precio extends Model
     {
         return $this->hasMany(VentaLeche::class);
     }
-
 }

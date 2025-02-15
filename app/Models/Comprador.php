@@ -11,7 +11,7 @@ class Comprador extends Model
 {
     use HasFactory;
 
-    protected $fillable=[
+    protected $fillable = [
         'nombre'
     ];
 

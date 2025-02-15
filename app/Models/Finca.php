@@ -11,7 +11,7 @@ class Finca extends Model
 {
     use HasFactory;
 
-    protected $fillable=[
+    protected $fillable = [
         'nombre'
     ];
 
@@ -24,5 +24,4 @@ class Finca extends Model
     {
         return $this->belongsTo(User::class);
     }
-
 }

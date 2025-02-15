@@ -28,7 +28,7 @@ class UpdateCompradorRequest extends FormRequest
          * @return string
          */
         $parametroPath = preg_replace("/[^0-9]/", "", request()->path());
-        
+
         return [
             'nombre' => ['required','string','min:3','max:255',Rule::unique('compradors')->ignore(intval($parametroPath))]
         ];

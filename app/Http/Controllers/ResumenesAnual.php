@@ -27,7 +27,7 @@ class ResumenesAnual extends Controller
             ->get();
 
         /**
- * @var Array<int:string>  
+ * @var Array<int:string>
 */
         $totalPoblacionAño = [];
 
@@ -55,12 +55,12 @@ class ResumenesAnual extends Controller
             function ($item, int $key) use ($totalPoblacionAño, $tasaNatalidad) {
                 //usar clave año para usar la variable global y obtener el valor de la clave qye sera el total de poblacion
                 $item->poblacion = $totalPoblacionAño[$item['año']];
-                $poblacion=$item['poblacion'];
-                $partos_producidos=$item['partos_producidos'];
+                $poblacion = $item['poblacion'];
+                $partos_producidos = $item['partos_producidos'];
 
                 //si no hay partos o poblacion no se calculará la tasa de natalidad
-                if($poblacion==0 || $partos_producidos==0) {
-                    $item->tasa_natalidad=0;
+                if ($poblacion == 0 || $partos_producidos == 0) {
+                    $item->tasa_natalidad = 0;
                     return $item;
                 }
 

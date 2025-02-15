@@ -19,8 +19,8 @@ class UsuarioVeterinarioResource extends JsonResource
             'usuario' => $this->user->usuario,
             'nombre' => $this->veterinario->nombre,
             'fecha_creacion' => $this->created_at->format('d-m-Y'),
-            'telefono'=>$this->veterinario->telefono,
-            'rol'=>$this->user->getRoleNames()[0]
+            'telefono' => $this->veterinario->telefono,
+            'rol' => $this->user->getRoleNames()[0]
 
         ];
     }

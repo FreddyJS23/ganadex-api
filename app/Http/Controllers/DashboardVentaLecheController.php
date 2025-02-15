@@ -59,9 +59,12 @@ class DashboardVentaLecheController extends Controller
         $monthActual = intval(now()->format('m'));
         $monthQueryParam = intval($request->query('month'));
 
-        if (preg_match($regexMonthOneDigit, $monthQueryParam)) { $month =$monthQueryParam;
-        } else if (preg_match($regexMonthTwoDigit, $monthQueryParam)) { $month = $monthQueryParam;
-        } else { $month = $monthActual;
+        if (preg_match($regexMonthOneDigit, $monthQueryParam)) {
+            $month = $monthQueryParam;
+        } elseif (preg_match($regexMonthTwoDigit, $monthQueryParam)) {
+            $month = $monthQueryParam;
+        } else {
+            $month = $monthActual;
         }
 
 

@@ -7,7 +7,6 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class GanadoDescarteCollection extends ResourceCollection
 {
-
     public static $wrap = 'ganado_descartes';
     /**
      * Transform the resource collection into an array.

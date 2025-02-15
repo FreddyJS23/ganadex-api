@@ -29,7 +29,7 @@ class CompradorController extends Controller
      */
     public function store(StoreCompradorRequest $request)
     {
-        $comprador = new Comprador;
+        $comprador = new Comprador();
         $comprador->fill($request->all());
         $comprador->finca_id = session('finca_id');
         $comprador->save();

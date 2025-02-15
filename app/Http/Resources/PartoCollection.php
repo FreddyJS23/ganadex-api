@@ -7,7 +7,7 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class PartoCollection extends ResourceCollection
 {
-    public static $wrap='partos';
+    public static $wrap = 'partos';
     /**
      * Transform the resource collection into an array.
      *

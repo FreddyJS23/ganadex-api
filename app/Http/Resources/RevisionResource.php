@@ -15,11 +15,11 @@ class RevisionResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'=>$this->id,
-            'fecha'=>$this->fecha,
-            'diagnostico'=>$this->diagnostico,
-            'tratamiento'=>$this->tratamiento,
-            'veterinario'=>$this->veterinario,
+            'id' => $this->id,
+            'fecha' => $this->fecha,
+            'diagnostico' => $this->diagnostico,
+            'tratamiento' => $this->tratamiento,
+            'veterinario' => $this->veterinario,
         ];
     }
 }

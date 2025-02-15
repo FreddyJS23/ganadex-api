@@ -32,39 +32,39 @@ class LecheController extends Controller
      */
     public function store(StoreLecheRequest $request, Ganado $ganado)
     {
-        $leche=new Leche;
+        $leche = new Leche();
         $leche->fill($request->all());
-        $leche->finca_id=session('finca_id');
+        $leche->finca_id = session('finca_id');
         $leche->ganado()->associate($ganado);
         $leche->save();
 
         PesajeLecheHecho::dispatch($ganado);
 
-        return response()->json(['pesaje_leche'=> new LecheResource($leche)], 201);
+        return response()->json(['pesaje_leche' => new LecheResource($leche)], 201);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Ganado $ganado,Leche $pesaje_leche)
+    public function show(Ganado $ganado, Leche $pesaje_leche)
     {
-        return response()->json(['pesaje_leche'=>new LecheResource($pesaje_leche)], 200);
+        return response()->json(['pesaje_leche' => new LecheResource($pesaje_leche)], 200);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateLecheRequest $request,Ganado $ganado, Leche $pesaje_leche)
+    public function update(UpdateLecheRequest $request, Ganado $ganado, Leche $pesaje_leche)
     {
         $pesaje_leche->fill($request->all());
         $pesaje_leche->save();
-        return response()->json(['pesaje_leche'=> new LecheResource($pesaje_leche)], 200);
+        return response()->json(['pesaje_leche' => new LecheResource($pesaje_leche)], 200);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Ganado $ganado,Leche $pesaje_leche)
+    public function destroy(Ganado $ganado, Leche $pesaje_leche)
     {
         return  response()->json(['pesajeLecheID' => Leche::destroy($pesaje_leche->id) ?  $pesaje_leche->id : ''], 200);
     }

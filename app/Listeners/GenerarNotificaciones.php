@@ -17,7 +17,6 @@ use Illuminate\Support\Str;
 
 class GenerarNotificaciones
 {
-
     /* se utiliza este scope ya que el evento
     que es login tiene varios listener por ende
     llama varias veces este archivo, si se declaran estas funciones
@@ -38,7 +37,7 @@ class GenerarNotificaciones
     }
 
     //Consultar si un evento esta cercano a los 7 dias
-    private function VerificarEventoCercano($evento, $usuarioId,$fincaId, $fechaActual)
+    private function VerificarEventoCercano($evento, $usuarioId, $fincaId, $fechaActual)
     {
         //eliminar sufijo de la columna eventos
         $tipoEvento = Str::of($evento)->after('prox_');
@@ -73,8 +72,6 @@ class GenerarNotificaciones
         $fincaId = $event->finca->id;
         $fechaActual = now()->format('Y-m-d');
         if (Ganado::where('finca_id', $fincaId)->count() > 0) {
-
-
             //extraer nombres de columnas de la tabla
             $columnasTablaEvento = Schema::getColumnListing('eventos');
             //intercambiar key=>valor por valor=>key exeptuando

@@ -7,7 +7,7 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class TopVacasMenosProductorasCollection extends ResourceCollection
 {
-    public static $wrap='top_vacas_menos_productoras';
+    public static $wrap = 'top_vacas_menos_productoras';
     /**
      * Transform the resource collection into an array.
      *

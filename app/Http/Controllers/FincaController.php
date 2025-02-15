@@ -26,7 +26,7 @@ class FincaController extends Controller
 
         event(new CrearSesionFinca($finca));
 
-        return response()->json(['finca'=>new FincaResource($finca)], 200);
+        return response()->json(['finca' => new FincaResource($finca)], 200);
     }
 
     public function verificar_sesion_finca()
@@ -36,12 +36,13 @@ class FincaController extends Controller
 
         $finca_id = session('finca_id');
 
-        if($finca_id == null) { return response()->json(['message'=>'no existe sesion'], 401);
+        if ($finca_id == null) {
+            return response()->json(['message' => 'no existe sesion'], 401);
         }
 
         $finca = Finca::find($finca_id)->first();
 
-        return response()->json(['finca'=>new FincaResource($finca)], 200);
+        return response()->json(['finca' => new FincaResource($finca)], 200);
     }
 
     /**
@@ -57,12 +58,12 @@ class FincaController extends Controller
      */
     public function store(StoreFincaRequest $request)
     {
-        $finca=new Finca;
-        $finca->nombre=$request->nombre;
-        $finca->user_id=$request->user()->id;
+        $finca = new Finca();
+        $finca->nombre = $request->nombre;
+        $finca->user_id = $request->user()->id;
         $finca->save();
 
-        return response()->json(['finca'=>new FincaResource($finca)], 201);
+        return response()->json(['finca' => new FincaResource($finca)], 201);
     }
 
     /**
@@ -78,10 +79,10 @@ class FincaController extends Controller
      */
     public function update(UpdateFincaRequest $request, Finca $finca)
     {
-        $finca->nombre=$request->nombre;
+        $finca->nombre = $request->nombre;
         $finca->save();
 
-        return response()->json(['finca'=>new FincaResource($finca)], 200);
+        return response()->json(['finca' => new FincaResource($finca)], 200);
     }
 
     /**

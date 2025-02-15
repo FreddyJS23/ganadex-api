@@ -10,7 +10,7 @@ class VentaLeche extends Model
 {
     use HasFactory;
 
-    protected $fillable=[
+    protected $fillable = [
         'cantidad',
         'precio_id',
     ];

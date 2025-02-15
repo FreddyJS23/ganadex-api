@@ -34,7 +34,7 @@ class StoreVentaRequest extends FormRequest
                             return $query->where('finca_id', session('finca_id'));
                         }
                     ),
-                    new ComprobarTienePesoActual
+                    new ComprobarTienePesoActual()
             ],
             'comprador_id' => [
                 'required', 'numeric', Rule::exists('compradors', 'id')

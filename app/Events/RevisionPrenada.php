@@ -13,7 +13,9 @@ use Illuminate\Queue\SerializesModels;
 
 class RevisionPrenada
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable;
+    use InteractsWithSockets;
+    use SerializesModels;
 
     public $revision;
     /**
@@ -21,7 +23,7 @@ class RevisionPrenada
      */
     public function __construct(Revision $revision)
     {
-        $this->revision=$revision;
+        $this->revision = $revision;
     }
 
     /**

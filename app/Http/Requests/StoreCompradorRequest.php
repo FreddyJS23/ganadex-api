@@ -22,7 +22,7 @@ class StoreCompradorRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nombre'=>'required|string|min:3|max:255|unique:compradors,nombre'
+            'nombre' => 'required|string|min:3|max:255|unique:compradors,nombre'
         ];
     }
 }

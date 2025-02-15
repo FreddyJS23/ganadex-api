@@ -34,7 +34,6 @@ class VerificarVacasAptaParaServicio
         $fincaId = $event->finca->id;
 
         if (Ganado::where('finca_id', $fincaId)->count() > 0) {
-
             $vacasAptasParaServicio = Ganado::doesntHave('toro')
                 ->doesntHave('ganadoDescarte')
                 ->doesntHave('fallecimiento')
@@ -57,5 +56,4 @@ class VerificarVacasAptaParaServicio
             ->withProperties('evento')
             ->log("Verificado si hay vacas aptas para un  servicio");
     }
-
 }

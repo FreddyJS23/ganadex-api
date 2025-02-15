@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Auth;
 
 class ConfiguracionController extends Controller
 {
-
     public function __construct()
     {
         $this->authorizeResource(Configuracion::class, 'configuracion');
@@ -43,7 +42,7 @@ class ConfiguracionController extends Controller
      */
     public function update(UpdateConfiguracionRequest $request)
     {
-        $configuracion=Configuracion::firstWhere('user_id', Auth::id());
+        $configuracion = Configuracion::firstWhere('user_id', Auth::id());
         $configuracion->fill($request->all());
         $configuracion->save();
 

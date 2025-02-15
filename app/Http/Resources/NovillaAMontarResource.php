@@ -15,9 +15,9 @@ class NovillaAMontarResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            "id"=>$this->id,
-            "numero"=>$this->ganado->numero,
-            "peso_actual"=>$this->peso_actual
+            "id" => $this->id,
+            "numero" => $this->ganado->numero,
+            "peso_actual" => $this->peso_actual
 
         ];
     }

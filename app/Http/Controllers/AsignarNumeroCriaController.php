@@ -8,7 +8,6 @@ use App\Models\Estado;
 use App\Models\Ganado;
 use Illuminate\Support\Facades\Auth;
 
-
 class AsignarNumeroCriaController extends Controller
 {
     /**
@@ -26,17 +25,15 @@ class AsignarNumeroCriaController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreNumeroCriaRequest $request,Ganado $ganado)
+    public function store(StoreNumeroCriaRequest $request, Ganado $ganado)
     {
-        $ganado->numero=$request->input('numero');
+        $ganado->numero = $request->input('numero');
         $ganado->save();
 
-        $estado=Estado::firstWhere('estado', 'pendiente_numeracion');
+        $estado = Estado::firstWhere('estado', 'pendiente_numeracion');
 
         $ganado->estados()->detach($estado->id);
 
         return response()->json();
     }
-
-
 }

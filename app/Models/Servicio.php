@@ -67,6 +67,5 @@ class Servicio extends Model
     {
 
         return LogOptions::defaults();
-
     }
 }

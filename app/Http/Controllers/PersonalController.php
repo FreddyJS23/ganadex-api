@@ -28,11 +28,11 @@ class PersonalController extends Controller
      */
     public function store(StorePersonalRequest $request)
     {
-        $personal=new Personal;
+        $personal = new Personal();
         $personal->fill($request->all());
-        $personal->finca_id=session('finca_id');
+        $personal->finca_id = session('finca_id');
         $personal->save();
-        return response()->json(['personal'=> new PersonalResource($personal)], 201);
+        return response()->json(['personal' => new PersonalResource($personal)], 201);
     }
 
     /**
@@ -40,7 +40,7 @@ class PersonalController extends Controller
      */
     public function show(Personal $personal)
     {
-        return response()->json(['personal'=> new PersonalResource($personal)], 200);
+        return response()->json(['personal' => new PersonalResource($personal)], 200);
     }
 
     /**
@@ -50,7 +50,7 @@ class PersonalController extends Controller
     {
         $personal->fill($request->all())->save();
 
-        return response()->json(['personal'=> new PersonalResource($personal)], 200);
+        return response()->json(['personal' => new PersonalResource($personal)], 200);
     }
 
     /**

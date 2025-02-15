@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Http\Resources\CausasFallecimientosDashboardResource;
 use App\Models\Fallecimiento;
 use Illuminate\Support\Facades\Auth;

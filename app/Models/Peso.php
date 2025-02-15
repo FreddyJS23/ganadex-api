@@ -13,7 +13,7 @@ class Peso extends Model
 {
     use HasFactory;
 
-    protected $fillable=[
+    protected $fillable = [
         'peso_nacimiento',
         'peso_destete',
         'peso_2year',

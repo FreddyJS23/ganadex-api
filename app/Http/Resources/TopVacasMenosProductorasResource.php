@@ -15,8 +15,8 @@ class TopVacasMenosProductorasResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'ganado'=>$this->ganado,
-            'peso_leche'=>$this->peso_leche
+            'ganado' => $this->ganado,
+            'peso_leche' => $this->peso_leche
         ];
     }
 }

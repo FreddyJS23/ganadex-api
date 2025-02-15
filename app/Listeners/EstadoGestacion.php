@@ -25,10 +25,10 @@ class EstadoGestacion
      */
     public function handle(RevisionPrenada $event): void
     {
-        $eventoGanado=Evento::firstWhere('ganado_id', $event->revision->ganado->id);
-        $fechaServicio=new DateTime($event->revision->ganado->servicioReciente->fecha);
-        $fechaParto=$fechaServicio->add(new DateInterval('P270D'))->format('Y-m-d');
-        $eventoGanado->prox_parto=$fechaParto;
+        $eventoGanado = Evento::firstWhere('ganado_id', $event->revision->ganado->id);
+        $fechaServicio = new DateTime($event->revision->ganado->servicioReciente->fecha);
+        $fechaParto = $fechaServicio->add(new DateInterval('P270D'))->format('Y-m-d');
+        $eventoGanado->prox_parto = $fechaParto;
         $eventoGanado->save();
 
         $estado = Estado::whereIn('estado', ['sano','gestacion'])->get();

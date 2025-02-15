@@ -7,8 +7,7 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class FincaCollection extends ResourceCollection
 {
-
-    public static $wrap='fincas';
+    public static $wrap = 'fincas';
     /**
      * Transform the resource collection into an array.
      *

@@ -7,7 +7,7 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class BalanceAnualVentasGanadoCollection extends ResourceCollection
 {
-    public static $wrap='balance_anual';
+    public static $wrap = 'balance_anual';
     /**
      * Transform the resource collection into an array.
      *

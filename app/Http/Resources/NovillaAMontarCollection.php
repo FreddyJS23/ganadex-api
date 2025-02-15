@@ -7,7 +7,7 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class NovillaAMontarCollection extends ResourceCollection
 {
-    public static $wrap='novillas_para_servicio';
+    public static $wrap = 'novillas_para_servicio';
     /**
      * Transform the resource collection into an array.
      *

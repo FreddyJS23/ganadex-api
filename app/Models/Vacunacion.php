@@ -11,7 +11,7 @@ class Vacunacion extends Model
 {
     use HasFactory;
 
-    protected $fillable=[
+    protected $fillable = [
         'vacuna_id',
         'finca_id',
         'fecha',
@@ -46,6 +46,4 @@ class Vacunacion extends Model
     {
         return $this->belongsTo(Vacuna::class);
     }
-
-
 }

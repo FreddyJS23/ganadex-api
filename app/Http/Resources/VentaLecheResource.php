@@ -15,10 +15,10 @@ class VentaLecheResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'=>$this->id,
-            'fecha'=>$this->fecha,
-            'cantidad'=>$this->cantidad . 'KG',
-            'precio'=>$this->precio->precio,
+            'id' => $this->id,
+            'fecha' => $this->fecha,
+            'cantidad' => $this->cantidad . 'KG',
+            'precio' => $this->precio->precio,
         ];
     }
 }

@@ -19,5 +19,4 @@ class TiposNotificacion extends Model
     {
         return $this->hasMany(Notificacion::class, 'tipo_id',);
     }
-
 }

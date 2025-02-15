@@ -20,10 +20,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Arr;
 
-
 class DashboardPrincipalController extends Controller
 {
-
     public function totalGanadoTipo()
     {
 
@@ -56,8 +54,8 @@ class DashboardPrincipalController extends Controller
         );
 
         $totalGanadoDescarte = GanadoDescarte::where('finca_id', session('finca_id'))->count();
-        $totalGanadoDescarte=collect(
-            [[  'tipo'=>'descarte',
+        $totalGanadoDescarte = collect(
+            [[  'tipo' => 'descarte',
             'ganado_count' => $totalGanadoDescarte]]
         );
 
@@ -83,7 +81,8 @@ class DashboardPrincipalController extends Controller
         $fechaActual = new DateTime();
         $mesActual = $fechaActual->format('m');
         $topVacasProductoras = Leche::withWhereHas(
-            'ganado', function ( $query) {
+            'ganado',
+            function ($query) {
                 $query->where('finca_id', session('finca_id'))->select('id', 'numero');
             }
         )->orderBy('peso_leche', 'desc')->whereMonth('fecha', $mesActual)->limit(3)->get();
@@ -95,10 +94,11 @@ class DashboardPrincipalController extends Controller
 
     public function topVacasMenosProductoras()
     {
-        $fechaActual = new DateTime;
+        $fechaActual = new DateTime();
         $mesActual = $fechaActual->format('m');
         $topVacasMenosProductoras = Leche::withWhereHas(
-            'ganado', function ($query) {
+            'ganado',
+            function ($query) {
                 $query->where('finca_id', session('finca_id'))->select('id', 'numero');
             }
         )->orderBy('peso_leche', 'asc')->whereMonth('fecha', $mesActual)->limit(3)->get();
@@ -129,14 +129,14 @@ class DashboardPrincipalController extends Controller
     {
         $menorCantidadInsumo = Insumo::where('finca_id', session('finca_id'))->orderBy('cantidad', 'asc')->first();
 
-        return response()->json(['menor_cantidad_insumo' =>$menorCantidadInsumo ? new CantidadInsumoResource($menorCantidadInsumo) : null]);
+        return response()->json(['menor_cantidad_insumo' => $menorCantidadInsumo ? new CantidadInsumoResource($menorCantidadInsumo) : null]);
     }
 
     public function insumoMayorExistencia()
     {
         $mayorCantidadInsumo = Insumo::where('finca_id', session('finca_id'))->orderBy('cantidad', 'desc')->first();
 
-        return response()->json(['mayor_cantidad_insumo' =>$mayorCantidadInsumo ? new CantidadInsumoResource($mayorCantidadInsumo) : null]);
+        return response()->json(['mayor_cantidad_insumo' => $mayorCantidadInsumo ? new CantidadInsumoResource($mayorCantidadInsumo) : null]);
     }
 
     public function balanceAnualProduccionLeche(Request $request)

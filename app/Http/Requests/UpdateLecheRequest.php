@@ -22,7 +22,7 @@ class UpdateLecheRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'peso_leche'=>'required|max_digits:6|numeric',
+            'peso_leche' => 'required|max_digits:6|numeric',
         ];
     }
 }

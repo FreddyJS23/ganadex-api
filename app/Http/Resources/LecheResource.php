@@ -15,9 +15,9 @@ class LecheResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'=>$this->id,
-            'pesaje'=>$this->peso_leche,
-            'fecha'=>$this->fecha
+            'id' => $this->id,
+            'pesaje' => $this->peso_leche,
+            'fecha' => $this->fecha
         ];
     }
 }

@@ -21,6 +21,5 @@ class TodosPesajeLeche extends Controller
                 ->where('finca_id', session('finca_id'))
                 ->get()
         );
-
     }
 }

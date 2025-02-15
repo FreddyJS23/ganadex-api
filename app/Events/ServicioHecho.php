@@ -13,7 +13,9 @@ use Illuminate\Queue\SerializesModels;
 
 class ServicioHecho
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable;
+    use InteractsWithSockets;
+    use SerializesModels;
 
     public $servicio;
     /**
@@ -21,7 +23,7 @@ class ServicioHecho
      */
     public function __construct(Servicio $servicio)
     {
-        $this->servicio=$servicio;
+        $this->servicio = $servicio;
     }
 
     /**

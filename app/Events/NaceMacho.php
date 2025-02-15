@@ -13,7 +13,9 @@ use Illuminate\Queue\SerializesModels;
 
 class NaceMacho
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable;
+    use InteractsWithSockets;
+    use SerializesModels;
 
     public $ganado;
     /**
@@ -21,7 +23,7 @@ class NaceMacho
      */
     public function __construct(Ganado $ganado)
     {
-        $this->ganado=$ganado;
+        $this->ganado = $ganado;
     }
 
     /**

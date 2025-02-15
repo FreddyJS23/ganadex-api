@@ -15,7 +15,6 @@ class TablaDetalle extends Component
         public string $tituloDetalle,
         public array $detalles
     ) {
-        
     }
 
     /**

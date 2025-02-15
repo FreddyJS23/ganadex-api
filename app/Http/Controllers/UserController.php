@@ -32,14 +32,14 @@ class UserController extends Controller
      */
     public function store(StoreUserRequest $request)
     {
-        $user= new User;
-        $user->password=hash::make($request->password);
+        $user = new User();
+        $user->password = hash::make($request->password);
         $user->fill($request->except('password'));
         $user->assignRole('admin');
         Configuracion::factory()->for($user);
         $user->save();
 
-        return response()->json(['message'=>'usuario creado'], 201);
+        return response()->json(['message' => 'usuario creado'], 201);
     }
 
     /**
@@ -48,14 +48,14 @@ class UserController extends Controller
     public function show(User $user)
     {
         $user->load('fincas');
-        $user->fincas=$user->fincas->map(
+        $user->fincas = $user->fincas->map(
             function (Finca $finca) {
-                $finca->fecha_creacion=$finca->created_at->format('d-m-Y');
+                $finca->fecha_creacion = $finca->created_at->format('d-m-Y');
                 return $finca;
             }
         );
 
-        return response()->json(['user'=>new UserResource($user)], 200);
+        return response()->json(['user' => new UserResource($user)], 200);
     }
 
     /**

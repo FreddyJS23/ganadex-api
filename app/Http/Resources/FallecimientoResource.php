@@ -15,10 +15,10 @@ class FallecimientoResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'=>$this->id,
-            'fecha'=>$this->fecha,
-            'causa'=>$this->causa,
-            'ganado'=>$this->ganado,
+            'id' => $this->id,
+            'fecha' => $this->fecha,
+            'causa' => $this->causa,
+            'ganado' => $this->ganado,
         ];
     }
 }

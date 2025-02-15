@@ -7,7 +7,7 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class InsumoCollection extends ResourceCollection
 {
-    public static $wrap='insumos';
+    public static $wrap = 'insumos';
     /**
      * Transform the resource collection into an array.
      *

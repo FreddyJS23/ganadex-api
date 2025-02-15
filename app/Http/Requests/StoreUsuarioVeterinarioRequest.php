@@ -31,7 +31,7 @@ class StoreUsuarioVeterinarioRequest extends FormRequest
                             return $query->where('finca_id', session('finca_id'));
                         }
                     ),
-                new ComprobarVeterianario,
+                new ComprobarVeterianario(),
             ],
         ];
     }

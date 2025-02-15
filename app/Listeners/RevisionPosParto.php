@@ -24,10 +24,10 @@ class RevisionPosParto
      */
     public function handle(PartoHecho $event): void
     {
-        $eventoGanado=Evento::firstWhere('ganado_id', $event->parto->ganado->id);
-        $fechaParto=new DateTime($event->parto->fecha);
-        $proxRevision=$fechaParto->add(new DateInterval('P30D'))->format('Y-m-d');
-        $eventoGanado->prox_revision=$proxRevision;
+        $eventoGanado = Evento::firstWhere('ganado_id', $event->parto->ganado->id);
+        $fechaParto = new DateTime($event->parto->fecha);
+        $proxRevision = $fechaParto->add(new DateInterval('P30D'))->format('Y-m-d');
+        $eventoGanado->prox_revision = $proxRevision;
         $eventoGanado->save();
 
         $numero = $event->parto->ganado->numero;

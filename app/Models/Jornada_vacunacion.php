@@ -52,12 +52,10 @@ class Jornada_vacunacion extends Model
     public function tapActivity(Activity $activity, string $eventName)
     {
         Auth::user() &&  Auth::user()->hasRole('admin') && activity()->disableLogging();
-
     }
 
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults();
-
     }
 }

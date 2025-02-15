@@ -27,7 +27,7 @@ class FallecimientoController extends Controller
      */
     public function store(StoreFallecimientoRequest $request)
     {
-        $fallecimiento=new Fallecimiento;
+        $fallecimiento = new Fallecimiento();
         $ganado = Ganado::find($request->input('ganado_id'));
         $fallecimiento->fill($request->only('causa', 'fecha'));
         $fallecimiento->ganado()->associate($ganado);
@@ -36,7 +36,6 @@ class FallecimientoController extends Controller
         FallecimientoGanado::dispatch($ganado);
 
         return response()->json(['fallecimiento' => new FallecimientoResource($fallecimiento->load('ganado:id,numero'))], 201);
-
     }
 
     /**
@@ -54,7 +53,7 @@ class FallecimientoController extends Controller
     {
 
         $fallecimiento->fill($request->only('causa'));
-        $fallecimiento->fecha=$request->input('fecha');
+        $fallecimiento->fecha = $request->input('fecha');
         $fallecimiento->save();
 
         return response()->json(['fallecimiento' => new FallecimientoResource($fallecimiento->load('ganado:id,numero'))], 200);
@@ -66,6 +65,5 @@ class FallecimientoController extends Controller
     public function destroy(Fallecimiento $fallecimiento)
     {
         return  response()->json(['fallecimientoID' => Fallecimiento::destroy($fallecimiento->id) ?  $fallecimiento->id : ''], 200);
-
     }
 }

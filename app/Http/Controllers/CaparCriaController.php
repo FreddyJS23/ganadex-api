@@ -5,9 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\CriasPenditeCaparCollection;
 use App\Models\Estado;
 use App\Models\Ganado;
-
 use Illuminate\Support\Facades\Auth;
-
 
 class CaparCriaController extends Controller
 {
@@ -28,11 +26,9 @@ class CaparCriaController extends Controller
      */
     public function capar(Ganado $ganado)
     {
-        $estado=Estado::firstWhere('estado', 'pendiente_capar');
+        $estado = Estado::firstWhere('estado', 'pendiente_capar');
         $ganado->estados()->detach($estado->id);
 
         return response()->json();
     }
-
-
 }

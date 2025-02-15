@@ -15,9 +15,9 @@ class PrecioResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'=>$this->id,
-            'precio' =>$this->precio,
-            'fecha'=>$this->fecha
+            'id' => $this->id,
+            'precio' => $this->precio,
+            'fecha' => $this->fecha
         ];
     }
 }

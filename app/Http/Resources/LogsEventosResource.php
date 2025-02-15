@@ -15,10 +15,10 @@ class LogsEventosResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' =>$this->id,
-            'operacion'=>$this->log_name,
-            'descripcion'=>$this->description,
-            'fecha'=>$this->created_at->format('d-m-Y H:i:s'),
+            'id' => $this->id,
+            'operacion' => $this->log_name,
+            'descripcion' => $this->description,
+            'fecha' => $this->created_at->format('d-m-Y H:i:s'),
         ];
     }
 }

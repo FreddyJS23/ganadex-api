@@ -11,7 +11,7 @@ class Notificacion extends Model
 {
     use HasFactory;
 
-    protected $fillable=[
+    protected $fillable = [
         'user_id',
         'tipo_id',
         'ganado_id',

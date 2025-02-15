@@ -13,16 +13,18 @@ use Illuminate\Queue\SerializesModels;
 
 class VentaGanado
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable;
+    use InteractsWithSockets;
+    use SerializesModels;
 
     public $venta;
-    
+
     /**
      * Create a new event instance.
      */
     public function __construct(Venta $venta)
     {
-        $this->venta=$venta;
+        $this->venta = $venta;
     }
 
     /**

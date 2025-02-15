@@ -25,7 +25,7 @@ class UpdateFincaRequest extends FormRequest
         $parametroPath = preg_replace("/[^0-9]/", "", request()->path());
 
         return [
-            'nombre'=>['required','min:3','max:255',Rule::unique('fincas')->ignore($parametroPath)],
+            'nombre' => ['required','min:3','max:255',Rule::unique('fincas')->ignore($parametroPath)],
         ];
     }
 }

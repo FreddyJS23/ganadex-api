@@ -18,7 +18,7 @@ class ComprobarRequisitosPrenada implements ValidationRule
         $idGanado = preg_replace("/[^0-9]/", "", request()->path());
         $ganado = Ganado::firstWhere('id', $idGanado);
 
-        $pesoActualGanado=$ganado->peso->getRawOriginal('peso_actual');
+        $pesoActualGanado = $ganado->peso->getRawOriginal('peso_actual');
         if ($value == 'prenada') {
             if ($pesoActualGanado < session('peso_servicio')) {
                 $fail('La vaca debe tener un peso mayor a ' . session('peso_servicio') . ' kg');

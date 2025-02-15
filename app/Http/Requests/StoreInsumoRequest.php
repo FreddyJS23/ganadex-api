@@ -22,9 +22,9 @@ class StoreInsumoRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'insumo'=>'required|min:3|max:255|string|unique:insumos,insumo',
-            'cantidad'=>'required|numeric|between:1,999',
-            'precio'=>'required|numeric'
+            'insumo' => 'required|min:3|max:255|string|unique:insumos,insumo',
+            'cantidad' => 'required|numeric|between:1,999',
+            'precio' => 'required|numeric'
         ];
     }
 }

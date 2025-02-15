@@ -7,7 +7,7 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class RevisionCollection extends ResourceCollection
 {
-    public static $wrap='revisiones';
+    public static $wrap = 'revisiones';
     /**
      * Transform the resource collection into an array.
      *

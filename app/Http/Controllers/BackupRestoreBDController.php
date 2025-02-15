@@ -32,7 +32,7 @@ class BackupRestoreBDController extends Controller
         $dateLastBackup = preg_match($regexDate, $pathDbRestore, $mathes);
         $dateLastBackup = $mathes[0] ?? null;
         //$dateLastBackup = null;
-        
+
         return response()->json(['ultimo_backup' => $dateLastBackup], 200);
     }
 
@@ -49,7 +49,7 @@ class BackupRestoreBDController extends Controller
 
         $pathDbRestore = end($listaBackup);
 
-        $zip = new ZipArchive;
+        $zip = new ZipArchive();
 
         $zip->open(storage_path('app/' . $pathDbRestore));
 
@@ -75,7 +75,7 @@ class BackupRestoreBDController extends Controller
         $fileSqlRestore = Storage::path('restore-bd/restore.sql');
 
         $restaurarDb = exec("mysql -u $dbUser  $dbName < $fileSqlRestore ", $output, $result);
-       
+
         return response()->json([], $result == 0 ? 200 : 500);
     }
 }

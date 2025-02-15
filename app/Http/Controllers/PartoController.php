@@ -47,30 +47,30 @@ class PartoController extends Controller
      */
     public function store(StorePartoRequest $request, Ganado $ganado)
     {
-        $parto=new Parto;
+        $parto = new Parto();
         $parto->fill($request->only(['observacion','personal_id','fecha']));
-        $servicio=$ganado->servicioReciente->servicioable;
+        $servicio = $ganado->servicioReciente->servicioable;
 
         $parto->ganado()->associate($ganado);
         $parto->partoable()->associate($servicio);
 
-        $cria=new Ganado;
+        $cria = new Ganado();
 
         $cria->fill($request->except(['observacion','peso_nacimiento']));
-        $cria->fecha_nacimiento=$request->input('fecha');
-        $cria->tipo_id=GanadoTipo::where('tipo', 'becerro')->first()->id;
-        $cria->origen='local';
-        $cria->finca_id=session('finca_id');
+        $cria->fecha_nacimiento = $request->input('fecha');
+        $cria->tipo_id = GanadoTipo::where('tipo', 'becerro')->first()->id;
+        $cria->origen = 'local';
+        $cria->finca_id = session('finca_id');
         $cria->save();
         $cria->evento()->create();
 
-        $estados=Estado::select('id')
+        $estados = Estado::select('id')
             ->whereIn('estado', ['sano','pendiente_numeracion'])
             ->get()
             ->modelKeys();
         $cria->estados()->sync($estados);
 
-        $peso_nacimiento=new Peso($request->only(['peso_nacimiento']));
+        $peso_nacimiento = new Peso($request->only(['peso_nacimiento']));
         $peso_nacimiento->ganado()->associate($cria)->save();
 
         $parto->ganado_cria()->associate($cria)->save();
@@ -79,14 +79,15 @@ class PartoController extends Controller
         NaceMacho::dispatchIf($cria->sexo == "M", $cria);
 
         return response()->json(
-            ['parto'=>new PartoResource(
+            ['parto' => new PartoResource(
                 $parto->load(
                     ['veterinario' => function (Builder $query) {
                         $query->select('personals.id', 'nombre');
                     }
                     ]
                 )->loadMorph('partoable', [Toro::class => 'ganado:id,numero', PajuelaToro::class])
-            )], 201
+            )],
+            201
         );
     }
 
@@ -104,14 +105,15 @@ class PartoController extends Controller
                     }
                     ]
                 )->loadMorph('partoable', [Toro::class => 'ganado:id,numero', PajuelaToro::class])
-            )], 200
+            )],
+            200
         );
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdatePartoRequest $request,Ganado $ganado, Parto $parto)
+    public function update(UpdatePartoRequest $request, Ganado $ganado, Parto $parto)
     {
         $parto->fill($request->only(['observacion']))->save();
 
@@ -124,14 +126,15 @@ class PartoController extends Controller
                     }
                     ]
                 )->loadMorph('partoable', [Toro::class => 'ganado:id,numero', PajuelaToro::class])
-            )], 200
+            )],
+            200
         );
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Ganado $ganado,Parto $parto)
+    public function destroy(Ganado $ganado, Parto $parto)
     {
         return  response()->json(['partoID' => Parto::destroy($parto->id) ?  $parto->id : ''], 200);
     }

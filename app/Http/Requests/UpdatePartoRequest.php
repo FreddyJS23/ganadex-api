@@ -24,7 +24,7 @@ class UpdatePartoRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'observacion'=>'required|min:3|max:255',
+            'observacion' => 'required|min:3|max:255',
         ];
     }
 }

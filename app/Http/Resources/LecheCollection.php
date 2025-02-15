@@ -7,7 +7,7 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class LecheCollection extends ResourceCollection
 {
-    public static $wrap='pesajes_leche';
+    public static $wrap = 'pesajes_leche';
     /**
      * Transform the resource collection into an array.
      *

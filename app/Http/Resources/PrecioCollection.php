@@ -7,7 +7,7 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class PrecioCollection extends ResourceCollection
 {
-    public static $wrap='precios';
+    public static $wrap = 'precios';
     /**
      * Transform the resource collection into an array.
      *

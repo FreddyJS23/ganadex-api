@@ -13,16 +13,18 @@ use Illuminate\Queue\SerializesModels;
 
 class PartoHecho
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable;
+    use InteractsWithSockets;
+    use SerializesModels;
 
     public $parto;
-    
+
     /**
      * Create a new event instance.
      */
     public function __construct(Parto $parto)
     {
-        $this->parto=$parto;
+        $this->parto = $parto;
     }
 
     /**

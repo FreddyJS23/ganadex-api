@@ -12,8 +12,10 @@ class checkSesionActivaUsuario extends Controller
      */
     public function __invoke(Request $request)
     {
-        if(Auth::check()) { return response()->json([]);
-        } else { return response()->json([], 401);
+        if (Auth::check()) {
+            return response()->json([]);
+        } else {
+            return response()->json([], 401);
         }
     }
 }

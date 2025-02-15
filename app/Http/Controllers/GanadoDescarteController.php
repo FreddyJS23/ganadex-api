@@ -74,10 +74,10 @@ class GanadoDescarteController extends Controller
                 }
             );
         } catch (\Throwable $error) {
-            return response()->json(['error'=>'error al insertar datos'], 501);
+            return response()->json(['error' => 'error al insertar datos'], 501);
         }
 
-        $ganadoDescarte = new GanadoDescarte;
+        $ganadoDescarte = new GanadoDescarte();
         $ganadoDescarte->finca_id = session('finca_id');
         $ganadoDescarte->ganado()->associate($ganado)->save();
 
@@ -114,9 +114,9 @@ class GanadoDescarteController extends Controller
 
     public function descartar(StoreDescartarGanado $request)
     {
-        $ganadoDescarte=new GanadoDescarte;
-        $ganadoDescarte->ganado_id=$request->ganado_id;
-        $ganadoDescarte->finca_id=session('finca_id');
+        $ganadoDescarte = new GanadoDescarte();
+        $ganadoDescarte->ganado_id = $request->ganado_id;
+        $ganadoDescarte->finca_id = session('finca_id');
         $ganadoDescarte->save();
         return response()->json(['ganado_descarte' => new GanadoDescarteResource($ganadoDescarte)], 201);
     }

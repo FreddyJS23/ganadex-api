@@ -40,8 +40,8 @@ class VerificarEdadGanado
                 ->where('tipo_id', 1)
                 ->select('tipo_id')
                 ->selectRaw($sentenciaSqlDiferenciaDias)
-                ->having('diferencia', '>=',  365)
-                ->having('diferencia', '<',  729)
+                ->having('diferencia', '>=', 365)
+                ->having('diferencia', '<', 729)
                 ->get();
 
             $becerros->count() > 0 && $becerros->toQuery()->update(['tipo_id' => 2]);

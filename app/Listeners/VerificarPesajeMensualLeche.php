@@ -8,7 +8,6 @@ use App\Models\Ganado;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Contracts\Queue\ShouldQueue;
-
 use Illuminate\Queue\InteractsWithQueue;
 
 class VerificarPesajeMensualLeche
@@ -31,7 +30,6 @@ class VerificarPesajeMensualLeche
         $fincaId = $event->finca->id;
 
         if (Ganado::where('finca_id', $fincaId)->count() > 0) {
-
             $vacasSinPesarEsteMes = Ganado::doesntHave('toro')
                 ->where('finca_id', $fincaId)
                 ->whereHas(

@@ -38,7 +38,6 @@ class TodosServicios extends Controller
                 $efectividad = fn (int $resultadoAlcanzado) => round(1 / $resultadoAlcanzado * 100, 2);
 
                 if ($ganado->parto->count() == 1) {
-
                     $ganado->load('servicios');
 
                     $ganado->efectividad = $ganado->servicios->count() >= 1 ? $efectividad($ganado->servicios->count()) : null;

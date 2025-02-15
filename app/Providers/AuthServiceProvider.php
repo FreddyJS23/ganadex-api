@@ -33,10 +33,11 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('update', [ConfiguracionPolicy::class,'update']);
 
         Gate::define(
-            'view-logs', function (User $user, UsuarioVeterinario $usuarioVeterinario) {
+            'view-logs',
+            function (User $user, UsuarioVeterinario $usuarioVeterinario) {
 
                 return $user->hasRole('admin') &&  $user->id === $usuarioVeterinario->admin_id;
             }
-        );    
+        );
     }
 }

@@ -31,13 +31,13 @@ class GanadoController extends Controller
     }
 
 
-    public array $estado=['estado_id'];
-    public array $peso=['peso_nacimiento', 'peso_destete','peso_2year','peso_actual'];
-    public array $vendido=['precio','comprador_id'];
+    public array $estado = ['estado_id'];
+    public array $peso = ['peso_nacimiento', 'peso_destete','peso_2year','peso_actual'];
+    public array $vendido = ['precio','comprador_id'];
     /**
      * Display a listing of the resource.
      */
-    public function index() :ResourceCollection
+    public function index(): ResourceCollection
     {
         return new GanadoCollection(
             Ganado::doesntHave('toro')
@@ -51,12 +51,12 @@ class GanadoController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreGanadoRequest $request) :JsonResponse
+    public function store(StoreGanadoRequest $request): JsonResponse
     {
-        $ganado=new Ganado;
+        $ganado = new Ganado();
         $ganado->sexo = "H";
         $ganado->fill($request->except($this->estado + $this->peso));
-        $ganado->finca_id=session('finca_id');
+        $ganado->finca_id = session('finca_id');
 
         try {
                 DB::transaction(
@@ -87,7 +87,7 @@ class GanadoController extends Controller
 
                         //vacunacion
 
-                        $vacunas=[];
+                        $vacunas = [];
 
                         foreach ($request->only('vacunas')['vacunas'] as $vacuna) {
                             array_push($vacunas, $vacuna + ['ganado_id' => $ganado->id, 'finca_id' => $ganado->finca_id]);
@@ -100,10 +100,8 @@ class GanadoController extends Controller
                 );
                 return response()->json(['ganado' => new GanadoResource($ganado)], 201);
         } catch (\Throwable $error) {
-
-            return response()->json(['error'=>'error al insertar datos'], 501);
+            return response()->json(['error' => 'error al insertar datos'], 501);
         }
-
     }
 
     /**
@@ -121,8 +119,8 @@ class GanadoController extends Controller
 
 
         //diferencia dias entre proxima vacunacion individual y jornada vacunacion
-        $diferencia=session('dias_diferencia_vacuna');
-        $setenciaDiferenciaDias="DATEDIFF(MAX(jornada_vacunacions.prox_dosis),MAX(vacunacions.prox_dosis))";
+        $diferencia = session('dias_diferencia_vacuna');
+        $setenciaDiferenciaDias = "DATEDIFF(MAX(jornada_vacunacions.prox_dosis),MAX(vacunacions.prox_dosis))";
 
         /* Explicacion consulta
         usar un alias para las vacunas.
@@ -132,7 +130,7 @@ class GanadoController extends Controller
         si existen registros en las dos tablas se comprueba que proxima dosis se le debe dar prioridad
         tercer case: determinar la ultima vacunacion dependiendo la existencia de registros en las tablas relacionadas,
         si existen registros en las dos tablas se comprueba que ultima dosis es la mas reciente*/
-        $sentenciaSqlAgruparVacunas="nombre as vacuna,
+        $sentenciaSqlAgruparVacunas = "nombre as vacuna,
         CASE
             WHEN MAX(vacunacions.prox_dosis) IS NULL OR MAX(jornada_vacunacions.prox_dosis) IS NULL THEN COUNT(nombre)
             ELSE COUNT(nombre) + 1
@@ -156,15 +154,17 @@ class GanadoController extends Controller
         Los ultimos dos wheres se utilizan para omitir los resultados de la tabla vacuna, ya que por defecto los trae y aumentaria el contador
         de aplicaciones de vacunas aplicada
         */
-        $agruparVacunas=Vacuna::selectRaw($sentenciaSqlAgruparVacunas)
+        $agruparVacunas = Vacuna::selectRaw($sentenciaSqlAgruparVacunas)
             ->leftJoin(
-                'vacunacions', function (JoinClause $join) use ($ganado) {
+                'vacunacions',
+                function (JoinClause $join) use ($ganado) {
                     $join->on('vacunas.id', '=', 'vacunacions.vacuna_id')
                         ->where('vacunacions.ganado_id', $ganado->id);
                 }
             )
         ->leftJoin(
-            'jornada_vacunacions', function (JoinClause $join) use ($ganado) {
+            'jornada_vacunacions',
+            function (JoinClause $join) use ($ganado) {
                 $join->on('vacunas.id', '=', 'jornada_vacunacions.vacuna_id')
                     ->where('jornada_vacunacions.finca_id', session('finca_id'))
                     ->where('fecha_inicio', '>', $ganado->fecha_nacimiento ?? $ganado->created_at);
@@ -180,9 +180,9 @@ class GanadoController extends Controller
         $ultimoPesajeLeche = $ganado->pesajeLecheReciente;
         $ultimoParto = $ganado->partoReciente;
         $ganado->load(
-            ['parto'=>function (Builder $query) {
+            ['parto' => function (Builder $query) {
                 $query->orderBy('fecha', 'desc');
-            }, 'vacunaciones'=>function (Builder $query) {
+            }, 'vacunaciones' => function (Builder $query) {
                 $query->select('vacunacions.id', 'nombre AS vacuna', 'fecha', 'ganado_id', 'prox_dosis')
                     ->join('vacunas', 'vacunacions.vacuna_id', 'vacunas.id');
             }
@@ -190,14 +190,14 @@ class GanadoController extends Controller
         )->loadCount('revision');
 
         //concatenando los datos de las vacunaciones con las jornadas de vacunacion posteriores
-        $ganado->vacunaciones=$ganado->vacunaciones->makeHidden('ganado_id')->concat($jornadasVacunacionAnteriores);
+        $ganado->vacunaciones = $ganado->vacunaciones->makeHidden('ganado_id')->concat($jornadasVacunacionAnteriores);
 
         //ordeno todas las vacunaciones y jornadas concadenadas por fecha
-        $ganado->vacunaciones=$ganado->vacunaciones->sortByDesc('fecha');
+        $ganado->vacunaciones = $ganado->vacunaciones->sortByDesc('fecha');
         //transformar el id para evitar duplicados de vacunaciones y jornadas vacunacion
-        $ganado->vacunaciones=$ganado->vacunaciones->transform(
-            function (Vacunacion|Jornada_vacunacion $item,int $key) {
-                $item->id=$item->id . $item->prox_dosis;
+        $ganado->vacunaciones = $ganado->vacunaciones->transform(
+            function (Vacunacion|Jornada_vacunacion $item, int $key) {
+                $item->id = $item->id . $item->prox_dosis;
                 return $item;
             }
         );
@@ -206,7 +206,6 @@ class GanadoController extends Controller
         $efectividad = fn (int $resultadoAlcanzado) => round(1 / $resultadoAlcanzado * 100, 2);
 
         if ($ganado->parto->count() == 1) {
-
             $ganado->load('servicios');
 
             $ganado->efectividad = $efectividad($ganado->servicios->count());
@@ -247,11 +246,12 @@ class GanadoController extends Controller
                 'peor' => $ultimoPesajeLeche ? new LecheResource($peorPesajesLeche) : null,
                 'estado' => $estadoProduccionLeche
             ]),
-            'vacunaciones' =>(object)[
-                'vacunas'=>$agruparVacunas,
-                'historial'=>$ganado->vacunaciones->values()->all()
+            'vacunaciones' => (object)[
+                'vacunas' => $agruparVacunas,
+                'historial' => $ganado->vacunaciones->values()->all()
                 ]
-            ], 200
+            ],
+            200
         );
     }
 
@@ -264,7 +264,7 @@ class GanadoController extends Controller
         $ganado->peso->fill($request->only($this->peso))->save();
         //$ganado->estados()->sync($request->only($this->estado)['estado_id']);
 
-        return response()->json(['ganado'=>new GanadoResource($ganado)], 200);
+        return response()->json(['ganado' => new GanadoResource($ganado)], 200);
     }
 
     /**

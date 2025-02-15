@@ -16,13 +16,13 @@ class LogsVeterinarioResource extends JsonResource
     public function toArray(Request $request): array
     {
         $fecha = Carbon::create($this->created_at)->locale('es');
-        $fecha= "$fecha->dayName, " . $fecha->format('d-m-Y H:i:s');
+        $fecha = "$fecha->dayName, " . $fecha->format('d-m-Y H:i:s');
 
         return [
-            'id' =>$this->id,
-            'actividad'=>$this->subject_type ?  class_basename($this->subject_type) : $this->log_name,
-            'actividad_id'=>$this->subject_id,
-            'fecha'=>$fecha,
+            'id' => $this->id,
+            'actividad' => $this->subject_type ?  class_basename($this->subject_type) : $this->log_name,
+            'actividad_id' => $this->subject_id,
+            'fecha' => $fecha,
         ];
     }
 }

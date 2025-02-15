@@ -25,7 +25,7 @@ class PrecioController extends Controller
      */
     public function store(StorePrecioRequest $request)
     {
-        $precio = new Precio;
+        $precio = new Precio();
         $precio->fill($request->only('precio', 'fecha'));
         $precio->finca_id = session('finca_id');
         $precio->save();

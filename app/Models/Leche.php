@@ -10,7 +10,7 @@ class Leche extends Model
 {
     use HasFactory;
 
-    protected $fillable=[
+    protected $fillable = [
         'peso_leche',
         'fecha'
     ];

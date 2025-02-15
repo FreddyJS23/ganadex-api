@@ -10,7 +10,7 @@ class Insumo extends Model
 {
     use HasFactory;
 
-    protected $fillable=[
+    protected $fillable = [
         'insumo',
         'cantidad',
         'precio',

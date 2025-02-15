@@ -7,7 +7,7 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class VeterinariosDisponiblesCollection extends ResourceCollection
 {
-    public static $wrap="veterinarios";
+    public static $wrap = "veterinarios";
     /**
      * Transform the resource collection into an array.
      *
