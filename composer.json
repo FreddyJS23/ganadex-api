@@ -26,6 +26,7 @@
         "mockery/mockery": "^1.4.4",
         "nunomaduro/collision": "^7.0",
         "phpunit/phpunit": "^10.1",
+        "rector/rector": "^2.0",
         "spatie/laravel-ignition": "^2.0",
         "squizlabs/php_codesniffer": "^3.11"
     },
@@ -60,7 +61,13 @@
         ],
         "format": "phpcbf app",
         "lint": "phpcs app",
-        "test": "phpunit"
+        "test": "phpunit",
+        "migrate:code": "rector"
+    },
+    "scripts-descriptions": {
+        "format": "Fix coding standards",
+        "lint": "Check coding standards",
+        "migrate:code": "Migrate to modern php code"
     },
     "extra": {
         "laravel": {
