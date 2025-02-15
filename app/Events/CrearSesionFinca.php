@@ -3,11 +3,8 @@
 namespace App\Events;
 
 use App\Models\Finca;
-use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
@@ -17,14 +14,10 @@ class CrearSesionFinca
     use InteractsWithSockets;
     use SerializesModels;
 
-    public $finca;
     /**
      * Create a new event instance.
      */
-    public function __construct(Finca $finca)
-    {
-        $this->finca = $finca;
-    }
+    public function __construct(public readonly Finca $finca) {}
 
     /**
      * Get the channels the event should broadcast on.

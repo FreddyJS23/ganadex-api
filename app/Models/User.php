@@ -4,8 +4,6 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -19,7 +17,6 @@ class User extends Authenticatable
     use HasFactory;
     use Notifiable;
     use HasRoles;
-
 
     /**
      * The attributes that are mass assignable.
@@ -54,8 +51,6 @@ class User extends Authenticatable
 
     /**
      * Get the configuracion associated with the User
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
     public function configuracion(): HasOne
     {
@@ -64,8 +59,6 @@ class User extends Authenticatable
 
     /**
      * Get all of the fincas for the User
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function fincas(): HasMany
     {
@@ -74,8 +67,6 @@ class User extends Authenticatable
 
     /**
      * Get all of the usuariosVeterinario for the User
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function usuariosVeterinario(): HasMany
     {

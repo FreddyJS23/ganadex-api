@@ -11,15 +11,13 @@ class Configuracion extends Model
     use HasFactory;
 
     protected $fillable = [
-       'peso_servicio',
-       'dias_evento_notificacion',
-       'dias_diferencia_vacuna',
+        'peso_servicio',
+        'dias_evento_notificacion',
+        'dias_diferencia_vacuna',
     ];
 
     /**
      * Get the user that owns the Configuracion
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function user(): BelongsTo
     {
