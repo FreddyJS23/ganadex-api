@@ -15,8 +15,9 @@ use Illuminate\Support\Facades\Auth;
 class JornadaVacunacionController extends Controller
 {
 
-     public function __construct() {
-        $this->authorizeResource(Jornada_vacunacion::class,'jornada_vacunacion');
+    public function __construct()
+    {
+        $this->authorizeResource(Jornada_vacunacion::class, 'jornada_vacunacion');
     }
 
     /**
@@ -24,9 +25,11 @@ class JornadaVacunacionController extends Controller
      */
     public function index()
     {
-        return new JornadaVacunacionCollection(Jornada_vacunacion::where('finca_id',session('finca_id'))
-        ->orderBy('fecha_inicio','desc')
-        ->get());
+        return new JornadaVacunacionCollection(
+            Jornada_vacunacion::where('finca_id', session('finca_id'))
+                ->orderBy('fecha_inicio', 'desc')
+                ->get()
+        );
     }
 
     /**
@@ -36,20 +39,21 @@ class JornadaVacunacionController extends Controller
     {
         $vacuna=Vacuna::find($request->input('vacuna_id'));
         $cantidadGanadoVacunado=Ganado::selectRaw('ganados.id,tipo')
-        ->join('ganado_tipos','ganados.tipo_id','ganado_tipos.id');
+        ->join('ganado_tipos', 'ganados.tipo_id', 'ganado_tipos.id');
 
         /* iterarar sobre los tipo de animal correspondiente a la vacuna
         para agregar clausulas de busqueda para buscar los ganados de esos tipos*/
         foreach ($vacuna->tipo_animal->toArray() as $key => $tipoAnimalVacuna) {
 
-            if($tipoAnimalVacuna=='rebano') break;
+            if($tipoAnimalVacuna=='rebano') { break;
+            }
 
             //eliminar los últimos dos caracteres para no distinguir terminos femeninos y masculinos
-            $tipoAnimalVacuna=substr($tipoAnimalVacuna,0,-2);
-            $cantidadGanadoVacunado->orWhere('tipo','like',"$tipoAnimalVacuna%");
+            $tipoAnimalVacuna=substr($tipoAnimalVacuna, 0, -2);
+            $cantidadGanadoVacunado->orWhere('tipo', 'like', "$tipoAnimalVacuna%");
         }
 
-        $cantidadGanadoVacunado=$cantidadGanadoVacunado->where('finca_id',session('finca_id'))->count();
+        $cantidadGanadoVacunado=$cantidadGanadoVacunado->where('finca_id', session('finca_id'))->count();
 
         $intervaloDosis=Vacuna::find($request->input('vacuna_id'))->intervalo_dosis;
         $proximaDosis=Carbon::create($request->input('fecha_fin'))->addDays($intervaloDosis)->format('Y-m-d');

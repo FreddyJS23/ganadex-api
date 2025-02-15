@@ -22,12 +22,12 @@ class EstadoPosFallecimiento
      */
     public function handle(FallecimientoGanado $event): void
     {
-        $estado = Estado::firstWhere('estado','fallecido');
+        $estado = Estado::firstWhere('estado', 'fallecido');
         $event->ganado->estados()->sync($estado->id);
 
         $numero = $event->ganado->numero;
         activity("fallecimiento")
-        ->withProperties('evento')
-        ->log("Estado fallecimiento animal $numero");
+            ->withProperties('evento')
+            ->log("Estado fallecimiento animal $numero");
     }
 }

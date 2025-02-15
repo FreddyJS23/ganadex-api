@@ -11,15 +11,16 @@ use Illuminate\Support\Facades\Auth;
 
 class PersonalController extends Controller
 {
-     public function __construct() {
-        $this->authorizeResource(Personal::class,'personal');
+    public function __construct()
+    {
+        $this->authorizeResource(Personal::class, 'personal');
     }
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return new PersonalCollection(Personal::where('finca_id',session('finca_id'))->get());
+        return new PersonalCollection(Personal::where('finca_id', session('finca_id'))->get());
     }
 
     /**
@@ -31,7 +32,7 @@ class PersonalController extends Controller
         $personal->fill($request->all());
         $personal->finca_id=session('finca_id');
         $personal->save();
-        return response()->json(['personal'=> new PersonalResource($personal)],201);
+        return response()->json(['personal'=> new PersonalResource($personal)], 201);
     }
 
     /**
@@ -39,7 +40,7 @@ class PersonalController extends Controller
      */
     public function show(Personal $personal)
     {
-        return response()->json(['personal'=> new PersonalResource($personal)],200);
+        return response()->json(['personal'=> new PersonalResource($personal)], 200);
     }
 
     /**
@@ -49,7 +50,7 @@ class PersonalController extends Controller
     {
         $personal->fill($request->all())->save();
 
-        return response()->json(['personal'=> new PersonalResource($personal)],200);
+        return response()->json(['personal'=> new PersonalResource($personal)], 200);
     }
 
     /**

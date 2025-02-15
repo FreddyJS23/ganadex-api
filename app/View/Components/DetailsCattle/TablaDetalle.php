@@ -14,8 +14,7 @@ class TablaDetalle extends Component
     public function __construct(
         public string $tituloDetalle,
         public array $detalles
-    )
-    {
+    ) {
         
     }
 

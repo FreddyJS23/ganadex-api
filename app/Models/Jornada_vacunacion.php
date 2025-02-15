@@ -49,15 +49,15 @@ class Jornada_vacunacion extends Model
        use LogsActivity;
 
        //si el usuario no es un admin regitrar logs de actividades
-       public function tapActivity(Activity $activity, string $eventName)
-       {
+    public function tapActivity(Activity $activity, string $eventName)
+    {
         Auth::user() &&  Auth::user()->hasRole('admin') && activity()->disableLogging();
 
-       }
+    }
 
-        public function getActivitylogOptions(): LogOptions
-       {
-           return LogOptions::defaults();
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults();
 
-       }
+    }
 }

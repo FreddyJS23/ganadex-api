@@ -19,11 +19,13 @@ class TodosServicios extends Controller
         $ganados = Ganado::doesntHave('toro')
             ->doesntHave('ganadoDescarte')
             ->has('servicios')
-            ->with([
+            ->with(
+                [
                 'parto' => function (Builder $query) {
                     $query->orderBy('fecha', 'desc');
                 },
-            ])
+                ]
+            )
             ->withCount('servicios')
             ->where('finca_id', session('finca_id'))->get();
 
@@ -47,9 +49,11 @@ class TodosServicios extends Controller
                     $ganado->fechaInicio = $fechaInicio;
                     $ganado->fechaFin = $fechaFin;
 
-                    $ganado->load(['servicios' => function (Builder $query) use ($fechaInicio, $fechaFin) {
-                        $query->whereBetween('fecha', [$fechaInicio, $fechaFin]);
-                    }]);
+                    $ganado->load(
+                        ['servicios' => function (Builder $query) use ($fechaInicio, $fechaFin) {
+                            $query->whereBetween('fecha', [$fechaInicio, $fechaFin]);
+                        }]
+                    );
 
                     $ganado->efectividad = $ganado->servicios->count() >= 1 ?  $efectividad($ganado->servicios->count()) : null;
                 }

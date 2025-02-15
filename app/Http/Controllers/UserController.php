@@ -16,7 +16,7 @@ class UserController extends Controller
 {
     public function __construct()
     {
-        $this->authorizeResource(User::class,'user');
+        $this->authorizeResource(User::class, 'user');
     }
 
     /**
@@ -39,7 +39,7 @@ class UserController extends Controller
         Configuracion::factory()->for($user);
         $user->save();
 
-        return response()->json(['message'=>'usuario creado'],201);
+        return response()->json(['message'=>'usuario creado'], 201);
     }
 
     /**
@@ -47,13 +47,15 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-    $user->load('fincas');
-    $user->fincas=$user->fincas->map(function(Finca $finca){
-        $finca->fecha_creacion=$finca->created_at->format('d-m-Y');
-        return $finca;
-    });
+        $user->load('fincas');
+        $user->fincas=$user->fincas->map(
+            function (Finca $finca) {
+                $finca->fecha_creacion=$finca->created_at->format('d-m-Y');
+                return $finca;
+            }
+        );
 
-    return response()->json(['user'=>new UserResource($user)],200);
+        return response()->json(['user'=>new UserResource($user)], 200);
     }
 
     /**

@@ -14,9 +14,9 @@ use Illuminate\Support\Facades\Auth;
 
 class LecheController extends Controller
 {
-     public function __construct()
+    public function __construct()
     {
-        $this->authorizeResource(Leche::class,'pesaje_leche');
+        $this->authorizeResource(Leche::class, 'pesaje_leche');
     }
 
     /**
@@ -40,7 +40,7 @@ class LecheController extends Controller
 
         PesajeLecheHecho::dispatch($ganado);
 
-        return response()->json(['pesaje_leche'=> new LecheResource($leche)],201);
+        return response()->json(['pesaje_leche'=> new LecheResource($leche)], 201);
     }
 
     /**
@@ -48,7 +48,7 @@ class LecheController extends Controller
      */
     public function show(Ganado $ganado,Leche $pesaje_leche)
     {
-        return response()->json(['pesaje_leche'=>new LecheResource($pesaje_leche)],200);
+        return response()->json(['pesaje_leche'=>new LecheResource($pesaje_leche)], 200);
     }
 
     /**
@@ -58,7 +58,7 @@ class LecheController extends Controller
     {
         $pesaje_leche->fill($request->all());
         $pesaje_leche->save();
-        return response()->json(['pesaje_leche'=> new LecheResource($pesaje_leche)],200);
+        return response()->json(['pesaje_leche'=> new LecheResource($pesaje_leche)], 200);
     }
 
     /**

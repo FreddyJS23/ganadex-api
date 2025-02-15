@@ -29,19 +29,19 @@ class UpdateServicioRequest extends FormRequest
             'observacion' => 'required|min:3|max:255',
             'toro_id' => [
                 Rule::requiredIf($this->tipo == 'monta'),Rule::exists('toros', 'id')
-                ->where(
-                    function ($query) {
-                        return $query->where('finca_id', session('finca_id'));
-                    }
-                )
+                    ->where(
+                        function ($query) {
+                            return $query->where('finca_id', session('finca_id'));
+                        }
+                    )
             ],
             'pajuela_toro_id' => [
                 Rule::requiredIf($this->tipo == 'inseminacion'), Rule::exists('pajuela_toros', 'id')
-                ->where(
-                    function ($query) {
-                        return $query->where('finca_id', session('finca_id'));
-                    }
-                )
+                    ->where(
+                        function ($query) {
+                            return $query->where('finca_id', session('finca_id'));
+                        }
+                    )
             ],
             'tipo' => 'required|in:monta,inseminacion',
 

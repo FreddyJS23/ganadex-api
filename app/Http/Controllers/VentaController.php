@@ -15,9 +15,9 @@ use Illuminate\Support\Facades\Auth;
 class VentaController extends Controller
 {
 
-      public function __construct()
+    public function __construct()
     {
-        $this->authorizeResource(Venta::class,'venta');
+        $this->authorizeResource(Venta::class, 'venta');
     }
 
     /**
@@ -25,7 +25,7 @@ class VentaController extends Controller
      */
     public function index()
     {
-        return new VentaCollection(Venta::where('finca_id',session('finca_id'))->with('ganado:id,numero')->get());
+        return new VentaCollection(Venta::where('finca_id', session('finca_id'))->with('ganado:id,numero')->get());
     }
 
     /**

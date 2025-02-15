@@ -26,11 +26,11 @@ class StoreUsuarioVeterinarioRequest extends FormRequest
         return [
             'personal_id' => [
                 'required', 'numeric', Rule::exists('personals', 'id')
-                ->where(
-                    function ($query) {
-                        return $query->where('finca_id', session('finca_id'));
-                    }
-                ),
+                    ->where(
+                        function ($query) {
+                            return $query->where('finca_id', session('finca_id'));
+                        }
+                    ),
                 new ComprobarVeterianario,
             ],
         ];

@@ -15,9 +15,9 @@ use Illuminate\Contracts\Database\Eloquent\Builder;
 
 class RevisionController extends Controller
 {
-     public function __construct()
+    public function __construct()
     {
-        $this->authorizeResource(Revision::class,'revision');
+        $this->authorizeResource(Revision::class, 'revision');
     }
 
     /**
@@ -25,9 +25,13 @@ class RevisionController extends Controller
      */
     public function index(Ganado $ganado)
     {
-        return new RevisionCollection(Revision::whereBelongsTo($ganado)->with(['veterinario' => function (Builder $query) {
-            $query->select('personals.id', 'nombre');
-        }])->get());
+        return new RevisionCollection(
+            Revision::whereBelongsTo($ganado)->with(
+                ['veterinario' => function (Builder $query) {
+                    $query->select('personals.id', 'nombre');
+                }]
+            )->get()
+        );
     }
 
     /**
@@ -40,13 +44,19 @@ class RevisionController extends Controller
         $revision->ganado()->associate($ganado)->save();
 
 
-         RevisionPrenada::dispatchIf($revision->diagnostico == 'prenada',$revision);
+         RevisionPrenada::dispatchIf($revision->diagnostico == 'prenada', $revision);
 
-         RevisionDescarte::dispatchIf($revision->diagnostico == 'descartar',$revision);
+         RevisionDescarte::dispatchIf($revision->diagnostico == 'descartar', $revision);
 
-        return response()->json(['revision'=>new RevisionResource($revision->load(['veterinario' => function (Builder $query) {
-            $query->select('personals.id', 'nombre');
-        }]))],201);
+        return response()->json(
+            ['revision'=>new RevisionResource(
+                $revision->load(
+                    ['veterinario' => function (Builder $query) {
+                        $query->select('personals.id', 'nombre');
+                    }]
+                )
+            )], 201
+        );
     }
 
     /**
@@ -54,9 +64,15 @@ class RevisionController extends Controller
      */
     public function show(Ganado $ganado,Revision $revision)
     {
-        return response()->json(['revision'=>new RevisionResource($revision->load(['veterinario' => function (Builder $query) {
-            $query->select('personals.id', 'nombre');
-        }]))]);
+        return response()->json(
+            ['revision'=>new RevisionResource(
+                $revision->load(
+                    ['veterinario' => function (Builder $query) {
+                        $query->select('personals.id', 'nombre');
+                    }]
+                )
+            )]
+        );
     }
 
     /**
@@ -67,9 +83,15 @@ class RevisionController extends Controller
         $revision->fill($request->all());
         $revision->save();
 
-        return response()->json(['revision'=>new RevisionResource($revision->load(['veterinario' => function (Builder $query) {
-            $query->select('personals.id', 'nombre');
-        }]))],200);
+        return response()->json(
+            ['revision'=>new RevisionResource(
+                $revision->load(
+                    ['veterinario' => function (Builder $query) {
+                        $query->select('personals.id', 'nombre');
+                    }]
+                )
+            )], 200
+        );
     }
 
     /**

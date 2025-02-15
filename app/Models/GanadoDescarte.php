@@ -15,25 +15,25 @@ class GanadoDescarte extends Model
         'numero',
         'origen',
         'fecha_nacimiento',
-    ];
+      ];
 
-     /**
-     * Get the ganado that owns the GanadoDescarte
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function ganado(): BelongsTo
-    {
-        return $this->belongsTo(Ganado::class);
-    }
+      /**
+       * Get the ganado that owns the GanadoDescarte
+       *
+       * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+       */
+      public function ganado(): BelongsTo
+      {
+          return $this->belongsTo(Ganado::class);
+      }
 
-    /**
-     * Get the user that owns the Toro
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function finca(): BelongsTo
-    {
-        return $this->belongsTo(Finca::class);
-    }
+      /**
+       * Get the user that owns the Toro
+       *
+       * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+       */
+      public function finca(): BelongsTo
+      {
+          return $this->belongsTo(Finca::class);
+      }
 }

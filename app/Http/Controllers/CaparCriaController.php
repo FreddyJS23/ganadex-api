@@ -16,9 +16,9 @@ class CaparCriaController extends Controller
      */
     public function index()
     {
-        $criasPendienteCapar = Ganado::where('finca_id',session('finca_id'))
-        ->whereRelation('estados','estado','pendiente_capar')
-        ->get();
+        $criasPendienteCapar = Ganado::where('finca_id', session('finca_id'))
+            ->whereRelation('estados', 'estado', 'pendiente_capar')
+            ->get();
 
         return new CriasPenditeCaparCollection($criasPendienteCapar);
     }
@@ -28,7 +28,7 @@ class CaparCriaController extends Controller
      */
     public function capar(Ganado $ganado)
     {
-        $estado=Estado::firstWhere('estado','pendiente_capar');
+        $estado=Estado::firstWhere('estado', 'pendiente_capar');
         $ganado->estados()->detach($estado->id);
 
         return response()->json();

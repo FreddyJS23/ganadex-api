@@ -19,7 +19,7 @@ use function Laravel\Prompts\select;
 class ToroController extends Controller
 {
     public array $peso = ['peso_nacimiento', 'peso_destete', 'peso_2year', 'peso_actual'];
-     public function __construct()
+    public function __construct()
     {
         $this->authorizeResource(Toro::class, 'toro');
     }
@@ -30,14 +30,16 @@ class ToroController extends Controller
     public function index()
     {
         $toros = Toro::where('finca_id', session('finca_id'))
-            ->with([
+            ->with(
+                [
                 'ganado' => function (Builder $query) {
                     $query->doesntHave('ganadoDescarte');
                 },
                 'padreEnPartos' => function (Builder $query) {
                     $query->orderBy('fecha', 'desc');
                 },
-            ])
+                ]
+            )
             ->withCount('servicios')
             ->withCount('padreEnPartos')->get();
 
@@ -61,9 +63,11 @@ class ToroController extends Controller
                     $toro->fechaInicio = $fechaInicio;
                     $toro->fechaFin = $fechaFin;
 
-                    $toro->load(['servicios' => function (Builder $query) use ($fechaInicio, $fechaFin) {
-                        $query->whereBetween('fecha', [$fechaInicio, $fechaFin]);
-                    }]);
+                    $toro->load(
+                        ['servicios' => function (Builder $query) use ($fechaInicio, $fechaFin) {
+                            $query->whereBetween('fecha', [$fechaInicio, $fechaFin]);
+                        }]
+                    );
 
                     $toro->efectividad = $toro->servicios->count() >= 1 ?  $efectividad($toro->servicios->count()) : null;
                 }
@@ -86,32 +90,36 @@ class ToroController extends Controller
         $ganado->sexo = "M";
 
         try {
-            DB::transaction(function () use ($ganado, $request) {
-                $ganado->save();
-                //estado fallecido
-                $request->only('estado_id')['estado_id'][0] == 2 && $ganado->fallecimiento()->create(
-                    [
+            DB::transaction(
+                function () use ($ganado, $request) {
+                    $ganado->save();
+                    //estado fallecido
+                    $request->only('estado_id')['estado_id'][0] == 2 && $ganado->fallecimiento()->create(
+                        [
                         'fecha' => $request->input('fecha_fallecimiento'),
                         'causa' => $request->input('causa')
-                    ]
-                );
+                        ]
+                    );
 
-                //estado vendido
-                $request->only('estado_id')['estado_id'][0] == 5 && $ganado->venta()->create([
-                    'fecha' => $request->input('fecha_venta'),
-                    'precio' => $request->input('precio'),
-                    'comprador_id' => $request->input('comprador_id'),
-                    'finca_id' => session('finca_id')
-                ]);
+                    //estado vendido
+                    $request->only('estado_id')['estado_id'][0] == 5 && $ganado->venta()->create(
+                        [
+                        'fecha' => $request->input('fecha_venta'),
+                        'precio' => $request->input('precio'),
+                        'comprador_id' => $request->input('comprador_id'),
+                        'finca_id' => session('finca_id')
+                        ]
+                    );
 
-                $ganado->estados()->sync($request->only('estado_id')['estado_id']);
-                $ganado->peso()->create($request->only($this->peso));
+                    $ganado->estados()->sync($request->only('estado_id')['estado_id']);
+                    $ganado->peso()->create($request->only($this->peso));
 
-                $ganado->evento()->create();
-            });
-} catch (\Throwable $error) {
-    return response()->json(['error'=>'error al insertar datos'], 501);
-}
+                    $ganado->evento()->create();
+                }
+            );
+        } catch (\Throwable $error) {
+            return response()->json(['error'=>'error al insertar datos'], 501);
+        }
 
         $toro = new Toro;
         $toro->finca_id = session('finca_id');
@@ -126,11 +134,13 @@ class ToroController extends Controller
     public function show(Toro $toro)
     {
         $toro
-            ->load([
+            ->load(
+                [
                 'padreEnPartos' => function (Builder $query) {
                     $query->orderBy('fecha', 'desc');
                 },
-            ]);
+                ]
+            );
 
         $toro->efectividad = null;
 
@@ -149,16 +159,20 @@ class ToroController extends Controller
             $toro->fechaInicio = $fechaInicio;
             $toro->fechaFin = $fechaFin;
 
-            $toro->load(['servicios' => function (Builder $query) use ($fechaInicio, $fechaFin) {
-                $query->whereBetween('fecha', [$fechaInicio, $fechaFin]);
-            }]);
+            $toro->load(
+                ['servicios' => function (Builder $query) use ($fechaInicio, $fechaFin) {
+                    $query->whereBetween('fecha', [$fechaInicio, $fechaFin]);
+                }]
+            );
 
             $toro->efectividad = $toro->servicios->count() >= 1 ?  $efectividad($toro->servicios->count()) : null;
         }
 
-        return response()->json([
+        return response()->json(
+            [
             'toro' => new ToroResource($toro),
-        ], 200);
+            ], 200
+        );
     }
 
 

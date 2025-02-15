@@ -31,19 +31,19 @@ class StoreServicioRequest extends FormRequest
             'fecha' => 'date_format:Y-m-d',
             'toro_id' => [
                 Rule::requiredIf($this->tipo == 'monta'), Rule::exists('toros', 'id')
-                ->where(
-                    function ($query) {
-                        return $query->where('finca_id', session('finca_id'));
-                    }
-                )
+                    ->where(
+                        function ($query) {
+                            return $query->where('finca_id', session('finca_id'));
+                        }
+                    )
             ],
             'pajuela_toro_id' => [
                 Rule::requiredIf($this->tipo == 'inseminacion'), Rule::exists('pajuela_toros', 'id')
-                ->where(
-                    function ($query) {
-                        return $query->where('finca_id', session('finca_id'));
-                    }
-                )
+                    ->where(
+                        function ($query) {
+                            return $query->where('finca_id', session('finca_id'));
+                        }
+                    )
             ],
             'personal_id' => ['required', new ComprobarVeterianario]
         ];

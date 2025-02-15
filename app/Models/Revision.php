@@ -38,20 +38,20 @@ class Revision extends Model
      */
     public function veterinario(): BelongsTo
     {
-        return $this->belongsTo(Personal::class,'personal_id');
+        return $this->belongsTo(Personal::class, 'personal_id');
     }
 
     /* activar logs de actividades */
     use LogsActivity;
 
-   /*  //si el usuario no es un admin regitrar logs de actividades
+    /*  //si el usuario no es un admin regitrar logs de actividades
     public function tapActivity(Activity $activity, string $eventName)
     {
         Auth::user() &&  Auth::user()->hasRole('admin') && activity()->disableLogging();
 
     } */
 
-     public function getActivitylogOptions(): LogOptions
+    public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults();
 

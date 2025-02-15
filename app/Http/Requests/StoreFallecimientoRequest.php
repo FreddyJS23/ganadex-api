@@ -28,11 +28,11 @@ class StoreFallecimientoRequest extends FormRequest
             'fecha' => 'date_format:Y-m-d',
             'ganado_id' => [
                 'required', 'numeric', Rule::exists('ganados', 'id')
-                ->where(
-                    function ($query) {
-                        return $query->where('finca_id', session('finca_id'));
-                    }
-                )
+                    ->where(
+                        function ($query) {
+                            return $query->where('finca_id', session('finca_id'));
+                        }
+                    )
             ],
         ];
     }

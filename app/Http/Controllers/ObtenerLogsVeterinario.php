@@ -23,6 +23,6 @@ class ObtenerLogsVeterinario extends Controller
 
         $logsUsuarioVeterinario = Activity::where('causer_id', $usuarioVeterinario->user_id)->get();
 
-       return response()->json(['logs' => LogsVeterinarioResource::collection($logsUsuarioVeterinario)]);
+        return response()->json(['logs' => LogsVeterinarioResource::collection($logsUsuarioVeterinario)]);
     }
 }

@@ -16,8 +16,7 @@ class TablasVacasProductoras extends Component
         public array $topVacasProductoras,
         public string $titulo2,
         public array $topVacasMenosProductoras,
-    )
-    {
+    ) {
         //
     }
 

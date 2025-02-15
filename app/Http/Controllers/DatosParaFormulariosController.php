@@ -20,9 +20,11 @@ class DatosParaFormulariosController extends Controller
 {
     public function novillasParaMontar()
     {
-        $novillasAmontar = Peso::whereHas('ganado', function (Builder $query) {
-            $query->where('finca_id', session('finca_id'));
-        })->where('peso_actual', '>=', 330)->get();
+        $novillasAmontar = Peso::whereHas(
+            'ganado', function (Builder $query) {
+                $query->where('finca_id', session('finca_id'));
+            }
+        )->where('peso_actual', '>=', 330)->get();
 
         return new NovillaAMontarCollection($novillasAmontar);
     }
@@ -34,46 +36,52 @@ class DatosParaFormulariosController extends Controller
     }
     public function veterinariosDisponibles()
     {
-        return new VeterinariosDisponiblesCollection(Personal::select('id','nombre')
-        ->where('cargo_id',2)
-        ->where('finca_id',session('finca_id'))
-        ->get());
+        return new VeterinariosDisponiblesCollection(
+            Personal::select('id', 'nombre')
+                ->where('cargo_id', 2)
+                ->where('finca_id', session('finca_id'))
+                ->get()
+        );
     }
 
     public function añosVentasGanado()
     {
-        $añosVentasGanado = Venta::where('finca_id',session('finca_id'))
+        $añosVentasGanado = Venta::where('finca_id', session('finca_id'))
             ->selectRaw('DATE_FORMAT(fecha,"%Y") as año')
             ->groupBy('año')
             ->orderBy('año', 'desc')
             ->get();
 
-        $añosVentasGanado->transform(function ($item, $key) {
-            $item->año=intval($item->año);
-            return $item;
-        });
+        $añosVentasGanado->transform(
+            function ($item, $key) {
+                $item->año=intval($item->año);
+                return $item;
+            }
+        );
 
         return response()->json(['años_ventas_ganado' => $añosVentasGanado]);
     }
     public function añosProduccionLeche()
     {
-        $añosVentaProduccionLeche = Leche::where('finca_id',session('finca_id'))
+        $añosVentaProduccionLeche = Leche::where('finca_id', session('finca_id'))
             ->selectRaw('DATE_FORMAT(fecha,"%Y") as año')
             ->groupBy('año')
             ->orderBy('año', 'desc')
             ->get();
 
-        $añosVentaProduccionLeche->transform(function ($item, $key) {
-            $item->año=intval($item->año);
-            return $item;
-        });
+        $añosVentaProduccionLeche->transform(
+            function ($item, $key) {
+                $item->año=intval($item->año);
+                return $item;
+            }
+        );
 
         return response()->json(['años_produccion_leche' => $añosVentaProduccionLeche]);
     }
 
     public function vacunasDisponibles()
     {
-        $vacunasDisponibles = Vacuna::select('id','nombre','intervalo_dosis','tipo_animal')
+        $vacunasDisponibles = Vacuna::select('id', 'nombre', 'intervalo_dosis', 'tipo_animal')
             ->get();
 
         return response()->json(['vacunas_disponibles' => $vacunasDisponibles]);
@@ -89,9 +97,9 @@ class DatosParaFormulariosController extends Controller
 
         while($numeroSugerido == null){
 
-            $numeroRandom=rand($intervalos[$punteroInicial],$intervalos[$punteroInicial+1]);
+            $numeroRandom=rand($intervalos[$punteroInicial], $intervalos[$punteroInicial+1]);
             $numeroYaRegistrado=Ganado::select('numero')
-            ->where('numero',$numeroRandom)->first();
+                ->where('numero', $numeroRandom)->first();
 
             if($numeroYaRegistrado == null) {
                 $numeroSugerido=$numeroRandom;
@@ -99,7 +107,7 @@ class DatosParaFormulariosController extends Controller
             }
             $iteracciones++;
 
-            if($iteracciones>=$maximaInteraciones){
+            if($iteracciones>=$maximaInteraciones) {
                 $iteracciones=0;
                 $punteroInicial++;
             }
@@ -109,11 +117,11 @@ class DatosParaFormulariosController extends Controller
 
     public function veterinariosSinUsuario()
     {
-        $veterinariosSinUsuario = Personal::where('cargo_id',2)
-        ->select('id','nombre')
-        ->where('finca_id',session('finca_id'))
-        ->whereDoesntHave('usuarioVeterinario')
-        ->get();
+        $veterinariosSinUsuario = Personal::where('cargo_id', 2)
+            ->select('id', 'nombre')
+            ->where('finca_id', session('finca_id'))
+            ->whereDoesntHave('usuarioVeterinario')
+            ->get();
 
         return response()->json(['veterinarios_sin_usuario'=>$veterinariosSinUsuario]);
     }

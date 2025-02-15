@@ -28,7 +28,7 @@ class EstadoPosPesajeMensualLeche
 
         $numero = $event->ganado->numero;
         activity("pesaje de leche")
-        ->withProperties('evento')
-        ->log("Animal $numero ya no esta pendiente de pesaje de leche");
+            ->withProperties('evento')
+            ->log("Animal $numero ya no esta pendiente de pesaje de leche");
     }
 }

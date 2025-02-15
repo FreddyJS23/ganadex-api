@@ -13,8 +13,7 @@ class TablaCausasFallecimientos extends Component
      */
     public function __construct(
         public array $causasFallecimientos
-    )
-    {
+    ) {
         //
     }
 

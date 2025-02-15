@@ -17,14 +17,14 @@ class UsuarioVeterinarioController extends Controller
 
     public function __construct()
     {
-        $this->authorizeResource(UsuarioVeterinario::class,'usuarios_veterinario');
+        $this->authorizeResource(UsuarioVeterinario::class, 'usuarios_veterinario');
     }
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return new UsuarioVeterinarioCollection(UsuarioVeterinario::where('admin_id',Auth::id())->get());
+        return new UsuarioVeterinarioCollection(UsuarioVeterinario::where('admin_id', Auth::id())->get());
     }
 
 
@@ -33,14 +33,14 @@ class UsuarioVeterinarioController extends Controller
      */
     public function store(StoreUsuarioVeterinarioRequest $request)
     {
-        $nameUsuarioAleatorio=fn()=> 'usuario'.rand(1,100) . rand(1,100) ;
+        $nameUsuarioAleatorio=fn()=> 'usuario'.rand(1, 100) . rand(1, 100);
 
-        $veterinario=Personal::where('id',$request->input('personal_id'))->first();
+        $veterinario=Personal::where('id', $request->input('personal_id'))->first();
         $usuarioVeterinario = new UsuarioVeterinario;
         $usuario=new User();
-        $usuario->usuario=explode(' ',$veterinario->nombre)[0] . rand(1,100) ;
+        $usuario->usuario=explode(' ', $veterinario->nombre)[0] . rand(1, 100);
 
-        if(strlen($usuario->usuario) < 5 || strlen($usuario->usuario) > 20){
+        if(strlen($usuario->usuario) < 5 || strlen($usuario->usuario) > 20) {
             $usuario->usuario=$nameUsuarioAleatorio();
         }
 

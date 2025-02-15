@@ -17,9 +17,9 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class ServicioController extends Controller
 {
-     public function __construct()
+    public function __construct()
     {
-        $this->authorizeResource(Servicio::class,'servicio');
+        $this->authorizeResource(Servicio::class, 'servicio');
     }   
 
     /**
@@ -27,15 +27,18 @@ class ServicioController extends Controller
      */
     public function index(Ganado $ganado)
     {
-        return new ServicioCollection(Servicio::whereBelongsTo($ganado)
-        ->with(['servicioable' => function (MorphTo $morphTo) {
-           $morphTo->morphWith([Toro::class=>'ganado:id,numero',PajuelaToro::class]);
-        },
-            'veterinario' => function (Builder $query) {
-                $query->select('personals.id', 'nombre');
-            }
-        ])->get()
-    );
+        return new ServicioCollection(
+            Servicio::whereBelongsTo($ganado)
+                ->with(
+                    ['servicioable' => function (MorphTo $morphTo) {
+                        $morphTo->morphWith([Toro::class=>'ganado:id,numero',PajuelaToro::class]);
+                    },
+                    'veterinario' => function (Builder $query) {
+                        $query->select('personals.id', 'nombre');
+                    }
+                    ]
+                )->get()
+        );
     }
     /**
      * Store a newly created resource in storage.
@@ -46,7 +49,8 @@ class ServicioController extends Controller
         $servicio->fill($request->except(['toro_id','pajuela_toro_id']));
         $servicio->ganado()->associate($ganado);
         /**
-         *@var 'monta' | 'inseminacion'  */
+         *@var 'monta' | 'inseminacion'  
+*/
         $tipoServicio=$request->input('tipo');
 
         if($tipoServicio == 'monta') {
@@ -60,11 +64,15 @@ class ServicioController extends Controller
         $servicio->save();
          ServicioHecho::dispatch($servicio);
 
-        return response()->json(['servicio'=>new ServicioResource($servicio->load(['veterinario' => function (Builder $query) {
-            $query->select('personals.id', 'nombre');
-        }]
-        )->loadMorph('servicioable', [Toro::class => 'ganado:id,numero', PajuelaToro::class])
-        )],201);
+        return response()->json(
+            ['servicio'=>new ServicioResource(
+                $servicio->load(
+                    ['veterinario' => function (Builder $query) {
+                        $query->select('personals.id', 'nombre');
+                    }]
+                )->loadMorph('servicioable', [Toro::class => 'ganado:id,numero', PajuelaToro::class])
+            )], 201
+        );
     }
 
     /**
@@ -72,13 +80,15 @@ class ServicioController extends Controller
      */
     public function show(Ganado $ganado, Servicio $servicio)
     {
-        return response()->json(['servicio' => new ServicioResource(
-            $servicio->load(
-                ['veterinario' => function (Builder $query) {
-                    $query->select('personals.id', 'nombre');
-                }]
-            )->loadMorph('servicioable', [Toro::class => 'ganado:id,numero', PajuelaToro::class])
-        )], 200);
+        return response()->json(
+            ['servicio' => new ServicioResource(
+                $servicio->load(
+                    ['veterinario' => function (Builder $query) {
+                        $query->select('personals.id', 'nombre');
+                    }]
+                )->loadMorph('servicioable', [Toro::class => 'ganado:id,numero', PajuelaToro::class])
+            )], 200
+        );
     }
 
     /**
@@ -89,7 +99,8 @@ class ServicioController extends Controller
         $servicio->fill($request->except(['toro_id', 'pajuela_toro_id']));
 
         /**
-         *@var 'monta' | 'inseminacion'  */
+         *@var 'monta' | 'inseminacion'  
+*/
         $tipoServicio = $request->input('tipo');
         if ($tipoServicio == 'monta') {
             $toro = Toro::find($request->input('toro_id'));
@@ -100,13 +111,15 @@ class ServicioController extends Controller
         }
         $servicio->save();
 
-        return response()->json(['servicio' => new ServicioResource(
-            $servicio->load(
-                ['veterinario' => function (Builder $query) {
-                    $query->select('personals.id', 'nombre');
-                }]
-            )->loadMorph('servicioable', [Toro::class => 'ganado:id,numero', PajuelaToro::class])
-        )], 200);
+        return response()->json(
+            ['servicio' => new ServicioResource(
+                $servicio->load(
+                    ['veterinario' => function (Builder $query) {
+                        $query->select('personals.id', 'nombre');
+                    }]
+                )->loadMorph('servicioable', [Toro::class => 'ganado:id,numero', PajuelaToro::class])
+            )], 200
+        );
     }
 
     /**

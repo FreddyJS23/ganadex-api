@@ -27,7 +27,7 @@ class UsuarioVeterinario extends Model
      */
     public function veterinario(): BelongsTo
     {
-        return $this->belongsTo(Personal::class,'personal_id');
+        return $this->belongsTo(Personal::class, 'personal_id');
     }
 
     protected $hidden = ['created_at','updated_at','personal_id','admin_id'];

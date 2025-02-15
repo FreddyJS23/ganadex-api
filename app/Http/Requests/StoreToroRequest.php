@@ -31,9 +31,11 @@ class StoreToroRequest extends FormRequest
             'peso_2year' => 'numeric|between:1,32767',
             'peso_actual' => 'numeric|between:1,32767',
             'fecha_nacimiento'=>'date_format:Y-m-d',
-            'estado_id' => Rule::foreach(function ($value, $attrubute) {
-                return Rule::exists('estados', 'id');
-            }),
+            'estado_id' => Rule::foreach(
+                function ($value, $attrubute) {
+                    return Rule::exists('estados', 'id');
+                }
+            ),
         ];
     }
 }

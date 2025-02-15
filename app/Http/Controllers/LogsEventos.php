@@ -18,7 +18,7 @@ class LogsEventos extends Controller
         Gate::allowIf(fn (User $user) => $user->hasRole('admin'));
 
         $logsEventos = Activity::where('causer_id', $request->user()->id)
-        ->where('log_name','!=' ,'login')
+        ->where('log_name', '!=', 'login')
         ->orderBy('created_at', 'desc')
         ->get();
 

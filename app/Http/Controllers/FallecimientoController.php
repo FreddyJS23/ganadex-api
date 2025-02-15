@@ -19,7 +19,7 @@ class FallecimientoController extends Controller
      */
     public function index()
     {
-        return new FallecimientoCollection(Fallecimiento::whereRelation('ganado','finca_id',[session('finca_id')][0])->with('ganado:id,numero')->get());
+        return new FallecimientoCollection(Fallecimiento::whereRelation('ganado', 'finca_id', [session('finca_id')][0])->with('ganado:id,numero')->get());
     }
 
     /**
@@ -29,7 +29,7 @@ class FallecimientoController extends Controller
     {
         $fallecimiento=new Fallecimiento;
         $ganado = Ganado::find($request->input('ganado_id'));
-        $fallecimiento->fill($request->only('causa','fecha'));
+        $fallecimiento->fill($request->only('causa', 'fecha'));
         $fallecimiento->ganado()->associate($ganado);
         $fallecimiento->save();
 

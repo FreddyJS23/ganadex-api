@@ -13,15 +13,15 @@ class DashboardVentaLecheController extends Controller
 {
     public function precioActual()
     {
-        $precioActual = Precio::where('finca_id',session('finca_id'))->latest('fecha')->first();
+        $precioActual = Precio::where('finca_id', session('finca_id'))->latest('fecha')->first();
 
         return response()->json(['precio_actual' => $precioActual->precio ?? 0]);
     }
 
     public function variacionPrecio()
     {
-        $precioActual = Precio::where('finca_id',session('finca_id'))->latest('fecha')->first() ?? 0;
-        $precioAnterior = !$precioActual == 0  ? Precio::where('finca_id',session('finca_id'))->latest('fecha')->where('fecha', '<', $precioActual->fecha)->first() : 0;
+        $precioActual = Precio::where('finca_id', session('finca_id'))->latest('fecha')->first() ?? 0;
+        $precioAnterior = !$precioActual == 0  ? Precio::where('finca_id', session('finca_id'))->latest('fecha')->where('fecha', '<', $precioActual->fecha)->first() : 0;
 
         $variacion = fn (float $precioAnterior, float $precioActual) =>
         $precioAnterior - $precioActual * 100 / $precioAnterior;
@@ -32,7 +32,7 @@ class DashboardVentaLecheController extends Controller
     public function gananciasDelMes()
     {
         $sumaGanaciaDelMes
-            = VentaLeche::where('finca_id',session('finca_id'))
+            = VentaLeche::where('finca_id', session('finca_id'))
             ->whereMonth('venta_leches.fecha', now()->month)
             ->whereYear('venta_leches.fecha', now()->year)
             ->join('precios', 'precio_id', '=', 'precios.id')
@@ -44,7 +44,7 @@ class DashboardVentaLecheController extends Controller
     public function ventasDelMes()
     {
         $ventasDelMes
-            = VentaLeche::where('finca_id',session('finca_id'))
+            = VentaLeche::where('finca_id', session('finca_id'))
             ->whereMonth('fecha', now()->month)
             ->whereYear('fecha', now()->year)
             ->get();
@@ -59,14 +59,15 @@ class DashboardVentaLecheController extends Controller
         $monthActual = intval(now()->format('m'));
         $monthQueryParam = intval($request->query('month'));
 
-        if (preg_match($regexMonthOneDigit, $monthQueryParam)) $month =$monthQueryParam;
-        else if (preg_match($regexMonthTwoDigit, $monthQueryParam)) $month = $monthQueryParam;
-        else $month = $monthActual;
+        if (preg_match($regexMonthOneDigit, $monthQueryParam)) { $month =$monthQueryParam;
+        } else if (preg_match($regexMonthTwoDigit, $monthQueryParam)) { $month = $monthQueryParam;
+        } else { $month = $monthActual;
+        }
 
 
         $ventasDelMes
-            = VentaLeche::where('finca_id',session('finca_id'))
-            ->select('fecha','cantidad')
+            = VentaLeche::where('finca_id', session('finca_id'))
+            ->select('fecha', 'cantidad')
             ->whereMonth('fecha', $month)
             ->orderBy('fecha')
             ->whereYear('fecha', now()->year)

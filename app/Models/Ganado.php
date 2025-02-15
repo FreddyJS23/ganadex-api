@@ -201,13 +201,13 @@ class Ganado extends Model
         return $this->hasOne(Venta::class);
     }
 
-   /**
-    * Get all of the vacunaciones for the Ganado
-    *
-    * @return \Illuminate\Database\Eloquent\Relations\HasMany
-    */
-   public function vacunaciones(): HasMany
-   {
-       return $this->hasMany(Vacunacion::class);
-   }
+    /**
+     * Get all of the vacunaciones for the Ganado
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function vacunaciones(): HasMany
+    {
+        return $this->hasMany(Vacunacion::class);
+    }
 }

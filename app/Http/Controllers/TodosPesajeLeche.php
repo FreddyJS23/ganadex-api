@@ -14,11 +14,13 @@ class TodosPesajeLeche extends Controller
      */
     public function __invoke()
     {
-        return new TodosPesajeLecheCollection(Ganado::doesntHave('toro')
-        ->doesntHave('ganadoDescarte')
-        ->has('pesajes_leche')
-        ->where('finca_id', session('finca_id'))
-        ->get());
+        return new TodosPesajeLecheCollection(
+            Ganado::doesntHave('toro')
+                ->doesntHave('ganadoDescarte')
+                ->has('pesajes_leche')
+                ->where('finca_id', session('finca_id'))
+                ->get()
+        );
 
     }
 }

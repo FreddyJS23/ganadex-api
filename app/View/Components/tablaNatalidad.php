@@ -13,8 +13,7 @@ class tablaNatalidad extends Component
      */
     public function __construct(
         public array $nacimientosPorMeses
-    )
-    {
+    ) {
         //
     }
 

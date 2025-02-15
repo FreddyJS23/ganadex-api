@@ -14,10 +14,12 @@ class TodosPartos extends Controller
      */
     public function __invoke(Request $request)
     {
-            return new TodosPartosCollection(Ganado::doesntHave('toro')
-        ->has('parto')
-        ->withCount('parto')
-        ->where('finca_id', session('finca_id'))
-            ->get());
+            return new TodosPartosCollection(
+                Ganado::doesntHave('toro')
+                    ->has('parto')
+                    ->withCount('parto')
+                    ->where('finca_id', session('finca_id'))
+                    ->get()
+            );
     }
 }

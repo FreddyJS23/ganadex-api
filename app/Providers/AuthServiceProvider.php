@@ -28,12 +28,15 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Gate::define('verificar_sesion_finca',[FincaPolicy::class,'verificar_sesion_finca']);
-        Gate::define('crear_sesion_finca',[FincaPolicy::class,'crear_sesion_finca']);
-        Gate::define('update',[ConfiguracionPolicy::class,'update']);
+        Gate::define('verificar_sesion_finca', [FincaPolicy::class,'verificar_sesion_finca']);
+        Gate::define('crear_sesion_finca', [FincaPolicy::class,'crear_sesion_finca']);
+        Gate::define('update', [ConfiguracionPolicy::class,'update']);
 
-        Gate::define('view-logs', function (User $user, UsuarioVeterinario $usuarioVeterinario) {
+        Gate::define(
+            'view-logs', function (User $user, UsuarioVeterinario $usuarioVeterinario) {
 
-            return $user->hasRole('admin') &&  $user->id === $usuarioVeterinario->admin_id;
-        });    }
+                return $user->hasRole('admin') &&  $user->id === $usuarioVeterinario->admin_id;
+            }
+        );    
+    }
 }

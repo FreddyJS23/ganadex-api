@@ -49,33 +49,33 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
- /**
-  * Get the configuracion associated with the User
-  *
-  * @return \Illuminate\Database\Eloquent\Relations\HasOne
-  */
- public function configuracion(): HasOne
- {
-     return $this->hasOne(Configuracion::class);
- }
+    /**
+     * Get the configuracion associated with the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function configuracion(): HasOne
+    {
+        return $this->hasOne(Configuracion::class);
+    }
 
-/**
- * Get all of the fincas for the User
- *
- * @return \Illuminate\Database\Eloquent\Relations\HasMany
- */
-public function fincas(): HasMany
-{
-    return $this->hasMany(Finca::class,);
-}
+    /**
+     * Get all of the fincas for the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function fincas(): HasMany
+    {
+        return $this->hasMany(Finca::class,);
+    }
 
- /**
-  * Get all of the usuariosVeterinario for the User
-  *
-  * @return \Illuminate\Database\Eloquent\Relations\HasMany
-  */
- public function usuariosVeterinario(): HasMany
- {
-     return $this->hasMany(UsuarioVeterinario::class,'admin_id')->with('veterinario');
- }
+    /**
+     * Get all of the usuariosVeterinario for the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function usuariosVeterinario(): HasMany
+    {
+        return $this->hasMany(UsuarioVeterinario::class, 'admin_id')->with('veterinario');
+    }
 }

@@ -11,9 +11,9 @@ use Illuminate\Support\Facades\Auth;
 
 class PajuelaToroController extends Controller
 {
- public function __construct()
+    public function __construct()
     {
-        $this->authorizeResource(PajuelaToro::class,'pajuela_toro');
+        $this->authorizeResource(PajuelaToro::class, 'pajuela_toro');
     }
 
     /**
@@ -21,7 +21,7 @@ class PajuelaToroController extends Controller
      */
     public function index()
     {
-        return new PajuelaToroCollection(PajuelaToro::where('finca_id',session('finca_id'))->get());
+        return new PajuelaToroCollection(PajuelaToro::where('finca_id', session('finca_id'))->get());
     }
 
     /**

@@ -32,7 +32,7 @@ class Fallecimiento extends Model
 
      /* activar logs de actividades */
      use LogsActivity;
-/*
+    /*
      //si el usuario no es un admin regitrar logs de actividades
      public function tapActivity(Activity $activity, string $eventName)
      {
@@ -40,9 +40,9 @@ class Fallecimiento extends Model
 
      } */
 
-      public function getActivitylogOptions(): LogOptions
-     {
-         return LogOptions::defaults();
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults();
 
-     }
+    }
 }

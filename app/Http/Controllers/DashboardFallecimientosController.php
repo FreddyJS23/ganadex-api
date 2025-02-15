@@ -23,9 +23,11 @@ class DashboardFallecimientosController extends Controller
             = Fallecimiento::whereRelation('ganado', 'finca_id', session('finca_id'))
             ->count();
 
-        return response()->json([
+        return response()->json(
+            [
             'total_fallecidos' => $totalFallecidos,
             'causas_frecuentes' => CausasFallecimientosDashboardResource::collection($causasFrecuentes),
-        ]);
+            ]
+        );
     }
 }

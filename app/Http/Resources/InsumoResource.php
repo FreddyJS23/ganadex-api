@@ -18,7 +18,7 @@ class InsumoResource extends JsonResource
             'id'=>$this->id,
             'insumo'=>$this->insumo,
             'cantidad'=>$this->cantidad,
-            'precio'=> round($this->precio,2)
+            'precio'=> round($this->precio, 2)
         ];
     }
 }

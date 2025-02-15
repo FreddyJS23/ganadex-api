@@ -21,7 +21,7 @@ class GanadoDescarteController extends Controller
 {
     public array $peso = ['peso_nacimiento', 'peso_destete', 'peso_2year', 'peso_actual'];
 
-     public function __construct()
+    public function __construct()
     {
         $this->authorizeResource(GanadoDescarte::class, 'ganado_descarte');
     }
@@ -46,32 +46,36 @@ class GanadoDescarteController extends Controller
         $ganado->sexo = "M";
 
         try {
-            DB::transaction(function () use ($ganado, $request) {
-                $ganado->save();
-                //estado fallecido
-                $request->only('estado_id')['estado_id'][0] == 2 && $ganado->fallecimiento()->create(
-                    [
+            DB::transaction(
+                function () use ($ganado, $request) {
+                    $ganado->save();
+                    //estado fallecido
+                    $request->only('estado_id')['estado_id'][0] == 2 && $ganado->fallecimiento()->create(
+                        [
                         'fecha' => $request->input('fecha_fallecimiento'),
                         'causa' => $request->input('causa')
-                    ]
-                );
+                        ]
+                    );
 
-                //estado vendido
-                $request->only('estado_id')['estado_id'][0] == 5 && $ganado->venta()->create([
-                    'fecha' => $request->input('fecha_venta'),
-                    'precio' => $request->input('precio'),
-                    'comprador_id' => $request->input('comprador_id'),
-                    'finca_id' => session('finca_id')
-                ]);
+                    //estado vendido
+                    $request->only('estado_id')['estado_id'][0] == 5 && $ganado->venta()->create(
+                        [
+                        'fecha' => $request->input('fecha_venta'),
+                        'precio' => $request->input('precio'),
+                        'comprador_id' => $request->input('comprador_id'),
+                        'finca_id' => session('finca_id')
+                        ]
+                    );
 
-                $ganado->estados()->sync($request->only('estado_id')['estado_id']);
-                $ganado->peso()->create($request->only($this->peso));
+                    $ganado->estados()->sync($request->only('estado_id')['estado_id']);
+                    $ganado->peso()->create($request->only($this->peso));
 
-                $ganado->evento()->create();
-            });
-} catch (\Throwable $error) {
-    return response()->json(['error'=>'error al insertar datos'], 501);
-}
+                    $ganado->evento()->create();
+                }
+            );
+        } catch (\Throwable $error) {
+            return response()->json(['error'=>'error al insertar datos'], 501);
+        }
 
         $ganadoDescarte = new GanadoDescarte;
         $ganadoDescarte->finca_id = session('finca_id');

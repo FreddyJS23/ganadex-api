@@ -24,7 +24,7 @@ class RevisionPosParto
      */
     public function handle(PartoHecho $event): void
     {
-        $eventoGanado=Evento::firstWhere('ganado_id',$event->parto->ganado->id);
+        $eventoGanado=Evento::firstWhere('ganado_id', $event->parto->ganado->id);
         $fechaParto=new DateTime($event->parto->fecha);
         $proxRevision=$fechaParto->add(new DateInterval('P30D'))->format('Y-m-d');
         $eventoGanado->prox_revision=$proxRevision;
@@ -32,7 +32,7 @@ class RevisionPosParto
 
         $numero = $event->parto->ganado->numero;
         activity("parto")
-        ->withProperties('evento')
-        ->log("Animal $numero tiene una fecha de revision despues del parto");
+            ->withProperties('evento')
+            ->log("Animal $numero tiene una fecha de revision despues del parto");
     }
 }

@@ -17,6 +17,6 @@ class GanadoTipo extends Model
      */
     public function ganado(): HasOne
     {
-        return $this->hasOne(Ganado::class,'tipo_id');
+        return $this->hasOne(Ganado::class, 'tipo_id');
     }
 }

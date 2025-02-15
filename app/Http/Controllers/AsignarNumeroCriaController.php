@@ -16,9 +16,9 @@ class AsignarNumeroCriaController extends Controller
      */
     public function index()
     {
-         $criasPendienteNumeracion = Ganado::where('finca_id',session('finca_id'))
-         ->whereRelation('estados','estado','pendiente_numeracion')
-        ->get();
+         $criasPendienteNumeracion = Ganado::where('finca_id', session('finca_id'))
+             ->whereRelation('estados', 'estado', 'pendiente_numeracion')
+             ->get();
 
         return new CriasPendienteNumeracionCollection($criasPendienteNumeracion);
     }
@@ -31,7 +31,7 @@ class AsignarNumeroCriaController extends Controller
         $ganado->numero=$request->input('numero');
         $ganado->save();
 
-        $estado=Estado::firstWhere('estado','pendiente_numeracion');
+        $estado=Estado::firstWhere('estado', 'pendiente_numeracion');
 
         $ganado->estados()->detach($estado->id);
 

@@ -24,12 +24,12 @@ class CambiaAvaca
     public function handle(PartoHecho $event): void
     {
         $novilla=Ganado::find($event->parto->ganado->id);
-        $novilla->tipo_id=GanadoTipo::where('tipo','adulto')->first()->id;
+        $novilla->tipo_id=GanadoTipo::where('tipo', 'adulto')->first()->id;
         $novilla->save();
 
         $numero = $event->parto->ganado->numero;
         activity("parto")
-        ->withProperties('evento')
-        ->log("Animal $numero cambia a vaca despues del parto");
+            ->withProperties('evento')
+            ->log("Animal $numero cambia a vaca despues del parto");
     }
 }

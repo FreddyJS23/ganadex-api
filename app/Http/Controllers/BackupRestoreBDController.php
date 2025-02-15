@@ -33,7 +33,7 @@ class BackupRestoreBDController extends Controller
         $dateLastBackup = $mathes[0] ?? null;
         //$dateLastBackup = null;
         
-        return response()->json(['ultimo_backup' => $dateLastBackup],200);
+        return response()->json(['ultimo_backup' => $dateLastBackup], 200);
     }
 
 
@@ -76,6 +76,6 @@ class BackupRestoreBDController extends Controller
 
         $restaurarDb = exec("mysql -u $dbUser  $dbName < $fileSqlRestore ", $output, $result);
        
-        return response()->json([],$result == 0 ? 200 : 500);
+        return response()->json([], $result == 0 ? 200 : 500);
     }
 }

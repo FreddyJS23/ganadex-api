@@ -22,7 +22,7 @@ class EstadoDespuesServicio
      */
     public function handle(ServicioHecho $event): void
     {
-        $estadoPendienteServico = Estado::where('estado',['pendiente_servicio'])->first()->id;
+        $estadoPendienteServico = Estado::where('estado', ['pendiente_servicio'])->first()->id;
 
         //eliminar estado pendiente de servicio
         $event->servicio->ganado->estados()->detach($estadoPendienteServico);

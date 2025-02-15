@@ -36,17 +36,17 @@ class VerificarVacasAptaParaServicio
         if (Ganado::where('finca_id', $fincaId)->count() > 0) {
 
             $vacasAptasParaServicio = Ganado::doesntHave('toro')
-            ->doesntHave('ganadoDescarte')
-            ->doesntHave('fallecimiento')
-            ->doesntHave('venta')
-            ->whereRelation('estados','estado','sano')
-            ->where('finca_id', $fincaId)
-            ->whereHas(
-                'peso',
-                function (Builder $query) {
-                    $query->where('peso_actual', '>=', session('peso_servicio'));
-                }
-            )
+                ->doesntHave('ganadoDescarte')
+                ->doesntHave('fallecimiento')
+                ->doesntHave('venta')
+                ->whereRelation('estados', 'estado', 'sano')
+                ->where('finca_id', $fincaId)
+                ->whereHas(
+                    'peso',
+                    function (Builder $query) {
+                        $query->where('peso_actual', '>=', session('peso_servicio'));
+                    }
+                )
             ->get();
 
             foreach ($vacasAptasParaServicio as $vacaAptaParaServicio) {
@@ -54,8 +54,8 @@ class VerificarVacasAptaParaServicio
             }
         }
         activity('servicio')
-        ->withProperties('evento')
-        ->log("Verificado si hay vacas aptas para un  servicio");
+            ->withProperties('evento')
+            ->log("Verificado si hay vacas aptas para un  servicio");
     }
 
 }

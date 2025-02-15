@@ -44,7 +44,7 @@ class VerificarEdadGanado
                 ->having('diferencia', '<',  729)
                 ->get();
 
-           $becerros->count() > 0 && $becerros->toQuery()->update(['tipo_id' => 2]);
+            $becerros->count() > 0 && $becerros->toQuery()->update(['tipo_id' => 2]);
 
             $mautes = Ganado::where('finca_id', $fincaId)
                 ->where('tipo_id', 2)
@@ -57,7 +57,7 @@ class VerificarEdadGanado
         }
 
         activity('edad ganado')
-        ->withProperties('evento')
-        ->log("Verificada edad de todos los animales");
+            ->withProperties('evento')
+            ->log("Verificada edad de todos los animales");
     }
 }

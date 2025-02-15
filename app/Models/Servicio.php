@@ -63,10 +63,10 @@ class Servicio extends Model
 
        } */
 
-        public function getActivitylogOptions(): LogOptions
-       {
+    public function getActivitylogOptions(): LogOptions
+    {
 
-            return LogOptions::defaults();
+        return LogOptions::defaults();
 
-       }
+    }
 }

@@ -56,6 +56,6 @@ class VacunaController extends Controller
      */
     public function destroy(Vacuna $vacuna)
     {
-    return  response()->json(['vacunaID' => Vacuna::destroy($vacuna->id) ?  $vacuna->id : ''], 200);
+        return  response()->json(['vacunaID' => Vacuna::destroy($vacuna->id) ?  $vacuna->id : ''], 200);
     }
 }

@@ -48,7 +48,7 @@ class VerificarPesajeMensualLeche
             }
         }
         activity('pesaje mensual leche')
-        ->withProperties('evento')
-        ->log("Verificado si hay vacas sin pesar en este mes");
+            ->withProperties('evento')
+            ->log("Verificado si hay vacas sin pesar en este mes");
     }
 }

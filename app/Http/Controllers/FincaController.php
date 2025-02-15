@@ -14,19 +14,19 @@ class FincaController extends Controller
 {
     public function __construct()
     {
-        $this->authorizeResource(Finca::class,'finca');
+        $this->authorizeResource(Finca::class, 'finca');
     }
 
     public function crear_sesion_finca(Finca $finca)
     {
-       //para usar politicas con difierente nombre se tuvo que haber registrado previamente en el auth service provides
-    $this->authorize('crear_sesion_finca',$finca);
+        //para usar politicas con difierente nombre se tuvo que haber registrado previamente en el auth service provides
+        $this->authorize('crear_sesion_finca', $finca);
 
         session()->put('finca_id', $finca->id);
 
         event(new CrearSesionFinca($finca));
 
-        return response()->json(['finca'=>new FincaResource($finca)],200);
+        return response()->json(['finca'=>new FincaResource($finca)], 200);
     }
 
     public function verificar_sesion_finca()
@@ -36,11 +36,12 @@ class FincaController extends Controller
 
         $finca_id = session('finca_id');
 
-        if($finca_id == null) return response()->json(['message'=>'no existe sesion'],401);
+        if($finca_id == null) { return response()->json(['message'=>'no existe sesion'], 401);
+        }
 
         $finca = Finca::find($finca_id)->first();
 
-        return response()->json(['finca'=>new FincaResource($finca)],200);
+        return response()->json(['finca'=>new FincaResource($finca)], 200);
     }
 
     /**
@@ -48,7 +49,7 @@ class FincaController extends Controller
      */
     public function index()
     {
-        return new FincaCollection(Finca::where('user_id',Auth::id())->get());
+        return new FincaCollection(Finca::where('user_id', Auth::id())->get());
     }
 
     /**
@@ -61,7 +62,7 @@ class FincaController extends Controller
         $finca->user_id=$request->user()->id;
         $finca->save();
 
-        return response()->json(['finca'=>new FincaResource($finca)],201);
+        return response()->json(['finca'=>new FincaResource($finca)], 201);
     }
 
     /**
@@ -80,7 +81,7 @@ class FincaController extends Controller
         $finca->nombre=$request->nombre;
         $finca->save();
 
-        return response()->json(['finca'=>new FincaResource($finca)],200);
+        return response()->json(['finca'=>new FincaResource($finca)], 200);
     }
 
     /**

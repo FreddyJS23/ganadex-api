@@ -14,15 +14,15 @@ class TodosRevisionesResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-      $existeRevision=$this->revisionReciente ? true : false;
+        $existeRevision=$this->revisionReciente ? true : false;
       
-      return[
+        return[
         "id"=>$this->id,
         "numero"=>$this->numero,
         "ultima_revision"=>$existeRevision ? $this->revisionReciente->fecha : 'desconocido',
         "diagnostico"=>$existeRevision ? $this->revisionReciente->diagnostico : 'desconocido',
         "proxima_revision"=>$this->evento ? $this->evento->prox_revision : null , 
         "total_revisiones"=>$this->revision_count
-      ];
+        ];
     }
 }

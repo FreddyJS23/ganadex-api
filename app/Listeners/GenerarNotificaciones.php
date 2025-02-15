@@ -18,7 +18,7 @@ use Illuminate\Support\Str;
 class GenerarNotificaciones
 {
 
-   /* se utiliza este scope ya que el evento
+    /* se utiliza este scope ya que el evento
     que es login tiene varios listener por ende
     llama varias veces este archivo, si se declaran estas funciones
     dentro del handle, dara error que la funcion ya se ha creado anteriormente */
@@ -27,12 +27,14 @@ class GenerarNotificaciones
         //Datos en la tabla tipos notificacion
         $columnaTipoNotificacion = ['revision' => 1, 'parto' => 2, 'secado' => 3,];
 
-        Notificacion::create([
+        Notificacion::create(
+            [
             'user_id' => $userId,
             'ganado_id' => $ganadoId,
             'dias_para_evento' => $diferenciaDiasEvento,
             'tipo_id' => $columnaTipoNotificacion["$tipo"]
-        ]);
+            ]
+        );
     }
 
     //Consultar si un evento esta cercano a los 7 dias
@@ -65,7 +67,6 @@ class GenerarNotificaciones
 
     /**
      * Handle the event.
-     *
      */
     public function handle(CrearSesionFinca $event): void
     {
@@ -83,13 +84,13 @@ class GenerarNotificaciones
 
             //iterar columnas
             foreach ($columnasTablaEvento as $columna => $key) {
-                $this->VerificarEventoCercano($columna, $event->finca->user_id,$fincaId, $fechaActual);
+                $this->VerificarEventoCercano($columna, $event->finca->user_id, $fincaId, $fechaActual);
             }
 
 
-        activity("notificaciones")
-        ->withProperties('evento')
-        ->log('Se han generado las notificaciones');
+            activity("notificaciones")
+                ->withProperties('evento')
+                ->log('Se han generado las notificaciones');
         }
     }
 }

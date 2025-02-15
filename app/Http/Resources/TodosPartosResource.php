@@ -12,9 +12,6 @@ class TodosPartosResource extends JsonResource
      *
      * @return array<string, mixed>
      */
-
-
-
     public function toArray(Request $request): array
     {
 
@@ -30,18 +27,19 @@ class TodosPartosResource extends JsonResource
             ])
         ];
 
-        if ($existeParto && $this->partoReciente->partoable_type == 'App\Models\Toro')
-        $resource['toro'] = (object)
-        [
+        if ($existeParto && $this->partoReciente->partoable_type == 'App\Models\Toro') {
+            $resource['toro'] = (object)
+            [
             'id' => $this->partoReciente->partoable->id,
             'numero' => $this->partoReciente->partoable->ganado->numero
-        ];
-        elseif ($existeParto && $this->partoReciente->partoable_type == 'App\Models\PajuelaToro')
-        $resource['pajuela_toro'] = (object)
-        [
+            ];
+        } elseif ($existeParto && $this->partoReciente->partoable_type == 'App\Models\PajuelaToro') {
+            $resource['pajuela_toro'] = (object)
+            [
             'id' => $this->partoReciente->partoable->id,
             'codigo' => $this->partoReciente->partoable->codigo
-        ];
+            ];
+        }
 
         return $resource;
     }

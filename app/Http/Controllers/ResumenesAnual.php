@@ -19,7 +19,6 @@ class ResumenesAnual extends Controller
          * obtener conteo nacimientos de los ultimos 5 años
          *
          * @var Collection<{año:int,partos_producidos:int}>
-
          */
         $nacimientosAnuales = Ganado::where('finca_id', session('finca_id'))
             ->selectRaw("DATE_FORMAT(fecha_nacimiento,'%Y') as año, COUNT(fecha_nacimiento) as partos_producidos")
@@ -27,7 +26,9 @@ class ResumenesAnual extends Controller
             ->groupBy('año')
             ->get();
 
-        /** @var Array<int:string>  */
+        /**
+ * @var Array<int:string>  
+*/
         $totalPoblacionAño = [];
 
         //obtener la poblacion de vacas sanas en cada año
@@ -50,21 +51,23 @@ class ResumenesAnual extends Controller
         $tasaNatalidad = fn(int $nacimientos, int $poblacion) => $nacimientos > 0 ? round($nacimientos / $poblacion * 100, 2) : 0;
 
         //agregar item rebaño y tasa de natalidad a la coleccion
-        $nacimientosAnuales->transform(function ($item, int $key) use ($totalPoblacionAño, $tasaNatalidad) {
-            //usar clave año para usar la variable global y obtener el valor de la clave qye sera el total de poblacion
-            $item->poblacion = $totalPoblacionAño[$item['año']];
-            $poblacion=$item['poblacion'];
-            $partos_producidos=$item['partos_producidos'];
+        $nacimientosAnuales->transform(
+            function ($item, int $key) use ($totalPoblacionAño, $tasaNatalidad) {
+                //usar clave año para usar la variable global y obtener el valor de la clave qye sera el total de poblacion
+                $item->poblacion = $totalPoblacionAño[$item['año']];
+                $poblacion=$item['poblacion'];
+                $partos_producidos=$item['partos_producidos'];
 
-            //si no hay partos o poblacion no se calculará la tasa de natalidad
-            if($poblacion==0 || $partos_producidos==0){
-                $item->tasa_natalidad=0;
+                //si no hay partos o poblacion no se calculará la tasa de natalidad
+                if($poblacion==0 || $partos_producidos==0) {
+                    $item->tasa_natalidad=0;
+                    return $item;
+                }
+
+                $item->tasa_natalidad = $tasaNatalidad($partos_producidos, $poblacion);
                 return $item;
             }
-
-            $item->tasa_natalidad = $tasaNatalidad($partos_producidos, $poblacion);
-            return $item;
-        });
+        );
 
         /* ------------------ grafico tora poblacion del año actual ----------------- */
         //obetner conteo agrupado anual ademas de la cantidad de machos y hembras para la poblacion
@@ -79,9 +82,11 @@ class ResumenesAnual extends Controller
             ->groupBy('año')
             ->first();
 
-        return response()->json([
+        return response()->json(
+            [
             'nacimientos_ultimos_5_año' => $nacimientosAnuales->toArray(),
             'nacimientos_año_actual' => $nacimientosAñoActual->toArray(),
-        ]);
+            ]
+        );
     }
 }

@@ -24,7 +24,7 @@ class RevisionServicio
      */
     public function handle(ServicioHecho $event): void
     {
-        $eventoGanado=Evento::firstWhere('ganado_id',$event->servicio->ganado->id);
+        $eventoGanado=Evento::firstWhere('ganado_id', $event->servicio->ganado->id);
         $fechaServicio=new DateTime($event->servicio->fecha);
         $proxRevision=$fechaServicio->add(new DateInterval('P40D'))->format('Y-m-d');
         $eventoGanado->prox_revision=$proxRevision;
@@ -32,7 +32,7 @@ class RevisionServicio
 
         $numero = $event->servicio->ganado->numero;
         activity("servicio")
-        ->withProperties('evento')
-        ->log("Animal $numero tiene una proxima revision despues del servicio");
+            ->withProperties('evento')
+            ->log("Animal $numero tiene una proxima revision despues del servicio");
     }
 }

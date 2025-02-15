@@ -12,8 +12,9 @@ use Illuminate\Support\Facades\Auth;
 class InsumoController extends Controller
 {
 
-     public function __construct() {
-        $this->authorizeResource(Insumo::class,'insumo');
+    public function __construct()
+    {
+        $this->authorizeResource(Insumo::class, 'insumo');
     }
 
     /**
@@ -21,7 +22,7 @@ class InsumoController extends Controller
      */
     public function index()
     {
-        return new InsumoCollection(Insumo::where('finca_id',session('finca_id'))->get());
+        return new InsumoCollection(Insumo::where('finca_id', session('finca_id'))->get());
     }
 
     /**
@@ -34,7 +35,7 @@ class InsumoController extends Controller
         $insumo->finca_id=session('finca_id');
         $insumo->save();
 
-        return response()->json(['insumo'=>new InsumoResource($insumo)],201);
+        return response()->json(['insumo'=>new InsumoResource($insumo)], 201);
     }
 
     /**
@@ -42,7 +43,7 @@ class InsumoController extends Controller
      */
     public function show(Insumo $insumo)
     {
-        return response()->json(['insumo'=>new InsumoResource($insumo)],200);
+        return response()->json(['insumo'=>new InsumoResource($insumo)], 200);
     }
 
     /**
@@ -53,7 +54,7 @@ class InsumoController extends Controller
         $insumo->fill($request->all());
         $insumo->save();
 
-        return response()->json(['insumo'=>new InsumoResource($insumo)],200);
+        return response()->json(['insumo'=>new InsumoResource($insumo)], 200);
     }
 
     /**

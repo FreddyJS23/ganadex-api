@@ -13,8 +13,8 @@ class TablaPromedioAnualSemestral extends Component
      */
     public function __construct(
         public string $tituloDetalle,
-        public array $detalles,)
-    {
+        public array $detalles,
+    ) {
         //
     }
 

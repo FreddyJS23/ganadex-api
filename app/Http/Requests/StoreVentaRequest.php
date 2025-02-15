@@ -31,7 +31,7 @@ class StoreVentaRequest extends FormRequest
                 'required', 'numeric', Rule::exists('ganados', 'id')
                     ->where(
                         function ($query) {
-                            return $query->where('finca_id',session('finca_id'));
+                            return $query->where('finca_id', session('finca_id'));
                         }
                     ),
                     new ComprobarTienePesoActual
@@ -40,7 +40,7 @@ class StoreVentaRequest extends FormRequest
                 'required', 'numeric', Rule::exists('compradors', 'id')
                     ->where(
                         function ($query) {
-                            return $query->where('finca_id',session('finca_id'));
+                            return $query->where('finca_id', session('finca_id'));
                         }
                     )
             ],

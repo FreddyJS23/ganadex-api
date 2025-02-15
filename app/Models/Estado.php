@@ -15,15 +15,15 @@ class Estado extends Model
         'estado',
     ];
 
-/**
- * The ganados that belong to the Estado
- *
- * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
- */
-public function ganados(): BelongsToMany
-{
-    return $this->belongsToMany(Ganado::class);
-}
+    /**
+     * The ganados that belong to the Estado
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function ganados(): BelongsToMany
+    {
+        return $this->belongsToMany(Ganado::class);
+    }
 
     protected $hidden = ['ganado_id', 'created_at', 'updated_at', 'pivot'];
 }

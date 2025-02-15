@@ -22,10 +22,12 @@ class UserResource extends JsonResource
             'fecha_creacion' => $this->created_at->format('d-m-Y'),
         ];
 
-        $usuarioAdmin = array_merge($usuario, [
+        $usuarioAdmin = array_merge(
+            $usuario, [
             'fincas' => $this->fincas,
             'configuracion'=>$this->configuracion
-            ]);
+            ]
+        );
 
         if ($this->hasRole('admin')) {
             return $usuarioAdmin;

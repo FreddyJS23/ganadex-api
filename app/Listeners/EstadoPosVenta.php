@@ -28,8 +28,8 @@ class EstadoPosVenta
 
         $numero = $event->venta->ganado->numero;
         activity('venta')
-        ->withProperties('evento')
-        ->log("Animal $numero ha sido vendido");
+            ->withProperties('evento')
+            ->log("Animal $numero ha sido vendido");
 
         $event->venta->ganado->estados()->sync($estado->id);
     }

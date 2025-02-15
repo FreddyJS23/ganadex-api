@@ -12,9 +12,8 @@ class TablaVentasLeche extends Component
      * Create a new component instance.
      */
     public function __construct(
-       public array $ventasLeche,
-    )
-    {
+        public array $ventasLeche,
+    ) {
         //
     }
 
