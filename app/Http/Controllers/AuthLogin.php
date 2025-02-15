@@ -27,67 +27,67 @@ class AuthLogin extends Controller
         }
 
         //intentar autenticar
-        if (Auth::attempt($request->only(['usuario', 'password']))) {
-            $request->session()->regenerate();
-            activity('Login')->log('Login');
-            $rol = $user->hasRole('admin') ? 'admin' : 'veterinario';
-            //notificar en el client si el login incluye inicio de sesion finca
-            $sesion_finca = false;
-            $configuracion = null;
+        if (!Auth::attempt($request->only(['usuario', 'password']))) {
+            return response()->json(['message' => 'invalid password'], 401);
+        }
 
-            if ($rol == 'admin') {
-                $configuracion = Configuracion::firstWhere('user_id', $user->id);
+        $request->session()->regenerate();
+        activity('Login')->log('Login');
+        $rol = $user->hasRole('admin') ? 'admin' : 'veterinario';
+        //notificar en el client si el login incluye inicio de sesion finca
+        $sesion_finca = false;
+        $configuracion = null;
 
-                session()->put(
-                    [
-                        'peso_servicio' => $configuracion->peso_servicio,
-                        'dias_evento_notificacion' => $configuracion->dias_evento_notificacion,
-                        'dias_diferencia_vacuna' => $configuracion->dias_diferencia_vacuna,
-                    ]
-                );
+        if ($rol == 'admin') {
+            $configuracion = Configuracion::firstWhere('user_id', $user->id);
 
-                if ($user->fincas->count() == 1) {
-                    $finca = $user->fincas->first();
-                    session()->put('finca_id', $finca->id);
-                    event(new CrearSesionFinca($finca));
-                    $sesion_finca = true;
-                }
-            } elseif ($rol == 'veterinario') {
-                $usuario_veterinario = UsuarioVeterinario::where('user_id', $user->id)->first();
-                $configuracion = Configuracion::firstWhere('user_id', $usuario_veterinario->admin_id);
-                $finca = Finca::find($usuario_veterinario->veterinario->finca_id)->first();
+            session()->put(
+                [
+                    'peso_servicio' => $configuracion->peso_servicio,
+                    'dias_evento_notificacion' => $configuracion->dias_evento_notificacion,
+                    'dias_diferencia_vacuna' => $configuracion->dias_diferencia_vacuna,
+                ]
+            );
 
-                session()->put(
-                    [
-                        'finca_id' => $finca->id,
-                        'peso_servicio' => $configuracion->peso_servicio,
-                        'dias_evento_notificacion' => $configuracion->dias_evento_notificacion,
-                        'dias_diferencia_vacuna' => $configuracion->dias_diferencia_vacuna,
-                    ]
-                );
-
+            if ($user->fincas->count() == 1) {
+                $finca = $user->fincas->first();
+                session()->put('finca_id', $finca->id);
                 event(new CrearSesionFinca($finca));
                 $sesion_finca = true;
             }
-            /* En caso que haya mas fincas creadas se debera asignar manualmente en el contralador finca */
+        } elseif ($rol == 'veterinario') {
+            $usuario_veterinario = UsuarioVeterinario::where('user_id', $user->id)->first();
+            $configuracion = Configuracion::firstWhere('user_id', $usuario_veterinario->admin_id);
+            $finca = Finca::find($usuario_veterinario->veterinario->finca_id)->first();
 
-            return response()
-                ->json(
-                    [
-                        'login' =>
-                        [
-                            'id' => $user->id,
-                            'usuario' => $user->usuario,
-                            'rol' => $rol,
-                            'token' => $user->createToken('API_TOKEN')->plainTextToken,
-                            'sesion_finca' => $sesion_finca,
-                            'configuracion' => new ConfiguracionResource($configuracion),
-                        ]
-                    ],
-                    200
-                );
-        } else {
-            return response()->json(['message' => 'invalid password'], 401);
+            session()->put(
+                [
+                    'finca_id' => $finca->id,
+                    'peso_servicio' => $configuracion->peso_servicio,
+                    'dias_evento_notificacion' => $configuracion->dias_evento_notificacion,
+                    'dias_diferencia_vacuna' => $configuracion->dias_diferencia_vacuna,
+                ]
+            );
+
+            event(new CrearSesionFinca($finca));
+            $sesion_finca = true;
         }
+        /* En caso que haya mas fincas creadas se debera asignar manualmente en el contralador finca */
+
+        return response()
+            ->json(
+                [
+                    'login' =>
+                    [
+                        'id' => $user->id,
+                        'usuario' => $user->usuario,
+                        'rol' => $rol,
+                        'token' => $user->createToken('API_TOKEN')->plainTextToken,
+                        'sesion_finca' => $sesion_finca,
+                        'configuracion' => new ConfiguracionResource($configuracion),
+                    ]
+                ],
+                200
+            );
     }
 }
