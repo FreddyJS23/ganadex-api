@@ -21,7 +21,7 @@ class UsuarioVeterinarioFactory extends Factory
     {
         return [
             'user_id' => User::factory()
-            ->create(['usuario'=>'veterinario','password'=>Hash::make('123456')])
+            ->create(['usuario' => 'veterinario','password' => Hash::make('123456')])
             ->assignRole('veterinario'),
         ];
     }

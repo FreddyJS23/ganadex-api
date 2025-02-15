@@ -72,16 +72,16 @@ class DashboardTest extends TestCase
     }
 
   //generar una fecha de produccion lactea
-      private  function mesesPesajeAnual(int $año)
-        {
-            $mes = rand(0, 11);
+    private function mesesPesajeAnual(int $año)
+    {
+          $mes = rand(0, 11);
 
-            $fechaInicial = Carbon::create($año, 1, 20);
+          $fechaInicial = Carbon::create($año, 1, 20);
 
-            $fechaConMesAñadido = $fechaInicial->addMonths($mes)->format('Y-m-d');
+          $fechaConMesAñadido = $fechaInicial->addMonths($mes)->format('Y-m-d');
 
-            return $mes == 0 ? $fechaInicial->format('Y-m-d') : $fechaConMesAñadido;
-        }
+          return $mes == 0 ? $fechaInicial->format('Y-m-d') : $fechaConMesAñadido;
+    }
 
     private function generarGanadoPesajeLecheAnual(int $año): Collection
     {
@@ -99,7 +99,7 @@ class DashboardTest extends TestCase
                     function (array $attributes, Ganado $ganado) {
                         return ['ganado_id' => $ganado->id];
                     }
-                )->sequence(fn (Sequence $sequence) => ['fecha' =>$this->mesesPesajeAnual($año)]),
+                )->sequence(fn (Sequence $sequence) => ['fecha' => $this->mesesPesajeAnual($año)]),
                 'pesajes_leche'
             )
             ->for($this->finca)
@@ -128,7 +128,7 @@ class DashboardTest extends TestCase
     public function test_total_ganado_por_tipo(): void
     {
         $this->generarGanado();
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->getJson(route('dashboardPrincipal.totalGanadoTipo'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('dashboardPrincipal.totalGanadoTipo'));
 
         $response->assertStatus(200)->assertJson(fn (AssertableJson $json) =>
         $json->whereType('total_tipos_ganado', 'array')
@@ -149,7 +149,7 @@ class DashboardTest extends TestCase
     public function test_total_personal(): void
     {
         $this->generarPersonal();
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->getJson(route('dashboardPrincipal.totalPersonal'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('dashboardPrincipal.totalPersonal'));
 
         $response->assertStatus(200)->assertJson(['total_personal' => $this->cantidad_elementos]);
     }
@@ -157,7 +157,7 @@ class DashboardTest extends TestCase
     public function test_total_vacas_en_gestacion(): void
     {
         $this->generarGanado();
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->getJson(route('dashboardPrincipal.vacasEnGestacion'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('dashboardPrincipal.vacasEnGestacion'));
 
         $response->assertStatus(200)->assertJson(fn (AssertableJson $json) => $json->whereType('vacas_en_gestacion', 'integer'));
     }
@@ -165,7 +165,7 @@ class DashboardTest extends TestCase
     public function test_ranking_top_3_vacas_mas_productoras(): void
     {
         $this->generarGanado();
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->getJson(route('dashboardPrincipal.topVacasProductoras'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('dashboardPrincipal.topVacasProductoras'));
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) =>
@@ -181,14 +181,13 @@ class DashboardTest extends TestCase
                         => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
                     )
                 )
-
         );
     }
 
     public function test_ranking_top_3_vacas_menos_productoras(): void
     {
         $this->generarGanado();
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->getJson(route('dashboardPrincipal.topVacasMenosProductoras'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('dashboardPrincipal.topVacasMenosProductoras'));
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) =>
@@ -204,14 +203,13 @@ class DashboardTest extends TestCase
                         => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
                     )
                 )
-
         );
     }
 
     public function test_total_vacas_pendientes_de_revision(): void
     {
         $this->generarGanado();
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->getJson(route('dashboardPrincipal.totalGanadoPendienteRevision'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('dashboardPrincipal.totalGanadoPendienteRevision'));
 
         $response->assertStatus(200)->assertJson(fn (AssertableJson $json) => $json->whereType('ganado_pendiente_revision', 'integer'));
     }
@@ -219,7 +217,7 @@ class DashboardTest extends TestCase
     public function test_total_novillas_pendientes_de_servicio_o_monta(): void
     {
         $this->generarGanado();
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->getJson(route('dashboardPrincipal.cantidadVacasParaServir'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('dashboardPrincipal.cantidadVacasParaServir'));
 
         $response->assertStatus(200)->assertJson(fn (AssertableJson $json) => $json->whereType('cantidad_vacas_para_servir', 'integer'));
     }
@@ -253,7 +251,7 @@ class DashboardTest extends TestCase
     public function test_balance_anual_leche(): void
     {
         $this->generarGanadoPesajeLecheAnual(now()->format('Y'));
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->getJson(route('dashboardPrincipal.balanceAnualProduccionLeche'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('dashboardPrincipal.balanceAnualProduccionLeche'));
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) => $json->has('balance_anual', 12)
@@ -265,19 +263,19 @@ class DashboardTest extends TestCase
                 )
         );
     }
-     public function test_balance_anual_leche_con_parametro(): void
+    public function test_balance_anual_leche_con_parametro(): void
     {
         $this->generarGanadoPesajeLecheAnual(now()->addYear()->format('Y'));
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->getJson(route('dashboardPrincipal.balanceAnualProduccionLeche',['year'=>now()->addYear()->format('Y')]));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('dashboardPrincipal.balanceAnualProduccionLeche', ['year' => now()->addYear()->format('Y')]));
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) => $json->has('balance_anual', 12)
-                ->whereAllType(
-                    [
-                        'balance_anual.0.mes' => 'string',
-                        'balance_anual.0.promedio_mensual' => 'integer'
-                    ]
-                )
+                 ->whereAllType(
+                     [
+                         'balance_anual.0.mes' => 'string',
+                         'balance_anual.0.promedio_mensual' => 'integer'
+                     ]
+                 )
         );
     }
 }

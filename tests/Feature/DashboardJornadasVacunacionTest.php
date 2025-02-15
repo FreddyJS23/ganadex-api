@@ -47,7 +47,7 @@ class DashboardJornadasVacunacionTest extends TestCase
     {
         $this->generarJornadasVacunacion();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->getJson(route('dashboardJornadasVacunacion.proximasJornadasVacunacion'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('dashboardJornadasVacunacion.proximasJornadasVacunacion'));
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) =>
@@ -63,5 +63,4 @@ class DashboardJornadasVacunacionTest extends TestCase
                 )
         );
     }
-
 }

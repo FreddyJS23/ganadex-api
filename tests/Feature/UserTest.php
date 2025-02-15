@@ -73,7 +73,7 @@ class UserTest extends TestCase
      */
 
 
-      public function test_creacion_usuario(): void
+    public function test_creacion_usuario(): void
     {
         $response = $this->withSession(['user' => true])->postJson('api/register', $this->usuario);
 
@@ -81,26 +81,26 @@ class UserTest extends TestCase
     }
 
 
-     public function test_obtener_usuario_administrador(): void
+    public function test_obtener_usuario_administrador(): void
     {
 
         $response = $this->actingAs($this->user)->getJson(route('usuario.show', ['user' => $this->user->id]));
         $response->assertStatus(200)
-            ->assertJson(
-                fn (AssertableJson $json) => $json->has(
-                    'user',
-                    fn (AssertableJson $json) =>
-                    $json->whereAllType([
-                        'id' => 'integer',
-                        'usuario' => 'string',
-                        'email' => 'string',
-                        'rol' => 'string',
-                        'fincas' => 'array',
-                        'fecha_creacion' => 'string',
-                        'configuracion'=>'array',
-                    ])
-                )
-            );
+           ->assertJson(
+               fn (AssertableJson $json) => $json->has(
+                   'user',
+                   fn (AssertableJson $json) =>
+                   $json->whereAllType([
+                       'id' => 'integer',
+                       'usuario' => 'string',
+                       'email' => 'string',
+                       'rol' => 'string',
+                       'fincas' => 'array',
+                       'fecha_creacion' => 'string',
+                       'configuracion' => 'array',
+                   ])
+               )
+           );
     }
 
     public function test_obtener_usuario_veterinario(): void
@@ -125,7 +125,7 @@ class UserTest extends TestCase
     }
 
 
-     public function test_actualizar_usuario(): void
+    public function test_actualizar_usuario(): void
     {
 
         $response = $this->actingAs($this->user)->putJson(route('usuario.update', ['user' => $this->user->id]), $this->usuario);
@@ -133,7 +133,7 @@ class UserTest extends TestCase
         $response->assertStatus(200)->assertJson(['user' => true]);
     }
 
-     public function test_actualizar_usuario_con_otro_existente_repitiendo_campos_unicos(): void
+    public function test_actualizar_usuario_con_otro_existente_repitiendo_campos_unicos(): void
     {
         $usuarioExistente = User::factory()->create(['usuario' => 'test']);
 
@@ -144,9 +144,9 @@ class UserTest extends TestCase
         ->etc());
     }
 
-     public function test_actualizar_usuario_conservando_campos_unicos(): void
+    public function test_actualizar_usuario_conservando_campos_unicos(): void
     {
-        $otroUsuario= User::factory()->create(['usuario' => 'test']);
+        $otroUsuario = User::factory()->create(['usuario' => 'test']);
 
         $otroUsuario->syncRoles('admin');
 
@@ -167,7 +167,7 @@ class UserTest extends TestCase
     /**
      * @dataProvider ErrorinputProvider
      */
-     public function test_error_validacion_registro_usuario($user, $errores): void
+    public function test_error_validacion_registro_usuario($user, $errores): void
     {
         User::factory()->create(['usuario' => 'test']);
 
@@ -176,7 +176,7 @@ class UserTest extends TestCase
         $response->assertStatus(422)->assertInvalid($errores);
     }
 
-     public function test_autorizacion_maniupular__usuario_otro_usuario(): void
+    public function test_autorizacion_maniupular__usuario_otro_usuario(): void
     {
         $otroUsuario = User::factory()->create();
 

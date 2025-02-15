@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('personal_id')->constrained()->onDelete('cascade');
             $table->unsignedBigInteger('admin_id');
             $table->foreign('admin_id')->references('id')->on('users')
-            ->constrained(table: 'users',indexName:'usuario_verinario_admin_id')->onDelete('cascade');
+            ->constrained(table: 'users', indexName:'usuario_verinario_admin_id')->onDelete('cascade');
             $table->timestamps();
         });
     }

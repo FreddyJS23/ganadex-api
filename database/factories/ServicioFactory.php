@@ -17,9 +17,9 @@ class ServicioFactory extends Factory
     public function definition(): array
     {
         return [
-            'observacion'=>fake()->word(),
-            'tipo'=>fake()->randomElement(['Inseminacion','Monta']),
-            'fecha'=>fake()->dateTimeThisYear()->format('Y-m-d'),
+            'observacion' => fake()->word(),
+            'tipo' => fake()->randomElement(['Inseminacion','Monta']),
+            'fecha' => fake()->dateTimeThisYear()->format('Y-m-d'),
         ];
     }
 }

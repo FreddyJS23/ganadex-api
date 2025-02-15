@@ -17,8 +17,8 @@ class FallecimientoFactory extends Factory
     public function definition(): array
     {
         return [
-            'causa'=>fake()->word(),
-            'fecha'=>fake()->date()
+            'causa' => fake()->word(),
+            'fecha' => fake()->date()
         ];
     }
 }

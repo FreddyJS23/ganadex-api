@@ -15,6 +15,5 @@ class CargoSeeder extends Seeder
     {
         DB::table('cargos')->insert(['cargo' => 'obrero']);
         DB::table('cargos')->insert(['cargo' => 'veterinario']);
-      
     }
 }

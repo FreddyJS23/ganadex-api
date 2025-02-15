@@ -4,4 +4,11 @@
     xsi:noNamespaceSchemaLocation="vendor/squizlabs/php_codesniffer/phpcs.xsd">
     <rule ref="PSR12" />
     <file>app</file>
+    <file>bootstrap</file>
+    <file>config</file>
+    <file>database</file>
+    <file>lang</file>
+    <file>public</file>
+    <file>routes</file>
+    <file>tests</file>
  </ruleset>

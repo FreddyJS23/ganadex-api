@@ -66,7 +66,7 @@ class DashboardVentaGanadoTest extends TestCase
     {
         $this->generarVentas();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->getJson(route('dashboardVentaGanado.mejorComprador'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('dashboardVentaGanado.mejorComprador'));
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJSon $json) =>
@@ -80,7 +80,7 @@ class DashboardVentaGanadoTest extends TestCase
     public function test_error_no_haya_compradores_registrados_para_obtener_mejor_comprador(): void
     {
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->getJson(route('dashboardVentaGanado.mejorComprador'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('dashboardVentaGanado.mejorComprador'));
 
         $response->assertJson(['comprador' => null]);
     }
@@ -156,7 +156,7 @@ class DashboardVentaGanadoTest extends TestCase
 
         $this->generarVentas();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->getJson(route('dashboardVentaGanado.ventasDelMes'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('dashboardVentaGanado.ventasDelMes'));
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) =>
@@ -187,26 +187,28 @@ class DashboardVentaGanadoTest extends TestCase
     {
         $this->generarVentas();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->getJson(route('dashboardVentaGanado.balanceAnualVentas'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('dashboardVentaGanado.balanceAnualVentas'));
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJSon $json) =>
-            $json->has('balance_anual',12,fn (AssertableJson $json) => $json->whereAllType(['mes' => 'string', 'ventas' => 'integer']))
+            $json->has('balance_anual', 12, fn (AssertableJson $json) => $json->whereAllType(['mes' => 'string', 'ventas' => 'integer']))
         );
     }
     public function test_obtener_balance_anual_ventas__con_parametro_año(): void
     {
         $this->generarVentas();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->getJson(route('dashboardVentaGanado.balanceAnualVentas',['year' => 2022,]));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('dashboardVentaGanado.balanceAnualVentas', ['year' => 2022,]));
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJSon $json) =>
-            $json->has('balance_anual',
-            12,
-            fn (AssertableJson $json)
-            => $json->whereAllType(['mes' => 'string', 'ventas' => 'integer'])
-            ->where('ventas',0))
+            $json->has(
+                'balance_anual',
+                12,
+                fn (AssertableJson $json)
+                => $json->whereAllType(['mes' => 'string', 'ventas' => 'integer'])
+                ->where('ventas', 0)
+            )
         );
     }
 }

@@ -13,7 +13,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Illuminate\Support\Str;
-
 use Tests\TestCase;
 
 class GanadoTest extends TestCase
@@ -79,9 +78,9 @@ class GanadoTest extends TestCase
 
 
             $comprador = Comprador::factory()->for($this->finca)->create()->id;
-            $this->cabeza_ganado_fallecida= array_merge($this->cabeza_ganado,['estado_id'=>[2,3,4],'fecha_fallecimiento'=>'2020-10-02','causa'=>'enferma']);
-            $this->cabeza_ganado_vendida =array_merge($this->cabeza_ganado,['estado_id'=>[5,6,7],'fecha_venta'=>'2020-10-02','precio'=>100,'comprador_id'=>$comprador]);
-            $this->cabeza_ganado=array_merge($this->cabeza_ganado,['estado_id'=>[1]]);
+            $this->cabeza_ganado_fallecida = array_merge($this->cabeza_ganado, ['estado_id' => [2,3,4],'fecha_fallecimiento' => '2020-10-02','causa' => 'enferma']);
+            $this->cabeza_ganado_vendida = array_merge($this->cabeza_ganado, ['estado_id' => [5,6,7],'fecha_venta' => '2020-10-02','precio' => 100,'comprador_id' => $comprador]);
+            $this->cabeza_ganado = array_merge($this->cabeza_ganado, ['estado_id' => [1]]);
     }
 
     private function generarGanado(): Collection
@@ -91,7 +90,7 @@ class GanadoTest extends TestCase
             ->hasPeso(1)
             ->hasEvento(1)
             ->hasAttached($this->estado)
-            ->hasVacunaciones(3,['finca_id'=>$this->finca->id])
+            ->hasVacunaciones(3, ['finca_id' => $this->finca->id])
             ->for($this->finca)
             ->create();
     }
@@ -161,7 +160,7 @@ class GanadoTest extends TestCase
     {
         $this->generarGanado();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->getJson('api/ganado');
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson('api/ganado');
         $response->assertStatus(200)
             ->assertJson(
                 fn (AssertableJson $json) =>
@@ -181,28 +180,28 @@ class GanadoTest extends TestCase
                         ])
                             ->where('sexo', fn (string $sexo) => Str::contains($sexo, ['M', 'H']))
                             ->where('tipo', fn (string $tipo) => Str::contains($tipo, ['becerro', 'maute', 'novillo', 'adulto']))
-                ->has(
-                    'pesos',
-                    fn (AssertableJson $json) => $json
-                        ->whereAllType([
-                            'id'=>'integer',
-                            'peso_nacimiento' => 'string',
-                            'peso_destete' => 'string',
-                            'peso_2year' => 'string',
-                            'peso_actual' => 'string',
-                        ])
-                )
-                ->has(
-                    'eventos',
-                    fn (AssertableJson $json) => $json
-                        ->whereAllType([
-                            'id'=>'integer',
-                            'prox_revision' => 'string|null',
-                            'prox_parto' => 'string|null',
-                            'prox_secado' => 'string|null',
-                        ])
-                )
-                            )
+                        ->has(
+                            'pesos',
+                            fn (AssertableJson $json) => $json
+                                ->whereAllType([
+                                    'id' => 'integer',
+                                    'peso_nacimiento' => 'string',
+                                    'peso_destete' => 'string',
+                                    'peso_2year' => 'string',
+                                    'peso_actual' => 'string',
+                                ])
+                        )
+                        ->has(
+                            'eventos',
+                            fn (AssertableJson $json) => $json
+                                ->whereAllType([
+                                    'id' => 'integer',
+                                    'prox_revision' => 'string|null',
+                                    'prox_parto' => 'string|null',
+                                    'prox_secado' => 'string|null',
+                                ])
+                        )
+                    )
             );
     }
 
@@ -210,76 +209,82 @@ class GanadoTest extends TestCase
     public function test_creacion_cabeza_ganado(): void
     {
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->postJson('api/ganado', $this->cabeza_ganado);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson('api/ganado', $this->cabeza_ganado);
 
         $response->assertStatus(201)
             ->assertJson(
                 fn (AssertableJson $json) =>
                 $json->has(
-                        'ganado',
-                        fn (AssertableJson $json) =>
-                        $json->whereAllType([
-                            'id' => 'integer',
-                            'nombre' => 'string',
-                            'numero' => 'integer',
-                            'origen' => 'string',
-                            'fecha_nacimiento' => 'string',
-                            'estados' => 'array',
-                            'estados.0.id' => 'integer',
-                            'estados.0.estado' => 'string',
-                        ])
-                            ->where('sexo', fn (string $sexo) => Str::contains($sexo, ['M', 'H']))
-                            ->where('tipo', fn (string $tipo) => Str::contains($tipo, ['becerro', 'maute', 'novillo', 'adulto']))
-                            ->has('pesos',
+                    'ganado',
+                    fn (AssertableJson $json) =>
+                    $json->whereAllType([
+                        'id' => 'integer',
+                        'nombre' => 'string',
+                        'numero' => 'integer',
+                        'origen' => 'string',
+                        'fecha_nacimiento' => 'string',
+                        'estados' => 'array',
+                        'estados.0.id' => 'integer',
+                        'estados.0.estado' => 'string',
+                    ])
+                        ->where('sexo', fn (string $sexo) => Str::contains($sexo, ['M', 'H']))
+                        ->where('tipo', fn (string $tipo) => Str::contains($tipo, ['becerro', 'maute', 'novillo', 'adulto']))
+                        ->has(
+                            'pesos',
                             fn(AssertableJson $json)=>$json
                             ->whereAllType([
-                                'id'=>'integer',
+                                'id' => 'integer',
                                 'peso_nacimiento' => 'string',
                                 'peso_destete' => 'string',
                                 'peso_2year' => 'string',
-                                'peso_actual' => 'string',]))
-                            ->has('eventos',
+                                'peso_actual' => 'string',
+                                    ])
+                        )
+                        ->has(
+                            'eventos',
                             fn(AssertableJson $json)=>$json
                             ->whereAllType([
-                         'id'=>'integer',
+                            'id' => 'integer',
                                 'prox_revision' => 'string|null',
 
-                        'prox_parto' => 'string|null',
-                        'prox_secado' => 'string|null',]))
-                            )
+                            'prox_parto' => 'string|null',
+                            'prox_secado' => 'string|null',
+                                    ])
+                        )
+                )
             );
     }
 
     public function test_creacion_cabeza_ganado_fallecida(): void
     {
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->postJson('api/ganado', $this->cabeza_ganado_fallecida);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson('api/ganado', $this->cabeza_ganado_fallecida);
 
         $response->assertStatus(201)
             ->assertJson(
                 fn (AssertableJson $json) =>
                 $json->has(
-                        'ganado',
-                        fn (AssertableJson $json) =>
-                        $json
-                            ->where('estados.0.estado','fallecido')
-                            ->etc()
+                    'ganado',
+                    fn (AssertableJson $json) =>
+                    $json
+                        ->where('estados.0.estado', 'fallecido')
+                        ->etc()
                 )
             );
     }
 
     public function test_creacion_cabeza_ganado_vendido(): void
     {
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->postJson('api/ganado', $this->cabeza_ganado_vendida);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson('api/ganado', $this->cabeza_ganado_vendida);
 
         $response->assertStatus(201)
             ->assertJson(
                 fn (AssertableJson $json) =>
                 $json->has(
-                        'ganado',
-                        fn (AssertableJson $json) =>
-                        $json
-                            ->where('estados.0.estado','vendido')
-                            ->etc()
+                    'ganado',
+                    fn (AssertableJson $json) =>
+                    $json
+                        ->where('estados.0.estado', 'vendido')
+                        ->etc()
                 )
             );
     }
@@ -292,7 +297,7 @@ class GanadoTest extends TestCase
         $idRandom = rand(0, $this->cantidad_ganado - 1);
         $idGanado = $cabezasGanado[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf('api/ganado/%s', $idGanado), $this->cabeza_ganado);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf('api/ganado/%s', $idGanado), $this->cabeza_ganado);
 
         $response->assertStatus(200)
             ->assertJson(
@@ -300,42 +305,40 @@ class GanadoTest extends TestCase
                 $json->has(
                     'vacunaciones',
                     fn(AssertableJson $json) =>
-                    $json->has('vacunas.0',fn(AssertableJson $json)=>
+                    $json->has('vacunas.0', fn(AssertableJson $json)=>
                         $json->whereAllType([
                             'vacuna' => 'string',
                             'cantidad' => 'integer',
                             'ultima_dosis' => 'string',
                             'prox_dosis' => 'string',
                         ])
-                        ->where('cantidad',fn(int $cantidad)=>$cantidad <= 3)
-                    )
-                    ->has('historial.0',fn(AssertableJson $json)=>
+                        ->where('cantidad', fn(int $cantidad)=>$cantidad <= 3))
+                    ->has('historial.0', fn(AssertableJson $json)=>
                         $json->whereAllType([
                             'id' => 'integer',
                             'vacuna' => 'string',
                             'fecha' => 'string',
                             'prox_dosis' => 'string',
-                        ])
-                        )
+                        ]))
                 )->etc()
             );
     }
 
     public function test_actualizar_cabeza_ganado(): void
     {
-    $ganadoEditar=Ganado::factory()
-    ->hasPeso(1)
-    ->hasEvento(1)
-    ->hasAttached($this->estado)
-    ->hasVacunaciones(3,['finca_id'=>$this->finca->id])
-    ->for($this->finca)
-    ->create([
-    'nombre' => 'test',
-    'numero' => 392,
-    'origen' => 'local',
-    'sexo' => 'H',]);
+        $ganadoEditar = Ganado::factory()
+        ->hasPeso(1)
+        ->hasEvento(1)
+        ->hasAttached($this->estado)
+        ->hasVacunaciones(3, ['finca_id' => $this->finca->id])
+        ->for($this->finca)
+        ->create([
+        'nombre' => 'test',
+        'numero' => 392,
+        'origen' => 'local',
+        'sexo' => 'H',]);
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/ganado/%s', $ganadoEditar->id), $this->cabeza_ganado_actualizada);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/ganado/%s', $ganadoEditar->id), $this->cabeza_ganado_actualizada);
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) =>
@@ -365,7 +368,7 @@ class GanadoTest extends TestCase
         $idRandom = rand(0, $this->cantidad_ganado - 1);
         $idGanadoEditar = $cabezasGanado[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/ganado/%s', $idGanadoEditar), $this->cabeza_ganado);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/ganado/%s', $idGanadoEditar), $this->cabeza_ganado);
 
         $response->assertStatus(422)->assertJson(fn (AssertableJson $json) =>
         $json->hasAll(['errors.nombre', 'errors.numero'])
@@ -380,7 +383,7 @@ class GanadoTest extends TestCase
             ->for($this->finca)
             ->create(['nombre' => 'test', 'numero' => 392]);
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/ganado/%s', $ganado->id), $this->cabeza_ganado);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/ganado/%s', $ganado->id), $this->cabeza_ganado);
 
         $response->assertStatus(200)->assertJson(['ganado' => true]);
     }
@@ -392,7 +395,7 @@ class GanadoTest extends TestCase
         $idToDelete = $cabezasGanado[$idRandom]->id;
 
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->deleteJson(sprintf('api/ganado/%s', $idToDelete));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->deleteJson(sprintf('api/ganado/%s', $idToDelete));
 
         $response->assertStatus(200)->assertJson(['ganadoID' => $idToDelete]);
     }
@@ -404,28 +407,28 @@ class GanadoTest extends TestCase
     {
         Ganado::factory()->for($this->finca)->create(['nombre' => 'test', 'numero' => 300]);
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->postJson('api/ganado', $ganado);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson('api/ganado', $ganado);
 
         $response->dd()->assertStatus(422)->assertInvalid($errores);
     }
 
-     public function test_autorizacion_maniupular_cabeza_ganado_otra_finca(): void
+    public function test_autorizacion_maniupular_cabeza_ganado_otra_finca(): void
     {
         $otroFinca = Finca::factory()
         ->for($this->user)
         ->create(['nombre' => 'otro_finca']);
 
         $ganadoOtroUsuario = Ganado::factory()
-            ->hasPeso(1)->hasEvento(1)
-            ->hasAttached($this->estado)
-            ->for($otroFinca)
-            ->create();
+           ->hasPeso(1)->hasEvento(1)
+           ->hasAttached($this->estado)
+           ->for($otroFinca)
+           ->create();
 
         $idGanadoOtroUsuario = $ganadoOtroUsuario->id;
 
         $this->generarGanado();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/ganado/%s', $idGanadoOtroUsuario), $this->cabeza_ganado);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/ganado/%s', $idGanadoOtroUsuario), $this->cabeza_ganado);
 
         $response->assertStatus(403);
     }
@@ -435,7 +438,7 @@ class GanadoTest extends TestCase
     {
         $this->cambiarRol($this->user);
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->postJson('api/ganado', $this->cabeza_ganado);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson('api/ganado', $this->cabeza_ganado);
 
         $response->assertStatus(403);
     }
@@ -448,7 +451,7 @@ class GanadoTest extends TestCase
         $idRandom = rand(0, $this->cantidad_ganado - 1);
         $idGanadoEditar = $cabezasGanado[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/ganado/%s', $idGanadoEditar), $this->cabeza_ganado);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/ganado/%s', $idGanadoEditar), $this->cabeza_ganado);
 
         $response->assertStatus(403);
     }
@@ -463,10 +466,8 @@ class GanadoTest extends TestCase
         $idToDelete = $cabezasGanado[$idRandom]->id;
 
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->deleteJson(sprintf('api/ganado/%s', $idToDelete));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->deleteJson(sprintf('api/ganado/%s', $idToDelete));
 
         $response->assertStatus(403);
     }
-
-
 }

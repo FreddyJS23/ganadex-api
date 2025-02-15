@@ -38,7 +38,7 @@ class DemostracionSeeder extends Seeder
         $elementos = 30;
         $cantidadGanados = 10;
 
-        $user =User::factory()
+        $user = User::factory()
         ->create();
 
         $user->assignRole('admin');
@@ -51,11 +51,11 @@ class DemostracionSeeder extends Seeder
         ->create();
 
 
-        $crearUsuarioVeterinario=UsuarioVeterinario::factory()
+        $crearUsuarioVeterinario = UsuarioVeterinario::factory()
         ->for(Personal::factory()->for($finca)->create(['cargo_id' => 2]), 'veterinario')
         ->create(['admin_id' => $user->id]);
 
-        $userVeterinario=User::find($crearUsuarioVeterinario->user_id)->first();
+        $userVeterinario = User::find($crearUsuarioVeterinario->user_id)->first();
 
         $userVeterinario->assignRole('veterinario');
 
@@ -112,7 +112,6 @@ class DemostracionSeeder extends Seeder
                 ['tipo_id' => 2],
                 ['tipo_id' => 3],
                 ['tipo_id' => 4],
-
             )
             ->hasEvento(1)
             ->hasAttached($estadoSano)
@@ -135,7 +134,7 @@ class DemostracionSeeder extends Seeder
                     ->for($ganados[$i])
                     //alternar un servicio con monta y otro con inseminacion
                     ->for($i % 2 == 0 ? $toros[rand(0, $elementos - 1)] : $pajuelaToros[rand(0, $elementos - 1)], 'servicioable')
-                    ->create(['personal_id' => $veterinario,'tipo'=>$i % 2 == 0 ? 'monta' : 'inseminacion']);
+                    ->create(['personal_id' => $veterinario,'tipo' => $i % 2 == 0 ? 'monta' : 'inseminacion']);
 
                 Parto::factory()
                     ->for($ganados[$i])

@@ -19,7 +19,7 @@ class InsumoFactory extends Factory
         return [
             'insumo' => fake()->unique()->word(),
             'cantidad' => fake()->numberBetween(0, 100),
-            'precio' => fake()->randomFloat(2,0,7),
+            'precio' => fake()->randomFloat(2, 0, 7),
         ];
     }
 }

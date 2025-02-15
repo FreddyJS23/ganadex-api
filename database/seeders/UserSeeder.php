@@ -13,7 +13,7 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        $user=User::factory()->create();
+        $user = User::factory()->create();
 
         $user->assignRole('admin');
     }

@@ -51,7 +51,7 @@ class DashboardFallecimientosTest extends TestCase
                 ['causa' => 'accidente5'],
                 ['causa' => 'accidente6'],
                 ['causa' => 'accidente7'],
-                )
+            )
             ->create();
     }
 
@@ -64,7 +64,7 @@ class DashboardFallecimientosTest extends TestCase
     {
         $this->generarFallecimiento();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->getJson(route('dashboardFallecimientos.causasMuertesFrecuentes'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('dashboardFallecimientos.causasMuertesFrecuentes'));
         $response->assertStatus(200)
             ->assertJson(
                 fn (AssertableJson $json) =>  $json
@@ -77,13 +77,12 @@ class DashboardFallecimientosTest extends TestCase
                             'causas_frecuentes.0.causa' => 'string'
                         ]
                     )
-
             );
     }
     public function test_error_caso_que_no_haya_muertes_para_sacar_causas_de_muertes_mas_frecuentes(): void
     {
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->getJson(route('dashboardFallecimientos.causasMuertesFrecuentes'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('dashboardFallecimientos.causasMuertesFrecuentes'));
         $response->assertStatus(200);
     }
 }

@@ -17,10 +17,10 @@ class PesoFactory extends Factory
     public function definition(): array
     {
         return [
-            'peso_nacimiento'=>fake()->numberBetween(0,32600),
-            'peso_destete'=>fake()->numberBetween(0,32600),
-            'peso_2year'=>fake()->numberBetween(0,32600),
-            'peso_actual'=>fake()->numberBetween(0,32600),
+            'peso_nacimiento' => fake()->numberBetween(0, 32600),
+            'peso_destete' => fake()->numberBetween(0, 32600),
+            'peso_2year' => fake()->numberBetween(0, 32600),
+            'peso_actual' => fake()->numberBetween(0, 32600),
         ];
     }
 }

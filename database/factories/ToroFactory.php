@@ -18,7 +18,7 @@ class ToroFactory extends Factory
     public function definition(): array
     {
         return [
-            
+
         ];
     }
 }

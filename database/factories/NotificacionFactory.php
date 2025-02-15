@@ -19,7 +19,7 @@ class NotificacionFactory extends Factory
         return [
             'tipo_id' => fake()->randomElement([1,2,3]),
             'leido' => fake()->randomElement([true, false]),
-            'dias_para_evento'=>fake()->numberBetween(-6,7)
+            'dias_para_evento' => fake()->numberBetween(-6, 7)
         ];
     }
 }

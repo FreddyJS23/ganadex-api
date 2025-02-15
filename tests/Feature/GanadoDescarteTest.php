@@ -29,7 +29,7 @@ class GanadoDescarteTest extends TestCase
         'fecha_nacimiento' => '2015-02-17',
     ];
 
-    private array $ganadoDescarteActualizado= [
+    private array $ganadoDescarteActualizado = [
         'nombre' => 'actualizado',
         'origen' => 'externo',
         'fecha_nacimiento' => '2010-02-17',
@@ -61,9 +61,9 @@ class GanadoDescarteTest extends TestCase
             ->create();
 
             $comprador = Comprador::factory()->for($this->finca)->create()->id;
-            $this->descarte_fallecido= array_merge($this->ganadoDescarte,['estado_id'=>[2,3,4],'fecha_fallecimiento'=>'2020-10-02','causa'=>'enferma']);
-            $this->descarte_vendido =array_merge($this->ganadoDescarte,['estado_id'=>[5,6,7],'fecha_venta'=>'2020-10-02','precio'=>100,'comprador_id'=>$comprador]);
-            $this->ganadoDescarte=array_merge($this->ganadoDescarte,['estado_id'=>[1]]);
+            $this->descarte_fallecido = array_merge($this->ganadoDescarte, ['estado_id' => [2,3,4],'fecha_fallecimiento' => '2020-10-02','causa' => 'enferma']);
+            $this->descarte_vendido = array_merge($this->ganadoDescarte, ['estado_id' => [5,6,7],'fecha_venta' => '2020-10-02','precio' => 100,'comprador_id' => $comprador]);
+            $this->ganadoDescarte = array_merge($this->ganadoDescarte, ['estado_id' => [1]]);
     }
 
     private function generarGanadoDescartes(): Collection
@@ -119,7 +119,7 @@ class GanadoDescarteTest extends TestCase
     {
         $this->generarGanadoDescartes();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->getJson('api/ganado_descarte');
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson('api/ganado_descarte');
 
         $response->assertStatus(200)
             ->assertJson(
@@ -133,7 +133,7 @@ class GanadoDescarteTest extends TestCase
                             'numero' => 'integer',
                             'origen' => 'string',
                             'fecha_nacimiento' => 'string',
-                            'ganado_id'=> 'integer',
+                            'ganado_id' => 'integer',
                             'estados' => 'array',
                             'pesos' => 'array|null',
                         ])
@@ -147,7 +147,7 @@ class GanadoDescarteTest extends TestCase
     public function test_creacion_ganadoDescarte(): void
     {
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->postJson('api/ganado_descarte', $this->ganadoDescarte);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson('api/ganado_descarte', $this->ganadoDescarte);
 
         $response->assertStatus(201)
             ->assertJson(
@@ -161,7 +161,7 @@ class GanadoDescarteTest extends TestCase
                             'origen' => 'string',
                             'tipo' => 'string',
                             'fecha_nacimiento' => 'string',
-                            'ganado_id'=> 'integer',
+                            'ganado_id' => 'integer',
                             'estados' => 'array',
                             'pesos' => 'array|null',
                         ])
@@ -173,34 +173,34 @@ class GanadoDescarteTest extends TestCase
 
     public function test_creacion_descarte_fallecido(): void
     {
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->postJson('api/ganado_descarte', $this->descarte_fallecido);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson('api/ganado_descarte', $this->descarte_fallecido);
 
         $response->assertStatus(201)
             ->assertJson(
                 fn (AssertableJson $json) =>
                 $json->has(
-                        'ganado_descarte',
-                        fn (AssertableJson $json) =>
-                        $json
-                            ->where('estados.0.estado','fallecido')
-                            ->etc()
+                    'ganado_descarte',
+                    fn (AssertableJson $json) =>
+                    $json
+                        ->where('estados.0.estado', 'fallecido')
+                        ->etc()
                 )
             );
     }
 
     public function test_creacion_descarte_vendido(): void
     {
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->postJson('api/ganado_descarte', $this->descarte_vendido);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson('api/ganado_descarte', $this->descarte_vendido);
 
         $response->assertStatus(201)
             ->assertJson(
                 fn (AssertableJson $json) =>
                 $json->has(
-                        'ganado_descarte',
-                        fn (AssertableJson $json) =>
-                        $json
-                            ->where('estados.0.estado','vendido')
-                            ->etc()
+                    'ganado_descarte',
+                    fn (AssertableJson $json) =>
+                    $json
+                        ->where('estados.0.estado', 'vendido')
+                        ->etc()
                 )
             );
     }
@@ -209,13 +209,13 @@ class GanadoDescarteTest extends TestCase
 
     public function test_descartar_ganado(): void
     {
-        $ganado =Ganado::factory()
+        $ganado = Ganado::factory()
             ->hasPeso(1)
             ->hasEvento(1)
             ->for($this->finca)
             ->create();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->postJson('api/descartar_ganado', ['ganado_id' => $ganado->id]);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson('api/descartar_ganado', ['ganado_id' => $ganado->id]);
 
         $response->assertStatus(201)
             ->assertJson(
@@ -230,7 +230,7 @@ class GanadoDescarteTest extends TestCase
                             'origen' => 'string',
                             'tipo' => 'string',
                             'fecha_nacimiento' => 'string',
-                            'ganado_id'=> 'integer',
+                            'ganado_id' => 'integer',
                             'estados' => 'array',
                             'pesos' => 'array|null',
                         ])
@@ -247,7 +247,7 @@ class GanadoDescarteTest extends TestCase
         $idRes = $ress[$idRandom]->id;
 
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf('api/ganado_descarte/%s', $idRes));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf('api/ganado_descarte/%s', $idRes));
 
         $response->assertStatus(200)
             ->assertJson(
@@ -260,13 +260,12 @@ class GanadoDescarteTest extends TestCase
                             'numero' => 'integer',
                             'origen' => 'string',
                             'fecha_nacimiento' => 'string',
-                            'ganado_id'=> 'integer',
+                            'ganado_id' => 'integer',
                             'estados' => 'array',
                             'pesos' => 'array|null',
                         ])
                         ->where('sexo', 'M')
                     ->where('tipo', fn (string $tipoGanado) => Str::contains($tipoGanado, ['becerro', 'maute', 'novillo', 'adulto']))
-
                 )
             );
     }
@@ -284,7 +283,7 @@ class GanadoDescarteTest extends TestCase
         'fecha_nacimiento' => '2015-02-17']))
         ->create();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/ganado_descarte/%s', $ganadoDescarteActual->id), $this->ganadoDescarteActualizado);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/ganado_descarte/%s', $ganadoDescarteActual->id), $this->ganadoDescarteActualizado);
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) =>
@@ -314,7 +313,7 @@ class GanadoDescarteTest extends TestCase
         $idRandom = rand(0, $this->cantidad_ganadoDescarte - 1);
         $idResEditar = $ganadoDescarte[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/ganado_descarte/%s', $idResEditar), $this->ganadoDescarte);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/ganado_descarte/%s', $idResEditar), $this->ganadoDescarte);
 
         $response->assertStatus(422)->assertJson(fn (AssertableJson $json) =>
         $json->hasAll(['errors.nombre', 'errors.numero'])
@@ -328,7 +327,7 @@ class GanadoDescarteTest extends TestCase
             ->for(Ganado::factory()->hasPeso()->for($this->finca)->create(['nombre' => 'test', 'numero' => 392]))
             ->create();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/ganado_descarte/%s', $ganadoDescarte->id), $this->ganadoDescarte);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/ganado_descarte/%s', $ganadoDescarte->id), $this->ganadoDescarte);
 
         $response->assertStatus(200)->assertJson(['ganado_descarte' => true]);
     }
@@ -341,7 +340,7 @@ class GanadoDescarteTest extends TestCase
         $idToDelete = $ress[$idRandom]->id;
 
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->deleteJson(sprintf('api/ganado_descarte/%s', $idToDelete));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->deleteJson(sprintf('api/ganado_descarte/%s', $idToDelete));
 
         $response->assertStatus(200)->assertJson(['ganado_descarteID' => $idToDelete]);
     }
@@ -356,7 +355,7 @@ class GanadoDescarteTest extends TestCase
             ->for(Ganado::factory()->for($this->finca)->create(['nombre' => 'test', 'numero' => 300]))
             ->create();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->postJson('api/ganado_descarte', $ganadoDescarte);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson('api/ganado_descarte', $ganadoDescarte);
 
         $response->assertStatus(422)->assertInvalid($errores);
     }
@@ -376,7 +375,7 @@ class GanadoDescarteTest extends TestCase
 
         $this->generarGanadoDescartes();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/ganado_descarte/%s', $idResOtroFinca), $this->ganadoDescarte);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/ganado_descarte/%s', $idResOtroFinca), $this->ganadoDescarte);
 
         $response->assertStatus(403);
     }
@@ -386,7 +385,7 @@ class GanadoDescarteTest extends TestCase
     {
         $this->cambiarRol($this->user);
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->postJson('api/ganado_descarte', $this->ganadoDescarte);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson('api/ganado_descarte', $this->ganadoDescarte);
 
         $response->assertStatus(403);
     }
@@ -399,7 +398,7 @@ class GanadoDescarteTest extends TestCase
         $idRandom = rand(0, $this->cantidad_ganadoDescarte - 1);
         $idGanadoEditar = $cabezasGanadoDescarte[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/ganado_descarte/%s', $idGanadoEditar), $this->ganadoDescarte);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/ganado_descarte/%s', $idGanadoEditar), $this->ganadoDescarte);
 
         $response->assertStatus(403);
     }
@@ -414,7 +413,7 @@ class GanadoDescarteTest extends TestCase
         $idEliminar = $cabezasGanadoDescarte[$idRandom]->id;
 
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->deleteJson(sprintf('api/ganado_descarte/%s', $idEliminar));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->deleteJson(sprintf('api/ganado_descarte/%s', $idEliminar));
 
         $response->assertStatus(403);
     }

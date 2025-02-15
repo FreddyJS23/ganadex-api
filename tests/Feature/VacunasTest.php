@@ -173,5 +173,4 @@ class VacunasTest extends TestCase
 
         $response->assertStatus(422)->assertInvalid($errores);
     }
-
 }

@@ -44,10 +44,9 @@ class LoginTest extends TestCase
             UsuarioVeterinario::factory()
             ->for(Personal::factory()->for($this->finca)->create(['cargo_id' => 2]), 'veterinario')
             ->create(['admin_id' => $this->userAdmin->id,
-            'user_id'=>$this->userVeterinario->id]);
+            'user_id' => $this->userVeterinario->id]);
 
             $this->userVeterinario->assignRole('veterinario');
-
     }
 
     private function generarFincas(): Collection
@@ -61,15 +60,15 @@ class LoginTest extends TestCase
     /**
      * A basic feature test example.
      */
-     public function test_logear_usuario_admin_tiene_una_finca(): void
+    public function test_logear_usuario_admin_tiene_una_finca(): void
     {
         $response = $this->withHeader('origin', config('app.url'))->postJson('api/login', [
-            'usuario' => 'admin',
-            'password' => 'admin',
+           'usuario' => 'admin',
+           'password' => 'admin',
         ]);
 
         $response->assertStatus(200)->assertJson(fn (AssertableJson $json) =>
-        $json->has('login',fn(AssertableJson $json)=>
+        $json->has('login', fn(AssertableJson $json)=>
             $json->where('rol', 'admin')->whereAllType([
             'id' => 'integer',
             'usuario' => 'string',
@@ -77,18 +76,16 @@ class LoginTest extends TestCase
             'configuracion.peso_servicio' => 'integer',
             'configuracion.dias_evento_notificacion' => 'integer',
             'configuracion.dias_diferencia_vacuna' => 'integer',
-        ])->where('sesion_finca', true))
-
-        )->assertSessionHas('finca_id', $this->finca->id)
-        ->assertSessionHas('peso_servicio',$this->userAdmin->configuracion->peso_servicio)
-        ->assertSessionHas('dias_evento_notificacion',$this->userAdmin->configuracion->dias_evento_notificacion)
-        ->assertSessionHas('dias_diferencia_vacuna',$this->userAdmin->configuracion->dias_diferencia_vacuna);
+        ])->where('sesion_finca', true)))->assertSessionHas('finca_id', $this->finca->id)
+        ->assertSessionHas('peso_servicio', $this->userAdmin->configuracion->peso_servicio)
+        ->assertSessionHas('dias_evento_notificacion', $this->userAdmin->configuracion->dias_evento_notificacion)
+        ->assertSessionHas('dias_diferencia_vacuna', $this->userAdmin->configuracion->dias_diferencia_vacuna);
     }
 
 
     public function test_logear_usuario_admin_tiene_varias_fincas(): void
     {
-      $this->generarFincas();
+        $this->generarFincas();
 
         $response = $this->withHeader('origin', config('app.url'))->postJson('api/login', [
             'usuario' => 'admin',
@@ -96,7 +93,7 @@ class LoginTest extends TestCase
         ]);
 
         $response->assertStatus(200)->assertJson(fn (AssertableJson $json) =>
-        $json->has('login',fn(AssertableJson $json)=>
+        $json->has('login', fn(AssertableJson $json)=>
             $json->where('rol', 'admin')->whereAllType([
             'id' => 'integer',
             'usuario' => 'string',
@@ -104,11 +101,10 @@ class LoginTest extends TestCase
             'configuracion.peso_servicio' => 'integer',
             'configuracion.dias_evento_notificacion' => 'integer',
             'configuracion.dias_diferencia_vacuna' => 'integer',
-        ])->where('sesion_finca', false))
-    )->assertSessionMissing('finca_id', null)
-    ->assertSessionHas('peso_servicio',$this->userAdmin->configuracion->peso_servicio)
-    ->assertSessionHas('dias_evento_notificacion',$this->userAdmin->configuracion->dias_evento_notificacion)
-    ->assertSessionHas('dias_diferencia_vacuna',$this->userAdmin->configuracion->dias_diferencia_vacuna);
+        ])->where('sesion_finca', false)))->assertSessionMissing('finca_id', null)
+        ->assertSessionHas('peso_servicio', $this->userAdmin->configuracion->peso_servicio)
+        ->assertSessionHas('dias_evento_notificacion', $this->userAdmin->configuracion->dias_evento_notificacion)
+        ->assertSessionHas('dias_diferencia_vacuna', $this->userAdmin->configuracion->dias_diferencia_vacuna);
     }
 
 
@@ -121,7 +117,7 @@ class LoginTest extends TestCase
         ]);
 
         $response->assertStatus(200)->assertJson(fn (AssertableJson $json) =>
-        $json->has('login',fn(AssertableJson $json)=>
+        $json->has('login', fn(AssertableJson $json)=>
             $json->where('rol', 'veterinario')->whereAllType([
             'id' => 'integer',
             'usuario' => 'string',
@@ -130,11 +126,10 @@ class LoginTest extends TestCase
             'configuracion.dias_evento_notificacion' => 'integer',
             'configuracion.dias_diferencia_vacuna' => 'integer',
         ])->where('sesion_finca', true))
-            ->where('login.sesion_finca', true)
-    )->assertSessionHas('finca_id', $this->finca->id)
-    ->assertSessionHas('peso_servicio',$this->userAdmin->configuracion->peso_servicio)
-    ->assertSessionHas('dias_evento_notificacion',$this->userAdmin->configuracion->dias_evento_notificacion)
-    ->assertSessionHas('dias_diferencia_vacuna',$this->userAdmin->configuracion->dias_diferencia_vacuna);
+            ->where('login.sesion_finca', true))->assertSessionHas('finca_id', $this->finca->id)
+        ->assertSessionHas('peso_servicio', $this->userAdmin->configuracion->peso_servicio)
+        ->assertSessionHas('dias_evento_notificacion', $this->userAdmin->configuracion->dias_evento_notificacion)
+        ->assertSessionHas('dias_diferencia_vacuna', $this->userAdmin->configuracion->dias_diferencia_vacuna);
     }
 
     public function test_logear_usuario_veterinario_con_admin_tiene_una_finca(): void
@@ -145,7 +140,7 @@ class LoginTest extends TestCase
         ]);
 
         $response->assertStatus(200)->assertJson(fn (AssertableJson $json) =>
-        $json->has('login',fn(AssertableJson $json)=>
+        $json->has('login', fn(AssertableJson $json)=>
         $json->where('rol', 'veterinario')->whereAllType([
         'id' => 'integer',
         'usuario' => 'string',
@@ -153,10 +148,9 @@ class LoginTest extends TestCase
         'configuracion.peso_servicio' => 'integer',
         'configuracion.dias_evento_notificacion' => 'integer',
         'configuracion.dias_diferencia_vacuna' => 'integer',
-    ])->where('sesion_finca', true))
-    )->assertSessionHas('finca_id', $this->finca->id)
-    ->assertSessionHas('peso_servicio',$this->userAdmin->configuracion->peso_servicio)
-    ->assertSessionHas('dias_evento_notificacion',$this->userAdmin->configuracion->dias_evento_notificacion)
-    ->assertSessionHas('dias_diferencia_vacuna',$this->userAdmin->configuracion->dias_diferencia_vacuna);
+    ])->where('sesion_finca', true)))->assertSessionHas('finca_id', $this->finca->id)
+        ->assertSessionHas('peso_servicio', $this->userAdmin->configuracion->peso_servicio)
+        ->assertSessionHas('dias_evento_notificacion', $this->userAdmin->configuracion->dias_evento_notificacion)
+        ->assertSessionHas('dias_diferencia_vacuna', $this->userAdmin->configuracion->dias_diferencia_vacuna);
     }
 }

@@ -37,6 +37,5 @@ class RoleSeeder extends Seeder
         $roleAdmin->givePermissionTo($permissionAdmin);
 
         $roleVeterinario->givePermissionTo($permissionVeterinario);
-
     }
 }

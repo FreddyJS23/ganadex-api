@@ -14,11 +14,11 @@ return new class extends Migration
         Schema::create('ganados', function (Blueprint $table) {
             $table->id();
             $table->string('nombre')->unique();
-            $table->smallInteger('numero')->unique()->nullable($value=true);
-            $table->enum('sexo',['H','M']);
-            $table->string('origen')->nullable($value=true);
-            $table->date('fecha_nacimiento')->nullable($value=true);
-            $table->foreignId('tipo_id')->constrained(table:'ganado_tipos',indexName:'ganado_tipo_id');
+            $table->smallInteger('numero')->unique()->nullable($value = true);
+            $table->enum('sexo', ['H','M']);
+            $table->string('origen')->nullable($value = true);
+            $table->date('fecha_nacimiento')->nullable($value = true);
+            $table->foreignId('tipo_id')->constrained(table:'ganado_tipos', indexName:'ganado_tipo_id');
             $table->foreignId('finca_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });

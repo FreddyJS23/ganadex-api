@@ -51,7 +51,6 @@ class JornadaVacunacionTest extends TestCase
                 ['tipo_id' => 4],
             )
             ->create();
-
     }
 
     private function generarJornadaVacunacion(): Collection
@@ -85,7 +84,7 @@ class JornadaVacunacionTest extends TestCase
     {
         $this->generarJornadaVacunacion();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->getJson(route('jornada_vacunacion.index'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('jornada_vacunacion.index'));
 
         $response->assertStatus(200)->assertJson(
             fn(AssertableJson $json) =>
@@ -100,7 +99,7 @@ class JornadaVacunacionTest extends TestCase
                         'fecha_fin' => 'string',
                         'vacuna' => 'string',
                         'vacunados' => 'integer',
-                        'ganado_vacunado'=>'array',
+                        'ganado_vacunado' => 'array',
                     ])
                 )
         );
@@ -110,7 +109,7 @@ class JornadaVacunacionTest extends TestCase
     public function test_creacion_jornada_vacunacion(): void
     {
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->postJson(route('jornada_vacunacion.store'), $this->jornadaVacunacion);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(route('jornada_vacunacion.store'), $this->jornadaVacunacion);
 
         $response->assertStatus(201)->assertJson(
             fn(AssertableJson $json) => $json->whereAllType([
@@ -119,7 +118,7 @@ class JornadaVacunacionTest extends TestCase
                 'jornada_vacunacion.fecha_fin' => 'string',
                 'jornada_vacunacion.vacuna' => 'string',
                 'jornada_vacunacion.vacunados' => 'integer',
-                'jornada_vacunacion.ganado_vacunado'=>'array',
+                'jornada_vacunacion.ganado_vacunado' => 'array',
             ])
         );
     }
@@ -130,7 +129,7 @@ class JornadaVacunacionTest extends TestCase
         $idRandom = rand(0, $this->cantidad_jornadasVacunacion - 1);
         $idJornadaVacunacion = $jornadasVacunacion[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->getJson(route('jornada_vacunacion.show', $idJornadaVacunacion));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('jornada_vacunacion.show', $idJornadaVacunacion));
 
         $response->assertStatus(200)->assertJson(
             fn(AssertableJson $json) => $json->whereAllType([
@@ -139,7 +138,7 @@ class JornadaVacunacionTest extends TestCase
                 'jornada_vacunacion.fecha_fin' => 'string',
                 'jornada_vacunacion.vacuna' => 'string',
                 'jornada_vacunacion.vacunados' => 'integer',
-                'jornada_vacunacion.ganado_vacunado'=>'array',
+                'jornada_vacunacion.ganado_vacunado' => 'array',
             ])
         );
     }
@@ -150,7 +149,7 @@ class JornadaVacunacionTest extends TestCase
         $idRandom = rand(0, $this->cantidad_jornadasVacunacion - 1);
         $idjornadaVacunacionEditar = $jornadaVacunacion[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->putJson(route('jornada_vacunacion.update', $idjornadaVacunacionEditar), $this->jornadaVacunacion);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(route('jornada_vacunacion.update', $idjornadaVacunacionEditar), $this->jornadaVacunacion);
 
         $response->assertStatus(200)->assertJson(
             fn(AssertableJson $json) =>
@@ -163,7 +162,7 @@ class JornadaVacunacionTest extends TestCase
                     'jornada_vacunacion.fecha_fin' => 'string',
                     'jornada_vacunacion.vacuna' => 'string',
                     'jornada_vacunacion.vacunados' => 'integer',
-                    'jornada_vacunacion.ganado_vacunado'=>'array',
+                    'jornada_vacunacion.ganado_vacunado' => 'array',
                 ])
                 ->etc()
         );
@@ -176,7 +175,7 @@ class JornadaVacunacionTest extends TestCase
         $idRandom = rand(0, $this->cantidad_jornadasVacunacion - 1);
         $idToDelete = $jornadasVacunacion[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->deleteJson(route('jornada_vacunacion.destroy', ['jornada_vacunacion'  => $idToDelete]));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->deleteJson(route('jornada_vacunacion.destroy', ['jornada_vacunacion'  => $idToDelete]));
 
         $response->assertStatus(200)->assertJson(['jornada_vacunacionID' => $idToDelete]);
     }
@@ -186,7 +185,7 @@ class JornadaVacunacionTest extends TestCase
      */
     public function test_error_validacion_registro_jornadas_vacunacion($jornadaVacunacion, $errores): void
     {
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->postJson(route('jornada_vacunacion.store'), $jornadaVacunacion);
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(route('jornada_vacunacion.store'), $jornadaVacunacion);
 
         $response->assertStatus(422)->assertInvalid($errores);
     }

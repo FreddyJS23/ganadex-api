@@ -18,7 +18,7 @@ class VacunaFactory extends Factory
     {
         return [
             'nombre' => fake()->word(),
-            'tipo_animal' =>['rebano','becerro','maute','novillo','adulto'],
+            'tipo_animal' => ['rebano','becerro','maute','novillo','adulto'],
             'intervalo_dosis' => fake()->numberBetween(1, 100),
         ];
     }

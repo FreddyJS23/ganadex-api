@@ -35,7 +35,6 @@ class AsignarNumeroCriaTest extends TestCase
             = Finca::factory()
             ->for($this->user)
             ->create();
-
     }
 
     private function generarGanado(): Collection
@@ -58,7 +57,7 @@ class AsignarNumeroCriaTest extends TestCase
     {
         $this->generarGanado();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->getJson(route('numeracion.index'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('numeracion.index'));
         $response->assertStatus(200)
             ->assertJson(fn (AssertableJson $json) => $json->has('crias_pendiente_numeracion', $this->cantidad_ganado));
     }
@@ -70,9 +69,9 @@ class AsignarNumeroCriaTest extends TestCase
         $idCria = $criasGanado[$idRandom]->id;
 
         //asignar numero
-        $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->postJson(route('numeracion.store', ['ganado' => $idCria]), ['numero' => rand(1, 999)]);
+        $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(route('numeracion.store', ['ganado' => $idCria]), ['numero' => rand(1, 999)]);
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->user->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf('api/ganado/%s', $idCria));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf('api/ganado/%s', $idCria));
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json) =>

@@ -22,7 +22,7 @@ class PersonalFactory extends Factory
             'apellido' => fake()->lastName(),
             'fecha_nacimiento' => fake()->date(),
             'telefono' => fake()->numerify('0275-#######'),
-            'cargo_id'=>fake()->randomElement([1,2])
+            'cargo_id' => fake()->randomElement([1,2])
             /* 'sueldo' => fake()->numberBetween($int=1,$max=100), */
         ];
     }

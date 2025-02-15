@@ -9,6 +9,4 @@ abstract class TestCase extends BaseTestCase
     use CreatesApplication;
 
     protected $seed = true;
-    
-   
 }

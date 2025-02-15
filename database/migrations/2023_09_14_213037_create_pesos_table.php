@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('pesos', function (Blueprint $table) {
             $table->id();
-            $table->smallInteger('peso_nacimiento')->nullable($value=true);
-            $table->smallInteger('peso_destete')->nullable($value=true);
-            $table->smallInteger('peso_2year')->nullable($value=true);
-            $table->smallInteger('peso_actual')->nullable($value=true);
+            $table->smallInteger('peso_nacimiento')->nullable($value = true);
+            $table->smallInteger('peso_destete')->nullable($value = true);
+            $table->smallInteger('peso_2year')->nullable($value = true);
+            $table->smallInteger('peso_actual')->nullable($value = true);
             $table->foreignId('ganado_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });

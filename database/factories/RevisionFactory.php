@@ -19,7 +19,7 @@ class RevisionFactory extends Factory
         return [
             'diagnostico' => fake()->word(),
             'tratamiento' =>  fake()->word(),
-            'fecha'=>fake()->date()
+            'fecha' => fake()->date()
         ];
     }
 }

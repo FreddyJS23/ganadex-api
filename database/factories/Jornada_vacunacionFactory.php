@@ -24,7 +24,7 @@ class Jornada_vacunacionFactory extends Factory
             'prox_dosis' => fake()->dateTimeThisYear()->format('y-m-d'),
             'vacuna_id' => $vacuna->id,
             'vacunados' => rand(1, 100),
-            'ganado_vacunado' =>$vacuna->tipo_animal,
+            'ganado_vacunado' => $vacuna->tipo_animal,
         ];
     }
 }

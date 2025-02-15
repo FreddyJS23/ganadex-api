@@ -52,7 +52,7 @@ class VacunaSeeder extends Seeder
 
         DB::table("vacunas")->insert([
             "nombre" => "RB51",
-            "tipo_animal" =>json_encode(["becerras"]),
+            "tipo_animal" => json_encode(["becerras"]),
             "intervalo_dosis" => 150,
         ]);
 
