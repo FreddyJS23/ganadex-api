@@ -1,5 +1,5 @@
 <table class="tabla_ventas_leche">
-    <thead >
+    <thead>
         <tr>
             <th>
                 <p>Fecha</p>
@@ -24,11 +24,11 @@
             @php
                 $gananciaTotal += $venta_leche['ganancia_total'];
             @endphp
-            <tr >
-                <td >
+            <tr>
+                <td>
                     <p>{{ $venta_leche['fecha'] }} </p>
                 </td>
-                <td >
+                <td>
                     <p>{{ $venta_leche['cantidad'] }}kg </p>
                 </td>
                 <td>
@@ -44,9 +44,9 @@
                 </td>
             </tr>
         @endforelse
-        <tr >
-            <td colspan="3" ><b>Ganancia acumulada</b></td>
-            <td > {{$gananciaTotal}}$ </td>
+        <tr>
+            <td colspan="3"><b>Ganancia acumulada</b></td>
+            <td> {{ $gananciaTotal }}$ </td>
         </tr>
     </tbody>
 </table>

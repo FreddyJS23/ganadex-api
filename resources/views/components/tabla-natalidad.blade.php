@@ -19,11 +19,10 @@
 
     <tbody>
         @forelse ($nacimientosPorMeses as $mes => $nacimiento)
-
-        <tr class="fila_celdas">
+            <tr class="fila_celdas">
                 <td class="celda_tabla">
                     <p>{{ $nacimiento['mes'] }} </p>
-                </td >
+                </td>
 
                 <td class="celda_tabla">
                     <p>{{ $nacimiento['machos'] }} </p>

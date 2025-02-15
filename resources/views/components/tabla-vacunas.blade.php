@@ -1,6 +1,6 @@
 <h3 style="width:30rem;margin:auto;margin-top:2rem;margin-bottom:1rem">Resumen de vacunas aplicadas</h3>
 <table class="tabla_ventas_leche">
-    <thead >
+    <thead>
         <tr>
             <th>
                 <p>Vacuna</p>
@@ -19,12 +19,11 @@
 
     <tbody>
         @forelse ($vacunas as $vacuna)
-
-            <tr >
-                <td >
+            <tr>
+                <td>
                     <p>{{ $vacuna['vacuna'] }} </p>
                 </td>
-                <td >
+                <td>
                     <p>{{ $vacuna['cantidad'] }} </p>
                 </td>
                 <td>

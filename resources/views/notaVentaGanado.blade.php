@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Nota de venta</title>
     <style>
-         * {
+        * {
             margin: 0;
             padding: 0;
             font-family: sans-serif;
@@ -22,11 +22,12 @@
             padding-right: 0rem;
             margin-bottom: 10px;
         }
+
         .header_nota_venta div {
             text-align: center;
             position: relative;
             right: 20px;
-            margin:1rem 0;
+            margin: 1rem 0;
         }
 
         .tabla_nota_venta {
@@ -47,21 +48,22 @@
             padding-top: 5px;
         }
 
-        .titulo_lista_vacunas{
+        .titulo_lista_vacunas {
             margin-top: 20px;
             margin-bottom: 10px;
-            margin:auto;
-            width:300px
+            margin: auto;
+            width: 300px
         }
 
-        .contenedor_lista_vacunas{
+        .contenedor_lista_vacunas {
             width: 300px;
-            margin:auto;
+            margin: auto;
             margin-top: 5px
         }
-        .elemento_lista_vacunas{
-            display:block;
-            margin-bottom:2px;
+
+        .elemento_lista_vacunas {
+            display: block;
+            margin-bottom: 2px;
             font-weight: bold
         }
 
@@ -72,6 +74,7 @@
             border-top: 1px solid black;
             width: 270px;
         }
+
         .footer_nota_venta p {
             position: relative;
             right: 10px;
@@ -81,9 +84,9 @@
 
 <body>
     <div class="header_nota_venta">
-    <div>
+        <div>
             <img src="{{ public_path('logo-light-fuente.png') }}" alt="logo" width="80" />
-    </div>
+        </div>
         <h2>Nota de venta</h2>
     </div>
     <table class="tabla_nota_venta">
@@ -97,25 +100,25 @@
                 <td class="header_vertical">Numero del animal</td>
                 <td></td>
                 <td></td>
-                <td>{{$numero}}</td>
+                <td>{{ $numero }}</td>
             </tr>
             <tr>
                 <td class="header_vertical">Tipo</td>
                 <td></td>
                 <td></td>
-                <td>{{$tipo}}</td>
+                <td>{{ $tipo }}</td>
             </tr>
             <tr>
                 <td class="header_vertical">Peso</td>
                 <td></td>
                 <td></td>
-                <td>{{$peso}}</td>
+                <td>{{ $peso }}</td>
             </tr>
             <tr>
                 <td class="header_vertical">Comprador</td>
                 <td></td>
                 <td></td>
-                <td>{{$comprador}}</td>
+                <td>{{ $comprador }}</td>
             </tr>
             {{-- <tr>
                 <td class="header_vertical">Precio</td>
@@ -137,23 +140,24 @@
     </div>
 
     @forelse ($vacunas as $vacuna )
-    @php
-        $nombreVacuna = ucfirst(array_keys($vacunas)[$loop->index]);
-    @endphp
+        @php
+            $nombreVacuna = ucfirst(array_keys($vacunas)[$loop->index]);
+        @endphp
 
-    <div class="contenedor_lista_vacunas">
-        <span class="elemento_lista_vacunas">
-            {{$nombreVacuna}}
-        </span>
-        <span>
-            @foreach ($vacuna as $fecha )
-            @if($loop->last)
-                &bull; {{$fecha}}.
-                @else  &bull; {{$fecha}},
-                @endif
-            @endforeach
-        </span>
-    </div>
+        <div class="contenedor_lista_vacunas">
+            <span class="elemento_lista_vacunas">
+                {{ $nombreVacuna }}
+            </span>
+            <span>
+                @foreach ($vacuna as $fecha)
+                    @if ($loop->last)
+                        &bull; {{ $fecha }}.
+                    @else
+                        &bull; {{ $fecha }},
+                    @endif
+                @endforeach
+            </span>
+        </div>
     @empty
 
     @endforelse

@@ -124,15 +124,16 @@
         .tabla_ventas_leche td,
         .tabla_ventas_ganado th,
         .tabla_ventas_ganado td,
-        .tabla_natalidad th ,
+        .tabla_natalidad th,
         .tabla_natalidad td {
             height: 20px;
             font-size: 12px;
             border: 1px solid #B9B9B9;
             text-align: center;
         }
+
         .tabla_ventas_ganado th,
-        .tabla_ventas_ganado td{
+        .tabla_ventas_ganado td {
             height: 35px;
 
         }
@@ -164,17 +165,18 @@
         }
 
         /* estilos graficos */
-        .contenedor_dos_graficos{
+        .contenedor_dos_graficos {
             margin: auto;
             width: 860px;
-            margin-top:2rem;
+            margin-top: 2rem;
             margin-bottom: 1rem;
         }
+
         .contenedor_dos_graficos :nth-child(1) {
             margin-right: 10px;
         }
 
-        .container_grafico_torta{
+        .container_grafico_torta {
             width: 300px;
             margin: auto;
         }
@@ -183,6 +185,7 @@
         .container_grafico_barra {
             margin: auto;
         }
+
         .container_grafico_lineal,
         .container_grafico_barra {
 

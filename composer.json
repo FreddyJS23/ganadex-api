@@ -59,7 +59,10 @@
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi"
         ],
-        "format": "phpcbf",
+        "format": [
+            "phpcbf",
+            "npm run format:blade"
+        ],
         "lint": "phpcs",
         "test": "phpunit",
         "migrate:code": "rector"

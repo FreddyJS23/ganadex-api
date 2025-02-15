@@ -14,10 +14,10 @@
                 @forelse ($topVacasProductoras as $vacaProductora)
                     @php
 
-                        $titulo ='Vaca ' . $vacaProductora['numero'];
+                        $titulo = 'Vaca ' . $vacaProductora['numero'];
                         $titulo = str_replace('_', ' ', $titulo);
 
-                        $detalle =$vacaProductora['peso_leche'] . 'kg';
+                        $detalle = $vacaProductora['peso_leche'] . 'kg';
                     @endphp
 
                     <td class="celda_tabla">
@@ -44,10 +44,10 @@
             <tr class="fila_celdas">
                 @forelse ($topVacasMenosProductoras as $vacaMenosProductora)
                     @php
-                         $titulo ='Vaca ' . $vacaProductora['numero'];
+                        $titulo = 'Vaca ' . $vacaProductora['numero'];
                         $titulo = str_replace('_', ' ', $titulo);
 
-                        $detalle =$vacaProductora['peso_leche'] . 'kg';
+                        $detalle = $vacaProductora['peso_leche'] . 'kg';
 
                     @endphp
 
