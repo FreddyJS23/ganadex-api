@@ -26,7 +26,7 @@ class UpdateGanadoRequest extends FormRequest
          *
          * @return string
          */
-        $parametroPath = preg_replace("/[^0-9]/", "", request()->path());
+        $parametroPath = preg_replace("/[^0-9]/", "", (string) request()->path());
 
         return [
             'nombre' => ['min:3','max:255', Rule::unique('ganados')->ignore(intval($parametroPath))],
@@ -40,9 +40,7 @@ class UpdateGanadoRequest extends FormRequest
             'peso_actual' => 'numeric|between:1,32767',
 
             'estado_id' => ['exclude', Rule::foreach(
-                function ($value, $attrubute) {
-                    return Rule::exists('estados', 'id');
-                }
+                fn($value, $attrubute) => Rule::exists('estados', 'id')
             ),]
 
         ];

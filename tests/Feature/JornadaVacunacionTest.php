@@ -126,7 +126,7 @@ class JornadaVacunacionTest extends TestCase
     public function test_obtener_jornada_vacunacion(): void
     {
         $jornadasVacunacion = $this->generarJornadaVacunacion();
-        $idRandom = rand(0, $this->cantidad_jornadasVacunacion - 1);
+        $idRandom = random_int(0, $this->cantidad_jornadasVacunacion - 1);
         $idJornadaVacunacion = $jornadasVacunacion[$idRandom]->id;
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('jornada_vacunacion.show', $idJornadaVacunacion));
@@ -146,7 +146,7 @@ class JornadaVacunacionTest extends TestCase
     public function test_actualizar_jornada_vacunacion(): void
     {
         $jornadaVacunacion = $this->generarJornadaVacunacion();
-        $idRandom = rand(0, $this->cantidad_jornadasVacunacion - 1);
+        $idRandom = random_int(0, $this->cantidad_jornadasVacunacion - 1);
         $idjornadaVacunacionEditar = $jornadaVacunacion[$idRandom]->id;
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(route('jornada_vacunacion.update', $idjornadaVacunacionEditar), $this->jornadaVacunacion);
@@ -172,7 +172,7 @@ class JornadaVacunacionTest extends TestCase
     public function test_eliminar_jornada_vacunacion(): void
     {
         $jornadasVacunacion = $this->generarJornadaVacunacion();
-        $idRandom = rand(0, $this->cantidad_jornadasVacunacion - 1);
+        $idRandom = random_int(0, $this->cantidad_jornadasVacunacion - 1);
         $idToDelete = $jornadasVacunacion[$idRandom]->id;
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->deleteJson(route('jornada_vacunacion.destroy', ['jornada_vacunacion'  => $idToDelete]));

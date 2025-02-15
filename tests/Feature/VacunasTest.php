@@ -109,7 +109,7 @@ class VacunasTest extends TestCase
     public function test_obtener_vacuna(): void
     {
         $vacunas = $this->generarVacunas();
-        $idRandom = rand(0, $this->cantidad_vacunas - 1);
+        $idRandom = random_int(0, $this->cantidad_vacunas - 1);
         $idVacuna = $vacunas[$idRandom]->id;
 
         $response = $this->actingAs($this->user)->getJson(sprintf('api/vacunas/%s', $idVacuna));
@@ -132,7 +132,7 @@ class VacunasTest extends TestCase
     public function test_actualizar_vacuna(): void
     {
         $vacunas = $this->generarVacunas();
-        $idRandom = rand(0, $this->cantidad_vacunas - 1);
+        $idRandom = random_int(0, $this->cantidad_vacunas - 1);
         $idVacunaEditar = $vacunas[$idRandom]->id;
 
         $response = $this->actingAs($this->user)->putJson(sprintf('api/vacunas/%s', $idVacunaEditar), $this->vacuna);
@@ -154,7 +154,7 @@ class VacunasTest extends TestCase
     public function test_eliminar_vacuna(): void
     {
         $vacunas = $this->generarVacunas();
-        $idRandom = rand(0, $this->cantidad_vacunas - 1);
+        $idRandom = random_int(0, $this->cantidad_vacunas - 1);
         $idToDelete = $vacunas[$idRandom]->id;
 
 

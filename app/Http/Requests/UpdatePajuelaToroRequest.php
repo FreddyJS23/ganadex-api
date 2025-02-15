@@ -27,7 +27,7 @@ class UpdatePajuelaToroRequest extends FormRequest
          *
          * @return string
          */
-        $parametroPath = preg_replace("/[^0-9]/", "", request()->path());
+        $parametroPath = preg_replace("/[^0-9]/", "", (string) request()->path());
 
         return [
             'codigo' => ['required','string','max:255', Rule::unique('pajuela_toros')->ignore(intval($parametroPath))],

@@ -114,7 +114,7 @@ class FincaTest extends TestCase
     public function test_actualizar_finca(): void
     {
         $finca = $this->generarFincas();
-        $idRandom = rand(0, $this->cantidad_fincas - 1);
+        $idRandom = random_int(0, $this->cantidad_fincas - 1);
         $idFincaEditar = $finca[$idRandom]->id;
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $idFincaEditar])->putJson(route('finca.update', ['finca' => $idFincaEditar]), $this->finca);
@@ -136,7 +136,7 @@ class FincaTest extends TestCase
         $fincaExistente = finca::factory()->for($this->user)->create();
 
         $finca = $this->generarFincas();
-        $idRandom = rand(0, $this->cantidad_fincas - 1);
+        $idRandom = random_int(0, $this->cantidad_fincas - 1);
         $idfincaEditar = $finca[$idRandom]->id;
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $idfincaEditar])->putJson(route('finca.update', ['finca' => $finca[$idRandom]]), ['nombre' => 'finca_sesion']);

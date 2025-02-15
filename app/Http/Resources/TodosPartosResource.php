@@ -27,13 +27,13 @@ class TodosPartosResource extends JsonResource
             ])
         ];
 
-        if ($existeParto && $this->partoReciente->partoable_type == 'App\Models\Toro') {
+        if ($existeParto && $this->partoReciente->partoable_type == \App\Models\Toro::class) {
             $resource['toro'] = (object)
             [
             'id' => $this->partoReciente->partoable->id,
             'numero' => $this->partoReciente->partoable->ganado->numero
             ];
-        } elseif ($existeParto && $this->partoReciente->partoable_type == 'App\Models\PajuelaToro') {
+        } elseif ($existeParto && $this->partoReciente->partoable_type == \App\Models\PajuelaToro::class) {
             $resource['pajuela_toro'] = (object)
             [
             'id' => $this->partoReciente->partoable->id,

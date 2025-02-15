@@ -101,7 +101,7 @@ class LoginTest extends TestCase
             'configuracion.peso_servicio' => 'integer',
             'configuracion.dias_evento_notificacion' => 'integer',
             'configuracion.dias_diferencia_vacuna' => 'integer',
-        ])->where('sesion_finca', false)))->assertSessionMissing('finca_id', null)
+        ])->where('sesion_finca', false)))->assertSessionMissing('finca_id')
         ->assertSessionHas('peso_servicio', $this->userAdmin->configuracion->peso_servicio)
         ->assertSessionHas('dias_evento_notificacion', $this->userAdmin->configuracion->dias_evento_notificacion)
         ->assertSessionHas('dias_diferencia_vacuna', $this->userAdmin->configuracion->dias_diferencia_vacuna);

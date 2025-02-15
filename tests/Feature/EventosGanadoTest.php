@@ -414,9 +414,7 @@ class EventosGanadoTest extends TestCase
             ->hasEvento(1)
             ->has(
                 Leche::factory()->for($this->finca)->state(
-                    function (array $attributes, Ganado $ganado) use ($fecha) {
-                        return ['ganado_id' => $ganado->id, 'fecha' => $fecha->format('Y-m-d')];
-                    }
+                    fn(array $attributes, Ganado $ganado) => ['ganado_id' => $ganado->id, 'fecha' => $fecha->format('Y-m-d')]
                 ),
                 'pesajes_leche'
             )
@@ -429,9 +427,7 @@ class EventosGanadoTest extends TestCase
             ->hasEvento(1)
             ->has(
                 Leche::factory()->for($this->finca)->state(
-                    function (array $attributes, Ganado $ganado) {
-                        return ['ganado_id' => $ganado->id, 'fecha' => now()->format('Y-m-d')];
-                    }
+                    fn(array $attributes, Ganado $ganado) => ['ganado_id' => $ganado->id, 'fecha' => now()->format('Y-m-d')]
                 ),
                 'pesajes_leche'
             )

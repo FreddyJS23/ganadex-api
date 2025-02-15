@@ -99,7 +99,7 @@ class GanadoController extends Controller
                     }
                 );
                 return response()->json(['ganado' => new GanadoResource($ganado)], 201);
-        } catch (\Throwable $error) {
+        } catch (\Throwable) {
             return response()->json(['error' => 'error al insertar datos'], 501);
         }
     }

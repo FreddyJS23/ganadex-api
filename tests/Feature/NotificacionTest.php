@@ -86,7 +86,7 @@ class NotificacionTest extends TestCase
     public function test_eliminar_notificacion(): void
     {
         $notificacions = $this->generarNotificaciones();
-        $idRandom = rand(0, $this->cantidad_notificaciones - 1);
+        $idRandom = random_int(0, $this->cantidad_notificaciones - 1);
         $idToDelete = $notificacions[$idRandom]->id;
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->deleteJson(route('notificaciones.destroy', ['notificacion' => $idToDelete]));

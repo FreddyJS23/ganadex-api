@@ -121,7 +121,7 @@ class PajuelaToroTest extends TestCase
     public function test_obtener_pajuela_toro(): void
     {
         $pajuela_torols = $this->generarPajuelasToros();
-        $idRandom = rand(0, $this->cantidad_pajuelaToro - 1);
+        $idRandom = random_int(0, $this->cantidad_pajuelaToro - 1);
         $idPajuelaToro = $pajuela_torols[$idRandom]->id;
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('pajuela_toros.show', ['pajuela_toro' => $idPajuelaToro]));
@@ -143,7 +143,7 @@ class PajuelaToroTest extends TestCase
     public function test_actualizar_pajuela_toro(): void
     {
         $pajuela_toro = $this->generarPajuelasToros();
-        $idRandom = rand(0, $this->cantidad_pajuelaToro - 1);
+        $idRandom = random_int(0, $this->cantidad_pajuelaToro - 1);
         $idPajuelaToroEditar = $pajuela_toro[$idRandom]->id;
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(route('pajuela_toros.update', ['pajuela_toro' => $idPajuelaToroEditar]), $this->pajuela_toro);
@@ -165,7 +165,7 @@ class PajuelaToroTest extends TestCase
     public function test_eliminar_pajuela_toro(): void
     {
         $pajuela_toro = $this->generarPajuelasToros();
-        $idRandom = rand(0, $this->cantidad_pajuelaToro - 1);
+        $idRandom = random_int(0, $this->cantidad_pajuelaToro - 1);
         $idToDelete = $pajuela_toro[$idRandom]->id;
 
 
@@ -217,7 +217,7 @@ class PajuelaToroTest extends TestCase
         $this->cambiarRol($this->user);
 
         $pajuelasToro = $this->generarPajuelasToros();
-        $idRandom = rand(0, $this->cantidad_pajuelaToro - 1);
+        $idRandom = random_int(0, $this->cantidad_pajuelaToro - 1);
         $idPajuelaToroEditar = $pajuelasToro[$idRandom]->id;
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(route('pajuela_toros.update', ['pajuela_toro' => $idPajuelaToroEditar]), $this->pajuela_toro);
@@ -231,7 +231,7 @@ class PajuelaToroTest extends TestCase
         $this->cambiarRol($this->user);
 
         $pajuelasToro = $this->generarPajuelasToros();
-        $idRandom = rand(0, $this->cantidad_pajuelaToro - 1);
+        $idRandom = random_int(0, $this->cantidad_pajuelaToro - 1);
         $idPajuelaToroEliminar = $pajuelasToro[$idRandom]->id;
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->deleteJson(route('pajuela_toros.destroy', ['pajuela_toro' => $idPajuelaToroEliminar]));

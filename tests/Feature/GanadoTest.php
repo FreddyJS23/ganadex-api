@@ -294,7 +294,7 @@ class GanadoTest extends TestCase
     {
         Jornada_vacunacion::factory()->for($this->finca)->count(2)->create();
         $cabezasGanado = $this->generarGanado();
-        $idRandom = rand(0, $this->cantidad_ganado - 1);
+        $idRandom = random_int(0, $this->cantidad_ganado - 1);
         $idGanado = $cabezasGanado[$idRandom]->id;
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf('api/ganado/%s', $idGanado), $this->cabeza_ganado);
@@ -365,7 +365,7 @@ class GanadoTest extends TestCase
             ->create(['nombre' => 'test', 'numero' => 392]);
 
         $cabezasGanado = $this->generarGanado();
-        $idRandom = rand(0, $this->cantidad_ganado - 1);
+        $idRandom = random_int(0, $this->cantidad_ganado - 1);
         $idGanadoEditar = $cabezasGanado[$idRandom]->id;
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/ganado/%s', $idGanadoEditar), $this->cabeza_ganado);
@@ -391,7 +391,7 @@ class GanadoTest extends TestCase
     public function test_eliminar_cabeza_ganado(): void
     {
         $cabezasGanado = $this->generarGanado();
-        $idRandom = rand(0, $this->cantidad_ganado - 1);
+        $idRandom = random_int(0, $this->cantidad_ganado - 1);
         $idToDelete = $cabezasGanado[$idRandom]->id;
 
 
@@ -448,7 +448,7 @@ class GanadoTest extends TestCase
         $this->cambiarRol($this->user);
 
         $cabezasGanado = $this->generarGanado();
-        $idRandom = rand(0, $this->cantidad_ganado - 1);
+        $idRandom = random_int(0, $this->cantidad_ganado - 1);
         $idGanadoEditar = $cabezasGanado[$idRandom]->id;
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/ganado/%s', $idGanadoEditar), $this->cabeza_ganado);
@@ -462,7 +462,7 @@ class GanadoTest extends TestCase
         $this->cambiarRol($this->user);
 
         $cabezasGanado = $this->generarGanado();
-        $idRandom = rand(0, $this->cantidad_ganado - 1);
+        $idRandom = random_int(0, $this->cantidad_ganado - 1);
         $idToDelete = $cabezasGanado[$idRandom]->id;
 
 

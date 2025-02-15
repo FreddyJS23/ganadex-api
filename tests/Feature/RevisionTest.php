@@ -221,7 +221,7 @@ class RevisionTest extends TestCase
     {
         $revisiones = $this->generarRevision();
 
-        $idRandom = rand(0, $this->cantidad_revision - 1);
+        $idRandom = random_int(0, $this->cantidad_revision - 1);
         $idRevision = $revisiones[$idRandom]->id;
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf($this->url . '/%s', $idRevision));
 
@@ -249,7 +249,7 @@ class RevisionTest extends TestCase
     public function test_actualizar_revision(): void
     {
         $revisiones = $this->generarRevision();
-        $idRandom = rand(0, $this->cantidad_revision - 1);
+        $idRandom = random_int(0, $this->cantidad_revision - 1);
         $idRevisionEditar = $revisiones[$idRandom]->id;
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf($this->url . '/%s', $idRevisionEditar), $this->revision);
@@ -277,7 +277,7 @@ class RevisionTest extends TestCase
     public function test_eliminar_revision(): void
     {
         $revisiones = $this->generarRevision();
-        $idRandom = rand(0, $this->cantidad_revision - 1);
+        $idRandom = random_int(0, $this->cantidad_revision - 1);
         $idToDelete = $revisiones[$idRandom]->id;
 
 

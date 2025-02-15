@@ -133,7 +133,7 @@ class FallecimientoTest extends TestCase
     public function test_obtener_fallecimiento(): void
     {
         $fallecimientos = $this->generarFallecimiento();
-        $idRandom = rand(0, $this->cantidad_fallecimientos - 1);
+        $idRandom = random_int(0, $this->cantidad_fallecimientos - 1);
         $idfallecimientos = $fallecimientos[$idRandom]->id;
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf('api/fallecimientos/%s', $idfallecimientos), $this->fallecimiento);
@@ -154,7 +154,7 @@ class FallecimientoTest extends TestCase
     public function test_actualizar_fallecimiento(): void
     {
         $fallecimientos = $this->generarFallecimiento();
-        $idRandom = rand(0, $this->cantidad_fallecimientos - 1);
+        $idRandom = random_int(0, $this->cantidad_fallecimientos - 1);
         $idfallecimientosEditar = $fallecimientos[$idRandom]->id;
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/fallecimientos/%s', $idfallecimientosEditar), $this->fallecimiento);
@@ -181,7 +181,7 @@ class FallecimientoTest extends TestCase
     public function test_eliminar_fallecimiento(): void
     {
         $fallecimientos = $this->generarFallecimiento();
-        $idRandom = rand(0, $this->cantidad_fallecimientos - 1);
+        $idRandom = random_int(0, $this->cantidad_fallecimientos - 1);
         $idToDelete = $fallecimientos[$idRandom]->id;
 
 

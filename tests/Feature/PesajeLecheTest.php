@@ -139,7 +139,7 @@ class PesajeLecheTest extends TestCase
     {
         $pesajesDeLeche = $this->generarPesajesLeche();
 
-        $idRandom = rand(0, $this->cantidad_pesoLeche - 1);
+        $idRandom = random_int(0, $this->cantidad_pesoLeche - 1);
         $idPesoLeche = $pesajesDeLeche[$idRandom]->id;
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf($this->url . '/%s', $idPesoLeche));
 
@@ -158,7 +158,7 @@ class PesajeLecheTest extends TestCase
     public function test_actualizar_pesoLeche(): void
     {
         $pesajesDeLeche = $this->generarPesajesLeche();
-        $idRandom = rand(0, $this->cantidad_pesoLeche - 1);
+        $idRandom = random_int(0, $this->cantidad_pesoLeche - 1);
         $idPesoLecheEditar = $pesajesDeLeche[$idRandom]->id;
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf($this->url . '/%s', $idPesoLecheEditar), $this->pesoLeche);
@@ -177,7 +177,7 @@ class PesajeLecheTest extends TestCase
     public function test_eliminar_pesoLeche(): void
     {
         $pesajesDeLeche = $this->generarPesajesLeche();
-        $idRandom = rand(0, $this->cantidad_pesoLeche - 1);
+        $idRandom = random_int(0, $this->cantidad_pesoLeche - 1);
         $idToDelete = $pesajesDeLeche[$idRandom]->id;
 
 
@@ -236,7 +236,7 @@ class PesajeLecheTest extends TestCase
         $this->cambiarRol($this->user);
 
         $pajuelasToro = $this->generarPesajesLeche();
-        $idRandom = rand(0, $this->cantidad_pesoLeche - 1);
+        $idRandom = random_int(0, $this->cantidad_pesoLeche - 1);
         $idPesoLecheEditar = $pajuelasToro[$idRandom]->id;
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(route('pesaje_leche.update', ['ganado' => $this->ganado->id,'pesaje_leche' => $idPesoLecheEditar]), $this->pesoLeche);
@@ -250,7 +250,7 @@ class PesajeLecheTest extends TestCase
         $this->cambiarRol($this->user);
 
         $pajuelasToro = $this->generarPesajesLeche();
-        $idRandom = rand(0, $this->cantidad_pesoLeche - 1);
+        $idRandom = random_int(0, $this->cantidad_pesoLeche - 1);
         $idPajuelaToroEliminar = $pajuelasToro[$idRandom]->id;
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->deleteJson(route('pesaje_leche.destroy', ['ganado' => $this->ganado->id,'pesaje_leche' => $idPajuelaToroEliminar]));

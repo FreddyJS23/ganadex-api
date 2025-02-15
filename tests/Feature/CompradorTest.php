@@ -113,7 +113,7 @@ class CompradorTest extends TestCase
     public function test_obtener_comprador(): void
     {
         $comprador = $this->generarComprador();
-        $idRandom = rand(0, $this->cantidad_comprador - 1);
+        $idRandom = random_int(0, $this->cantidad_comprador - 1);
         $idComprador = $comprador[$idRandom]->id;
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf('api/comprador/%s', $idComprador));
@@ -130,7 +130,7 @@ class CompradorTest extends TestCase
     public function test_actualizar_comprador(): void
     {
         $comprador = $this->generarComprador();
-        $idRandom = rand(0, $this->cantidad_comprador - 1);
+        $idRandom = random_int(0, $this->cantidad_comprador - 1);
         $idCompradorEditar = $comprador[$idRandom]->id;
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/comprador/%s', $idCompradorEditar), $this->comprador);
@@ -147,7 +147,7 @@ class CompradorTest extends TestCase
         $compradorExistente = Comprador::factory()->for($this->finca)->create(['nombre' => 'test']);
 
         $comprador = $this->generarComprador();
-        $idRandom = rand(0, $this->cantidad_comprador - 1);
+        $idRandom = random_int(0, $this->cantidad_comprador - 1);
         $idCompradorEditar = $comprador[$idRandom]->id;
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/comprador/%s', $idCompradorEditar), $this->comprador);
@@ -173,7 +173,7 @@ class CompradorTest extends TestCase
     public function test_eliminar_comprador(): void
     {
         $comprador = $this->generarComprador();
-        $idRandom = rand(0, $this->cantidad_comprador - 1);
+        $idRandom = random_int(0, $this->cantidad_comprador - 1);
         $idToDelete = $comprador[$idRandom]->id;
 
 
@@ -228,7 +228,7 @@ class CompradorTest extends TestCase
         $this->cambiarRol($this->user);
 
         $compradores = $this->generarComprador();
-        $idRandom = rand(0, $this->cantidad_comprador - 1);
+        $idRandom = random_int(0, $this->cantidad_comprador - 1);
         $idCompradorEditar = $compradores[$idRandom]->id;
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/comprador/%s', $idCompradorEditar), $this->comprador);
@@ -242,7 +242,7 @@ class CompradorTest extends TestCase
         $this->cambiarRol($this->user);
 
         $compradores = $this->generarComprador();
-        $idRandom = rand(0, $this->cantidad_comprador - 1);
+        $idRandom = random_int(0, $this->cantidad_comprador - 1);
         $idToDelete = $compradores[$idRandom]->id;
 
 

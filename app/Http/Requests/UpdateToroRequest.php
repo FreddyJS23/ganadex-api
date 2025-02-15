@@ -28,7 +28,7 @@ class UpdateToroRequest extends FormRequest
          *
          * @return string
          */
-        $parametroPath = preg_replace("/[^0-9]/", "", request()->path());
+        $parametroPath = preg_replace("/[^0-9]/", "", (string) request()->path());
         $ganadoId = Toro::find($parametroPath)->ganado->id;
 
         return [

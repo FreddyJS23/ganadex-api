@@ -65,7 +65,7 @@ class CaparCriaTest extends TestCase
     public function test_capar_cria(): void
     {
         $criasGanado = $this->generarGanado();
-        $idRandom = rand(0, $this->cantidad_ganado - 1);
+        $idRandom = random_int(0, $this->cantidad_ganado - 1);
         $idCria = $criasGanado[$idRandom]->id;
 
         //capar

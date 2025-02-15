@@ -152,7 +152,7 @@ class UsuarioVeterinarioTest extends TestCase
     public function test_eliminar_usuario_veterinario(): void
     {
         $usuarioVeterinario = $this->usuariosVeterinarios();
-        $idRandom = rand(0, 9);
+        $idRandom = random_int(0, 9);
         $idToDelete = $usuarioVeterinario[$idRandom]->id;
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->deleteJson(route('usuarios_veterinarios.destroy', ['usuarios_veterinario' => $idToDelete]));

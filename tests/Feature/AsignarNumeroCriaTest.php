@@ -65,11 +65,11 @@ class AsignarNumeroCriaTest extends TestCase
     public function test_asignar_numero_cria(): void
     {
         $criasGanado = $this->generarGanado();
-        $idRandom = rand(0, $this->cantidad_ganado - 1);
+        $idRandom = random_int(0, $this->cantidad_ganado - 1);
         $idCria = $criasGanado[$idRandom]->id;
 
         //asignar numero
-        $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(route('numeracion.store', ['ganado' => $idCria]), ['numero' => rand(1, 999)]);
+        $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(route('numeracion.store', ['ganado' => $idCria]), ['numero' => random_int(1, 999)]);
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf('api/ganado/%s', $idCria));
 

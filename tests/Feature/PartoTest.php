@@ -244,7 +244,7 @@ class PartoTest extends TestCase
     {
         $partos = $this->generarpartosMonta();
 
-        $idRandom = rand(0, $this->cantidad_parto - 1);
+        $idRandom = random_int(0, $this->cantidad_parto - 1);
         $idparto = $partos[$idRandom]->id;
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf($this->urlServicioMonta . '/%s', $idparto));
 
@@ -279,7 +279,7 @@ class PartoTest extends TestCase
     public function test_actualizar_parto_monta(): void
     {
         $partos = $this->generarpartosMonta();
-        $idRandom = rand(0, $this->cantidad_parto - 1);
+        $idRandom = random_int(0, $this->cantidad_parto - 1);
         $idpartoEditar = $partos[$idRandom]->id;
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf($this->urlServicioMonta . '/%s', $idpartoEditar), $this->parto + ['numero_toro' => $this->numero_toro]);
@@ -301,7 +301,7 @@ class PartoTest extends TestCase
     public function test_eliminar_parto_monta(): void
     {
         $partos = $this->generarpartosInseminacion();
-        $idRandom = rand(0, $this->cantidad_parto - 1);
+        $idRandom = random_int(0, $this->cantidad_parto - 1);
         $idToDelete = $partos[$idRandom]->id;
 
 
@@ -390,7 +390,7 @@ class PartoTest extends TestCase
     {
         $partos = $this->generarpartosInseminacion();
 
-        $idRandom = rand(0, $this->cantidad_parto - 1);
+        $idRandom = random_int(0, $this->cantidad_parto - 1);
         $idparto = $partos[$idRandom]->id;
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf($this->urlServicioInseminacion . '/%s', $idparto));
 
@@ -426,7 +426,7 @@ class PartoTest extends TestCase
     public function test_actualizar_parto_inseminacion(): void
     {
         $partos = $this->generarpartosInseminacion();
-        $idRandom = rand(0, $this->cantidad_parto - 1);
+        $idRandom = random_int(0, $this->cantidad_parto - 1);
         $idpartoEditar = $partos[$idRandom]->id;
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf($this->urlServicioInseminacion . '/%s', $idpartoEditar), $this->parto + ['numero_toro' => $this->numero_toro]);
@@ -448,7 +448,7 @@ class PartoTest extends TestCase
     public function test_eliminar_parto_inseminacion(): void
     {
         $partos = $this->generarpartosInseminacion();
-        $idRandom = rand(0, $this->cantidad_parto - 1);
+        $idRandom = random_int(0, $this->cantidad_parto - 1);
         $idToDelete = $partos[$idRandom]->id;
 
 

@@ -32,12 +32,12 @@ class UsuarioVeterinarioController extends Controller
      */
     public function store(StoreUsuarioVeterinarioRequest $request)
     {
-        $nameUsuarioAleatorio = fn()=> 'usuario' . rand(1, 100) . rand(1, 100);
+        $nameUsuarioAleatorio = fn()=> 'usuario' . random_int(1, 100) . random_int(1, 100);
 
         $veterinario = Personal::where('id', $request->input('personal_id'))->first();
         $usuarioVeterinario = new UsuarioVeterinario();
         $usuario = new User();
-        $usuario->usuario = explode(' ', $veterinario->nombre)[0] . rand(1, 100);
+        $usuario->usuario = explode(' ', (string) $veterinario->nombre)[0] . random_int(1, 100);
 
         if (strlen($usuario->usuario) < 5 || strlen($usuario->usuario) > 20) {
             $usuario->usuario = $nameUsuarioAleatorio();

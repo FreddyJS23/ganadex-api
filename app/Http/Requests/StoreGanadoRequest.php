@@ -34,9 +34,7 @@ class StoreGanadoRequest extends FormRequest
             'peso_2year' => 'numeric|between:1,32767',
             'peso_actual' => ['numeric','between:1,32767',Rule::requiredIf(fn ()=> in_array(5, $this->estado_id))],
             'estado_id' => Rule::foreach(
-                function ($value, $attrubute) {
-                    return Rule::exists('estados', 'id');
-                }
+                fn($value, $attrubute) => Rule::exists('estados', 'id')
             ),
             //campos para registrar ganado vendido
             'fecha_venta' => ['date_format:Y-m-d', Rule::requiredIf(fn () => in_array(5, $this->estado_id))],
@@ -45,9 +43,7 @@ class StoreGanadoRequest extends FormRequest
                  Rule::requiredIf(fn () => in_array(5, $this->estado_id)),
                 'numeric', Rule::exists('compradors', 'id')
                     ->where(
-                        function ($query) {
-                            return $query->where('finca_id', session('finca_id'));
-                        }
+                        fn($query) => $query->where('finca_id', session('finca_id'))
                     )
             ],
             //campos para registrar ganado muerto

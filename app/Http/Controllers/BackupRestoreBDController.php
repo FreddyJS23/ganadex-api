@@ -29,7 +29,7 @@ class BackupRestoreBDController extends Controller
         $pathDbRestore = end($listaBackup);
         //format Y-m-d
         $regexDate = '/[1-9][0-9][0-9]{2}-([0][1-9]|[1][0-2])-([1-2][0-9]|[0][1-9]|[3][0-1])/';
-        $dateLastBackup = preg_match($regexDate, $pathDbRestore, $mathes);
+        $dateLastBackup = preg_match($regexDate, (string) $pathDbRestore, $mathes);
         $dateLastBackup = $mathes[0] ?? null;
         //$dateLastBackup = null;
 

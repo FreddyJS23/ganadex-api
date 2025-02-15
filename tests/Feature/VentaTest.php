@@ -164,7 +164,7 @@ class VentaTest extends TestCase
     public function test_obtener_venta(): void
     {
         $venta = $this->generarVentas();
-        $idRandom = rand(0, $this->cantidad_ventas - 1);
+        $idRandom = random_int(0, $this->cantidad_ventas - 1);
         $idVenta = $venta[$idRandom]->id;
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('ventas.show', ['venta' => $idVenta]));
@@ -197,7 +197,7 @@ class VentaTest extends TestCase
     public function test_actualizar_venta(): void
     {
         $venta = $this->generarVentas();
-        $idRandom = rand(0, $this->cantidad_ventas - 1);
+        $idRandom = random_int(0, $this->cantidad_ventas - 1);
         $idVentaEditar = $venta[$idRandom]->id;
 
         $ganado = Ganado::factory()->for($this->finca)->hasAttached($this->estado)->hasPeso(1)->create();
@@ -220,7 +220,7 @@ class VentaTest extends TestCase
     public function test_eliminar_venta(): void
     {
         $venta = $this->generarVentas();
-        $idRandom = rand(0, $this->cantidad_ventas - 1);
+        $idRandom = random_int(0, $this->cantidad_ventas - 1);
         $idToDelete = $venta[$idRandom]->id;
 
 
@@ -280,7 +280,7 @@ class VentaTest extends TestCase
         $this->cambiarRol($this->user);
 
         $ventas = $this->generarVentas();
-        $idRandom = rand(0, $this->cantidad_ventas - 1);
+        $idRandom = random_int(0, $this->cantidad_ventas - 1);
         $idVentaEditar = $ventas[$idRandom]->id;
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(route('ventas.update', ['venta' => $idVentaEditar]), $this->venta);
@@ -295,7 +295,7 @@ class VentaTest extends TestCase
 
 
         $ventas = $this->generarVentas();
-        $idRandom = rand(0, $this->cantidad_ventas - 1);
+        $idRandom = random_int(0, $this->cantidad_ventas - 1);
         $idVentaEditar = $ventas[$idRandom]->id;
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->deleteJson(route('ventas.destroy', ['venta' => $idVentaEditar]));

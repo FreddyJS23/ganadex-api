@@ -22,13 +22,13 @@ class ServicioResource extends JsonResource
             'veterinario' => $this->veterinario,
         ];
 
-        if ($this->servicioable_type == 'App\Models\Toro') {
+        if ($this->servicioable_type == \App\Models\Toro::class) {
             $resource['toro'] = (object)
             [
                 'id' => $this->servicioable->id,
                 'numero' => $this->servicioable->ganado->numero
             ];
-        } elseif ($this->servicioable_type == 'App\Models\PajuelaToro') {
+        } elseif ($this->servicioable_type == \App\Models\PajuelaToro::class) {
             $resource['pajuela_toro'] = (object)
             [
                 'id' => $this->servicioable->id,

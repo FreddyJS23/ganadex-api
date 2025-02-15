@@ -123,7 +123,7 @@ class InsumoTest extends TestCase
     public function test_obtener_insumo(): void
     {
         $insumos = $this->generarInsumo();
-        $idRandom = rand(0, $this->cantidad_insumo - 1);
+        $idRandom = random_int(0, $this->cantidad_insumo - 1);
         $idInsumo = $insumos[$idRandom]->id;
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf('api/insumo/%s', $idInsumo));
@@ -145,7 +145,7 @@ class InsumoTest extends TestCase
     public function test_actualizar_insumo(): void
     {
         $insumos = $this->generarInsumo();
-        $idRandom = rand(0, $this->cantidad_insumo - 1);
+        $idRandom = random_int(0, $this->cantidad_insumo - 1);
         $idInsumoEditar = $insumos[$idRandom]->id;
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/insumo/%s', $idInsumoEditar), $this->insumo);
@@ -168,7 +168,7 @@ class InsumoTest extends TestCase
         $insumoExistente = Insumo::factory()->for($this->finca)->create(['insumo' => 'vacuna']);
 
         $insumo = $this->generarInsumo();
-        $idRandom = rand(0, $this->cantidad_insumo - 1);
+        $idRandom = random_int(0, $this->cantidad_insumo - 1);
         $idInsumoEditar = $insumo[$idRandom]->id;
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/insumo/%s', $idInsumoEditar), $this->insumo);
@@ -190,7 +190,7 @@ class InsumoTest extends TestCase
     public function test_eliminar_insumo(): void
     {
         $insumos = $this->generarInsumo();
-        $idRandom = rand(0, $this->cantidad_insumo - 1);
+        $idRandom = random_int(0, $this->cantidad_insumo - 1);
         $idToDelete = $insumos[$idRandom]->id;
 
 

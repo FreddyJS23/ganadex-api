@@ -38,7 +38,7 @@ class ReportsPdfController extends Controller
         $resumenServicio = [];
         if ($ultimoServicio) {
             //servicio monta
-            if ($ultimoServicio->servicioable_type == 'App\Models\Toro') {
+            if ($ultimoServicio->servicioable_type == \App\Models\Toro::class) {
                 $resumenServicio = ['ultimo' => $ultimoServicio->fecha,
                 'toro' => $ultimoServicio->servicioable->ganado->numero,
                 'efectividad' => $ganado->parto_count ? round($efectividad($ganado->parto_count, $ganado->servicios_count), 2) : null,
@@ -46,7 +46,7 @@ class ReportsPdfController extends Controller
                 ];
             }
             //servicio inseminacion
-            if ($ultimoServicio->servicioable_type == 'App\Models\PajuelaToro') {
+            if ($ultimoServicio->servicioable_type == \App\Models\PajuelaToro::class) {
                 $resumenServicio = ['ultimo' => $ultimoServicio->fecha,
                 'codigo pajuela' => $ultimoServicio->servicioable->codigo,
                 'efectividad' => $ganado->parto_count ? round($efectividad($ganado->parto_count, $ganado->servicios_count), 2) : null,
@@ -124,7 +124,7 @@ END as ultima_dosis
         $resumenParto = $ultimoParto ? [
         'ultimo' => $ultimoParto->fecha,
         'peso_cria' => $ultimoParto->ganado_cria->peso->peso_nacimiento,
-        'numero' => $ultimoParto->ganado_cria->numero ? $ultimoParto->ganado_cria->numero : $ultimoParto->ganado_cria->nombre,
+        'numero' => $ultimoParto->ganado_cria->numero ?: $ultimoParto->ganado_cria->nombre,
         'total' => $ganado->parto_count,
         ] : [];
 

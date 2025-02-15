@@ -27,7 +27,7 @@ class UpdatePersonalRequest extends FormRequest
          *
          * @return string
          */
-        $parametroPath = preg_replace("/[^0-9]/", "", request()->path());
+        $parametroPath = preg_replace("/[^0-9]/", "", (string) request()->path());
 
         return [
             'ci' => ['required','numeric','digits_between:7,8',Rule::unique('personals')->ignore(intval($parametroPath))],

@@ -154,7 +154,7 @@ class PersonalTest extends TestCase
     public function test_obtener_personal(): void
     {
         $personals = $this->generarPersonal();
-        $idRandom = rand(0, $this->cantidad_personal - 1);
+        $idRandom = random_int(0, $this->cantidad_personal - 1);
         $idPersonal = $personals[$idRandom]->id;
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf('api/personal/%s', $idPersonal));
@@ -179,7 +179,7 @@ class PersonalTest extends TestCase
     public function test_actualizar_personal(): void
     {
         $personals = $this->generarPersonal();
-        $idRandom = rand(0, $this->cantidad_personal - 1);
+        $idRandom = random_int(0, $this->cantidad_personal - 1);
         $idPersonalEditar = $personals[$idRandom]->id;
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/personal/%s', $idPersonalEditar), $this->personal);
@@ -205,7 +205,7 @@ class PersonalTest extends TestCase
         $personalExistente = Personal::factory()->for($this->finca)->create(['ci' => 28472738]);
 
         $personal = $this->generarPersonal();
-        $idRandom = rand(0, $this->cantidad_personal - 1);
+        $idRandom = random_int(0, $this->cantidad_personal - 1);
         $idPersonalEditar = $personal[$idRandom]->id;
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/personal/%s', $idPersonalEditar), $this->personal);
@@ -228,7 +228,7 @@ class PersonalTest extends TestCase
     public function test_eliminar_personal(): void
     {
         $personals = $this->generarPersonal();
-        $idRandom = rand(0, $this->cantidad_personal - 1);
+        $idRandom = random_int(0, $this->cantidad_personal - 1);
         $idToDelete = $personals[$idRandom]->id;
 
 
@@ -280,7 +280,7 @@ class PersonalTest extends TestCase
         $this->cambiarRol($this->user);
 
         $personal = $this->generarPersonal();
-        $idRandom = rand(0, $this->cantidad_personal - 1);
+        $idRandom = random_int(0, $this->cantidad_personal - 1);
         $idPersonalEditar = $personal[$idRandom]->id;
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(route('personal.update', ['personal' => $idPersonalEditar]), $this->personal);
@@ -294,7 +294,7 @@ class PersonalTest extends TestCase
         $this->cambiarRol($this->user);
 
         $personal = $this->generarPersonal();
-        $idRandom = rand(0, $this->cantidad_personal - 1);
+        $idRandom = random_int(0, $this->cantidad_personal - 1);
         $idPersonalEditar = $personal[$idRandom]->id;
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->deleteJson(route('personal.destroy', ['personal' => $idPersonalEditar]));

@@ -28,17 +28,13 @@ class UpdateVentaRequest extends FormRequest
             'ganado_id' => [
                 'required', 'numeric', Rule::exists('ganados', 'id')
                     ->where(
-                        function ($query) {
-                            return $query->where('finca_id', session('finca_id'));
-                        }
+                        fn($query) => $query->where('finca_id', session('finca_id'))
                     )
             ],
             'comprador_id' => [
                 'required', 'numeric', Rule::exists('compradors', 'id')
                     ->where(
-                        function ($query) {
-                            return $query->where('finca_id', session('finca_id'));
-                        }
+                        fn($query) => $query->where('finca_id', session('finca_id'))
                     )
             ],
 

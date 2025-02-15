@@ -217,7 +217,7 @@ class ToroTest extends TestCase
     public function test_obtener_toro(): void
     {
         $toros = $this->generarToros();
-        $idRandom = rand(0, $this->cantidad_toro - 1);
+        $idRandom = random_int(0, $this->cantidad_toro - 1);
         $idToro = $toros[$idRandom]->id;
 
 
@@ -287,7 +287,7 @@ class ToroTest extends TestCase
             ->create();
 
         $toros = $this->generarToros();
-        $idRandom = rand(0, $this->cantidad_toro - 1);
+        $idRandom = random_int(0, $this->cantidad_toro - 1);
         $idToroEditar = $toros[$idRandom]->id;
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/toro/%s', $idToroEditar), $this->toro);
@@ -313,7 +313,7 @@ class ToroTest extends TestCase
     public function test_eliminar_toro(): void
     {
         $toros = $this->generarToros();
-        $idRandom = rand(0, $this->cantidad_toro - 1);
+        $idRandom = random_int(0, $this->cantidad_toro - 1);
         $idToDelete = $toros[$idRandom]->id;
 
 
@@ -371,7 +371,7 @@ class ToroTest extends TestCase
         $this->cambiarRol($this->user);
 
         $toro = $this->generarToros();
-        $idRandom = rand(0, $this->cantidad_toro - 1);
+        $idRandom = random_int(0, $this->cantidad_toro - 1);
         $idToroEditar = $toro[$idRandom]->id;
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(route('toro.update', ['toro' => $idToroEditar]), $this->toro);
@@ -385,7 +385,7 @@ class ToroTest extends TestCase
         $this->cambiarRol($this->user);
 
         $toro = $this->generarToros();
-        $idRandom = rand(0, $this->cantidad_toro - 1);
+        $idRandom = random_int(0, $this->cantidad_toro - 1);
         $idToroEliminar = $toro[$idRandom]->id;
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->deleteJson(route('toro.destroy', ['toro' => $idToroEliminar]));

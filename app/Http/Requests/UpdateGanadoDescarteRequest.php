@@ -28,7 +28,7 @@ class UpdateGanadoDescarteRequest extends FormRequest
          *
          * @return string
          */
-        $parametroPath = preg_replace("/[^0-9]/", "", request()->path());
+        $parametroPath = preg_replace("/[^0-9]/", "", (string) request()->path());
         $ganadoId = GanadoDescarte::find($parametroPath)->ganado->id;
         return [
             'nombre' => ['min:3','max:255',Rule::unique('ganados')->ignore($ganadoId)],

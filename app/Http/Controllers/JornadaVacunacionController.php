@@ -48,7 +48,7 @@ class JornadaVacunacionController extends Controller
             }
 
             //eliminar los últimos dos caracteres para no distinguir terminos femeninos y masculinos
-            $tipoAnimalVacuna = substr($tipoAnimalVacuna, 0, -2);
+            $tipoAnimalVacuna = substr((string) $tipoAnimalVacuna, 0, -2);
             $cantidadGanadoVacunado->orWhere('tipo', 'like', "$tipoAnimalVacuna%");
         }
 

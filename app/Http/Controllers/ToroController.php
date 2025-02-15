@@ -116,7 +116,7 @@ class ToroController extends Controller
                     $ganado->evento()->create();
                 }
             );
-        } catch (\Throwable $error) {
+        } catch (\Throwable) {
             return response()->json(['error' => 'error al insertar datos'], 501);
         }
 

@@ -97,7 +97,7 @@ class DatosParaFormulariosController extends Controller
         $punteroInicial = 0;
 
         while ($numeroSugerido == null) {
-            $numeroRandom = rand($intervalos[$punteroInicial], $intervalos[$punteroInicial + 1]);
+            $numeroRandom = random_int($intervalos[$punteroInicial], $intervalos[$punteroInicial + 1]);
             $numeroYaRegistrado = Ganado::select('numero')
                 ->where('numero', $numeroRandom)->first();
 

@@ -34,10 +34,7 @@ class AuthServiceProvider extends ServiceProvider
 
         Gate::define(
             'view-logs',
-            function (User $user, UsuarioVeterinario $usuarioVeterinario) {
-
-                return $user->hasRole('admin') &&  $user->id === $usuarioVeterinario->admin_id;
-            }
+            fn(User $user, UsuarioVeterinario $usuarioVeterinario) => $user->hasRole('admin') &&  $user->id === $usuarioVeterinario->admin_id
         );
     }
 }

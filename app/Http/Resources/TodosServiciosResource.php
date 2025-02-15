@@ -23,13 +23,13 @@ class TodosServiciosResource extends JsonResource
             "efectividad" => $this->efectividad,
             "total_servicios" => $this->servicios_count
         ];
-        if ($existeServicio && $this->servicioReciente->servicioable_type == 'App\Models\Toro') {
+        if ($existeServicio && $this->servicioReciente->servicioable_type == \App\Models\Toro::class) {
             $resource['toro'] = (object)
             [
                 'id' => $this->servicioReciente->servicioable->id,
                 'numero' => $this->servicioReciente->servicioable->ganado->numero
             ];
-        } elseif ($existeServicio && $this->servicioReciente->servicioable_type == 'App\Models\PajuelaToro') {
+        } elseif ($existeServicio && $this->servicioReciente->servicioable_type == \App\Models\PajuelaToro::class) {
             $resource['pajuela_toro'] = (object)
             [
                 'id' => $this->servicioReciente->servicioable->id,

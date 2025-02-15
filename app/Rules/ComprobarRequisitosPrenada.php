@@ -15,7 +15,7 @@ class ComprobarRequisitosPrenada implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        $idGanado = preg_replace("/[^0-9]/", "", request()->path());
+        $idGanado = preg_replace("/[^0-9]/", "", (string) request()->path());
         $ganado = Ganado::firstWhere('id', $idGanado);
 
         $pesoActualGanado = $ganado->peso->getRawOriginal('peso_actual');

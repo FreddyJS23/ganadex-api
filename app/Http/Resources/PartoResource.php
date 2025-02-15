@@ -22,13 +22,13 @@ class PartoResource extends JsonResource
             'veterinario' => $this->veterinario,
         ];
 
-        if ($this->partoable_type == 'App\Models\Toro') {
+        if ($this->partoable_type == \App\Models\Toro::class) {
             $resource['padre_toro'] = (object)
             [
             'id' => $this->partoable->id,
             'numero' => $this->partoable->ganado->numero
             ];
-        } elseif ($this->partoable_type == 'App\Models\PajuelaToro') {
+        } elseif ($this->partoable_type == \App\Models\PajuelaToro::class) {
             $resource['pajuela_toro'] = (object)
             [
             'id' => $this->partoable->id,

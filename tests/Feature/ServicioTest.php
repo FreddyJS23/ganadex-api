@@ -227,7 +227,7 @@ class ServicioTest extends TestCase
     {
         $servicios = $this->generarServicioMonta();
 
-        $idRandom = rand(0, $this->cantidad_servicio - 1);
+        $idRandom = random_int(0, $this->cantidad_servicio - 1);
         $idservicio = $servicios[$idRandom]->id;
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf($this->url . '/%s', $idservicio));
 
@@ -257,7 +257,7 @@ class ServicioTest extends TestCase
     public function test_actualizar_servicio_monta(): void
     {
         $servicios = $this->generarServicioMonta();
-        $idRandom = rand(0, $this->cantidad_servicio - 1);
+        $idRandom = random_int(0, $this->cantidad_servicio - 1);
         $idservicioEditar = $servicios[$idRandom]->id;
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf($this->url . '/%s', $idservicioEditar), $this->servicioMonta + ['toro_id' => $this->toro->id]);
@@ -268,7 +268,7 @@ class ServicioTest extends TestCase
                     'servicio',
                     fn (AssertableJson $json) =>
                     $json->where('observacion', $this->servicioMonta['observacion'])
-                    ->where('tipo', ucwords($this->servicioMonta['tipo']))
+                    ->where('tipo', ucwords((string) $this->servicioMonta['tipo']))
                     ->has(
                         'veterinario',
                         fn (AssertableJson $json)
@@ -282,7 +282,7 @@ class ServicioTest extends TestCase
     public function test_eliminar_servicio_monta(): void
     {
         $servicios = $this->generarServicioMonta();
-        $idRandom = rand(0, $this->cantidad_servicio - 1);
+        $idRandom = random_int(0, $this->cantidad_servicio - 1);
         $idToDelete = $servicios[$idRandom]->id;
 
 
@@ -386,7 +386,7 @@ class ServicioTest extends TestCase
     {
         $servicios = $this->generarServicioInseminacion();
 
-        $idRandom = rand(0, $this->cantidad_servicio - 1);
+        $idRandom = random_int(0, $this->cantidad_servicio - 1);
         $idservicio = $servicios[$idRandom]->id;
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf($this->url . '/%s', $idservicio));
 
@@ -415,7 +415,7 @@ class ServicioTest extends TestCase
     public function test_actualizar_servicio_inseminacion(): void
     {
         $servicios = $this->generarServicioInseminacion();
-        $idRandom = rand(0, $this->cantidad_servicio - 1);
+        $idRandom = random_int(0, $this->cantidad_servicio - 1);
         $idservicioEditar = $servicios[$idRandom]->id;
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf($this->url . '/%s', $idservicioEditar), $this->servicioInseminacion + ['pajuela_toro_id' => $this->pajuelaToro->id]);
@@ -426,7 +426,7 @@ class ServicioTest extends TestCase
                     'servicio',
                     fn (AssertableJson $json) =>
                     $json->where('observacion', $this->servicioInseminacion['observacion'])
-                    ->where('tipo', ucwords($this->servicioInseminacion['tipo']))
+                    ->where('tipo', ucwords((string) $this->servicioInseminacion['tipo']))
                     ->has(
                         'veterinario',
                         fn (AssertableJson $json)
@@ -440,7 +440,7 @@ class ServicioTest extends TestCase
     public function test_eliminar_servicio_inseminacion(): void
     {
         $servicios = $this->generarServicioInseminacion();
-        $idRandom = rand(0, $this->cantidad_servicio - 1);
+        $idRandom = random_int(0, $this->cantidad_servicio - 1);
         $idToDelete = $servicios[$idRandom]->id;
 
 

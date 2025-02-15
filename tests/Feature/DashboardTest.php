@@ -58,14 +58,12 @@ class DashboardTest extends TestCase
             ->hasAttached($this->estado)
             ->has(
                 Leche::factory()->for($this->finca)->state(
-                    function (array $attributes, Ganado $ganado) {
-                        return ['ganado_id' => $ganado->id, 'fecha' => Carbon::now()->format('Y-m-d')];
-                    }
+                    fn(array $attributes, Ganado $ganado) => ['ganado_id' => $ganado->id, 'fecha' => Carbon::now()->format('Y-m-d')]
                 ),
                 'pesajes_leche'
             )
             ->state(new Sequence(
-                fn (Sequence $sequence) => ['tipo_id' => rand(1, 4)]
+                fn (Sequence $sequence) => ['tipo_id' => random_int(1, 4)]
             ))
             ->for($this->finca)
             ->create();
@@ -74,7 +72,7 @@ class DashboardTest extends TestCase
   //generar una fecha de produccion lactea
     private function mesesPesajeAnual(int $año)
     {
-          $mes = rand(0, 11);
+          $mes = random_int(0, 11);
 
           $fechaInicial = Carbon::create($año, 1, 20);
 
@@ -96,9 +94,7 @@ class DashboardTest extends TestCase
             asi siempre todos los meses estaran cubiertos por lo menos una vez */
             ->has(
                 Leche::factory()->for($this->finca)->count(12)->state(
-                    function (array $attributes, Ganado $ganado) {
-                        return ['ganado_id' => $ganado->id];
-                    }
+                    fn(array $attributes, Ganado $ganado) => ['ganado_id' => $ganado->id]
                 )->sequence(fn (Sequence $sequence) => ['fecha' => $this->mesesPesajeAnual($año)]),
                 'pesajes_leche'
             )

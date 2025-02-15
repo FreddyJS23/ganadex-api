@@ -60,7 +60,7 @@ class EfectividadTest extends TestCase
             ->for($this->finca)
             ->for(Ganado::factory()->for($this->finca)->create(['sexo' => 'M']))->create();
 
-        $this->cantidadServicios = rand(1, 10);
+        $this->cantidadServicios = random_int(1, 10);
     }
 
 
@@ -76,7 +76,7 @@ class EfectividadTest extends TestCase
             ->create(['personal_id' => $this->veterinario]);
 
         Parto::factory()
-            ->count(rand(1, $this->cantidadServicios))
+            ->count(random_int(1, $this->cantidadServicios))
             ->for($this->ganado)
             ->for(Ganado::factory()->for($this->finca)->hasAttached(Estado::firstWhere('estado', 'sano')), 'ganado_cria')
             ->for($this->toro, 'partoable')
@@ -97,14 +97,14 @@ class EfectividadTest extends TestCase
         Servicio::factory()
             ->count($this->cantidadServicios)
             ->for($this->ganado)
-            ->sequence(fn(Sequence $sequence) => ['fecha' => now()->subDays(rand(1, 30))->subMonths(rand(1, 3))])
+            ->sequence(fn(Sequence $sequence) => ['fecha' => now()->subDays(random_int(1, 30))->subMonths(random_int(1, 3))])
             ->for($this->toro, 'servicioable')
             ->create(['personal_id' => $this->veterinario]);
 
         Parto::factory()
-            ->count(rand(1, $this->cantidadServicios))
+            ->count(random_int(1, $this->cantidadServicios))
             ->for($this->ganado)
-            ->sequence(fn (Sequence $sequence) => ['fecha' => now()->subDays(rand(1, 30))->subMonths(rand(1, 3))])
+            ->sequence(fn (Sequence $sequence) => ['fecha' => now()->subDays(random_int(1, 30))->subMonths(random_int(1, 3))])
             ->for(Ganado::factory()->for($this->finca)->hasAttached(Estado::firstWhere('estado', 'sano')), 'ganado_cria')
             ->for($this->toro, 'partoable')
             ->create(['personal_id' => $this->veterinario]);
