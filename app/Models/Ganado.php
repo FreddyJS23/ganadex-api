@@ -9,6 +9,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
+/**
+ * @property-read ?int $id
+ * @property string $nombre
+ * @property ?int $numero
+ * @property 'H'|'M' $sexo
+ * @property ?string $origen
+ * @property ?string $fecha_nacimiento
+ * @property-read ?GanadoTipo $tipo
+ * @property-read ?Finca $finca
+ */
 class Ganado extends Model
 {
     use HasFactory;
@@ -24,8 +34,6 @@ class Ganado extends Model
 
     /**
      * Get the tipo that owns the Ganado
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function tipo(): BelongsTo
     {
@@ -34,8 +42,6 @@ class Ganado extends Model
 
     /**
      * Get the toro associated with the Ganado
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
     public function toro(): HasOne
     {
@@ -44,8 +50,6 @@ class Ganado extends Model
 
     /**
      * Get the ganadoDescarte associated with the Ganado
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
     public function ganadoDescarte(): HasOne
     {
@@ -54,8 +58,6 @@ class Ganado extends Model
 
     /**
      * Get the peso associated with the Ganado
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
     public function peso(): HasOne
     {
@@ -64,8 +66,6 @@ class Ganado extends Model
 
     /**
      * The estados that belong to the Ganado
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function estados(): BelongsToMany
     {
@@ -74,8 +74,6 @@ class Ganado extends Model
 
     /**
      * Get all of the revision for the Ganado
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function revision(): HasMany
     {
@@ -84,8 +82,6 @@ class Ganado extends Model
 
     /**
      * Get the ganado most recent servicio
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
     public function servicioReciente(): HasOne
     {
@@ -93,8 +89,6 @@ class Ganado extends Model
     }
     /**
      * Get the ganado most recent paro
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
     public function partoReciente(): HasOne
     {
@@ -102,19 +96,14 @@ class Ganado extends Model
     }
     /**
      * Get the ganado most recent revision
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
     public function revisionReciente(): HasOne
     {
         return $this->hasOne(Revision::class)->latestOfMany();
     }
 
-
     /**
      * Get all of the servicios for the Ganado
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function servicios(): HasMany
     {
@@ -123,8 +112,6 @@ class Ganado extends Model
 
     /**
      * Get all of the comments for the Parto
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function parto(): HasMany
     {
@@ -133,8 +120,6 @@ class Ganado extends Model
 
     /**
      * Get all of the pesajes_leche for the Ganado
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function pesajes_leche(): HasMany
     {
@@ -143,8 +128,6 @@ class Ganado extends Model
 
     /**
      * Get the ganado most recent pesaje leche
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
     public function pesajeLecheReciente(): HasOne
     {
@@ -153,8 +136,6 @@ class Ganado extends Model
 
     /**
      * Get the user that owns the Ganado
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function finca(): BelongsTo
     {
@@ -163,8 +144,6 @@ class Ganado extends Model
 
     /**
      * Get the evento associated with the Ganado
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
     public function evento(): HasOne
     {
@@ -173,8 +152,6 @@ class Ganado extends Model
 
     /**
      * Get the fallecimiento associated with the Ganado
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
     public function fallecimiento(): HasOne
     {
@@ -183,8 +160,6 @@ class Ganado extends Model
 
     /**
      * Get all of the notificaciones for the Ganado
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function notificaciones(): HasMany
     {
@@ -193,8 +168,6 @@ class Ganado extends Model
 
     /**
      * Get the fallecimiento associated with the Ganado
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
     public function venta(): HasOne
     {
@@ -203,8 +176,6 @@ class Ganado extends Model
 
     /**
      * Get all of the vacunaciones for the Ganado
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function vacunaciones(): HasMany
     {

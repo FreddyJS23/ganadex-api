@@ -3,39 +3,19 @@
 namespace Tests\Feature;
 
 use App\Models\Estado;
-use App\Models\Finca;
 use App\Models\Ganado;
-use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Testing\Fluent\AssertableJson;
+use Tests\Feature\Common\NeedsFinca;
+use Tests\Feature\Common\NeedsGanado;
 use Tests\TestCase;
-use Illuminate\Support\Str;
 
 class AsignarNumeroCriaTest extends TestCase
 {
     use RefreshDatabase;
-
-    private int $cantidad_ganado = 10;
-
-    private $user;
-    private $ganado;
-    private $estado;
-    private $finca;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->user
-            = User::factory()->hasConfiguracion()->create();
-
-            $this->finca
-            = Finca::factory()
-            ->for($this->user)
-            ->create();
-    }
+    use NeedsGanado;
+    use NeedsFinca;
 
     private function generarGanado(): Collection
     {
@@ -50,16 +30,27 @@ class AsignarNumeroCriaTest extends TestCase
             ->create(['numero' => null]);
     }
 
-    /**
-     * A basic feature test example.
-     */
+    private function setUpRequest(): static
+    {
+        $this
+            ->actingAs($this->user)
+            ->withSession($this->getSessionInitializationArray());
+
+        return $this;
+    }
+
     public function test_obtener_crias_pendientes_numeracion(): void
     {
         $this->generarGanado();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('numeracion.index'));
-        $response->assertStatus(200)
-            ->assertJson(fn (AssertableJson $json) => $json->has('crias_pendiente_numeracion', $this->cantidad_ganado));
+        $this
+            ->setUpRequest()
+            ->getJson(route('numeracion.index'))
+            ->assertStatus(200)
+            ->assertJson(fn(AssertableJson $json) => $json->has(
+                key: 'crias_pendiente_numeracion',
+                length: $this->cantidad_ganado
+            ));
     }
 
     public function test_asignar_numero_cria(): void
@@ -69,18 +60,28 @@ class AsignarNumeroCriaTest extends TestCase
         $idCria = $criasGanado[$idRandom]->id;
 
         //asignar numero
-        $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(route('numeracion.store', ['ganado' => $idCria]), ['numero' => random_int(1, 999)]);
+        $this
+            ->setUpRequest()
+            ->postJson(
+                uri: route('numeracion.store', ['ganado' => $idCria]),
+                data: ['numero' => random_int(1, 999)]
+            );
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf('api/ganado/%s', $idCria));
-
-        $response->assertStatus(200)->assertJson(
-            fn (AssertableJson $json) =>
-            $json->where(
-                'ganado.estados',
-                fn (Collection $estados) => $estados->doesntContain('estado', 'pendiente_numeracion')
-            )
-                ->whereType('ganado.numero', 'integer')
-                ->etc()
-        );
+        $this
+            ->setUpRequest()
+            ->getJson(sprintf('api/ganado/%s', $idCria))
+            ->assertStatus(200)
+            ->assertJson(
+                fn(AssertableJson $json) => $json
+                    ->where(
+                        key: 'ganado.estados',
+                        expected: fn(Collection $estados) => $estados->doesntContain(
+                            key: 'estado',
+                            operator: 'pendiente_numeracion'
+                        )
+                    )
+                    ->whereType('ganado.numero', 'integer')
+                    ->etc()
+            );
     }
 }

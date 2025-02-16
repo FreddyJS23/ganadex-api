@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -11,6 +11,14 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
+/**
+ * @property-read ?int $id
+ * @property string $usuario
+ * @property ?string $email
+ * @property-read ?DateTimeInterface $email_verified_at
+ * @property string $password
+ * @property-read ?string $remember_token
+ */
 class User extends Authenticatable
 {
     use HasApiTokens;
@@ -70,6 +78,8 @@ class User extends Authenticatable
      */
     public function usuariosVeterinario(): HasMany
     {
-        return $this->hasMany(UsuarioVeterinario::class, 'admin_id')->with('veterinario');
+        return $this
+            ->hasMany(UsuarioVeterinario::class, 'admin_id')
+            ->with('veterinario');
     }
 }

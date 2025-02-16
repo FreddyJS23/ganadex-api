@@ -3,39 +3,19 @@
 namespace Tests\Feature;
 
 use App\Models\Estado;
-use App\Models\Finca;
 use App\Models\Ganado;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Collection;
 use Illuminate\Testing\Fluent\AssertableJson;
+use Tests\Feature\Common\NeedsFinca;
+use Tests\Feature\Common\NeedsGanado;
 use Tests\TestCase;
 
 class CaparCriaTest extends TestCase
 {
     use RefreshDatabase;
-
-    private int $cantidad_ganado = 10;
-
-    private $user;
-    private $ganado;
-    private $estado;
-    private $finca;
-
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->user
-            = User::factory()->hasConfiguracion()->create();
-
-            $this->finca
-            = Finca::factory()
-            ->for($this->user)
-            ->create();
-    }
+    use NeedsGanado;
+    use NeedsFinca;
 
     private function generarGanado(): Collection
     {
@@ -50,16 +30,27 @@ class CaparCriaTest extends TestCase
             ->create();
     }
 
-    /**
-     * A basic feature test example.
-     */
+    private function setUpRequest(): static
+    {
+        $this
+            ->actingAs($this->user)
+            ->withSession($this->getSessionInitializationArray());
+
+        return $this;
+    }
+
     public function test_obtener_crias_pendientes_capar(): void
     {
         $this->generarGanado();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('capar.index'));
-        $response->assertStatus(200)
-            ->assertJson(fn (AssertableJson $json) => $json->has('crias_pendiente_capar', $this->cantidad_ganado));
+        $this
+            ->setUpRequest()
+            ->getJson(route('capar.index'))
+            ->assertStatus(200)
+            ->assertJson(fn(AssertableJson $json) => $json->has(
+                key: 'crias_pendiente_capar',
+                length: $this->cantidad_ganado
+            ));
     }
 
     public function test_capar_cria(): void
@@ -69,17 +60,24 @@ class CaparCriaTest extends TestCase
         $idCria = $criasGanado[$idRandom]->id;
 
         //capar
-        $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('capar.capar', ['ganado' => $idCria]));
+        $this
+            ->setUpRequest()
+            ->getJson(route('capar.capar', ['ganado' => $idCria]));
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf('api/ganado/%s', $idCria));
-
-        $response->assertStatus(200)->assertJson(
-            fn (AssertableJson $json) => $json
-                ->where(
-                    'ganado.estados',
-                    fn (Collection $estados) => $estados->doesntContain('estado', 'pendiente_capar')
-                )
-                ->etc()
-        );
+        $this
+            ->setUpRequest()
+            ->getJson(sprintf('api/ganado/%s', $idCria))
+            ->assertStatus(200)
+            ->assertJson(
+                fn(AssertableJson $json) => $json
+                    ->where(
+                        key: 'ganado.estados',
+                        expected: fn(Collection $estados) => $estados->doesntContain(
+                            key: 'estado',
+                            operator: 'pendiente_capar'
+                        )
+                    )
+                    ->etc()
+            );
     }
 }
