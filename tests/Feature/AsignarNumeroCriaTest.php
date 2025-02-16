@@ -30,15 +30,6 @@ class AsignarNumeroCriaTest extends TestCase
             ->create(['numero' => null]);
     }
 
-    private function setUpRequest(): static
-    {
-        $this
-            ->actingAs($this->user)
-            ->withSession($this->getSessionInitializationArray());
-
-        return $this;
-    }
-
     public function test_obtener_crias_pendientes_numeracion(): void
     {
         $this->generarGanado();

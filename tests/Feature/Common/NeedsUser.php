@@ -13,6 +13,7 @@ trait NeedsUser
         parent::setUp();
 
         $this->user  = User::factory()->hasConfiguracion()->create();
+        $this->user->assignRole('admin');
     }
 
     private function getSessionInitializationArray(): array

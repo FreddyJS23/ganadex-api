@@ -2,18 +2,16 @@
 
 namespace Tests\Feature;
 
-use App\Models\Configuracion;
 use App\Models\User;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Testing\Fluent\AssertableJson;
+use Tests\Feature\Common\NeedsUser;
 use Tests\TestCase;
 
 class ConfiguracionTest extends TestCase
 {
     use RefreshDatabase;
+    use NeedsUser;
 
     private array $configuracion = [
         'dias_diferencia_vacuna' => 10,
@@ -23,91 +21,102 @@ class ConfiguracionTest extends TestCase
 
     private int $cantidad_configuracion = 10;
 
-    private $user;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->user
-            = User::factory()->hasConfiguracion()->create();
-
-        $this->user->assignRole('admin');
-    }
-
     public static function ErrorInputProvider(): array
     {
         return [
-
             'caso de insertar datos erróneos' => [
                 [
-                'peso_servicio' => 0,
-                'dias_evento_notificacion' => 23243483384,
-                'dias_diferencia_vacuna' => 'ssss',
-                ], ['peso_servicio', 'dias_evento_notificacion', 'dias_diferencia_vacuna']
+                    'peso_servicio' => 0,
+                    'dias_evento_notificacion' => 23243483384,
+                    'dias_diferencia_vacuna' => 'ssss',
+                ],
+                [
+                    'peso_servicio',
+                    'dias_evento_notificacion',
+                    'dias_diferencia_vacuna'
+                ]
             ],
         ];
     }
 
-
-
-    /**
-     * A basic feature test example.
-     */
-
     public function test_obtener_configuracion(): void
     {
-
-        $response = $this->actingAs($this->user)->getJson('api/configuracion');
-
-        $response->assertStatus(200)->assertJson(
-            fn (AssertableJson $json) => $json->whereAllType(
-                [
-                    'configuracion.peso_servicio' => 'integer',
-                    'configuracion.dias_evento_notificacion' => 'integer',
-                    'configuracion.dias_diferencia_vacuna' => 'integer',
-                ]
-            )
-        );
+        $this
+            ->actingAs($this->user)
+            ->getJson('api/configuracion')
+            ->assertStatus(200)
+            ->assertJson(
+                fn(AssertableJson $json) => $json->whereAllType(
+                    [
+                        'configuracion.peso_servicio' => 'integer',
+                        'configuracion.dias_evento_notificacion' => 'integer',
+                        'configuracion.dias_diferencia_vacuna' => 'integer',
+                    ]
+                )
+            );
     }
 
 
     public function test_actualizar_configuracion(): void
     {
-        $response = $this->actingAs($this->user)->withSession(['peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(route('configuracion.update'), $this->configuracion);
-
-        $response->assertStatus(200)->assertJson(
-            fn (AssertableJson $json) => $json->where('configuracion.peso_servicio', $this->configuracion['peso_servicio'])
-            ->where('configuracion.dias_evento_notificacion', $this->configuracion['dias_evento_notificacion'])
-            ->where('configuracion.dias_diferencia_vacuna', $this->configuracion['dias_diferencia_vacuna'])
-            ->etc()
-        ) ->assertSessionHas('peso_servicio', $this->configuracion['peso_servicio'])
-        ->assertSessionHas('dias_evento_notificacion', $this->configuracion['dias_evento_notificacion'])
-        ->assertSessionHas('dias_diferencia_vacuna', $this->configuracion['dias_diferencia_vacuna']);
-        ;
+        $response = $this
+            ->actingAs($this->user)
+            ->withSession([
+                'peso_servicio' => $this->user->configuracion->peso_servicio,
+                'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,
+                'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna
+            ])
+            ->putJson(route('configuracion.update'), $this->configuracion)
+            ->assertStatus(200)
+            ->assertJson(
+                fn(AssertableJson $json) => $json
+                    ->where(
+                        key: 'configuracion.peso_servicio',
+                        expected: $this->configuracion['peso_servicio']
+                    )
+                    ->where(
+                        key: 'configuracion.dias_evento_notificacion',
+                        expected: $this->configuracion['dias_evento_notificacion']
+                    )
+                    ->where(
+                        'configuracion.dias_diferencia_vacuna',
+                        $this->configuracion['dias_diferencia_vacuna']
+                    )
+                    ->etc()
+            )
+            ->assertSessionHas(
+                key: 'peso_servicio',
+                value: $this->configuracion['peso_servicio']
+            )
+            ->assertSessionHas(
+                key: 'dias_evento_notificacion',
+                value: $this->configuracion['dias_evento_notificacion']
+            )
+            ->assertSessionHas(
+                key: 'dias_diferencia_vacuna',
+                value: $this->configuracion['dias_diferencia_vacuna']
+            );;
     }
 
-
-    /**
-     * @dataProvider ErrorinputProvider
-     */
+    /** @dataProvider ErrorinputProvider */
     public function test_error_validacion_registro_configuracion($configuracion, $errores): void
     {
-
-        $response = $this->actingAs($this->user)->putJson('api/configuracion', $configuracion);
-
-        $response->assertStatus(422)->assertInvalid($errores);
+        $this
+            ->actingAs($this->user)
+            ->putJson('api/configuracion', $configuracion)
+            ->assertStatus(422)
+            ->assertInvalid($errores);
     }
 
 
     public function test_autorizacion_usuario_veterinario_maniupular_configuracion(): void
     {
         $usuarioVeterinario = User::factory()->hasConfiguracion()->create();
-
         $usuarioVeterinario->syncRoles('veterinario');
 
-        $response = $this->actingAs($usuarioVeterinario)->putJson(route('configuracion.update'), $this->configuracion);
-
-        $response->assertStatus(403);
+        $this
+            ->actingAs($usuarioVeterinario)
+            ->putJson(route('configuracion.update'), $this->configuracion)
+            ->assertStatus(403);
     }
 }
