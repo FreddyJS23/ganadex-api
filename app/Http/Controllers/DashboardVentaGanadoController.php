@@ -74,11 +74,16 @@ class DashboardVentaGanadoController extends Controller
         $balanceAnual = [];
 
         foreach ($meses as $keyMes => $mes) {
+            /* inicializar cantidad de ventas del mes, para asi discriminar si existe o no ventas del mes */
             $cantidadVentasMes = 0;
 
             /* Iterar resultado sql para sincronizar numero mes y ventas del mes,
             al crear array con el nombre del mes y las ventas del mes */
+
+            /* Esto se hace con el fin de llenar la grafica con todos los meses,
+            pudiendo haber meses que no hayan tenido ventas, entonces se lo que se hace es filtrar que meses tuvieron ventas */
             foreach ($balanceMesesVentas as $mesBalance) {
+
                 if (intval($mesBalance['mes']) == $keyMes +  1) {
                     $cantidadVentasMes = $mesBalance['ventas'];
                 }
