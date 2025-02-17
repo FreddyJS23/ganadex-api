@@ -409,7 +409,7 @@ class GanadoTest extends TestCase
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson('api/ganado', $ganado);
 
-        $response->dd()->assertStatus(422)->assertInvalid($errores);
+        $response->assertStatus(422)->assertInvalid($errores);
     }
 
     public function test_autorizacion_maniupular_cabeza_ganado_otra_finca(): void
