@@ -34,6 +34,10 @@ class StoreGanadoDescarteRequest extends FormRequest
             'estado_id' => Rule::foreach(
                 fn($value, $attrubute) => Rule::exists('estados', 'id')
             ),
+             //campos vacunacion
+             'vacunas.*.fecha' => 'date_format:Y-m-d',
+             'vacunas.*.prox_dosis' => 'date_format:Y-m-d',
+             'vacunas.*.vacuna_id' => ['integer',Rule::exists('vacunas', 'id')],
         ];
     }
 }

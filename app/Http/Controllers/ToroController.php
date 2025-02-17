@@ -8,9 +8,12 @@ use App\Http\Resources\ToroCollection;
 use App\Http\Resources\ToroResource;
 use App\Models\Ganado;
 use App\Models\GanadoTipo;
+use App\Models\Jornada_vacunacion;
 use App\Models\Servicio;
 use App\Models\Toro;
+use App\Models\Vacuna;
 use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -109,6 +112,15 @@ class ToroController extends Controller
                         'finca_id' => session('finca_id')
                         ]
                     );
+                    //vacunacion
+
+                    $vacunas = [];
+
+                    foreach ($request->only('vacunas')['vacunas'] as $vacuna) {
+                        array_push($vacunas, $vacuna + ['ganado_id' => $ganado->id, 'finca_id' => $ganado->finca_id]);
+                    }
+
+                    $ganado->vacunaciones()->createMany($vacunas);
 
                     $ganado->estados()->sync($request->only('estado_id')['estado_id']);
                     $ganado->peso()->create($request->only($this->peso));
@@ -141,6 +153,117 @@ class ToroController extends Controller
                 ]
             );
 
+        //tabla principal relacional, para obtener el ganado
+        $ganado=$toro->ganado;
+
+        /*sentencia sql para poder generar un id a base de la fecha de creacion, si no se genera un id puede habe un error
+        ya que pueden coincidir los id de la tabla vacunaciones y la de jornada_vacunaciones*/
+        /*Explicacion consulta: se evaluara y los id de algunas de las tablas es nulo,
+        ademas se utliza un formato de la fecha (j, para obtener el numero del dia del año, ejem:034)
+        ademas se le concatena el id de la tabla que no es nulo*/
+        $sentenciaSqlGenerarId="CASE
+            WHEN vacunacions.id IS NULL THEN CONCAT(DATE_FORMAT(jornada_vacunacions.created_at, '%j'),jornada_vacunacions.id)
+            WHEN jornada_vacunacions.created_at IS NULL THEN CONCAT(DATE_FORMAT(vacunacions.created_at, '%j'),vacunacions.id)
+            ELSE CONCAT(DATE_FORMAT(jornada_vacunacions.created_at, '%j'),jornada_vacunacions.id)
+        END";
+
+        /*sentencia sql para poder obtener el historial de vacunaciones bien sea de las tablas vacunaciones o jornada_vacunaciones*/
+        $sentenciaSqlHistorialVacunas = "
+        CONCAT(vacunas.id, $sentenciaSqlGenerarId) as id,
+        nombre as vacuna,
+        CASE
+            WHEN vacunacions.prox_dosis IS NULL THEN jornada_vacunacions.prox_dosis
+            WHEN jornada_vacunacions.prox_dosis IS NULL THEN vacunacions.prox_dosis
+            ELSE jornada_vacunacions.prox_dosis
+        END as prox_dosis,
+        CASE
+            WHEN vacunacions.fecha is NULL THEN jornada_vacunacions.fecha_inicio
+            WHEN jornada_vacunacions.fecha_inicio is NULL THEN vacunacions.fecha
+        END as fecha
+        ";
+
+        /*  se utilizas el leftJoin para traer resultado independientemente si existen resultados en una tabla u otra,
+        si se usa inner join se obtendra resultados precisos ya solo traera resultados cuando existan en las dos tablas relacionadas.
+        Los ultimos dos wheres se utilizan para omitir los resultados de la tabla vacuna, ya que por defecto los trae y aumentaria el contador
+        de aplicaciones de vacunas aplicada
+        */
+        $historialVacunas = Vacuna::selectRaw($sentenciaSqlHistorialVacunas)
+            ->leftJoin(
+                'vacunacions',
+                function (JoinClause $join) use ($ganado) {
+                    $join->on('vacunas.id', '=', 'vacunacions.vacuna_id')
+                        ->where('vacunacions.ganado_id', $ganado->id);
+                }
+            )
+        ->leftJoin(
+            'jornada_vacunacions',
+            function (JoinClause $join) use ($ganado) {
+                $join->on('vacunas.id', '=', 'jornada_vacunacions.vacuna_id')
+                    ->where('jornada_vacunacions.finca_id', session('finca_id'))
+                    ->where('fecha_inicio', '>', $ganado->fecha_nacimiento ?? $ganado->created_at);
+            }
+        )
+        ->where('jornada_vacunacions.prox_dosis', '!=', 'null')
+        ->orWhere('vacunacions.prox_dosis', '!=', 'null')
+        ->get();
+
+        //diferencia dias entre proxima vacunacion individual y jornada vacunacion
+        $diferencia = session('dias_diferencia_vacuna');
+        $setenciaDiferenciaDias = "DATEDIFF(MAX(jornada_vacunacions.prox_dosis),MAX(vacunacions.prox_dosis))";
+
+        /* Explicacion consulta
+        usar un alias para las vacunas.
+        primer case: para comprobar ver si alguna de las tablas relacionadas no existe registro,
+        si existe registro en las dos se hace una suma de +1 ya que al contar los registros al existir en las dos tablas hace el conteo como 1.
+        segundo case: determinar la proxima dosis dependiendo la existencia de registros en las tablas relacionadas,
+        si existen registros en las dos tablas se comprueba que proxima dosis se le debe dar prioridad
+        tercer case: determinar la ultima vacunacion dependiendo la existencia de registros en las tablas relacionadas,
+        si existen registros en las dos tablas se comprueba que ultima dosis es la mas reciente*/
+        $sentenciaSqlAgruparVacunas = "nombre as vacuna,
+        CASE
+            WHEN MAX(vacunacions.prox_dosis) IS NULL OR MAX(jornada_vacunacions.prox_dosis) IS NULL THEN COUNT(nombre)
+            ELSE COUNT(nombre) + 1
+            END as cantidad,
+        CASE
+            WHEN MAX(vacunacions.prox_dosis) IS NULL THEN MAX(jornada_vacunacions.prox_dosis)
+            WHEN MAX(jornada_vacunacions.prox_dosis) IS NULL THEN MAX(vacunacions.prox_dosis)
+            WHEN $setenciaDiferenciaDias >= $diferencia THEN MAX(vacunacions.prox_dosis)
+            ELSE MAX(jornada_vacunacions.prox_dosis)
+        END as prox_dosis,
+        CASE
+            WHEN MAX(vacunacions.fecha) IS NULL THEN MAX(jornada_vacunacions.fecha_inicio)
+            WHEN MAX(jornada_vacunacions.fecha_inicio) IS NULL THEN MAX(vacunacions.fecha)
+            WHEN MAX(jornada_vacunacions.fecha_inicio) > MAX(vacunacions.fecha) THEN MAX(jornada_vacunacions.fecha_inicio)
+            ELSE MAX(vacunacions.fecha)
+        END as ultima_dosis
+        ";
+
+        /*  se utilizas el leftJoin para traer resultado independientemente si existen resultados en una tabla u otra,
+        si se usa inner join se obtendra resultados precisos ya solo traera resultados cuando existan en las dos tablas relacionadas.
+        Los ultimos dos wheres se utilizan para omitir los resultados de la tabla vacuna, ya que por defecto los trae y aumentaria el contador
+        de aplicaciones de vacunas aplicada
+        */
+        $agruparVacunas = Vacuna::selectRaw($sentenciaSqlAgruparVacunas)
+            ->leftJoin(
+                'vacunacions',
+                function (JoinClause $join) use ($ganado) {
+                    $join->on('vacunas.id', '=', 'vacunacions.vacuna_id')
+                        ->where('vacunacions.ganado_id', $ganado->id);
+                }
+            )
+        ->leftJoin(
+            'jornada_vacunacions',
+            function (JoinClause $join) use ($ganado) {
+                $join->on('vacunas.id', '=', 'jornada_vacunacions.vacuna_id')
+                    ->where('jornada_vacunacions.finca_id', session('finca_id'))
+                    ->where('fecha_inicio', '>', $ganado->fecha_nacimiento ?? $ganado->created_at);
+            }
+        )
+        ->where('jornada_vacunacions.prox_dosis', '!=', 'null')
+        ->orWhere('vacunacions.prox_dosis', '!=', 'null')
+        ->groupBy('nombre')
+        ->get();
+
         $toro->efectividad = null;
 
         /*efectividad respecto a cuantos servicios hiso para que la vaca quede prenada */
@@ -169,6 +292,10 @@ class ToroController extends Controller
         return response()->json(
             [
             'toro' => new ToroResource($toro),
+            'vacunaciones' => (object)[
+                'vacunas' => $agruparVacunas,
+                'historial' => $historialVacunas
+                ]
             ],
             200
         );

@@ -27,6 +27,18 @@ class ToroTest extends TestCase
         'sexo' => 'M',
         'tipo_id' => 4,
         'fecha_nacimiento' => '2015-02-17',
+        'vacunas' => [
+            [
+                'fecha' => '2015-02-17',
+                'vacuna_id' => 1,
+                'prox_dosis' => '2015-02-17',
+            ],
+            [
+                'fecha' => '2015-02-17',
+                'vacuna_id' => 2,
+                'prox_dosis' => '2015-02-17',
+            ],
+        ],
 
     ];
 
@@ -72,7 +84,7 @@ class ToroTest extends TestCase
         return Toro::factory()
             ->count(10)
             ->for($this->finca)
-            ->forGanado(['finca_id' => $this->finca->id, 'sexo' => 'M', 'tipo_id' => 4])
+            ->for(Ganado::factory()->hasVacunaciones(3, ['finca_id' => $this->finca->id])->create( ['finca_id' => $this->finca->id, 'sexo' => 'M', 'tipo_id' => 4])  )
             ->create();
     }
 
@@ -243,6 +255,24 @@ class ToroTest extends TestCase
                         ])
                         ->where('sexo', 'M')
                         ->where('tipo', 'adulto')
+                )->has(
+                    'vacunaciones',
+                    fn(AssertableJson $json) =>
+                    $json->has('vacunas.0', fn(AssertableJson $json)=>
+                        $json->whereAllType([
+                            'vacuna' => 'string',
+                            'cantidad' => 'integer',
+                            'ultima_dosis' => 'string',
+                            'prox_dosis' => 'string',
+                        ])
+                        ->where('cantidad', fn(int $cantidad)=>$cantidad <= 3))
+                    ->has('historial.0', fn(AssertableJson $json)=>
+                        $json->whereAllType([
+                            'id' => 'integer',
+                            'vacuna' => 'string',
+                            'fecha' => 'string',
+                            'prox_dosis' => 'string',
+                        ]))
                 )
             );
     }

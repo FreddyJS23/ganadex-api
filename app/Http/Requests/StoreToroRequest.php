@@ -34,6 +34,7 @@ class StoreToroRequest extends FormRequest
             'estado_id' => Rule::foreach(
                 fn($value, $attrubute) => Rule::exists('estados', 'id')
             ),
+            
         ];
     }
 }
