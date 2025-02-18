@@ -17,7 +17,7 @@ class RevisionResource extends JsonResource
         return [
             'id' => $this->id,
             'fecha' => $this->fecha,
-            'diagnostico' => $this->diagnostico,
+            'diagnostico' => $this->tipoRevision->tipo,
             'tratamiento' => $this->tratamiento,
             'veterinario' => $this->veterinario,
         ];

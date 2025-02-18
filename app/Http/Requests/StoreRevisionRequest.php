@@ -25,7 +25,7 @@ class StoreRevisionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'diagnostico' => ['required','min:3','max:255', new ComprobarRequisitosPrenada()],
+            'tipo_revision_id' => ['required','numeric',Rule::exists('tipo_revisions', 'id'), new ComprobarRequisitosPrenada()],
             'tratamiento' => 'required|min:3,|max:255',
             'fecha' => 'date_format:Y-m-d',
             'personal_id' => ['required',new ComprobarVeterianario()]

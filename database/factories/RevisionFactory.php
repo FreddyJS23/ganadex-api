@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\TipoRevision;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,7 +18,7 @@ class RevisionFactory extends Factory
     public function definition(): array
     {
         return [
-            'diagnostico' => fake()->word(),
+            'tipo_revision_id' => TipoRevision::factory(),
             'tratamiento' =>  fake()->word(),
             'fecha' => fake()->date()
         ];

@@ -57,13 +57,11 @@ class EventosGanadoTest extends TestCase
 
 
     private array $revision = [
-        'diagnostico' => 'prenada',
         'fecha' => '2020-10-02',
         'tratamiento' => 'medicina',
     ];
 
     private array $revisionDescarte = [
-        'diagnostico' => 'descartar',
         'fecha' => '2020-10-02',
         'tratamiento' => 'ninguno',
     ];
@@ -87,6 +85,12 @@ class EventosGanadoTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        //tipo de revision preñada
+        $this->revision=$this->revision + ['tipo_revision_id' => 1];
+
+        //tipo de revision descartear
+        $this->revisionDescarte=$this->revisionDescarte + ['tipo_revision_id' => 2];
 
         $this->user
             = User::factory()->hasConfiguracion()->create();

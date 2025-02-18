@@ -19,7 +19,7 @@ class ComprobarRequisitosPrenada implements ValidationRule
         $ganado = Ganado::firstWhere('id', $idGanado);
 
         $pesoActualGanado = $ganado->peso->getRawOriginal('peso_actual');
-        if ($value == 'prenada') {
+        if ($value == 1) {
             if ($pesoActualGanado < session('peso_servicio')) {
                 $fail('La vaca debe tener un peso mayor a ' . session('peso_servicio') . ' kg');
             }

@@ -22,7 +22,6 @@ class RevisionTest extends TestCase
     use RefreshDatabase;
 
     private array $revision = [
-        'diagnostico' => 'revisar',
         'tratamiento' => 'medicina',
         'fecha' => '2020-10-02',
 
@@ -40,6 +39,9 @@ class RevisionTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        //tipo de revision preñada
+        $this->revision=$this->revision + ['tipo_revision_id' => 3];
 
         $this->estado = Estado::all();
 
@@ -82,18 +84,19 @@ class RevisionTest extends TestCase
 
             'caso de insertar datos erróneos' => [
                 [
-                    'diagnostico' => 'te',
+                    'tipo_revision_id' => 'd',
                     'tratamiento' => 'hj',
                     'personal_id' => 'd'
-                ], ['diagnostico', 'tratamiento','personal_id']
+                ], ['tipo_revision_id', 'tratamiento','personal_id']
             ],
             'caso de no insertar datos requeridos' => [
-                [], ['diagnostico', 'tratamiento','personal_id']
+                [], ['tipo_revision_id', 'tratamiento','personal_id']
             ],
             'caso de insertar un personal que no sea veterinario' => [
                 [
-                    'personal_id' => 2
-                ], ['personal_id']
+                    'tipo_revision_id' => 167,
+                    'personal_id' => 2,
+                ], ['tipo_revision_id', 'personal_id']
             ],
         ];
     }
@@ -187,11 +190,11 @@ class RevisionTest extends TestCase
 
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])
-        ->postJson(route('revision.store', ['ganado' => $ganadoNoRequisito->id]), ['diagnostico' => 'prenada','tratamiento' => 'medicina', 'fecha' => '2020-10-02','personal_id' => $this->veterinario->id]);
+        ->postJson(route('revision.store', ['ganado' => $ganadoNoRequisito->id]), ['tipo_revision_id' => 1,'tratamiento' => 'medicina', 'fecha' => '2020-10-02','personal_id' => $this->veterinario->id]);
 
         $response->assertStatus(422)
             ->assertJson(
-                fn (AssertableJson $json) => $json->where('errors.diagnostico.0', fn(string $message)=>Str::contains($message, 'La vaca debe tener un peso mayor a'))
+                fn (AssertableJson $json) => $json->where('errors.tipo_revision_id.0', fn(string $message)=>Str::contains($message, 'La vaca debe tener un peso mayor a'))
                 ->etc()
             );
     }
@@ -206,11 +209,11 @@ class RevisionTest extends TestCase
         ->create();
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])
-        ->postJson(route('revision.store', ['ganado' => $ganadoNoRequisito->id]), ['diagnostico' => 'prenada','tratamiento' => 'medicina', 'fecha' => '2020-10-02','personal_id' => $this->veterinario->id]);
+        ->postJson(route('revision.store', ['ganado' => $ganadoNoRequisito->id]), ['tipo_revision_id' => 1,'tratamiento' => 'medicina', 'fecha' => '2020-10-02','personal_id' => $this->veterinario->id]);
 
         $response->assertStatus(422)
             ->assertJson(
-                fn (AssertableJson $json) => $json->where('errors.diagnostico.0', 'La vaca debe de tener un servicio previo')
+                fn (AssertableJson $json) => $json->where('errors.tipo_revision_id.0', 'La vaca debe de tener un servicio previo')
                 ->etc()
             )
             ;
@@ -259,7 +262,7 @@ class RevisionTest extends TestCase
                 fn (AssertableJson $json) => $json->has(
                     'revision',
                     fn (AssertableJson $json) =>
-                    $json->where('diagnostico', $this->revision['diagnostico'])
+                    $json->where('diagnostico', 'Rutina')
                     ->where('tratamiento', $this->revision['tratamiento'])
                     ->has(
                         'veterinario',

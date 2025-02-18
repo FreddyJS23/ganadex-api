@@ -28,7 +28,6 @@ class LogsTest extends TestCase
 
 
     private array $revision = [
-        'diagnostico' => 'revisar',
         'tratamiento' => 'medicina',
         'fecha' => '2020-10-02',
 
@@ -75,6 +74,9 @@ class LogsTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        //tipo de revision preñada
+        $this->revision=$this->revision + ['tipo_revision_id' => 1];
 
         $causaFallecimiento = CausasFallecimiento::factory()->create();
         $this->fallecimiento=$this->fallecimiento + ['causas_fallecimiento_id'=>$causaFallecimiento->id];
@@ -299,7 +301,7 @@ class LogsTest extends TestCase
         $response->assertStatus(200)->assertJson(fn (AssertableJson $json)
          => $json->has(
              'logs',
-             15,
+             16,
              fn (AssertableJson $json) => $json->whereAllType([
                 'id' => 'integer',
                 'actividad' => 'string',

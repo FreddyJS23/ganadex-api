@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('revisions', function (Blueprint $table) {
             $table->id();
             $table->date('fecha');
-            $table->string('diagnostico');
+            $table->string('tipo_revision_id');
             $table->string('tratamiento');
             $table->foreignId('ganado_id')->constrained()->cascadeOnDelete();
             $table->foreignId('personal_id')->constrained()->cascadeOnDelete();
