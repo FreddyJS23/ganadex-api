@@ -7,6 +7,7 @@ use App\Http\Requests\StoreFallecimientoRequest;
 use App\Http\Requests\UpdateFallecimientoRequest;
 use App\Http\Resources\FallecimientoCollection;
 use App\Http\Resources\FallecimientoResource;
+use App\Models\CausasFallecimiento;
 use App\Models\Fallecimiento;
 use App\Models\Ganado;
 use Carbon\Carbon;
@@ -29,7 +30,7 @@ class FallecimientoController extends Controller
     {
         $fallecimiento = new Fallecimiento();
         $ganado = Ganado::find($request->input('ganado_id'));
-        $fallecimiento->fill($request->only('causa', 'fecha'));
+        $fallecimiento->fill($request->only('causas_fallecimiento_id','descripcion', 'fecha'));
         $fallecimiento->ganado()->associate($ganado);
         $fallecimiento->save();
 
@@ -52,8 +53,9 @@ class FallecimientoController extends Controller
     public function update(UpdateFallecimientoRequest $request, Fallecimiento $fallecimiento)
     {
 
-        $fallecimiento->fill($request->only('causa'));
+        $fallecimiento->fill($request->only('causas_fallecimiento_id'));
         $fallecimiento->fecha = $request->input('fecha');
+        $fallecimiento->descripcion = $request->input('descripcion');
         $fallecimiento->save();
 
         return response()->json(['fallecimiento' => new FallecimientoResource($fallecimiento->load('ganado:id,numero'))], 200);

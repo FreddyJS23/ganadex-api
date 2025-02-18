@@ -16,9 +16,15 @@ class Fallecimiento extends Model
 
     protected $fillable =
     [
-        'causa',
-        'fecha'
+        'causas_fallecimiento_id',
+        'fecha',
+        'descripcion'
     ];
+
+    public function causa_fallecimiento(): BelongsTo
+    {
+        return $this->belongsTo(CausasFallecimiento::class,'causas_fallecimiento_id','id','causas_fallecimiento');
+    }
 
     /**
      * Get the ganado that owns the Fallecimiento

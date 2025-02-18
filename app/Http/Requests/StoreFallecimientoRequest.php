@@ -24,7 +24,8 @@ class StoreFallecimientoRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'causa' => 'required|min:3|max:255|string',
+            'causas_fallecimiento_id' => ['required', 'numeric', Rule::exists('causas_fallecimientos', 'id') ],
+            'descripcion' => 'min:3|max:255',
             'fecha' => 'date_format:Y-m-d',
             'ganado_id' => [
                 'required', 'numeric', Rule::exists('ganados', 'id')

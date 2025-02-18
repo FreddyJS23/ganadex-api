@@ -48,7 +48,7 @@ class StoreGanadoRequest extends FormRequest
             ],
             //campos para registrar ganado muerto
             'fecha_fallecimiento' => ['date_format:Y-m-d', Rule::requiredIf(fn () => in_array(2, $this->estado_id))],
-            'causa' => ['min:3','max:255','string', Rule::requiredIf(fn () => in_array(2, $this->estado_id))],
+            'causas_fallecimiento_id' => [Rule::requiredIf(fn () => in_array(2, $this->estado_id)), 'numeric', Rule::exists('causas_fallecimientos', 'id') ],
             //campos vacunacion
             'vacunas.*.fecha' => 'date_format:Y-m-d',
             'vacunas.*.prox_dosis' => 'date_format:Y-m-d',

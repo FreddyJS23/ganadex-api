@@ -66,7 +66,7 @@ class GanadoController extends Controller
                         $request->only($this->estado)['estado_id'][0] == 2 && $ganado->fallecimiento()->create(
                             [
                             'fecha' => $request->input('fecha_fallecimiento'),
-                            'causa' => $request->input('causa')
+                            'causas_fallecimiento_id' => $request->input('causas_fallecimiento_id')
                             ]
                         );
 

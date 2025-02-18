@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\CausasFallecimiento;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,7 +18,8 @@ class FallecimientoFactory extends Factory
     public function definition(): array
     {
         return [
-            'causa' => fake()->word(),
+            'causas_fallecimiento_id' => CausasFallecimiento::factory(),
+            'descripcion' => fake()->sentence(),
             'fecha' => fake()->date()
         ];
     }
