@@ -3,9 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
-class UpdateFallecimientoRequest extends FormRequest
+class UpdateCausasFallecimientosRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,8 +22,7 @@ class UpdateFallecimientoRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'causas_fallecimiento_id' => ['required', 'numeric', Rule::exists('causas_fallecimientos', 'id') ],
-            'fecha' => 'required|date_format:Y-m-d'
+            'causa' => 'required|min:3|max:255',
         ];
     }
 }

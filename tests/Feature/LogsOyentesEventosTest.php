@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Events\FallecimientoGanado;
+use App\Models\CausasFallecimiento;
 use App\Models\Comprador;
 use App\Models\Estado;
 use App\Models\Fallecimiento;
@@ -75,8 +76,8 @@ class LogsOyentesEventosTest extends TestCase
     ];
 
     private array $fallecimiento = [
-        'causa' => 'enferma',
         'fecha' => '2020-10-02',
+        'descripcion' => 'test',
     ];
 
     private array $pesoLeche = [
@@ -88,6 +89,9 @@ class LogsOyentesEventosTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        $causaFallecimiento = CausasFallecimiento::factory()->create();
+        $this->fallecimiento=$this->fallecimiento + ['causas_fallecimiento_id'=>$causaFallecimiento->id];
 
         $this->user
             = User::factory()->hasConfiguracion()->create();

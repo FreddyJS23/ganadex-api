@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\CausasFallecimiento;
 use App\Models\Comprador;
 use App\Models\Finca;
 use App\Models\Ganado;
@@ -27,6 +28,7 @@ class ToroTest extends TestCase
         'sexo' => 'M',
         'tipo_id' => 4,
         'fecha_nacimiento' => '2015-02-17',
+        'estado_id' => [1],
         'vacunas' => [
             [
                 'fecha' => '2015-02-17',
@@ -74,7 +76,8 @@ class ToroTest extends TestCase
             ->create();
 
             $comprador = Comprador::factory()->for($this->finca)->create()->id;
-            $this->toro_fallecido = array_merge($this->toro, ['estado_id' => [2,3,4],'fecha_fallecimiento' => '2020-10-02','causa' => 'enferma']);
+            $causaFallecimiento = CausasFallecimiento::factory()->create();
+            $this->toro_fallecido = array_merge($this->toro, ['estado_id' => [2,3,4],'fecha_fallecimiento' => '2020-10-02','descripcion'=>'test','causas_fallecimiento_id'=>$causaFallecimiento->id]);
             $this->toro_vendido = array_merge($this->toro, ['estado_id' => [5,6,7],'fecha_venta' => '2020-10-02','precio' => 100,'comprador_id' => $comprador]);
             $this->toro = array_merge($this->toro, ['estado_id' => [1]]);
     }
@@ -105,6 +108,8 @@ class ToroTest extends TestCase
                     'sexo' => 'M',
                     'tipo_id' => '4',
                     'fecha_nacimiento' => '2015-03-02',
+                    'estado_id' => [1],
+
                 ], ['nombre', 'numero']
             ],
             'caso de insertar datos erróneos' => [
@@ -112,13 +117,15 @@ class ToroTest extends TestCase
                     'nombre' => 'te',
                     'numero' => 'hj',
                     'origen' => 'ce',
+                    'estado_id' => [1],
                     'fecha_nacimiento' => '2015-13-02',
                 ], [
                     'nombre', 'numero', 'origen', 'fecha_nacimiento',
                 ]
             ],
             'caso de no insertar datos requeridos' => [
-                ['origen' => 'local'], ['nombre', 'numero',]
+                ['origen' => 'local', 'estado_id' => [1],
+            ], ['nombre', 'numero',]
             ],
         ];
     }

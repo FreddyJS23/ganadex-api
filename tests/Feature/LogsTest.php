@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\CausasFallecimiento;
 use App\Models\Estado;
 use App\Models\Fallecimiento;
 use App\Models\Finca;
@@ -57,7 +58,7 @@ class LogsTest extends TestCase
     ];
 
     private array $fallecimiento = [
-        'causa' => 'enferma',
+        'descripcion' => 'enferma',
         'fecha' => '2020-10-02',
     ];
 
@@ -74,6 +75,9 @@ class LogsTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        $causaFallecimiento = CausasFallecimiento::factory()->create();
+        $this->fallecimiento=$this->fallecimiento + ['causas_fallecimiento_id'=>$causaFallecimiento->id];
 
         $this->userAdmin
             = User::factory()
@@ -295,7 +299,7 @@ class LogsTest extends TestCase
         $response->assertStatus(200)->assertJson(fn (AssertableJson $json)
          => $json->has(
              'logs',
-             6,
+             15,
              fn (AssertableJson $json) => $json->whereAllType([
                 'id' => 'integer',
                 'actividad' => 'string',

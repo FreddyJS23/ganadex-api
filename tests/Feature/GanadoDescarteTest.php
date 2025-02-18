@@ -2,7 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Models\CausasFallecimiento;
 use App\Models\Comprador;
+use App\Models\Estado;
 use App\Models\Finca;
 use App\Models\Ganado;
 use App\Models\GanadoDescarte;
@@ -58,6 +60,8 @@ class GanadoDescarteTest extends TestCase
     private $finca;
     private $descarte_fallecido;
     private $descarte_vendido;
+    private $estado;
+
 
     protected function setUp(): void
     {
@@ -67,6 +71,7 @@ class GanadoDescarteTest extends TestCase
             = User::factory()->hasConfiguracion()->create();
 
         $this->user->assignRole('admin');
+        $this->estado = Estado::all();
 
             $this->finca
             = Finca::factory()
@@ -74,7 +79,8 @@ class GanadoDescarteTest extends TestCase
             ->create();
 
             $comprador = Comprador::factory()->for($this->finca)->create()->id;
-            $this->descarte_fallecido = array_merge($this->ganadoDescarte, ['estado_id' => [2,3,4],'fecha_fallecimiento' => '2020-10-02','causa' => 'enferma']);
+            $causaFallecimiento = CausasFallecimiento::factory()->create();
+            $this->descarte_fallecido = array_merge($this->ganadoDescarte, ['estado_id' => [2,3,4],'fecha_fallecimiento' => '2020-10-02','descripcion'=>'tyes','causas_fallecimiento_id'=>$causaFallecimiento->id]);
             $this->descarte_vendido = array_merge($this->ganadoDescarte, ['estado_id' => [5,6,7],'fecha_venta' => '2020-10-02','precio' => 100,'comprador_id' => $comprador]);
             $this->ganadoDescarte = array_merge($this->ganadoDescarte, ['estado_id' => [1]]);
     }
@@ -104,6 +110,7 @@ class GanadoDescarteTest extends TestCase
                     'sexo' => 'M',
                     'tipo_id' => '4',
                     'fecha_nacimiento' => '2015-03-02',
+                    'estado_id' => [1],
                 ], ['nombre', 'numero']
             ],
             'caso de insertar datos erróneos' => [
@@ -112,12 +119,13 @@ class GanadoDescarteTest extends TestCase
                     'numero' => 'hj',
                     'origen' => 'ce',
                     'fecha_nacimiento' => '2015-13-02',
+                    'estado_id' => [1],
                 ], [
                     'nombre', 'numero', 'origen', 'fecha_nacimiento',
                 ]
             ],
             'caso de no insertar datos requeridos' => [
-                ['origen' => 'local'], ['nombre']
+                ['origen' => 'local','estado_id' => [1],], ['nombre']
             ],
         ];
     }

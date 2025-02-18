@@ -17,6 +17,15 @@ class AsignarNumeroCriaTest extends TestCase
     use NeedsGanado;
     use NeedsFinca;
 
+    private function setUpRequest(): static
+    {
+        $this
+            ->actingAs($this->user)
+            ->withSession($this->getSessionInitializationArray());
+
+        return $this;
+    }
+
     private function generarGanado(): Collection
     {
         $this->estado = Estado::where('estado', 'pendiente_numeracion')->get();

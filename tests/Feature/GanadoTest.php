@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\CausasFallecimiento;
 use App\Models\Comprador;
 use App\Models\Estado;
 use App\Models\Finca;
@@ -76,9 +77,10 @@ class GanadoTest extends TestCase
 
             $this->estado = Estado::all();
 
+            $causaFallecimiento = CausasFallecimiento::factory()->create();
 
             $comprador = Comprador::factory()->for($this->finca)->create()->id;
-            $this->cabeza_ganado_fallecida = array_merge($this->cabeza_ganado, ['estado_id' => [2,3,4],'fecha_fallecimiento' => '2020-10-02','causa' => 'enferma']);
+            $this->cabeza_ganado_fallecida = array_merge($this->cabeza_ganado, ['estado_id' => [2,3,4],'fecha_fallecimiento' => '2020-10-02','descripcion'=>'test','causas_fallecimiento_id'=>$causaFallecimiento->id]);
             $this->cabeza_ganado_vendida = array_merge($this->cabeza_ganado, ['estado_id' => [5,6,7],'fecha_venta' => '2020-10-02','precio' => 100,'comprador_id' => $comprador]);
             $this->cabeza_ganado = array_merge($this->cabeza_ganado, ['estado_id' => [1]]);
     }

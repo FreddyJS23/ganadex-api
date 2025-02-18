@@ -13,6 +13,7 @@ class DashboardFallecimientosController extends Controller
     {
         $causasFrecuentes = Fallecimiento::whereRelation('ganado', 'finca_id', session('finca_id'))
             ->select(DB::raw('count(*) as fallecimientos'), 'causa')
+            ->join('causas_fallecimientos','causas_fallecimiento_id','=','causas_fallecimientos.id')
             ->groupBy('causa')
             ->limit(5)
             ->orderBy('fallecimientos', 'desc')
