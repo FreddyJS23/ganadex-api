@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Ganado;
 use App\Rules\ComprobarRequisitosPrenada;
 use App\Rules\ComprobarVeterianario;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 

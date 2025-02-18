@@ -2,9 +2,11 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Ganado;
 use App\Rules\ComprobarVeterianario;
 use App\Rules\VerificarGeneroToro;
 use App\Rules\VerificarGeneroVaca;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StorePartoRequest extends FormRequest
@@ -33,6 +35,35 @@ class StorePartoRequest extends FormRequest
             'peso_nacimiento' => 'numeric|between:1,32767',
             'personal_id' => ['required', new ComprobarVeterianario()]
 
+        ];
+    }
+
+    public function after()
+    {
+        $idGanado = preg_replace("/[^0-9]/", "", (string) request()->path());
+        $ganado = Ganado::firstWhere('id', $idGanado);
+        //tiene que tener un servicio reciente para poder registrar un parto
+        $servicioReciente=$ganado->servicioReciente;
+        //tiene que estar en gestacion para poder registrar un parto
+        $estadoGestacion=$ganado->estados()->where('estado','gestacion')->get()->toArray();
+
+
+
+        return[
+            function(Validator $validator) use ($servicioReciente, $estadoGestacion){
+                if(!$servicioReciente){
+                    $validator->errors()->add(
+                        'servicio',
+                        'Para registrar un parto la vaca debe de tener un servicio previo'
+                    );
+                }
+                else if(!$estadoGestacion){
+                    $validator->errors()->add(
+                        'estado_gestacion',
+                        'Para registrar un parto la vaca debe estar en gestacion'
+                    );
+                }
+            }
         ];
     }
 }
