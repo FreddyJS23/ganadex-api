@@ -4,6 +4,7 @@ use App\Http\Controllers\AsignarNumeroCriaController;
 use App\Http\Controllers\AuthLogin;
 use App\Http\Controllers\BackupRestoreBDController;
 use App\Http\Controllers\CaparCriaController;
+use App\Http\Controllers\CausasFallecimientoController;
 use App\Http\Controllers\checkSesionActivaUsuario;
 use App\Http\Controllers\CompradorController;
 use App\Http\Controllers\ConfiguracionController;
@@ -84,6 +85,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('/finca', FincaController::class)->only(['index', 'store', 'update']);
     Route::get('/crear_sesion_finca/{finca}', [FincaController::class, 'crear_sesion_finca'])->name('crear_sesion_finca');
     Route::get('/verificar_sesion_finca', [FincaController::class, 'verificar_sesion_finca'])->name('verificar_sesion_finca');
+    Route::apiResource('/causas_fallecimiento', CausasFallecimientoController::class);
 
     Route::get('/crias_pendiente_capar', [CaparCriaController::class, 'index'])->name('capar.index');
     Route::get('/capar_cria/{ganado}', [CaparCriaController::class, 'capar'])->name('capar.capar');
