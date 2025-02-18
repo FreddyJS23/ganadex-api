@@ -29,6 +29,7 @@ use App\Http\Controllers\PajuelaToroController;
 use App\Http\Controllers\ResumenesAnual;
 use App\Http\Controllers\RevisionController;
 use App\Http\Controllers\ServicioController;
+use App\Http\Controllers\TipoRevisionController;
 use App\Http\Controllers\TodosPartos;
 use App\Http\Controllers\TodosPesajeLeche;
 use App\Http\Controllers\TodosRevisiones;
@@ -86,6 +87,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/crear_sesion_finca/{finca}', [FincaController::class, 'crear_sesion_finca'])->name('crear_sesion_finca');
     Route::get('/verificar_sesion_finca', [FincaController::class, 'verificar_sesion_finca'])->name('verificar_sesion_finca');
     Route::apiResource('/causas_fallecimiento', CausasFallecimientoController::class);
+    Route::apiResource('/tipos_revision', TipoRevisionController::class);
 
     Route::get('/crias_pendiente_capar', [CaparCriaController::class, 'index'])->name('capar.index');
     Route::get('/capar_cria/{ganado}', [CaparCriaController::class, 'capar'])->name('capar.capar');

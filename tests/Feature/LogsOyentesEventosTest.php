@@ -59,13 +59,11 @@ class LogsOyentesEventosTest extends TestCase
 
 
     private array $revision = [
-        'diagnostico' => 'prenada',
         'fecha' => '2020-10-02',
         'tratamiento' => 'medicina',
     ];
 
     private array $revisionDescarte = [
-        'diagnostico' => 'descartar',
         'fecha' => '2020-10-02',
         'tratamiento' => 'ninguno',
     ];
@@ -89,6 +87,12 @@ class LogsOyentesEventosTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        //tipo de revision preñada
+        $this->revision=$this->revision + ['tipo_revision_id' => 1];
+
+        //tipo de revision descarte
+        $this->revisionDescarte=$this->revisionDescarte + ['tipo_revision_id' => 2];
 
         $causaFallecimiento = CausasFallecimiento::factory()->create();
         $this->fallecimiento=$this->fallecimiento + ['causas_fallecimiento_id'=>$causaFallecimiento->id];

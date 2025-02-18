@@ -11,13 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('revisions', function (Blueprint $table) {
+        Schema::create('tipo_revisions', function (Blueprint $table) {
             $table->id();
-            $table->date('fecha');
-            $table->string('tipo_revision_id');
-            $table->string('tratamiento');
-            $table->foreignId('ganado_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('personal_id')->constrained()->cascadeOnDelete();
+            $table->string('tipo');
             $table->timestamps();
         });
     }
@@ -27,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('revisions');
+        Schema::dropIfExists('tipo_revisions');
     }
 };

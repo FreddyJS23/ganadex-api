@@ -44,9 +44,9 @@ class RevisionController extends Controller
         $revision->ganado()->associate($ganado)->save();
 
 
-         RevisionPrenada::dispatchIf($revision->diagnostico == 'prenada', $revision);
+         RevisionPrenada::dispatchIf($revision->tipo_revision_id == 1, $revision);
 
-         RevisionDescarte::dispatchIf($revision->diagnostico == 'descartar', $revision);
+         RevisionDescarte::dispatchIf($revision->tipo_revision_id == 2, $revision);
 
         return response()->json(
             ['revision' => new RevisionResource(

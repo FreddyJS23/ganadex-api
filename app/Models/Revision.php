@@ -15,7 +15,7 @@ class Revision extends Model
     use HasFactory;
 
     protected $fillable = [
-        'diagnostico',
+        'tipo_revision_id',
         'tratamiento',
         'fecha',
         'personal_id',
@@ -39,6 +39,11 @@ class Revision extends Model
     public function veterinario(): BelongsTo
     {
         return $this->belongsTo(Personal::class, 'personal_id');
+    }
+
+    public function tipoRevision(): BelongsTo
+    {
+        return $this->belongsTo(TipoRevision::class);
     }
 
     /* activar logs de actividades */
