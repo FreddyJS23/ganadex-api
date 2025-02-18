@@ -65,7 +65,7 @@ class PartoController extends Controller
         $cria->evento()->create();
 
         $estados = Estado::select('id')
-            ->whereIn('estado', ['sano','pendiente_numeracion'])
+            ->whereIn('estado', ['sano'])
             ->get()
             ->modelKeys();
         $cria->estados()->sync($estados);
@@ -76,7 +76,6 @@ class PartoController extends Controller
         $parto->ganado_cria()->associate($cria)->save();
 
         PartoHecho::dispatch($parto);
-        NaceMacho::dispatchIf($cria->sexo == "M", $cria);
 
         return response()->json(
             ['parto' => new PartoResource(
