@@ -28,7 +28,14 @@ class PesajeLecheTest extends TestCase
 
     private $user;
     private $ganado;
+    private $ganadoFallecido;
+    private $ganadoVendido;
+    private $ganadoSano;
     private $estado;
+    private $estadoLactancia;
+    private $estadoSano;
+    private $estadoVendido;
+    private $estadoFallecido;
     private $url;
     private $finca;
 
@@ -36,6 +43,10 @@ class PesajeLecheTest extends TestCase
     {
         parent::setUp();
 
+        $this->estadoSano = Estado::find(1);
+        $this->estadoLactancia = Estado::find(4);
+        $this->estadoFallecido = Estado::find(2);
+        $this->estadoVendido = Estado::find(5);
         $this->estado = Estado::all();
 
         $this->user
@@ -52,7 +63,7 @@ class PesajeLecheTest extends TestCase
             = Ganado::factory()
             ->hasPeso(1)
             ->hasEvento(1)
-            ->hasAttached($this->estado)
+            ->hasAttached($this->estadoLactancia)
             ->for($this->finca)
             ->create();
 
@@ -97,7 +108,9 @@ class PesajeLecheTest extends TestCase
 
     public function test_obtener_todos_pesaje_de_leches(): void
     {
+
         $this->generarPesajesLeche();
+
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson($this->url);
 

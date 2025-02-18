@@ -44,6 +44,9 @@ class PartoTest extends TestCase
     private $servicioInseminacion;
     private $veterinario;
     private $estado;
+    private $estadoSano;
+    private $estadoVendido;
+    private $estadoFallecido;
     private $numero_toro;
     private $urlServicioMonta;
     private $urlServicioInseminacion;
@@ -54,6 +57,9 @@ class PartoTest extends TestCase
         parent::setUp();
 
         $this->estado = Estado::all();
+        $this->estadoSano = Estado::find(1);
+        $this->estadoVendido = Estado::find(2);
+        $this->estadoFallecido = Estado::find(5);
 
         $this->user
             = User::factory()->hasConfiguracion()->create();
@@ -237,6 +243,58 @@ class PartoTest extends TestCase
                     )
                 )
             );
+    }
+
+    public function test_error_creacion_parto_sin_servicio_previo(): void
+    {
+
+        $ganado = Ganado::factory()
+            ->hasPeso(1)
+            ->hasEvento(1)
+            ->hasAttached($this->estado)
+            ->for($this->finca)
+            ->create();
+
+            $this->urlServicioMonta = sprintf('api/ganado/%s/parto', $ganado->id);
+
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson($this->urlServicioMonta, $this->parto + ['personal_id' => $this->veterinario->id]);
+
+        $response->assertStatus(422)
+            ->assertJson(
+                fn (AssertableJson $json) => $json->where('errors.servicio.0', 'Para registrar un parto la vaca debe de tener un servicio previo')
+                ->etc()
+            )
+            ;
+
+    }
+
+    public function test_error_creacion_parto_sin_estado_gestacion(): void
+    {
+
+        $ganado = Ganado::factory()
+            ->hasPeso(1)
+            ->hasEvento(1)
+            ->hasAttached($this->estadoSano)
+            ->for($this->finca)
+            ->create();
+
+            $this->servicioMonta = Servicio::factory()
+            ->for($ganado)
+            ->for($this->toro, 'servicioable')
+            ->create(['personal_id' => $this->veterinario]);
+
+
+            $this->urlServicioMonta = sprintf('api/ganado/%s/parto', $ganado->id);
+
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson($this->urlServicioMonta, $this->parto + ['personal_id' => $this->veterinario->id]);
+
+        $response->assertStatus(422)
+        ->assertJson(
+            fn (AssertableJson $json) => $json->where('errors.estado_gestacion.0', 'Para registrar un parto la vaca debe estar en gestacion')
+            ->etc()
+        )
+        ;
+
     }
 
 
@@ -491,7 +549,7 @@ class PartoTest extends TestCase
 
     public function test_obtener_partos_de_todas_las_vacas(): void
     {
-        /* partos con monta */
+        /* partos con monta fallecidos */
         Ganado::factory()
             ->count(5)
             ->hasPeso(1)
@@ -504,7 +562,41 @@ class PartoTest extends TestCase
                 return ['partoable_id' => $ganado->servicioReciente->servicioable->id,'partoable_type' => $ganado->servicioReciente->servicioable->getMorphClass(), 'ganado_cria_id' => $cria->id, 'personal_id' => $veterinario->id];
             })
             ->hasEvento(1)
-            ->hasAttached($this->estado)
+            ->hasAttached($this->estadoFallecido)
+            ->for($this->finca)
+            ->create();
+
+            /* partos con monta fallecidos vendidos */
+        Ganado::factory()
+            ->count(5)
+            ->hasPeso(1)
+            ->hasServicios(7, ['servicioable_id' => $this->toro->id,'servicioable_type' => $this->toro->getMorphClass(), 'personal_id' => $this->veterinario->id])
+            ->hasParto(3, function (array $attributes, Ganado $ganado) {
+                $finca = $ganado->finca->id;
+                $veterinario = Personal::factory()->create(['finca_id' => $finca, 'cargo_id' => 2]);
+                $cria = Ganado::factory()->create(['finca_id' => $finca]);
+
+                return ['partoable_id' => $ganado->servicioReciente->servicioable->id,'partoable_type' => $ganado->servicioReciente->servicioable->getMorphClass(), 'ganado_cria_id' => $cria->id, 'personal_id' => $veterinario->id];
+            })
+            ->hasEvento(1)
+            ->hasAttached($this->estadoVendido)
+            ->for($this->finca)
+            ->create();
+
+            /* partos con monta fallecidos sanos */
+        Ganado::factory()
+            ->count(5)
+            ->hasPeso(1)
+            ->hasServicios(7, ['servicioable_id' => $this->toro->id,'servicioable_type' => $this->toro->getMorphClass(), 'personal_id' => $this->veterinario->id])
+            ->hasParto(3, function (array $attributes, Ganado $ganado) {
+                $finca = $ganado->finca->id;
+                $veterinario = Personal::factory()->create(['finca_id' => $finca, 'cargo_id' => 2]);
+                $cria = Ganado::factory()->create(['finca_id' => $finca]);
+
+                return ['partoable_id' => $ganado->servicioReciente->servicioable->id,'partoable_type' => $ganado->servicioReciente->servicioable->getMorphClass(), 'ganado_cria_id' => $cria->id, 'personal_id' => $veterinario->id];
+            })
+            ->hasEvento(1)
+            ->hasAttached($this->estadoSano)
             ->for($this->finca)
             ->create();
 
@@ -530,7 +622,7 @@ class PartoTest extends TestCase
         $response->assertStatus(200)
             ->assertJson(
                 fn (AssertableJson $json) => $json->has(
-                    'todos_partos.1',
+                    'todos_partos',10,
                     fn (AssertableJson $json) => $json->whereAllType([
                         'id' => 'integer',
                         'numero' => 'integer',
