@@ -26,7 +26,7 @@ class GenerarNotificaciones
         //Datos en la tabla tipos notificacion
         $columnaTipoNotificacion = ['revision' => 1, 'parto' => 2, 'secado' => 3,];
 
-        Notificacion::create(
+        Notificacion::firstOrCreate(
             [
             'user_id' => $userId,
             'ganado_id' => $ganadoId,
