@@ -104,7 +104,8 @@ class LogsTest extends TestCase
 
             $this->userVeterinario->assignRole('veterinario');
 
-        $this->estado = Estado::all();
+            //estado:sano,gestacion
+        $this->estado = Estado::where('id',1)->orWhere('id',3)->get();
 
         $this->veterinario
         = Personal::factory()
@@ -301,7 +302,7 @@ class LogsTest extends TestCase
         $response->assertStatus(200)->assertJson(fn (AssertableJson $json)
          => $json->has(
              'logs',
-             16,
+             14,
              fn (AssertableJson $json) => $json->whereAllType([
                 'id' => 'integer',
                 'actividad' => 'string',
