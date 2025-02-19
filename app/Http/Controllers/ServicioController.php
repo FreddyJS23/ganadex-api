@@ -11,12 +11,15 @@ use App\Models\Ganado;
 use App\Models\PajuelaToro;
 use App\Models\Servicio;
 use App\Models\Toro;
+use App\Traits\GuardarVeterinarioOperacionSegunRol;
 use DateTime;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class ServicioController extends Controller
 {
+    use GuardarVeterinarioOperacionSegunRol;
+
     public function __construct()
     {
         $this->authorizeResource(Servicio::class, 'servicio');
@@ -46,7 +49,8 @@ class ServicioController extends Controller
     public function store(StoreServicioRequest $request, Ganado $ganado)
     {
         $servicio = new Servicio();
-        $servicio->fill($request->except(['toro_id','pajuela_toro_id']));
+        $servicio->fill($request->except(['toro_id','pajuela_toro_id','personal_id']));
+        $servicio->personal_id=$this->veterinarioOperacion($request);
         $servicio->ganado()->associate($ganado);
         /**
          *@var 'monta' | 'inseminacion'

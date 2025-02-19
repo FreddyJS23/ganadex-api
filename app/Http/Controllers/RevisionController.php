@@ -10,16 +10,19 @@ use App\Http\Resources\RevisionCollection;
 use App\Http\Resources\RevisionResource;
 use App\Models\Ganado;
 use App\Models\Revision;
+use App\Traits\GuardarVeterinarioOperacionSegunRol;
 use DateTime;
 use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 
 class RevisionController extends Controller
 {
+    use GuardarVeterinarioOperacionSegunRol;
+
     public function __construct()
     {
         $this->authorizeResource(Revision::class, 'revision');
     }
-
     /**
      * Display a listing of the resource.
      */
@@ -40,7 +43,8 @@ class RevisionController extends Controller
     public function store(StoreRevisionRequest $request, Ganado $ganado)
     {
         $revision = new Revision();
-        $revision->fill($request->all());
+        $revision->fill($request->except(['personal_id']));
+        $revision->personal_id=$this->veterinarioOperacion($request);
         $revision->ganado()->associate($ganado)->save();
 
 

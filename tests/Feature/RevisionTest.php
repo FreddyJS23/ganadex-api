@@ -10,6 +10,7 @@ use App\Models\Revision;
 use App\Models\Servicio;
 use App\Models\Toro;
 use App\Models\User;
+use App\Models\UsuarioVeterinario;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -37,6 +38,7 @@ class RevisionTest extends TestCase
     private $estadoFallecido;
     private $estadoPendienteServicio;
     private $veterinario;
+    private $userVeterinario;
     private $url;
     private $finca;
 
@@ -76,6 +78,17 @@ class RevisionTest extends TestCase
             ->hasAttached($this->estado)
             ->for($this->finca)
             ->create();
+
+            $this->userVeterinario
+            = User::factory()
+            ->create(['usuario' => 'veterinario']);
+
+            $this->userVeterinario->assignRole('veterinario');
+
+            UsuarioVeterinario::factory()
+            ->for(Personal::factory()->for($this->finca)->create(['nombre'=>'usuarioVeterinario','cargo_id' => 2]), 'veterinario')
+            ->create(['admin_id' => $this->user->id,
+            'user_id' => $this->userVeterinario->id]);
 
         $this->url = sprintf('api/ganado/%s/revision', $this->ganado->id);
     }
@@ -167,6 +180,34 @@ class RevisionTest extends TestCase
                             'id' => 'integer',
                             'nombre' => 'string'
                         ])
+                    )
+                )
+            );
+    }
+
+    public function test_creacion_revision_usuario_veterinario(): void
+    {
+
+        $response = $this->actingAs($this->userVeterinario)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson($this->url, $this->revision + ['personal_id' => $this->veterinario->id]);
+
+        $response->assertStatus(201)
+            ->assertJson(
+                fn (AssertableJson $json) => $json->has(
+                    'revision',
+                    fn (AssertableJson $json) =>
+                    $json->whereAllType([
+                        'id' => 'integer',
+                        'fecha' => 'string',
+                        'diagnostico' => 'string',
+                        'tratamiento' => 'string',
+                    ])->has(
+                        'veterinario',
+                        fn (AssertableJson $json)
+                        => $json->whereAllType([
+                            'id' => 'integer',
+                            'nombre' => 'string'
+                        ])
+                        ->where('nombre', 'usuarioVeterinario')
                     )
                 )
             );

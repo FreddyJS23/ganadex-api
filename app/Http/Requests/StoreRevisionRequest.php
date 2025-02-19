@@ -26,11 +26,17 @@ class StoreRevisionRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'tipo_revision_id' => ['required','numeric',Rule::exists('tipo_revisions', 'id'), new ComprobarRequisitosPrenada()],
+        $rules = [
+            'tipo_revision_id' => ['required', 'numeric', Rule::exists('tipo_revisions', 'id'), new ComprobarRequisitosPrenada()],
             'tratamiento' => 'required|min:3,|max:255',
             'fecha' => 'date_format:Y-m-d',
-            'personal_id' => ['required',new ComprobarVeterianario()]
         ];
+
+        /* para evitar problema con la validacion de comprabacionVeterinario
+        se agrega el campo solo si es un admin */
+        $userAdmin = $this->user()->hasRole('admin');
+        if ($userAdmin) {
+            return $rules = array_merge($rules, ['personal_id' => ['required', new ComprobarVeterianario()]]);
+        } else return $rules;
     }
 }

@@ -15,6 +15,7 @@ use App\Models\PajuelaToro;
 use App\Models\Parto;
 use App\Models\Peso;
 use App\Models\Toro;
+use App\Traits\GuardarVeterinarioOperacionSegunRol;
 use DateTime;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -22,6 +23,8 @@ use Illuminate\Support\Facades\Auth;
 
 class PartoController extends Controller
 {
+    use GuardarVeterinarioOperacionSegunRol;
+
     /**
      * Display a listing of the resource.
      */
@@ -48,7 +51,8 @@ class PartoController extends Controller
     public function store(StorePartoRequest $request, Ganado $ganado)
     {
         $parto = new Parto();
-        $parto->fill($request->only(['observacion','personal_id','fecha']));
+        $parto->fill($request->only(['observacion','fecha']));
+        $parto->personal_id=$this->veterinarioOperacion($request);
         $servicio = $ganado->servicioReciente->servicioable;
 
         $parto->ganado()->associate($ganado);
