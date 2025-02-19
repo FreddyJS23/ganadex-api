@@ -234,6 +234,7 @@ class GanadoDescarteTest extends TestCase
             ->hasPeso(1)
             ->hasEvento(1)
             ->for($this->finca)
+            ->hasAttached($this->estado)
             ->create();
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson('api/descartar_ganado', ['ganado_id' => $ganado->id]);
@@ -256,6 +257,7 @@ class GanadoDescarteTest extends TestCase
                             'pesos' => 'array|null',
                         ])
                     ->where('tipo', fn (string $tipoGanado) => Str::contains($tipoGanado, ['becerro', 'maute', 'novillo', 'adulto']))
+                    ->has('estados',1)
                 )
             );
     }

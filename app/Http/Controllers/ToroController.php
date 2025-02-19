@@ -6,6 +6,7 @@ use App\Http\Requests\StoreToroRequest;
 use App\Http\Requests\UpdateToroRequest;
 use App\Http\Resources\ToroCollection;
 use App\Http\Resources\ToroResource;
+use App\Http\Resources\ToroServiciosResource;
 use App\Models\Ganado;
 use App\Models\GanadoTipo;
 use App\Models\Jornada_vacunacion;
@@ -301,6 +302,19 @@ class ToroController extends Controller
         );
     }
 
+    public function servicios(Toro $toro)
+    {
+        $servicios = $toro->servicios()->with('servicioable')->get();
+
+        return response()->json(
+            [
+                'servicios' => ToroServiciosResource::collection($servicios),
+            ],
+            200
+        );
+    }
+
+
 
     /**
      * Update the specified resource in storage.
@@ -321,3 +335,4 @@ class ToroController extends Controller
         return  response()->json(['toroID' => Ganado::destroy($toro->ganado->id) ?  $toro->id : ''], 200);
     }
 }
+

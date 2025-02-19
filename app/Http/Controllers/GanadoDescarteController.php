@@ -245,6 +245,8 @@ class GanadoDescarteController extends Controller
     {
         $ganadoDescarte = new GanadoDescarte();
         $ganadoDescarte->ganado_id = $request->ganado_id;
+        $ganado=Ganado::firstWhere('id',$ganadoDescarte->ganado_id);
+        $ganado->estados()->sync(1);
         $ganadoDescarte->finca_id = session('finca_id');
         $ganadoDescarte->save();
         return response()->json(['ganado_descarte' => new GanadoDescarteResource($ganadoDescarte)], 201);
