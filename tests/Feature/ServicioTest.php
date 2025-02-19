@@ -39,6 +39,9 @@ class ServicioTest extends TestCase
     private $ganado;
     private $veterinario;
     private $estado;
+    private $estadoSano;
+    private $estadoVendido;
+    private $estadoFallecido;
     private $toro;
     private $pajuelaToro ;
     private $url;
@@ -51,6 +54,9 @@ class ServicioTest extends TestCase
         $this->user
             = User::factory()->hasConfiguracion()->create();
 
+        $this->estadoSano = Estado::find(1);
+        $this->estadoVendido = Estado::find(2);
+        $this->estadoFallecido = Estado::find(5);
 
             $this->finca
             = Finca::factory()
@@ -480,7 +486,7 @@ class ServicioTest extends TestCase
 
     public function test_obtener_servicios_de_todas_las_vacas(): void
     {
-        /* partos con monta */
+        /* partos con monta fallecidas */
         Ganado::factory()
             ->count(5)
             ->hasPeso(1)
@@ -493,7 +499,41 @@ class ServicioTest extends TestCase
                 return ['partoable_id' => $ganado->servicioReciente->servicioable->id, 'partoable_type' => $ganado->servicioReciente->servicioable->getMorphClass(), 'ganado_cria_id' => $cria->id, 'personal_id' => $veterinario->id];
             })
             ->hasEvento(1)
-            ->hasAttached($this->estado)
+            ->hasAttached($this->estadoFallecido)
+            ->for($this->finca)
+            ->create();
+
+            /* partos con monta vendida */
+        Ganado::factory()
+            ->count(5)
+            ->hasPeso(1)
+            ->hasServicios(7, ['servicioable_id' => $this->toro->id, 'servicioable_type' => $this->toro->getMorphClass(), 'personal_id' => $this->veterinario->id])
+            ->hasParto(3, function (array $attributes, Ganado $ganado) {
+                $finca = $ganado->finca->id;
+                $veterinario = Personal::factory()->create(['finca_id' => $finca, 'cargo_id' => 2]);
+                $cria = Ganado::factory()->create(['finca_id' => $finca]);
+
+                return ['partoable_id' => $ganado->servicioReciente->servicioable->id, 'partoable_type' => $ganado->servicioReciente->servicioable->getMorphClass(), 'ganado_cria_id' => $cria->id, 'personal_id' => $veterinario->id];
+            })
+            ->hasEvento(1)
+            ->hasAttached($this->estadoVendido)
+            ->for($this->finca)
+            ->create();
+
+            /* partos con monta sanas */
+        Ganado::factory()
+            ->count(5)
+            ->hasPeso(1)
+            ->hasServicios(7, ['servicioable_id' => $this->toro->id, 'servicioable_type' => $this->toro->getMorphClass(), 'personal_id' => $this->veterinario->id])
+            ->hasParto(3, function (array $attributes, Ganado $ganado) {
+                $finca = $ganado->finca->id;
+                $veterinario = Personal::factory()->create(['finca_id' => $finca, 'cargo_id' => 2]);
+                $cria = Ganado::factory()->create(['finca_id' => $finca]);
+
+                return ['partoable_id' => $ganado->servicioReciente->servicioable->id, 'partoable_type' => $ganado->servicioReciente->servicioable->getMorphClass(), 'ganado_cria_id' => $cria->id, 'personal_id' => $veterinario->id];
+            })
+            ->hasEvento(1)
+            ->hasAttached($this->estadoSano)
             ->for($this->finca)
             ->create();
 
@@ -519,7 +559,7 @@ class ServicioTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson(
-                fn (AssertableJson $json) => $json->has('todos_servicios.1', fn (AssertableJson $json) => $json->whereAllType([
+                fn (AssertableJson $json) => $json->has('todos_servicios',10, fn (AssertableJson $json) => $json->whereAllType([
                     'id' => 'integer',
                     'numero' => 'integer',
                     'ultimo_servicio' => 'string',

@@ -279,6 +279,7 @@ class GanadoDescarteTest extends TestCase
                             'id' => 'integer',
                             'nombre' => 'string',
                             'numero' => 'integer',
+                            'sexo'=>'string',
                             'origen' => 'string',
                             'fecha_nacimiento' => 'string',
                             'ganado_id' => 'integer',

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Estado;
 use App\Models\Finca;
 use App\Models\Ganado;
 use App\Models\Jornada_vacunacion;
@@ -26,6 +27,9 @@ class JornadaVacunacionTest extends TestCase
     private int $cantidad_jornadasVacunacion = 10;
     private $user;
     private $finca;
+    private $estadoSano;
+    private $estadoFallecido;
+    private $estadoVendido;
 
     protected function setUp(): void
     {
@@ -41,6 +45,10 @@ class JornadaVacunacionTest extends TestCase
             ->for($this->user)
             ->create();
 
+            $this->estadoSano = Estado::find(1);
+            $this->estadoFallecido = Estado::find(2);
+            $this->estadoVendido = Estado::find(5);
+
             Ganado::factory()
             ->count(30)
             ->for($this->finca)
@@ -50,6 +58,7 @@ class JornadaVacunacionTest extends TestCase
                 ['tipo_id' => 3],
                 ['tipo_id' => 4],
             )
+            ->hasAttached($this->estadoSano)
             ->create();
     }
 
@@ -84,6 +93,8 @@ class JornadaVacunacionTest extends TestCase
     {
         $this->generarJornadaVacunacion();
 
+
+
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('jornada_vacunacion.index'));
 
         $response->assertStatus(200)->assertJson(
@@ -109,6 +120,20 @@ class JornadaVacunacionTest extends TestCase
     public function test_creacion_jornada_vacunacion(): void
     {
 
+        /* ganado con estado fallecido */
+        Ganado::factory()
+        ->count(30)
+        ->for($this->finca)
+        ->hasAttached($this->estadoFallecido)
+        ->create(  ['tipo_id' => 4]);
+
+        /* ganado con estado vendido */
+        Ganado::factory()
+        ->count(30)
+        ->for($this->finca)
+        ->hasAttached($this->estadoVendido)
+        ->create(  ['tipo_id' => 4]);
+
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(route('jornada_vacunacion.store'), $this->jornadaVacunacion);
 
         $response->assertStatus(201)->assertJson(
@@ -120,6 +145,8 @@ class JornadaVacunacionTest extends TestCase
                 'jornada_vacunacion.vacunados' => 'integer',
                 'jornada_vacunacion.ganado_vacunado' => 'array',
             ])
+            ->where('jornada_vacunacion.vacunados',fn(int $vacunados)=> $vacunados <= 30)
+
         );
     }
 

@@ -52,7 +52,10 @@ class JornadaVacunacionController extends Controller
             $cantidadGanadoVacunado->orWhere('tipo', 'like', "$tipoAnimalVacuna%");
         }
 
-        $cantidadGanadoVacunado = $cantidadGanadoVacunado->where('finca_id', session('finca_id'))->count();
+        $cantidadGanadoVacunado = $cantidadGanadoVacunado
+        ->whereRelation('estados', 'estado','!=', 'fallecido')
+        ->whereRelation('estados', 'estado','!=', 'vendido')
+        ->where('finca_id', session('finca_id'))->count();
 
         $intervaloDosis = Vacuna::find($request->input('vacuna_id'))->intervalo_dosis;
         $proximaDosis = Carbon::create($request->input('fecha_fin'))->addDays($intervaloDosis)->format('Y-m-d');

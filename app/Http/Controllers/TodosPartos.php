@@ -16,6 +16,8 @@ class TodosPartos extends Controller
     {
             return new TodosPartosCollection(
                 Ganado::doesntHave('toro')
+                    ->whereRelation('estados', 'estado','!=', 'fallecido')
+                    ->whereRelation('estados', 'estado','!=', 'vendido')
                     ->has('parto')
                     ->withCount('parto')
                     ->where('finca_id', session('finca_id'))

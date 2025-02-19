@@ -17,6 +17,8 @@ class TodosServicios extends Controller
     {
 
         $ganados = Ganado::doesntHave('toro')
+            ->whereRelation('estados', 'estado','!=', 'fallecido')
+            ->whereRelation('estados', 'estado','!=', 'vendido')
             ->doesntHave('ganadoDescarte')
             ->has('servicios')
             ->with(
