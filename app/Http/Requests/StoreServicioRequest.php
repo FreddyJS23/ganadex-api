@@ -25,7 +25,7 @@ class StoreServicioRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        $rules = [
             'observacion' => 'required|min:3|max:255',
             'tipo' => 'required|in:monta,inseminacion',
             'fecha' => 'date_format:Y-m-d',
@@ -41,7 +41,13 @@ class StoreServicioRequest extends FormRequest
                         fn($query) => $query->where('finca_id', session('finca_id'))
                     )
             ],
-            'personal_id' => ['required', new ComprobarVeterianario()]
         ];
+
+          /* para evitar problema con la validacion de comprabacionVeterinario
+        se agrega el campo solo si es un admin */
+        $userAdmin = $this->user()->hasRole('admin');
+        if ($userAdmin) {
+            return $rules=array_merge($rules,['personal_id' => ['required', new ComprobarVeterianario()]]);
+        } else return $rules;
     }
 }
