@@ -11,6 +11,7 @@ use App\Models\Personal;
 use App\Models\Servicio;
 use App\Models\Toro;
 use App\Models\User;
+use App\Models\UsuarioVeterinario;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -51,6 +52,7 @@ class PartoTest extends TestCase
     private $urlServicioMonta;
     private $urlServicioInseminacion;
     private $finca;
+    private $userVeterinario;
 
     protected function setUp(): void
     {
@@ -63,6 +65,8 @@ class PartoTest extends TestCase
 
         $this->user
             = User::factory()->hasConfiguracion()->create();
+
+            $this->user->assignRole('admin');
 
             $this->finca
             = Finca::factory()
@@ -107,6 +111,18 @@ class PartoTest extends TestCase
             ->for($this->ganadoServicioInseminacion)
             ->for($this->pajuelaToro, 'servicioable')
             ->create(['personal_id' => $this->veterinario]);
+
+            $this->userVeterinario
+            = User::factory()
+            ->create(['usuario' => 'veterinario']);
+
+            $this->userVeterinario->assignRole('veterinario');
+
+            UsuarioVeterinario::factory()
+            ->for(Personal::factory()->for($this->finca)->create(['nombre'=>'usuarioVeterinario','cargo_id' => 2]), 'veterinario')
+            ->create(['admin_id' => $this->user->id,
+            'user_id' => $this->userVeterinario->id]);
+
 
 
         $this->urlServicioMonta = sprintf('api/ganado/%s/parto', $this->ganadoServicioMonta->id);
@@ -240,6 +256,41 @@ class PartoTest extends TestCase
                         'veterinario',
                         fn (AssertableJson $json)
                         => $json->whereAllType(['id' => 'integer', 'nombre' => 'string'])
+                    )
+                )
+            );
+    }
+
+    public function test_creacion_parto_monta_usuario_veterinario(): void
+    {
+
+        $response = $this->actingAs($this->userVeterinario)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson($this->urlServicioMonta, $this->parto);
+
+        $response->assertStatus(201)
+            ->assertJson(
+                fn (AssertableJson $json) => $json->has(
+                    'parto',
+                    fn (AssertableJson $json) =>
+                    $json->whereAllType([
+                        'id' => 'integer',
+                        'fecha' => 'string',
+                        'observacion' => 'string',
+                        'cria' => 'array',
+                        'cria.id' => 'integer',
+                        'cria.nombre' => 'string',
+                        'cria.numero' => 'integer',
+                        'cria.sexo' => 'string',
+                        'cria.origen' => 'string',
+                        'cria.fecha_nacimiento' => 'string',
+                    ])->has(
+                        'padre_toro',
+                        fn (AssertableJson $json)
+                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
+                    )->has(
+                        'veterinario',
+                        fn (AssertableJson $json)
+                        => $json->whereAllType(['id' => 'integer', 'nombre' => 'string'])
+                        ->where('nombre', 'usuarioVeterinario')
                     )
                 )
             );

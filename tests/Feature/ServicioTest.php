@@ -10,6 +10,7 @@ use App\Models\Personal;
 use App\Models\Servicio;
 use App\Models\Toro;
 use App\Models\User;
+use App\Models\UsuarioVeterinario;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -42,6 +43,7 @@ class ServicioTest extends TestCase
     private $estadoSano;
     private $estadoVendido;
     private $estadoFallecido;
+    private $userVeterinario;
     private $toro;
     private $pajuelaToro ;
     private $url;
@@ -53,6 +55,8 @@ class ServicioTest extends TestCase
 
         $this->user
             = User::factory()->hasConfiguracion()->create();
+
+            $this->user->assignRole('admin');
 
         $this->estadoSano = Estado::find(1);
         $this->estadoVendido = Estado::find(2);
@@ -83,6 +87,18 @@ class ServicioTest extends TestCase
             ->for(Ganado::factory()->for($this->finca)->create(['sexo' => 'M']))->create();
 
         $this->pajuelaToro = PajuelaToro::factory()->for($this->finca)->create();
+
+        $this->userVeterinario
+        = User::factory()
+        ->create(['usuario' => 'veterinario']);
+
+        $this->userVeterinario->assignRole('veterinario');
+
+        UsuarioVeterinario::factory()
+        ->for(Personal::factory()->for($this->finca)->create(['nombre'=>'usuarioVeterinario','cargo_id' => 2]), 'veterinario')
+        ->create(['admin_id' => $this->user->id,
+        'user_id' => $this->userVeterinario->id]);
+
 
         $this->url = sprintf('api/ganado/%s/servicio', $this->ganado->id);
     }
@@ -223,6 +239,35 @@ class ServicioTest extends TestCase
                         'veterinario',
                         fn (AssertableJson $json)
                         => $json->whereAllType(['id' => 'integer', 'nombre' => 'string'])
+                    )
+                )
+            );
+    }
+
+    public function test_creacion_servicio_monta_usuario_veterinario(): void
+    {
+
+        $response = $this->actingAs($this->userVeterinario)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson($this->url, $this->servicioMonta + ['toro_id' => $this->toro->id]);
+
+        $response->assertStatus(201)
+            ->assertJson(
+                fn (AssertableJson $json) => $json->has(
+                    'servicio',
+                    fn (AssertableJson $json) => $json
+                        ->whereAllType([
+                            'id' => 'integer',
+                            'observacion' => 'string',
+                            'fecha' => 'string',
+                        ])->where('tipo', fn (string $tipoServicio) => Str::contains($tipoServicio, ['Monta', 'Inseminacion']))
+                    ->has(
+                        'toro',
+                        fn (AssertableJson $json)
+                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
+                    )->has(
+                        'veterinario',
+                        fn (AssertableJson $json)
+                        => $json->whereAllType(['id' => 'integer', 'nombre' => 'string'])
+                        ->where('nombre', 'usuarioVeterinario')
                     )
                 )
             );
