@@ -6,6 +6,8 @@ use App\Models\CausasFallecimiento;
 use App\Models\Comprador;
 use App\Models\Finca;
 use App\Models\Ganado;
+use App\Models\Personal;
+use App\Models\Servicio;
 use App\Models\Toro;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
@@ -60,6 +62,7 @@ class ToroTest extends TestCase
     private $finca;
     private $toro_fallecido;
     private $toro_vendido;
+    private $veterinario;
 
     protected function setUp(): void
     {
@@ -74,6 +77,11 @@ class ToroTest extends TestCase
             = Finca::factory()
             ->for($this->user)
             ->create();
+
+            $this->veterinario
+            = Personal::factory()
+                ->for($this->finca)
+                ->create(['cargo_id' => 2]);
 
             $comprador = Comprador::factory()->for($this->finca)->create()->id;
             $causaFallecimiento = CausasFallecimiento::factory()->create();
@@ -282,6 +290,37 @@ class ToroTest extends TestCase
                         ]))
                 )
             );
+    }
+
+
+    public function test_obtener_servicios_de_un_toro(): void
+    {
+        $toros = $this->generarToros();
+        $idRandom = random_int(0, $this->cantidad_toro - 1);
+        $toro = $toros[$idRandom];
+
+        Servicio::factory()
+            ->count(3)
+            ->for(Ganado::factory()->for($this->finca))
+            ->for($toro, 'servicioable')
+            ->create(['personal_id' => $this->veterinario]);
+
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('toro.servicios', $toro->id));
+
+        $response->assertStatus(200)
+            ->assertJson(
+                fn (AssertableJson $json) => $json->has(
+                    'servicios',
+                    3,fn (AssertableJson $json)=>$json
+                    ->whereAllType([
+                        'id'=>'integer',
+                        'fecha'=>'string',
+                        'observacion'=>'string',
+                        'vaca'=>'array',
+                        'veterinario'=>'array',
+                    ]) )
+                    );
+
     }
 
     public function test_actualizar_toro(): void
