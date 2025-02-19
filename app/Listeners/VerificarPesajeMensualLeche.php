@@ -32,6 +32,7 @@ class VerificarPesajeMensualLeche
         if (Ganado::where('finca_id', $fincaId)->count() > 0) {
             $vacasSinPesarEsteMes = Ganado::doesntHave('toro')
                 ->where('finca_id', $fincaId)
+                ->whereRelation('estados', 'estado','!=', 'pendiente_pesaje_leche')
                 ->whereHas(
                     'pesajes_leche',
                     function (Builder $query) {
