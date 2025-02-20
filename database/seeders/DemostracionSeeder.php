@@ -130,7 +130,7 @@ class DemostracionSeeder extends Seeder
             ->create();
 
         //vacas con revisiones
-        $ganados = Ganado::factory()
+            Ganado::factory()
             ->count($cantidadGanados)
             ->hasPeso(1)
             ->hasRevision(5, ['personal_id' => $veterinario])
@@ -146,17 +146,17 @@ class DemostracionSeeder extends Seeder
             ->create();
 
         //vacas con servicios
-        $ganados = Ganado::factory()
+            Ganado::factory()
             ->count($cantidadGanados)
             ->hasPeso(1)
             ->hasServicios(5, ['servicioable_id' => $toroParaServicio->toro->id,'servicioable_type' => $toroParaServicio->toro->getMorphClass(), 'personal_id' => $veterinario->id])
             ->hasEvento(['prox_revision' => null, 'prox_parto' => null, 'prox_secado' => null])
             ->hasAttached($estadoSano)
             ->for($finca)
-            ->create(['tipo_id' => 3, 'sexo' => 'H']);
+            ->create(['tipo_id' => 3,]);
 
         //vacas con revision preñada
-        $ganados = Ganado::factory()
+            Ganado::factory()
             ->count($cantidadGanados)
             ->hasPeso(1)
             ->hasRevision(5, ['personal_id' => $veterinario, 'tipo_revision_id' => 1])
@@ -164,7 +164,7 @@ class DemostracionSeeder extends Seeder
             ->hasEvento(['prox_revision' => null])
             ->hasAttached([$estadoSano, $estadoGestacion])
             ->for($finca)
-            ->create(['tipo_id' => 3, 'sexo' => 'H']);
+            ->create(['tipo_id' => 3]);
 
 
         //vacas que ya cumplieron ciclo revision->servicio->parto
