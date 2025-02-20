@@ -20,7 +20,7 @@ class DatabaseSeeder extends Seeder
            CargoSeeder::class,
            TiposNotificacionSeeder::class,
            VacunaSeeder::class,
-           TipoRevisionSeeder::class
+           TipoRevisionSeeder::class,
            //DemostracionSeeder::class,
         ]);
     }
