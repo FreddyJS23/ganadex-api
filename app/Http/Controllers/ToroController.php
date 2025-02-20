@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreToroRequest;
 use App\Http\Requests\UpdateToroRequest;
+use App\Http\Resources\ServiciosToroResource;
 use App\Http\Resources\ToroCollection;
 use App\Http\Resources\ToroResource;
 use App\Models\Ganado;
@@ -299,6 +300,12 @@ class ToroController extends Controller
             ],
             200
         );
+    }
+
+    public function servicios(Toro $toro)
+    {
+        $servicios = $toro->servicios;
+        return response()->json(['servicios' => ServiciosToroResource::collection($servicios)], 200);
     }
 
 
