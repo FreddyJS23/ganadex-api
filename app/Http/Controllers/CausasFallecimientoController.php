@@ -36,9 +36,9 @@ class CausasFallecimientoController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(CausasFallecimiento $causasFallecimientos)
+    public function show(CausasFallecimiento $causasFallecimiento)
     {
-        //
+        return response()->json(['causa_fallecimiento' => new CausasFallecimientosResource($causasFallecimiento)], 200);
     }
 
     /**

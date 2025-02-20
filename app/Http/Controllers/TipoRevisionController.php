@@ -39,9 +39,9 @@ class TipoRevisionController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(TipoRevision $tipoRevision)
+    public function show(TipoRevision $tiposRevision)
     {
-        //
+        return response()->json(['tipo_revision' => new TipoRevisionResource($tiposRevision)], 200);
     }
 
     /**

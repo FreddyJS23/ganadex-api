@@ -21,7 +21,7 @@ class CausasFallecimientoPolicy
      */
     public function view(User $user, CausasFallecimiento $causasFallecimiento): bool
     {
-        return false;
+        return $user->hasRole('admin');
     }
 
     /**

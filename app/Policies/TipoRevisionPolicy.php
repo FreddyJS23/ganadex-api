@@ -21,7 +21,7 @@ class TipoRevisionPolicy
      */
     public function view(User $user, TipoRevision $tiposRevision): bool
     {
-        return false;
+        return $user->hasRole('admin');
     }
 
     /**
