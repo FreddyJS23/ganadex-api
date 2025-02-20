@@ -41,6 +41,8 @@ class VerificarVacasAptaParaServicio
                 ->whereRelation('estados', 'estado', 'sano')
                 ->whereRelation('estados', 'estado','!=', 'gestacion')
                 ->whereRelation('estados', 'estado','!=', 'pendiente_servicio')
+                ->whereRelation('estados', 'estado','!=', 'vendido')
+                ->whereRelation('estados', 'estado','!=', 'fallecido')
                 ->where('finca_id', $fincaId)
                 ->whereHas(
                     'peso',
