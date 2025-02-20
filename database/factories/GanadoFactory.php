@@ -20,7 +20,7 @@ class GanadoFactory extends Factory
             'nombre' => fake()->unique()->firstName(),
             'numero' => fake()->unique()->numberBetween($int = 0, $int = 32767),
             'origen' => fake()->randomElement(['local','externo']),
-            'sexo' => fake()->randomElement(['H','M']),
+            'sexo' => fake()->randomElement(['H']),
             'tipo_id' => 4,
             'fecha_nacimiento' => fake()->date(),
 
