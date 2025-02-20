@@ -63,6 +63,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('/comprador', CompradorController::class);
     Route::apiResource('/ventas', VentaController::class);
     Route::apiResource('/toro', ToroController::class);
+    Route::get('/toro/{toro}/servicio', [ToroController::class, 'servicios'])->name('toro.servicios');
     Route::apiResource('/ganado', GanadoController::class);
     Route::apiResource('vacunas', VacunaController::class);
     Route::apiResource('/ganado_descarte', GanadoDescarteController::class);
