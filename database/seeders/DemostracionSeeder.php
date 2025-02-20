@@ -99,6 +99,7 @@ class DemostracionSeeder extends Seeder
         Ganado::factory()
             ->count($elementos)
             ->for($finca)
+            ->hasPeso(1)
             ->has(GanadoDescarte::factory()->for($finca))
             ->hasAttached($estadoSano)
             ->create(['sexo' => array_rand(['M' => 'M', 'H' => 'H'])]);
@@ -210,8 +211,8 @@ class DemostracionSeeder extends Seeder
         Venta::factory()
             ->count($elementos)
             ->for($finca)
-            ->for(Ganado::factory()->for($finca)->hasPeso(1)->hasAttached($estadoVendido)->create())
-            ->for(Comprador::factory()->for($finca)->create())
+            ->for(Ganado::factory()->for($finca)->hasPeso(1)->hasAttached($estadoVendido))
+            ->for(Comprador::factory()->for($finca))
             ->create();
 
         Fallecimiento::factory()
