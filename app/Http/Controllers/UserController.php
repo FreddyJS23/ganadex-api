@@ -36,8 +36,8 @@ class UserController extends Controller
         $user->password = hash::make($request->password);
         $user->fill($request->except('password'));
         $user->assignRole('admin');
-        Configuracion::factory()->for($user);
         $user->save();
+        Configuracion::factory()->for($user)->create();
 
         return response()->json(['message' => 'usuario creado'], 201);
     }
