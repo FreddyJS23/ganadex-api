@@ -420,6 +420,7 @@ END as ultima_dosis
         $fin = $request->query('end');
 
         $fallecimientos = Fallecimiento::whereRelation('ganado', 'finca_id', session('finca_id'))
+            ->join('causas_fallecimientos','causas_fallecimiento_id','=','causas_fallecimientos.id')
             ->selectRaw('causa, COUNT(causa) AS cantidad')
             ->orderby('cantidad', 'desc')
             ->groupBy('causa')
