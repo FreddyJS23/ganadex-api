@@ -17,7 +17,7 @@ class FincaResource extends JsonResource
         return [
             'id' => $this->id,
             'nombre' => $this->nombre,
-            'fecha_creacion' => $this->created_at
+            'fecha_creacion' => $this->created_at->format('d-m-Y H:i:s')
         ];
     }
 }
