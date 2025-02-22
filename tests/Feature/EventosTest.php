@@ -124,9 +124,8 @@ class EventosGanadoTest extends TestCase
         $this->numero_toro = $this->toro->ganado->numero;
     }
 
-    /**
-     * A basic feature test example.
-     */
+
+    /* -----------------------------Evento Servicio hecho ----------------------------- */
     public function test_cuando_se_realiza_un_servicio_tiene_proxima_revision_y_no_esta_pendiente_de_servicio(): void
     {
         //realizar servicio
@@ -149,6 +148,8 @@ class EventosGanadoTest extends TestCase
             ->etc()
         );
     }
+
+    /* ------------------------- Evento Revision preñada ------------------------ */
 
     public function test_cuando_se_realiza_una_revision_y_sale_preñada_y_es_primer_parto(): void
     {
@@ -226,6 +227,7 @@ class EventosGanadoTest extends TestCase
         );
     }
 
+    /* ------------------------ Evento revision descarte ------------------------ */
     public function test_cuando_se_realiza_una_revision_y_se_descarta(): void
     {
         //realizar revision
@@ -243,6 +245,7 @@ class EventosGanadoTest extends TestCase
     }
 
 
+    /* --------------------------- Evento parto hecho --------------------------- */
     public function test_cuando_se_realiza_un_parto_empieza_lactancia_y_cambia_adulto_y_ya_no_debe_tener_evento_proximo_parto(): void
     {
         //realizar servicio
@@ -308,7 +311,7 @@ class EventosGanadoTest extends TestCase
         );
     }
 
-
+/* --------------------------- Evento venta ganado -------------------------- */
     public function test_cuando_se_realiza_una_venta(): void
     {
         $comprador = Comprador::factory()->for($this->finca)->create();
@@ -329,6 +332,7 @@ class EventosGanadoTest extends TestCase
         );
     }
 
+    /* ----------------------- Evento fallecimiento ganado ---------------------- */
     public function test_cuando_se_registra_fallecimiento_de_una_cabeza_ganado(): void
     {
 
@@ -352,6 +356,7 @@ class EventosGanadoTest extends TestCase
         );
     }
 
+    /* ---------------------- Evento pesaje de leche hecho ---------------------- */
     public function test_cuando_se_realiza_pesaje_mensual_de_leche_ya_no_esta_pendiente_de_pesaje_de_leche(): void
     {
         //realizar pesaje de leche
@@ -369,6 +374,7 @@ class EventosGanadoTest extends TestCase
         );
     }
 
+    /* ----------------------- Evento inicio sesion finca ----------------------- */
     public function test_verificacion_vaca_pendiente_pesaje_leche_este_mes(): void
     {
         $estado = Estado::firstWhere('estado', 'sano');
