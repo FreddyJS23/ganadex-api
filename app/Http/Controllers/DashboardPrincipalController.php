@@ -147,6 +147,7 @@ class DashboardPrincipalController extends Controller
 
         $balanceAnualLeche = Leche::selectRaw("DATE_FORMAT(fecha,'%m') as mes")
             ->selectRaw("AVG(peso_leche) as promedio_mensual")
+            ->where('finca_id', session('finca_id'))
             ->whereYear('fecha', $year)
             ->groupBy('mes')->get();
 
