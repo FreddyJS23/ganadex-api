@@ -25,7 +25,7 @@ use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
 use Illuminate\Support\Str;
 
-class EventosGanadoTest extends TestCase
+class EventosTest extends TestCase
 {
     use RefreshDatabase;
 
