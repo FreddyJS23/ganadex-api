@@ -38,22 +38,31 @@ class VerificarEdadGanado
         if (Ganado::where('finca_id', $fincaId)->count() > 0) {
             $becerros = Ganado::where('finca_id', $fincaId)
                 ->where('tipo_id', 1)
-                ->select('tipo_id')
+                ->select('id')
                 ->selectRaw($sentenciaSqlDiferenciaDias)
                 ->having('diferencia', '>=', 365)
                 ->having('diferencia', '<', 729)
                 ->get();
 
-            $becerros->count() > 0 && $becerros->toQuery()->update(['tipo_id' => 2]);
+                //extraer ids de todos los becerros encontrados
+                $becerrosIds = $becerros->modelKeys();
+
+                if( count($becerrosIds) > 0)
+                    Ganado::whereIn('id',$becerrosIds)->update(['tipo_id' => 2]);
+
 
             $mautes = Ganado::where('finca_id', $fincaId)
                 ->where('tipo_id', 2)
-                ->select('tipo_id')
+                ->select('id')
                 ->selectRaw($sentenciaSqlDiferenciaDias)
                 ->having('diferencia', '>=', 730)
                 ->get();
 
-            $mautes->count() > 0 && $mautes->toQuery()->update(['tipo_id' => 3]);
+            $mautesIds = $mautes->modelKeys();
+
+            if( count($mautesIds) > 0)
+                Ganado::whereIn('id',$mautesIds)->update(['tipo_id' => 3]);
+
         }
 
         activity('edad ganado')
