@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
 use Illuminate\Support\Str;
+use Spatie\Activitylog\Models\Activity;
 
 class EventosTest extends TestCase
 {
@@ -533,5 +534,51 @@ class EventosTest extends TestCase
                     )->etc()
             )
         );
+    }
+
+    public function test_verificacion_edad_ganado(): void
+    {
+        //becerros que deberian pasar a maute
+        $becerros = Ganado::factory()
+        ->hasPeso(1)
+        ->count(2)
+        ->hasEvento(1)
+        ->hasAttached($this->estado)
+        ->for($this->finca)
+        ->create(['tipo_id'=>1,'fecha_nacimiento'=>now()->subDay(400)->format('Y-m-d')]);
+
+        //mautes que deberian pasar a novillo
+        $mautes = Ganado::factory()
+        ->hasPeso(1)
+        ->count(2)
+        ->hasEvento(1)
+        ->hasAttached($this->estado)
+        ->for($this->finca)
+        ->create(['tipo_id'=>2,'fecha_nacimiento'=>now()->subDay(1000)->format('Y-m-d')]);
+
+ //evento iniciar sesion finca
+ $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('crear_sesion_finca', ['finca' => $this->finca->id]));
+
+
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson('api/ganado');
+        $response->assertStatus(200)
+            ->assertJson(
+                fn (AssertableJson $json) =>
+                //se empieza por la posicion 1 ya que  ya hay un ganado registrado
+                $json->has(
+                        'cabezas_ganado.1',
+                        fn (AssertableJson $json) =>
+                            $json->where('tipo','maute')
+                            ->etc()
+                    )
+                    ->has(
+                        'cabezas_ganado.4',
+                        fn (AssertableJson $json) =>
+                            $json->where('tipo','novillo')
+                            ->etc()
+                    )
+                ->etc()
+            );
+
     }
 }
