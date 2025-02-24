@@ -19,6 +19,7 @@ class FincaController extends Controller
 
     public function crear_sesion_finca(Finca $finca)
     {
+        //dd($finca);
         //para usar politicas con difierente nombre se tuvo que haber registrado previamente en el auth service provides
         $this->authorize('crear_sesion_finca', $finca);
 
@@ -40,7 +41,7 @@ class FincaController extends Controller
             return response()->json(['message' => 'no existe sesion'], 401);
         }
 
-        $finca = Finca::find($finca_id)->first();
+        $finca = Finca::find($finca_id);
 
         return response()->json(['finca' => new FincaResource($finca)], 200);
     }
