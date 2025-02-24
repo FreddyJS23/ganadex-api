@@ -107,6 +107,34 @@ class LoginTest extends TestCase
         ->assertSessionHas('dias_diferencia_vacuna', $this->userAdmin->configuracion->dias_diferencia_vacuna);
     }
 
+    public function test_logear_usuario_admin_tiene_varias_fincas_y_crea_sesion_finca(): void
+    {
+        $fincas=$this->generarFincas();
+        $randomFinca=random_int(0,count($fincas)-1);
+        $fincaId=$fincas[$randomFinca]->id;
+
+        //login
+        $this->withHeader('origin', config('app.url'))->postJson('api/login', [
+            'usuario' => 'admin',
+            'password' => 'admin',
+        ]);
+
+        //crear sesion finca
+        $this->getJson(route('crear_sesion_finca', ['finca' => $fincaId]));
+
+        //obtener sesion finca
+        $response = $this->getJson(route('verificar_sesion_finca'));
+
+        $response->assertStatus(200)->assertJson(fn (AssertableJson $json) =>
+        $json->has('finca', fn(AssertableJson $json) => $json->where('id', $fincaId)
+            ->etc()
+            )
+        )->assertSessionHas('peso_servicio', $this->userAdmin->configuracion->peso_servicio)
+        ->assertSessionHas('dias_evento_notificacion', $this->userAdmin->configuracion->dias_evento_notificacion)
+        ->assertSessionHas('dias_diferencia_vacuna', $this->userAdmin->configuracion->dias_diferencia_vacuna)
+        ->assertSessionHas('finca_id', $fincaId);
+    }
+
 
     public function test_logear_usuario_veterinario_con_admin_tiene_varias_fincas(): void
     {
