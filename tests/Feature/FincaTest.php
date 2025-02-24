@@ -92,10 +92,11 @@ class FincaTest extends TestCase
     }
 
 
-    public function test_creacion_finca(): void
+     public function test_creacion_finca_y_tiene_varias_anteriores(): void
     {
+        $this->generarFincas();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->fincaEnSesion->id])->postJson(route('finca.store'), $this->finca);
+        $response = $this->actingAs($this->user)->postJson(route('finca.store'), $this->finca);
 
         $response->assertStatus(201)->assertJson(
             fn(AssertableJson $json) =>
@@ -108,7 +109,29 @@ class FincaTest extends TestCase
                     'fecha_creacion' => 'string'
                 ])
             )
-        );
+        )->assertSessionMissing('finca_id');
+    }
+
+    public function test_creacion_finca_por_primera_vez(): void
+    {
+        //vaciar tabla finca
+        //no se usa truncate ya que da error de contricciones de llaves foraneas
+        Finca::where('id', '>', 0)->delete();
+
+        $response = $this->actingAs($this->user)->postJson(route('finca.store'), $this->finca);
+
+        $response->assertStatus(201)->assertJson(
+            fn(AssertableJson $json) =>
+            $json->has(
+                'finca',
+                fn(AssertableJson $json)
+                => $json->whereAllType([
+                    'id' => 'integer',
+                    'nombre' => 'string',
+                    'fecha_creacion' => 'string'
+                ])
+            )
+        )->assertSessionHas('finca_id', Finca::all()->first()->id);
     }
 
     public function test_actualizar_finca(): void
@@ -147,7 +170,7 @@ class FincaTest extends TestCase
 
     public function test_obtener_finca_en_sesion(): void
     {
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->fincaEnSesion])->getJson(route('verificar_sesion_finca'));
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->fincaEnSesion->id])->getJson(route('verificar_sesion_finca'));
 
         $response->assertStatus(200)->assertJson(
             fn(AssertableJson $json) =>
@@ -207,7 +230,7 @@ class FincaTest extends TestCase
     /**
      * @dataProvider ErrorinputProvider
      */
-    public function test_error_validacion_registro_finca($finca, $errores): void
+     public function test_error_validacion_registro_finca($finca, $errores): void
     {
         $fincaTest = Finca::factory()->for($this->user)->create(['nombre' => 'test']);
 
