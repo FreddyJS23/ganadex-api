@@ -58,7 +58,7 @@ class AuthLogin extends Controller
         } elseif ($rol == 'veterinario') {
             $usuario_veterinario = UsuarioVeterinario::where('user_id', $user->id)->first();
             $configuracion = Configuracion::firstWhere('user_id', $usuario_veterinario->admin_id);
-            $finca = Finca::find($usuario_veterinario->veterinario->finca_id)->first();
+            $finca = Finca::find($usuario_veterinario->veterinario->finca_id);
 
             session()->put(
                 [
