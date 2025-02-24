@@ -55,7 +55,7 @@ class DemostracionSeeder extends Seeder
         ->for(Personal::factory()->for($finca)->create(['cargo_id' => 2]), 'veterinario')
         ->create(['admin_id' => $user->id]);
 
-        $userVeterinario = User::find($crearUsuarioVeterinario->user_id)->first();
+        $userVeterinario = User::find($crearUsuarioVeterinario->user_id);
 
         $userVeterinario->assignRole('veterinario');
 
