@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateFincaRequest;
 use App\Http\Resources\FincaCollection;
 use App\Http\Resources\FincaResource;
 use App\Models\Finca;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
 class FincaController extends Controller
@@ -59,10 +60,19 @@ class FincaController extends Controller
      */
     public function store(StoreFincaRequest $request)
     {
+        $user=User::find($request->user()->id);
         $finca = new Finca();
         $finca->nombre = $request->nombre;
-        $finca->user_id = $request->user()->id;
+        $finca->user_id = $user->id;
         $finca->save();
+
+
+        /* en caso que sea la primera finca del usuario se debe crear la sesion de la finca */
+        if($user->fincas->count() == 1)
+          {
+            session()->put('finca_id', $finca->id);
+        }
+
 
         return response()->json(['finca' => new FincaResource($finca)], 201);
     }
