@@ -18,7 +18,6 @@ class TodosPesajeLeche extends Controller
             Ganado::whereRelation('estados', 'estado','lactancia')
                 ->whereRelation('estados', 'estado','!=', 'fallecido')
                 ->whereRelation('estados', 'estado','!=', 'vendido')
-                ->has('pesajes_leche')
                 ->where('finca_id', session('finca_id'))
                 ->get()
         );
