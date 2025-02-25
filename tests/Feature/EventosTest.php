@@ -247,7 +247,7 @@ class EventosTest extends TestCase
 
 
     /* --------------------------- Evento parto hecho --------------------------- */
-    public function test_cuando_se_realiza_un_parto_empieza_lactancia_y_cambia_adulto_y_ya_no_debe_tener_evento_proximo_parto(): void
+    public function test_cuando_se_realiza_un_parto_empieza_lactancia_y_cambia_adulto_y_ya_no_debe_tener_evento_proximo_parto_y_debe_estar_pendiente_pesaje_leche(): void
     {
         //realizar servicio
         $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(
@@ -274,7 +274,7 @@ class EventosTest extends TestCase
                     'parto_reciente.cria' => 'array',
                     'total_partos' => 'integer',
                 ]
-            )->has('ganado.estados', 2)
+            )->has('ganado.estados', 3)
                 ->where('ganado.tipo', 'adulto')
                 ->where(
                     'ganado.estados',
@@ -282,6 +282,10 @@ class EventosTest extends TestCase
                 )->where(
                     'ganado.estados',
                     fn (Collection $estados) => $estados->contains('estado', 'lactancia')
+                )
+                ->where(
+                    'ganado.estados',
+                    fn (Collection $estados) => $estados->contains('estado', 'pendiente_pesaje_leche')
                 )
                 ->etc()
         );
@@ -545,7 +549,8 @@ class EventosTest extends TestCase
         ->hasEvento(1)
         ->hasAttached($this->estado)
         ->for($this->finca)
-        ->create(['tipo_id'=>1,'fecha_nacimiento'=>now()->subDay()->format('Y-m-d')]);
+        //fecha de nacimiento 400 dias atras
+        ->create(['tipo_id'=>1,'fecha_nacimiento'=>now()->subDay(400)->format('Y-m-d')]);
 
         //mautes que deberian pasar a novillo
         $mautes = Ganado::factory()
@@ -554,7 +559,8 @@ class EventosTest extends TestCase
         ->hasEvento(1)
         ->hasAttached($this->estado)
         ->for($this->finca)
-        ->create(['tipo_id'=>2,'fecha_nacimiento'=>now()->subDay()->format('Y-m-d')]);
+        //fecha de nacimiento 1000 dias atras
+        ->create(['tipo_id'=>2,'fecha_nacimiento'=>now()->subDay(1000)->format('Y-m-d')]);
 
  //evento iniciar sesion finca
  $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('crear_sesion_finca', ['finca' => $this->finca->id]));
