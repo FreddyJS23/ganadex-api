@@ -299,11 +299,11 @@ class LogsTest extends TestCase
 
         $response = $this->actingAs($this->userAdmin)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->userAdmin->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->userAdmin->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->userAdmin->configuracion->dias_diferencia_vacuna])->getJson(route('logsVeterinario.index', ['usuario_veterinario' => $this->infoUserVeterinario->id]));
 
-        $response->assertStatus(200)->assertJson(fn (AssertableJson $json)
+        $response->assertStatus(200)->assertJson(fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
          => $json->has(
              'logs',
              14,
-             fn (AssertableJson $json) => $json->whereAllType([
+             fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
                 'id' => 'integer',
                 'actividad' => 'string',
                 'actividad_id' => 'integer|null',

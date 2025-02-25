@@ -87,9 +87,9 @@ class UserTest extends TestCase
         $response = $this->actingAs($this->user)->getJson(route('usuario.show', ['user' => $this->user->id]));
         $response->assertStatus(200)
            ->assertJson(
-               fn (AssertableJson $json) => $json->has(
+               fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                    'user',
-                   fn (AssertableJson $json) =>
+                   fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                    $json->whereAllType([
                        'id' => 'integer',
                        'usuario' => 'string',
@@ -110,9 +110,9 @@ class UserTest extends TestCase
         $response = $this->actingAs($this->user)->getJson(route('usuario.show', ['user' => $this->user->id]));
         $response->assertStatus(200)
             ->assertJson(
-                fn (AssertableJson $json) => $json->has(
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'user',
-                    fn (AssertableJson $json) =>
+                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                     $json->whereAllType([
                         'id' => 'integer',
                         'usuario' => 'string',
@@ -139,7 +139,7 @@ class UserTest extends TestCase
 
         $response = $this->actingAs($this->user)->putJson(route('usuario.update', ['user' => $this->user->id]), $this->usuario);
 
-        $response->assertStatus(422)->assertJson(fn (AssertableJson $json) =>
+        $response->assertStatus(422)->assertJson(fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
         $json->hasAll(['errors.usuario'])
         ->etc());
     }
@@ -167,7 +167,7 @@ class UserTest extends TestCase
     /**
      * @dataProvider ErrorinputProvider
      */
-    public function test_error_validacion_registro_usuario($user, $errores): void
+    public function test_error_validacion_registro_usuario(array $user, array $errores): void
     {
         User::factory()->create(['usuario' => 'test']);
 

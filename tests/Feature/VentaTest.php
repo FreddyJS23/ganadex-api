@@ -104,10 +104,10 @@ class VentaTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson(
-                fn (AssertableJson $json) => $json->has(
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'ventas',
                     $this->cantidad_ventas,
-                    fn (AssertableJson $json) => $json
+                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
                         ->whereAllType([
                             'id' => 'integer',
                             'fecha' => 'string',
@@ -117,7 +117,7 @@ class VentaTest extends TestCase
                             'comprador' => 'string',
                         ])->has(
                             'ganado',
-                            fn (AssertableJson $json)
+                            fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                             => $json->whereAllType([
                                 'id' => 'integer',
                                 'numero' => 'integer',
@@ -138,9 +138,9 @@ class VentaTest extends TestCase
 
         $response->assertStatus(201)
             ->assertJson(
-                fn (AssertableJson $json) => $json->has(
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'venta',
-                    fn (AssertableJson $json) => $json
+                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
                         ->whereAllType([
                             'id' => 'integer',
                             'fecha' => 'string',
@@ -150,7 +150,7 @@ class VentaTest extends TestCase
                             'comprador' => 'string',
                         ])->has(
                             'ganado',
-                            fn (AssertableJson $json)
+                            fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                             => $json->whereAllType([
                                 'id' => 'integer',
                                 'numero' => 'integer',
@@ -171,9 +171,9 @@ class VentaTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson(
-                fn (AssertableJson $json) => $json->has(
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'venta',
-                    fn (AssertableJson $json) => $json
+                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
                         ->whereAllType([
                             'id' => 'integer',
                             'fecha' => 'string',
@@ -183,7 +183,7 @@ class VentaTest extends TestCase
                             'comprador' => 'string',
                         ])->has(
                             'ganado',
-                            fn (AssertableJson $json)
+                            fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                             => $json->whereAllType([
                                 'id' => 'integer',
                                 'numero' => 'integer',
@@ -207,10 +207,10 @@ class VentaTest extends TestCase
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(route('ventas.update', ['venta' => $idVentaEditar]), $this->venta);
 
         $response->assertStatus(200)->assertJson(
-            fn (AssertableJson $json) =>
+            fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
             $json->has(
                 'venta',
-                fn (AssertableJson $json) =>
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                 $json->where('ganado.id', $this->venta['ganado_id'])
                 ->etc()
             )
@@ -232,7 +232,7 @@ class VentaTest extends TestCase
     /**
      * @dataProvider ErrorinputProvider
      */
-    public function test_error_validacion_registro_venta($venta, $errores): void
+    public function test_error_validacion_registro_venta(array $venta, array $errores): void
     {
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(route('ventas.store'), $venta);

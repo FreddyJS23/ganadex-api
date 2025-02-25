@@ -92,15 +92,15 @@ class ResumenesAnualesTest extends TestCase
         $this->generarPartos();
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(route('resumenesAnual.resumenNatalidad'));
         $response->assertStatus(200);
-        $response->assertJson(fn(AssertableJson $json) =>
-        $json->has('nacimientos_ultimos_5_año.0', fn(AssertableJson $json)
+        $response->assertJson(fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
+        $json->has('nacimientos_ultimos_5_año.0', fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
         => $json->whereAllType([
             'año' => 'string',
             'partos_producidos' => 'integer',
             'poblacion' => 'integer',
             'tasa_natalidad' => 'float|integer'
         ]))
-            ->has('nacimientos_año_actual', fn(AssertableJson $json)
+            ->has('nacimientos_año_actual', fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
             => $json->whereAllType([
                 'año' => 'string',
                 'total' => 'integer',

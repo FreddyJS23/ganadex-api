@@ -36,7 +36,7 @@ class PesajeLecheTest extends TestCase
     private $estadoSano;
     private $estadoVendido;
     private $estadoFallecido;
-    private $url;
+    private string $url;
     private $finca;
 
     protected function setUp(): void
@@ -116,10 +116,10 @@ class PesajeLecheTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson(
-                fn (AssertableJson $json) => $json->has(
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'pesajes_leche',
                     $this->cantidad_pesoLeche,
-                    fn (AssertableJson $json) => $json->whereAllType([
+                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
                         'id' => 'integer',
                         'pesaje' => 'integer',
                         'fecha' => 'string',
@@ -136,9 +136,9 @@ class PesajeLecheTest extends TestCase
 
         $response->assertStatus(201)
             ->assertJson(
-                fn (AssertableJson $json) => $json->has(
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'pesaje_leche',
-                    fn (AssertableJson $json) => $json->whereAllType([
+                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
                         'id' => 'integer',
                         'pesaje' => 'string',
                         'fecha' => 'string',
@@ -158,9 +158,9 @@ class PesajeLecheTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson(
-                fn (AssertableJson $json) => $json->has(
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'pesaje_leche',
-                    fn (AssertableJson $json) => $json->whereAllType([
+                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
                         'id' => 'integer',
                         'pesaje' => 'integer',
                         'fecha' => 'string',
@@ -178,9 +178,9 @@ class PesajeLecheTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson(
-                fn (AssertableJson $json) => $json->has(
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'pesaje_leche',
-                    fn (AssertableJson $json) => $json
+                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
                         ->where('pesaje', $this->pesoLeche['peso_leche'])
                         ->etc()
                 )
@@ -214,7 +214,7 @@ class PesajeLecheTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson(
-                fn (AssertableJson $json) => $json->has('todos_pesaje_leche.1', fn (AssertableJson $json) => $json->whereAllType([
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has('todos_pesaje_leche.1', fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
                     'id' => 'integer',
                     'nombre' => 'string',
                     'numero' => 'integer',
@@ -227,7 +227,7 @@ class PesajeLecheTest extends TestCase
     /**
      * @dataProvider ErrorinputProvider
      */
-    public function test_error_validacion_registro_pesoLeche($pesoLeche, $errores): void
+    public function test_error_validacion_registro_pesoLeche(array $pesoLeche, array $errores): void
     {
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson($this->url, $pesoLeche);

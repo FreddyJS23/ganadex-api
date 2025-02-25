@@ -47,7 +47,7 @@ class AsignarNumeroCriaTest extends TestCase
             ->setUpRequest()
             ->getJson(route('numeracion.index'))
             ->assertStatus(200)
-            ->assertJson(fn(AssertableJson $json) => $json->has(
+            ->assertJson(fn(AssertableJson $json): AssertableJson => $json->has(
                 key: 'crias_pendiente_numeracion',
                 length: $this->cantidad_ganado
             ));
@@ -72,7 +72,7 @@ class AsignarNumeroCriaTest extends TestCase
             ->getJson(sprintf('api/ganado/%s', $idCria))
             ->assertStatus(200)
             ->assertJson(
-                fn(AssertableJson $json) => $json
+                fn(AssertableJson $json): AssertableJson => $json
                     ->where(
                         key: 'ganado.estados',
                         expected: fn(Collection $estados) => $estados->doesntContain(

@@ -95,12 +95,12 @@ class FallecimientoTest extends TestCase
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson('api/fallecimientos');
 
         $response->assertStatus(200)->assertJson(
-            fn (AssertableJson $json) =>
+            fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
             $json->whereType('fallecidos', 'array')
                 ->has('fallecidos', $this->cantidad_fallecimientos)
                 ->has(
                     'fallecidos.0',
-                    fn (AssertableJson $json)
+                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                     => $json->whereAllType([
                         'id' => 'integer',
                         'fecha' => 'string',
@@ -109,7 +109,7 @@ class FallecimientoTest extends TestCase
                     ])
                     ->has(
                         'ganado',
-                        fn (AssertableJson $json)
+                        fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                         => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
                     )
                 )
@@ -128,13 +128,13 @@ class FallecimientoTest extends TestCase
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson('api/fallecimientos', $this->fallecimiento + ['ganado_id' => $ganado->id,'causas_fallecimiento_id'=>$this->causaFallecimiento->id]);
 
         $response->assertStatus(201)->assertJson(
-            fn (AssertableJson $json) => $json->whereAllType([
+            fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
                 'fallecimiento.id' => 'integer',
                 'fallecimiento.fecha' => 'string',
                 'fallecimiento.causa' => 'string',
             ])->has(
                 'fallecimiento.ganado',
-                fn (AssertableJson $json)
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                 => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
             )
         );
@@ -150,13 +150,13 @@ class FallecimientoTest extends TestCase
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf('api/fallecimientos/%s', $idfallecimientos), $this->fallecimiento);
 
         $response->assertStatus(200)->assertJson(
-            fn (AssertableJson $json) => $json->whereAllType([
+            fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
                 'fallecimiento.id' => 'integer',
                 'fallecimiento.fecha' => 'string',
                 'fallecimiento.causa' => 'string',
             ])->has(
                 'fallecimiento.ganado',
-                fn (AssertableJson $json)
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                 => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
             )
         );
@@ -171,7 +171,7 @@ class FallecimientoTest extends TestCase
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/fallecimientos/%s', $idfallecimientosEditar), $this->fallecimientoActualizado + ['causas_fallecimiento_id'=>$this->causaFallecimiento->id]);
 
         $response->assertStatus(200)->assertJson(
-            fn (AssertableJson $json) =>
+            fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
             $json
                 ->where('fallecimiento.fecha', $this->fallecimientoActualizado['fecha'])
                 ->where('fallecimiento.descripcion', $this->fallecimientoActualizado['descripcion'])
@@ -181,7 +181,7 @@ class FallecimientoTest extends TestCase
                     'fallecimiento.causa' => 'string',
                 ])->has(
                     'fallecimiento.ganado',
-                    fn (AssertableJson $json)
+                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                     => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
                 )
                 ->etc()
@@ -204,7 +204,7 @@ class FallecimientoTest extends TestCase
     /**
      * @dataProvider ErrorinputProvider
      */
-    public function test_error_validacion_registro_fallecimiento($fallecimientos, $errores): void
+    public function test_error_validacion_registro_fallecimiento(array $fallecimientos, array $errores): void
     {
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson('api/fallecimientos', $fallecimientos);
 

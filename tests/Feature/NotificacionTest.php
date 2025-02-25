@@ -16,7 +16,7 @@ class NotificacionTest extends TestCase
 {
     use RefreshDatabase;
 
-    private $cantidad_notificaciones = 10;
+    private int $cantidad_notificaciones = 10;
     private $user;
     private $finca;
 
@@ -49,34 +49,34 @@ class NotificacionTest extends TestCase
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('notificaciones.index'));
         $response->assertStatus(200)->assertJson(
-            fn (AssertableJson $json) =>
+            fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
             $json->whereType('notificaciones', 'array')
-                ->has('notificaciones', fn (AssertableJson $json) =>
+                ->has('notificaciones', fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                 $json->has(
                     'revision.0',
-                    fn (AssertableJson $json)
+                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                     => $json->whereAllType(['id' => 'integer', 'tipo' => 'string', 'leido' => 'boolean', 'dias_para_evento' => 'integer'])
                         ->has(
                             'ganado',
-                            fn (AssertableJson $json)
+                            fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                             => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
                         )
                 )->has(
                     'secado.0',
-                    fn (AssertableJson $json)
+                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                     => $json->whereAllType(['id' => 'integer', 'tipo' => 'string', 'leido' => 'boolean', 'dias_para_evento' => 'integer'])
                         ->has(
                             'ganado',
-                            fn (AssertableJson $json)
+                            fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                             => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
                         )
                 )->has(
                     'parto.0',
-                    fn (AssertableJson $json)
+                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                     => $json->whereAllType(['id' => 'integer', 'tipo' => 'string', 'leido' => 'boolean', 'dias_para_evento' => 'integer'])
                         ->has(
                             'ganado',
-                            fn (AssertableJson $json)
+                            fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                             => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
                         )
                 ))
@@ -102,6 +102,6 @@ class NotificacionTest extends TestCase
         $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('notificaciones.destroyAll'));
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('notificaciones.index'));
-        $response->assertStatus(200)->assertJson(fn (AssertableJson $json) => $json->has('notificaciones', 0));
+        $response->assertStatus(200)->assertJson(fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has('notificaciones', 0));
     }
 }

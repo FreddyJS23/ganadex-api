@@ -46,7 +46,7 @@ class ConfiguracionTest extends TestCase
             ->getJson('api/configuracion')
             ->assertStatus(200)
             ->assertJson(
-                fn(AssertableJson $json) => $json->whereAllType(
+                fn(AssertableJson $json): AssertableJson => $json->whereAllType(
                     [
                         'configuracion.peso_servicio' => 'integer',
                         'configuracion.dias_evento_notificacion' => 'integer',
@@ -56,20 +56,23 @@ class ConfiguracionTest extends TestCase
             );
     }
 
+    private function setUpRequest(): static
+    {
+        $this
+            ->actingAs($this->user)
+            ->withSession($this->getSessionInitializationArray());
+
+        return $this;
+    }
 
     public function test_actualizar_configuracion(): void
     {
-        $response = $this
-            ->actingAs($this->user)
-            ->withSession([
-                'peso_servicio' => $this->user->configuracion->peso_servicio,
-                'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,
-                'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna
-            ])
+        $this
+            ->setUpRequest()
             ->putJson(route('configuracion.update'), $this->configuracion)
             ->assertStatus(200)
             ->assertJson(
-                fn(AssertableJson $json) => $json
+                fn(AssertableJson $json): AssertableJson => $json
                     ->where(
                         key: 'configuracion.peso_servicio',
                         expected: $this->configuracion['peso_servicio']
@@ -99,7 +102,7 @@ class ConfiguracionTest extends TestCase
     }
 
     /** @dataProvider ErrorinputProvider */
-    public function test_error_validacion_registro_configuracion($configuracion, $errores): void
+    public function test_error_validacion_registro_configuracion(array $configuracion, array $errores): void
     {
         $this
             ->actingAs($this->user)
@@ -108,13 +111,13 @@ class ConfiguracionTest extends TestCase
             ->assertInvalid($errores);
     }
 
-
     public function test_autorizacion_usuario_veterinario_maniupular_configuracion(): void
     {
         $usuarioVeterinario = User::factory()->hasConfiguracion()->create();
         $usuarioVeterinario->syncRoles('veterinario');
 
         $this
+            ->cambiarRol($this->user)
             ->actingAs($usuarioVeterinario)
             ->putJson(route('configuracion.update'), $this->configuracion)
             ->assertStatus(403);

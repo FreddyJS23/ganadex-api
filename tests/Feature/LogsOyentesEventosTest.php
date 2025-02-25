@@ -46,15 +46,15 @@ class LogsOyentesEventosTest extends TestCase
         'tipo' => 'monta'
     ];
 
-    private $parto = [
+    private array $parto = [
         'observacion' => 'bien',
         'nombre' => 'test',
         'fecha' => '2020-10-02',
         'numero' => 33,
         'peso_nacimiento' => 50,
     ];
-    private $hembra = ['sexo' => 'H'];
-    private $macho = ['sexo' => 'M'];
+    private array $hembra = ['sexo' => 'H'];
+    private array $macho = ['sexo' => 'M'];
 
 
 
@@ -385,10 +385,10 @@ class LogsOyentesEventosTest extends TestCase
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id, 'peso_servicio' => $this->user->configuracion->peso_servicio, 'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion, 'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('logsEventos.index'));
 
-        $response->assertStatus(200)->assertJson(fn(AssertableJson $json)
+        $response->assertStatus(200)->assertJson(fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
         => $json->has(
             'logs_eventos.0',
-            fn(AssertableJson $json) => $json->whereAllType([
+            fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
                 'id' => 'integer',
                 'operacion' => 'string',
                 'descripcion' => 'string',

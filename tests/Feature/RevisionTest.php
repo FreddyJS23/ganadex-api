@@ -39,7 +39,7 @@ class RevisionTest extends TestCase
     private $estadoPendienteServicio;
     private $veterinario;
     private $userVeterinario;
-    private $url;
+    private string $url;
     private $finca;
 
     protected function setUp(): void
@@ -137,10 +137,10 @@ class RevisionTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson(
-                fn (AssertableJson $json) => $json->has(
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'revisiones',
                     $this->cantidad_revision,
-                    fn (AssertableJson $json) =>
+                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                     $json->whereAllType([
                         'id' => 'integer',
                         'fecha' => 'string',
@@ -148,7 +148,7 @@ class RevisionTest extends TestCase
                         'tratamiento' => 'string',
                     ])->has(
                         'veterinario',
-                        fn(AssertableJson $json)
+                        fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                         =>$json->whereAllType([
                             'id' => 'integer',
                         'nombre' => 'string'])
@@ -165,9 +165,9 @@ class RevisionTest extends TestCase
 
         $response->assertStatus(201)
             ->assertJson(
-                fn (AssertableJson $json) => $json->has(
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'revision',
-                    fn (AssertableJson $json) =>
+                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                     $json->whereAllType([
                         'id' => 'integer',
                         'fecha' => 'string',
@@ -175,7 +175,7 @@ class RevisionTest extends TestCase
                         'tratamiento' => 'string',
                     ])->has(
                         'veterinario',
-                        fn (AssertableJson $json)
+                        fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                         => $json->whereAllType([
                             'id' => 'integer',
                             'nombre' => 'string'
@@ -192,9 +192,9 @@ class RevisionTest extends TestCase
 
         $response->assertStatus(201)
             ->assertJson(
-                fn (AssertableJson $json) => $json->has(
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'revision',
-                    fn (AssertableJson $json) =>
+                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                     $json->whereAllType([
                         'id' => 'integer',
                         'fecha' => 'string',
@@ -202,7 +202,7 @@ class RevisionTest extends TestCase
                         'tratamiento' => 'string',
                     ])->has(
                         'veterinario',
-                        fn (AssertableJson $json)
+                        fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                         => $json->whereAllType([
                             'id' => 'integer',
                             'nombre' => 'string'
@@ -244,7 +244,7 @@ class RevisionTest extends TestCase
 
         $response->assertStatus(422)
             ->assertJson(
-                fn (AssertableJson $json) => $json->where('errors.tipo_revision_id.0', fn(string $message)=>Str::contains($message, 'La vaca debe tener un peso mayor a'))
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->where('errors.tipo_revision_id.0', fn(string $message)=>Str::contains($message, 'La vaca debe tener un peso mayor a'))
                 ->etc()
             );
     }
@@ -263,7 +263,7 @@ class RevisionTest extends TestCase
 
         $response->assertStatus(422)
             ->assertJson(
-                fn (AssertableJson $json) => $json->where('errors.tipo_revision_id.0', 'La vaca debe de tener un servicio previo')
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->where('errors.tipo_revision_id.0', 'La vaca debe de tener un servicio previo')
                 ->etc()
             )
             ;
@@ -303,7 +303,7 @@ class RevisionTest extends TestCase
 
         $response->assertStatus(422)
             ->assertJson(
-                fn (AssertableJson $json) => $json->where('errors.tipo_revision_id.0', 'Realize un nuevo servicio, el servicio anterior ya se utilizo para el parto ya registrado')
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->where('errors.tipo_revision_id.0', 'Realize un nuevo servicio, el servicio anterior ya se utilizo para el parto ya registrado')
                 ->etc()
             )
             ;
@@ -320,9 +320,9 @@ class RevisionTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson(
-                fn (AssertableJson $json) => $json->has(
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'revision',
-                    fn (AssertableJson $json) =>
+                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                     $json->whereAllType([
                         'id' => 'integer',
                         'fecha' => 'string',
@@ -330,7 +330,7 @@ class RevisionTest extends TestCase
                         'tratamiento' => 'string',
                     ])->has(
                         'veterinario',
-                        fn (AssertableJson $json)
+                        fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                         => $json->whereAllType([
                             'id' => 'integer',
                             'nombre' => 'string'
@@ -349,14 +349,14 @@ class RevisionTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson(
-                fn (AssertableJson $json) => $json->has(
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'revision',
-                    fn (AssertableJson $json) =>
+                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                     $json->where('diagnostico', 'Rutina')
                     ->where('tratamiento', $this->revision['tratamiento'])
                     ->has(
                         'veterinario',
-                        fn (AssertableJson $json)
+                        fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                         => $json->whereAllType([
                             'id' => 'integer',
                             'nombre' => 'string'
@@ -414,7 +414,7 @@ class RevisionTest extends TestCase
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('todasRevisiones'));
         $response->assertStatus(200)
             ->assertJson(
-                fn (AssertableJson $json) => $json->has('todas_revisiones', 6 , fn (AssertableJson $json) => $json->whereAllType([
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has('todas_revisiones', 6 , fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
                     'id' => 'integer',
                     'numero' => 'integer',
                     'diagnostico' => 'string',
@@ -429,7 +429,7 @@ class RevisionTest extends TestCase
     /**
      * @dataProvider ErrorinputProvider
      */
-    public function test_error_validacion_registro_revision($revision, $errores): void
+    public function test_error_validacion_registro_revision(array $revision, array $errores): void
     {
         //crear personal no veterinario
             Personal::factory()

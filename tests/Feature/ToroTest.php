@@ -152,10 +152,10 @@ class ToroTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson(
-                fn (AssertableJson $json) => $json->has(
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'toros',
                     $this->cantidad_toro,
-                    fn (AssertableJson $json) => $json
+                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
                         ->whereAllType([
                             'id' => 'integer',
                             'nombre' => 'string',
@@ -184,9 +184,9 @@ class ToroTest extends TestCase
 
         $response->assertStatus(201)
             ->assertJson(
-                fn (AssertableJson $json) => $json->has(
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'toro',
-                    fn (AssertableJson $json) => $json
+                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
                         ->whereAllType([
                             'id' => 'integer',
                             'nombre' => 'string',
@@ -212,10 +212,10 @@ class ToroTest extends TestCase
 
         $response->assertStatus(201)
             ->assertJson(
-                fn (AssertableJson $json) =>
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                 $json->has(
                     'toro',
-                    fn (AssertableJson $json) =>
+                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                     $json
                         ->where('estados.0.estado', 'fallecido')
                         ->etc()
@@ -229,10 +229,10 @@ class ToroTest extends TestCase
 
         $response->assertStatus(201)
             ->assertJson(
-                fn (AssertableJson $json) =>
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                 $json->has(
                     'toro',
-                    fn (AssertableJson $json) =>
+                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                     $json
                         ->where('estados.0.estado', 'vendido')
                         ->etc()
@@ -252,9 +252,9 @@ class ToroTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson(
-                fn (AssertableJson $json) => $json->has(
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'toro',
-                    fn (AssertableJson $json) => $json
+                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
                         ->whereAllType([
                             'id' => 'integer',
                             'nombre' => 'string',
@@ -272,16 +272,16 @@ class ToroTest extends TestCase
                         ->where('tipo', 'adulto')
                 )->has(
                     'vacunaciones',
-                    fn(AssertableJson $json) =>
-                    $json->has('vacunas.0', fn(AssertableJson $json)=>
+                    fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
+                    $json->has('vacunas.0', fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson=>
                         $json->whereAllType([
                             'vacuna' => 'string',
                             'cantidad' => 'integer',
                             'ultima_dosis' => 'string',
                             'prox_dosis' => 'string',
                         ])
-                        ->where('cantidad', fn(int $cantidad)=>$cantidad <= 3))
-                    ->has('historial.0', fn(AssertableJson $json)=>
+                        ->where('cantidad', fn(int $cantidad): bool=>$cantidad <= 3))
+                    ->has('historial.0', fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson=>
                         $json->whereAllType([
                             'id' => 'integer',
                             'vacuna' => 'string',
@@ -308,10 +308,10 @@ class ToroTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson(
-                fn (AssertableJson $json) => $json->has(
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'servicios',
                     3,
-                    fn (AssertableJson $json) => $json
+                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
                     ->whereAllType([
                         'id' => 'integer',
                         'fecha' => 'string',
@@ -340,7 +340,7 @@ class ToroTest extends TestCase
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/toro/%s', $toroActual->id), $this->toroActualizado);
 
         $response->assertStatus(200)->assertJson(
-            fn (AssertableJson $json) =>
+            fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
             $json
                 ->where('toro.nombre', $this->toroActualizado['nombre'])
                 ->where('toro.numero', $toroActual['ganado']['numero'])
@@ -368,7 +368,7 @@ class ToroTest extends TestCase
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/toro/%s', $idToroEditar), $this->toro);
 
-        $response->assertStatus(422)->assertJson(fn (AssertableJson $json) =>
+        $response->assertStatus(422)->assertJson(fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
         $json->hasAll(['errors.nombre', 'errors.numero'])
         ->etc());
     }
@@ -401,7 +401,7 @@ class ToroTest extends TestCase
     /**
      * @dataProvider ErrorinputProvider
      */
-    public function test_error_validacion_registro_toro($toro, $errores): void
+    public function test_error_validacion_registro_toro(array $toro, array $errores): void
     {
         Toro::factory()
             ->for($this->finca)

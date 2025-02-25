@@ -78,10 +78,10 @@ class UsuarioVeterinarioTest extends TestCase
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('usuarios_veterinarios.index'));
         $response->assertStatus(200)
             ->assertJson(
-                fn(AssertableJson $json) => $json->has(
+                fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'usuarios_veterinarios',
                     10,
-                    fn(AssertableJson $json) => $json->whereAllType([
+                    fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
                         'id' => 'integer',
                         'usuario' => 'string',
                         'nombre' => 'string',
@@ -98,9 +98,9 @@ class UsuarioVeterinarioTest extends TestCase
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(route('usuarios_veterinarios.store'), ['personal_id' => $this->personal]);
 
         $response->assertStatus(201)->assertJson(
-            fn(AssertableJson $json) => $json->has(
+            fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                 'usuario_veterinario',
-                fn(AssertableJson $json) => $json->whereAllType([
+                fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
                     'id' => 'integer',
                     'usuario' => 'string',
                     'nombre' => 'string',
@@ -122,10 +122,10 @@ class UsuarioVeterinarioTest extends TestCase
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(route('usuarios_veterinarios.store'), ['personal_id' => $this->personal]);
 
         $response->assertStatus(201)->assertJson(
-            fn(AssertableJson $json) => $json->has(
+            fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                 'usuario_veterinario',
-                fn(AssertableJson $json) => $json
-                ->where('usuario', fn(string $usuario)=> str_contains($usuario, 'usuario'))
+                fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
+                ->where('usuario', fn(string $usuario): bool=> str_contains($usuario, 'usuario'))
                 ->etc()
             )
         );
@@ -140,10 +140,10 @@ class UsuarioVeterinarioTest extends TestCase
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(route('usuarios_veterinarios.store'), ['personal_id' => $this->personal]);
 
         $response->assertStatus(201)->assertJson(
-            fn(AssertableJson $json) => $json->has(
+            fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                 'usuario_veterinario',
-                fn(AssertableJson $json) => $json
-                ->where('usuario', fn(string $usuario)=> str_contains($usuario, 'usuario'))
+                fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
+                ->where('usuario', fn(string $usuario): bool=> str_contains($usuario, 'usuario'))
                 ->etc()
             )
         );
@@ -208,7 +208,7 @@ class UsuarioVeterinarioTest extends TestCase
     /**
      * @dataProvider ErrorinputProvider
      */
-    public function test_error_validacion_registro_usuario_veterinario($usuarioVeterinario, $errores): void
+    public function test_error_validacion_registro_usuario_veterinario(array $usuarioVeterinario, array $errores): void
     {
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(route('usuarios_veterinarios.store'), $usuarioVeterinario);

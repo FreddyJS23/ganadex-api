@@ -84,10 +84,10 @@ class PajuelaToroTest extends TestCase
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('pajuela_toros.index'));
         $response->assertStatus(200)
             ->assertJson(
-                fn (AssertableJson $json) => $json->has(
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'pajuela_toros',
                     $this->cantidad_pajuelaToro,
-                    fn (AssertableJson $json) => $json->whereAllType([
+                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
                         'id' => 'integer',
                         'codigo' => 'string',
                         'descripcion' => 'string',
@@ -105,9 +105,9 @@ class PajuelaToroTest extends TestCase
 
         $response->assertStatus(201)
             ->assertJson(
-                fn (AssertableJson $json) => $json->has(
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'pajuela_toro',
-                    fn (AssertableJson $json) => $json->whereAllType([
+                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
                         'id' => 'integer',
                         'codigo' => 'string',
                         'descripcion' => 'string',
@@ -128,9 +128,9 @@ class PajuelaToroTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson(
-                fn (AssertableJson $json) => $json->has(
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'pajuela_toro',
-                    fn (AssertableJson $json) => $json->whereAllType([
+                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
                         'id' => 'integer',
                         'codigo' => 'string',
                         'descripcion' => 'string',
@@ -150,9 +150,9 @@ class PajuelaToroTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson(
-                fn (AssertableJson $json) => $json->has(
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'pajuela_toro',
-                    fn (AssertableJson $json) => $json
+                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
                         ->where('codigo', $this->pajuela_toro['codigo'])
                         ->where('descripcion', $this->pajuela_toro['descripcion'])
                         ->where('fecha', $this->pajuela_toro['fecha'])
@@ -177,7 +177,7 @@ class PajuelaToroTest extends TestCase
     /**
      * @dataProvider ErrorinputProvider
      */
-    public function test_error_validacion_registro_pajuela_toro($pajuela_toro, $errores): void
+    public function test_error_validacion_registro_pajuela_toro(array $pajuela_toro, array $errores): void
     {
         PajuelaToro::factory()->for($this->finca)->create(['codigo' => 28472738]);
 

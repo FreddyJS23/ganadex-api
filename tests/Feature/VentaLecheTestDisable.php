@@ -75,7 +75,7 @@ class VentaLecheTest extends TestCase
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson('api/venta_leche');
         $response->assertStatus(200)
-            ->assertJson(fn (AssertableJson $json) => $json->has('ventas_de_leche', $this->cantidad_ventaLeche, fn (AssertableJson $json) => $json
+            ->assertJson(fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has('ventas_de_leche', $this->cantidad_ventaLeche, fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
                 ->whereAllType([
                     'id' => 'integer',
                     'fecha' => 'string',
@@ -92,10 +92,10 @@ class VentaLecheTest extends TestCase
 
         $response->assertStatus(201)
             ->assertJson(
-                fn (AssertableJson $json) =>
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                 $json->has(
                     'venta_leche',
-                    fn (AssertableJson $json) =>
+                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                     $json->whereAllType([
                         'id' => 'integer',
                         'fecha' => 'string',
@@ -110,7 +110,7 @@ class VentaLecheTest extends TestCase
     /**
      * @dataProvider ErrorinputProvider
      */
-    public function test_error_validacion_registro_venta_de_leche($ventaLeche, $errores): void
+    public function test_error_validacion_registro_venta_de_leche(array $ventaLeche, array $errores): void
     {
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson('api/venta_leche', $ventaLeche);
 
