@@ -168,7 +168,6 @@ END as ultima_dosis
 
         $fechaActual = new DateTime();
         $mesActual = $fechaActual->format('m');
-        session()->put('finca_id', 1);
 
         /* ------------------------------ obtene vacas ------------------------------ */
         //tambien abarca las que seran futuras vacas
@@ -387,7 +386,7 @@ END as ultima_dosis
     public function resumenVentaGanadoAnual(Request $request)
     {
 
-        session()->put('finca_id', 1);
+
         $year = $request->query('year');
 
         $ventasGanado = Venta::where('ventas.finca_id', session('finca_id'))
@@ -415,7 +414,7 @@ END as ultima_dosis
 
     public function resumenCausasFallecimientos(Request $request)
     {
-        session()->put('finca_id', 1);
+
         $inicio = $request->query('start');
         $fin = $request->query('end');
 
@@ -453,7 +452,7 @@ END as ultima_dosis
 
     public function resumenNatalidad(Request $request)
     {
-        session()->put('finca_id', 1);
+
         $year = $request->query('year');
         // Recibir las imágenes en base64 desde la solicitud
         //eliminar comillas ya que viene con comilas por el formdata, para poder usarlo en el src de la etiqueta html img
@@ -501,7 +500,7 @@ END as ultima_dosis
 
     public function facturaVentaGanado()
     {
-        session()->put('finca_id', 1);
+
 
         $ventaGanado = Venta::where('finca_id', session('finca_id'))
             ->with(['ganado' => ['peso'],'comprador'])
