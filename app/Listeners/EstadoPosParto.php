@@ -22,7 +22,7 @@ class EstadoPosParto
      */
     public function handle(PartoHecho $event): void
     {
-        $estado = Estado::whereIn('estado', ['sano','lactancia'])->get();
+        $estado = Estado::whereIn('estado', ['sano','lactancia','pendiente_pesaje_leche'])->get();
 
         $event->parto->ganado->estados()->sync($estado);
 

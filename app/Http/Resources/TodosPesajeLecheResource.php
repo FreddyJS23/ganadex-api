@@ -15,14 +15,15 @@ class TodosPesajeLecheResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $pendientePesaje = new Carbon($this->pesajeLecheReciente->fecha);
+        //en caso de que no tenga pesaje leeche reciente quiere decir que no tiene una relacion en la tabla leche por ende seria la primera vez que se le haria un pesaje de leche
+        $pendientePesaje =$this->pesajeLecheReciente ? new Carbon($this->pesajeLecheReciente->fecha) : false;
 
         return [
             'id' => $this->id,
             'nombre' => $this->nombre,
             'numero' => $this->numero,
-            'ultimo_pesaje' => $this->pesajeLecheReciente->peso_leche . "KG",
-            'pesaje_este_mes' => $pendientePesaje->isCurrentMonth(),
+            'ultimo_pesaje' => $pendientePesaje ? $this->pesajeLecheReciente->peso_leche . "KG" : null,
+            'pesaje_este_mes' =>$pendientePesaje ? $pendientePesaje->isCurrentMonth() : false,
         ];
     }
 }
