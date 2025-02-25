@@ -67,8 +67,8 @@ class LoginTest extends TestCase
            'password' => 'admin',
         ]);
 
-        $response->assertStatus(200)->assertJson(fn (AssertableJson $json) =>
-        $json->has('login', fn(AssertableJson $json)=>
+        $response->assertStatus(200)->assertJson(fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
+        $json->has('login', fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson=>
             $json->where('rol', 'admin')->whereAllType([
             'id' => 'integer',
             'usuario' => 'string',
@@ -92,8 +92,8 @@ class LoginTest extends TestCase
             'password' => 'admin',
         ]);
 
-        $response->assertStatus(200)->assertJson(fn (AssertableJson $json) =>
-        $json->has('login', fn(AssertableJson $json)=>
+        $response->assertStatus(200)->assertJson(fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
+        $json->has('login', fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson=>
             $json->where('rol', 'admin')->whereAllType([
             'id' => 'integer',
             'usuario' => 'string',
@@ -125,8 +125,8 @@ class LoginTest extends TestCase
         //obtener sesion finca
         $response = $this->getJson(route('verificar_sesion_finca'));
 
-        $response->assertStatus(200)->assertJson(fn (AssertableJson $json) =>
-        $json->has('finca', fn(AssertableJson $json) => $json->where('id', $fincaId)
+        $response->assertStatus(200)->assertJson(fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
+        $json->has('finca', fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->where('id', $fincaId)
             ->etc()
             )
         )->assertSessionHas('peso_servicio', $this->userAdmin->configuracion->peso_servicio)
@@ -144,8 +144,8 @@ class LoginTest extends TestCase
             'password' => 'veterinario',
         ]);
 
-        $response->assertStatus(200)->assertJson(fn (AssertableJson $json) =>
-        $json->has('login', fn(AssertableJson $json)=>
+        $response->assertStatus(200)->assertJson(fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
+        $json->has('login', fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson=>
             $json->where('rol', 'veterinario')->whereAllType([
             'id' => 'integer',
             'usuario' => 'string',
@@ -167,8 +167,8 @@ class LoginTest extends TestCase
             'password' => 'veterinario',
         ]);
 
-        $response->assertStatus(200)->assertJson(fn (AssertableJson $json) =>
-        $json->has('login', fn(AssertableJson $json)=>
+        $response->assertStatus(200)->assertJson(fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
+        $json->has('login', fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson=>
         $json->where('rol', 'veterinario')->whereAllType([
         'id' => 'integer',
         'usuario' => 'string',

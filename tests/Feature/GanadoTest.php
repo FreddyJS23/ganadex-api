@@ -165,11 +165,11 @@ class GanadoTest extends TestCase
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson('api/ganado');
         $response->assertStatus(200)
             ->assertJson(
-                fn (AssertableJson $json) =>
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                 $json->has('cabezas_ganado', $this->cantidad_ganado)
                     ->has(
                         'cabezas_ganado.0',
-                        fn (AssertableJson $json) =>
+                        fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                         $json->whereAllType([
                             'id' => 'integer',
                             'nombre' => 'string',
@@ -184,7 +184,7 @@ class GanadoTest extends TestCase
                             ->where('tipo', fn (string $tipo) => Str::contains($tipo, ['becerro', 'maute', 'novillo', 'adulto']))
                         ->has(
                             'pesos',
-                            fn (AssertableJson $json) => $json
+                            fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
                                 ->whereAllType([
                                     'id' => 'integer',
                                     'peso_nacimiento' => 'string',
@@ -195,7 +195,7 @@ class GanadoTest extends TestCase
                         )
                         ->has(
                             'eventos',
-                            fn (AssertableJson $json) => $json
+                            fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
                                 ->whereAllType([
                                     'id' => 'integer',
                                     'prox_revision' => 'string|null',
@@ -215,10 +215,10 @@ class GanadoTest extends TestCase
 
         $response->assertStatus(201)
             ->assertJson(
-                fn (AssertableJson $json) =>
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                 $json->has(
                     'ganado',
-                    fn (AssertableJson $json) =>
+                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                     $json->whereAllType([
                         'id' => 'integer',
                         'nombre' => 'string',
@@ -233,7 +233,7 @@ class GanadoTest extends TestCase
                         ->where('tipo', fn (string $tipo) => Str::contains($tipo, ['becerro', 'maute', 'novillo', 'adulto']))
                         ->has(
                             'pesos',
-                            fn(AssertableJson $json)=>$json
+                            fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson=>$json
                             ->whereAllType([
                                 'id' => 'integer',
                                 'peso_nacimiento' => 'string',
@@ -244,7 +244,7 @@ class GanadoTest extends TestCase
                         )
                         ->has(
                             'eventos',
-                            fn(AssertableJson $json)=>$json
+                            fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson=>$json
                             ->whereAllType([
                             'id' => 'integer',
                                 'prox_revision' => 'string|null',
@@ -263,10 +263,10 @@ class GanadoTest extends TestCase
 
         $response->assertStatus(201)
             ->assertJson(
-                fn (AssertableJson $json) =>
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                 $json->has(
                     'ganado',
-                    fn (AssertableJson $json) =>
+                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                     $json
                         ->where('estados.0.estado', 'fallecido')
                         ->etc()
@@ -280,10 +280,10 @@ class GanadoTest extends TestCase
 
         $response->assertStatus(201)
             ->assertJson(
-                fn (AssertableJson $json) =>
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                 $json->has(
                     'ganado',
-                    fn (AssertableJson $json) =>
+                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                     $json
                         ->where('estados.0.estado', 'vendido')
                         ->etc()
@@ -303,19 +303,19 @@ class GanadoTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson(
-                fn(AssertableJson $json) =>
+                fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                 $json->has(
                     'vacunaciones',
-                    fn(AssertableJson $json) =>
-                    $json->has('vacunas.0', fn(AssertableJson $json)=>
+                    fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
+                    $json->has('vacunas.0', fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson=>
                         $json->whereAllType([
                             'vacuna' => 'string',
                             'cantidad' => 'integer',
                             'ultima_dosis' => 'string',
                             'prox_dosis' => 'string',
                         ])
-                        ->where('cantidad', fn(int $cantidad)=>$cantidad <= 3))
-                    ->has('historial.0', fn(AssertableJson $json)=>
+                        ->where('cantidad', fn(int $cantidad): bool=>$cantidad <= 3))
+                    ->has('historial.0', fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson=>
                         $json->whereAllType([
                             'id' => 'integer',
                             'vacuna' => 'string',
@@ -343,7 +343,7 @@ class GanadoTest extends TestCase
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/ganado/%s', $ganadoEditar->id), $this->cabeza_ganado_actualizada);
 
         $response->assertStatus(200)->assertJson(
-            fn (AssertableJson $json) =>
+            fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
             $json
                 ->where('ganado.nombre', $this->cabeza_ganado_actualizada['nombre'])
                 ->where('ganado.numero', $ganadoEditar['numero'])
@@ -372,7 +372,7 @@ class GanadoTest extends TestCase
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/ganado/%s', $idGanadoEditar), $this->cabeza_ganado);
 
-        $response->assertStatus(422)->assertJson(fn (AssertableJson $json) =>
+        $response->assertStatus(422)->assertJson(fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
         $json->hasAll(['errors.nombre', 'errors.numero'])
             ->etc());
     }
@@ -405,7 +405,7 @@ class GanadoTest extends TestCase
     /**
      * @dataProvider ErrorinputProvider
      */
-    public function test_error_validacion_registro_cabeza_ganado($ganado, $errores): void
+    public function test_error_validacion_registro_cabeza_ganado(array $ganado, array $errores): void
     {
         Ganado::factory()->for($this->finca)->create(['nombre' => 'test', 'numero' => 300]);
 

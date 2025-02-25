@@ -42,11 +42,11 @@ class DashboardJornadasVacunacionTest extends TestCase
             ->getJson(route('dashboardJornadasVacunacion.proximasJornadasVacunacion'))
             ->assertStatus(200)
             ->assertJson(
-                fn(AssertableJson $json) => $json
+                fn(AssertableJson $json): AssertableJson => $json
                     ->whereType('proximas_jornadas_vacunacion', 'array')
                     ->has(
                         key: 'proximas_jornadas_vacunacion.0',
-                        length: fn(AssertableJson $json) => $json->whereAllType([
+                        length: fn(AssertableJson $json): AssertableJson => $json->whereAllType([
                             'vacuna' => 'string',
                             'prox_dosis' => 'string',
                             'ganado_vacunado' => 'array',

@@ -71,10 +71,10 @@ class TipoRevisionTest extends TestCase
             ->getJson(route('tipos_revision.index'))
             ->assertStatus(200)
             ->assertJson(
-                fn(AssertableJson $json) => $json->has(
+                fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     key: 'tipos_revision',
                     length: $this->cantidad_tipoRevision + 3,
-                    callback: fn(AssertableJson $json) => $json->whereAllType(
+                    callback: fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType(
                         [
                             'id' => 'integer',
                             'tipo' => 'string'
@@ -92,7 +92,7 @@ class TipoRevisionTest extends TestCase
             ->postJson(route('tipos_revision.store'), $this->tipo_revision)
             ->assertStatus(201)
             ->assertJson(
-                fn(AssertableJson $json) => $json
+                fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
                     ->where(
                         key: 'tipo_revision.tipo',
                         expected: $this->tipo_revision['tipo']
@@ -115,7 +115,7 @@ class TipoRevisionTest extends TestCase
             ->putJson(route('tipos_revision.update',['tipos_revision'=>$idTipoRevisionEditar]), $this->tipo_revision_actualizado)
             ->assertStatus(200)
             ->assertJson(
-                fn(AssertableJson $json) => $json
+                fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
                     ->where('tipo_revision.tipo', $this->tipo_revision_actualizado['tipo'])
                     ->etc()
             );
@@ -148,7 +148,7 @@ class TipoRevisionTest extends TestCase
 
 
     /** @dataProvider ErrorinputProvider */
-    public function test_error_validacion_registro_tipo_revision($tipo_revision, $errores): void
+    public function test_error_validacion_registro_tipo_revision(array $tipo_revision, array $errores): void
     {
 
         $this

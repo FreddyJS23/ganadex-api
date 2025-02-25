@@ -47,7 +47,7 @@ class CaparCriaTest extends TestCase
             ->setUpRequest()
             ->getJson(route('capar.index'))
             ->assertStatus(200)
-            ->assertJson(fn(AssertableJson $json) => $json->has(
+            ->assertJson(fn(AssertableJson $json): AssertableJson => $json->has(
                 key: 'crias_pendiente_capar',
                 length: $this->cantidad_ganado
             ));
@@ -69,7 +69,7 @@ class CaparCriaTest extends TestCase
             ->getJson(sprintf('api/ganado/%s', $idCria))
             ->assertStatus(200)
             ->assertJson(
-                fn(AssertableJson $json) => $json
+                fn(AssertableJson $json): AssertableJson => $json
                     ->where(
                         key: 'ganado.estados',
                         expected: fn(Collection $estados) => $estados->doesntContain(

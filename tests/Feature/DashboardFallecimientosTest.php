@@ -55,7 +55,7 @@ class DashboardFallecimientosTest extends TestCase
             ->getJson(route('dashboardFallecimientos.causasMuertesFrecuentes'))
             ->assertStatus(200)
             ->assertJson(
-                fn(AssertableJson $json) =>  $json
+                fn(AssertableJson $json): AssertableJson =>  $json
                     ->where('total_fallecidos', $this->cantidad_fallecimientos)
                     ->whereType('causas_frecuentes', 'array')
                     ->whereAllType(

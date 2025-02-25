@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use App\Models\Comprador;
 use App\Models\Finca;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\Feature\Common\NeedsComprador;
@@ -13,22 +12,7 @@ use Tests\TestCase;
 class CompradorTest extends TestCase
 {
     use RefreshDatabase;
-
-    use NeedsComprador {
-        setUp as needsCompradorSetUp;
-    }
-
-    protected function setUp(): void
-    {
-        $this->needsCompradorSetUp();
-
-        $this->user->assignRole('admin');
-    }
-
-    private function cambiarRol(User $user): void
-    {
-        $user->syncRoles('veterinario');
-    }
+    use NeedsComprador;
 
     public static function ErrorInputProvider(): array
     {
@@ -70,10 +54,10 @@ class CompradorTest extends TestCase
             ->getJson('api/comprador')
             ->assertStatus(200)
             ->assertJson(
-                fn(AssertableJson $json) => $json->has(
+                fn(AssertableJson $json): AssertableJson => $json->has(
                     key: 'compradores',
                     length: $this->cantidad_comprador,
-                    callback: fn(AssertableJson $json) => $json->whereAllType(
+                    callback: fn(AssertableJson $json): AssertableJson => $json->whereAllType(
                         [
                             'id' => 'integer',
                             'nombre' => 'string'
@@ -91,7 +75,7 @@ class CompradorTest extends TestCase
             ->postJson('api/comprador', $this->comprador)
             ->assertStatus(201)
             ->assertJson(
-                fn(AssertableJson $json) => $json
+                fn(AssertableJson $json): AssertableJson => $json
                     ->where(
                         key: 'comprador.nombre',
                         expected: $this->comprador['nombre']
@@ -111,13 +95,14 @@ class CompradorTest extends TestCase
             ->setUpRequest()
             ->getJson(sprintf('api/comprador/%s', $idComprador))
             ->assertStatus(200)
-            ->assertJson(fn(AssertableJson $json) => $json->whereAllType(
+            ->assertJson(fn(AssertableJson $json): AssertableJson => $json->whereAllType(
                 [
                     'comprador.id' => 'integer',
                     'comprador.nombre' => 'string'
                 ]
             ));
     }
+
     public function test_actualizar_comprador(): void
     {
         $comprador = $this->generarComprador();
@@ -129,7 +114,7 @@ class CompradorTest extends TestCase
             ->putJson(sprintf('api/comprador/%s', $idCompradorEditar), $this->comprador)
             ->assertStatus(200)
             ->assertJson(
-                fn(AssertableJson $json) => $json
+                fn(AssertableJson $json): AssertableJson => $json
                     ->where('comprador.nombre', $this->comprador['nombre'])
                     ->etc()
             );
@@ -145,10 +130,10 @@ class CompradorTest extends TestCase
 
         $this
             ->setUpRequest()
-            ->putJson(sprintf('api/comprador/%s', $idCompradorEditar), $this->comprador)
+            ->putJson("api/comprador/$idCompradorEditar", $this->comprador)
             ->assertStatus(422)
             ->assertJson(
-                fn(AssertableJson $json) => $json
+                fn(AssertableJson $json): AssertableJson => $json
                     ->hasAll(['errors.nombre'])
                     ->etc()
             );
@@ -156,7 +141,9 @@ class CompradorTest extends TestCase
 
     public function test_actualizar_comprador_conservando_campos_unicos(): void
     {
-        $compradorExistente = Comprador::factory()->for($this->finca)->create(['nombre' => 'test']);
+        $compradorExistente = Comprador::factory()
+            ->for($this->finca)
+            ->create(['nombre' => 'test']);
 
         $this
             ->setUpRequest()
@@ -166,7 +153,7 @@ class CompradorTest extends TestCase
             )
             ->assertStatus(200)
             ->assertJson(
-                fn(AssertableJson $json) => $json
+                fn(AssertableJson $json): AssertableJson => $json
                     ->where('comprador.nombre', $this->comprador['nombre'])
                     ->etc()
             );
@@ -186,7 +173,7 @@ class CompradorTest extends TestCase
     }
 
     /** @dataProvider ErrorinputProvider */
-    public function test_error_validacion_registro_comprador($comprador, $errores): void
+    public function test_error_validacion_registro_comprador(array $comprador, array $errores): void
     {
         Comprador::factory()->for($this->finca)->create(['nombre' => 'test']);
 
@@ -199,8 +186,6 @@ class CompradorTest extends TestCase
 
     public function test_autorizacion_maniupular__comprador_otro_usuario(): void
     {
-        $this->cambiarRol($this->user);
-
         $otroFinca = Finca::factory()
             ->for($this->user)
             ->create(['nombre' => 'otro_finca']);
@@ -211,6 +196,7 @@ class CompradorTest extends TestCase
         $this->generarComprador();
 
         $this
+            ->cambiarRol($this->user)
             ->setUpRequest()
             ->putJson(
                 uri: sprintf('api/comprador/%s', $idCompradorOtroUsuario),
@@ -222,9 +208,8 @@ class CompradorTest extends TestCase
 
     public function test_veterinario_no_autorizado_a_crear_comprador(): void
     {
-        $this->cambiarRol($this->user);
-
         $this
+            ->cambiarRol($this->user)
             ->setUpRequest()
             ->postJson('api/comprador', $this->comprador)
             ->assertStatus(403);
@@ -232,13 +217,12 @@ class CompradorTest extends TestCase
 
     public function test_veterinario_no_autorizado_a_actualizar_comprador(): void
     {
-        $this->cambiarRol($this->user);
-
         $compradores = $this->generarComprador();
         $idRandom = random_int(0, $this->cantidad_comprador - 1);
         $idCompradorEditar = $compradores[$idRandom]->id;
 
         $this
+            ->cambiarRol($this->user)
             ->setUpRequest()
             ->putJson(
                 uri: sprintf('api/comprador/%s', $idCompradorEditar),
@@ -250,13 +234,12 @@ class CompradorTest extends TestCase
 
     public function test_veterinario_no_autorizado_a_eliminar_comprador(): void
     {
-        $this->cambiarRol($this->user);
-
         $compradores = $this->generarComprador();
         $idRandom = random_int(0, $this->cantidad_comprador - 1);
         $idToDelete = $compradores[$idRandom]->id;
 
         $this
+            ->cambiarRol($this->user)
             ->setUpRequest()
             ->deleteJson(sprintf('api/comprador/%s', $idToDelete))
             ->assertStatus(403);

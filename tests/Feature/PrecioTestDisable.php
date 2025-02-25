@@ -65,10 +65,10 @@ class PrecioTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson(
-                fn (AssertableJson $json) => $json->has(
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'precios',
                     $this->cantidad_precio,
-                    fn (AssertableJson $json) =>
+                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                     $json->whereAllType([
                         'id' => 'integer',
                         'precio' => 'integer|double',
@@ -85,9 +85,9 @@ class PrecioTest extends TestCase
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson('api/precio', $this->precio);
 
         $response->assertStatus(201)->assertJson(
-            fn (AssertableJson $json) =>
+            fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
             $json->first(
-                fn (AssertableJson $json) =>
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                 $json->whereAllType([
                     'precio' => 'integer|double',
                     'fecha' => 'string'
@@ -100,7 +100,7 @@ class PrecioTest extends TestCase
     /**
      * @dataProvider ErrorinputProvider
      */
-    public function test_error_validacion_registro_precio($precio, $errores): void
+    public function test_error_validacion_registro_precio(array $precio, array $errores): void
     {
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson('api/precio', $precio);
 

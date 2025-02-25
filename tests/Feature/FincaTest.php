@@ -77,11 +77,11 @@ class FincaTest extends TestCase
         $response = $this->actingAs($this->user)->getJson(route('finca.index'));
 
         $response->assertStatus(200)->assertJson(
-            fn(AssertableJson $json) =>
+            fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
             $json->has(
                 'fincas',
                 $this->cantidad_fincas + 1,
-                fn(AssertableJson $json)
+                fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                 => $json->whereAllType([
                     'id' => 'integer',
                     'nombre' => 'string',
@@ -99,10 +99,10 @@ class FincaTest extends TestCase
         $response = $this->actingAs($this->user)->postJson(route('finca.store'), $this->finca);
 
         $response->assertStatus(201)->assertJson(
-            fn(AssertableJson $json) =>
+            fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
             $json->has(
                 'finca',
-                fn(AssertableJson $json)
+                fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                 => $json->whereAllType([
                     'id' => 'integer',
                     'nombre' => 'string',
@@ -121,10 +121,10 @@ class FincaTest extends TestCase
         $response = $this->actingAs($this->user)->postJson(route('finca.store'), $this->finca);
 
         $response->assertStatus(201)->assertJson(
-            fn(AssertableJson $json) =>
+            fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
             $json->has(
                 'finca',
-                fn(AssertableJson $json)
+                fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                 => $json->whereAllType([
                     'id' => 'integer',
                     'nombre' => 'string',
@@ -143,10 +143,10 @@ class FincaTest extends TestCase
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $idFincaEditar])->putJson(route('finca.update', ['finca' => $idFincaEditar]), $this->finca);
 
         $response->assertStatus(200)->assertJson(
-            fn(AssertableJson $json) =>
+            fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
              $json->has(
                  'finca',
-                 fn(AssertableJson $json) =>
+                 fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                  $json->where('id', $idFincaEditar)
                  ->where('nombre', $this->finca['nombre'])
                  ->etc()
@@ -164,7 +164,7 @@ class FincaTest extends TestCase
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $idfincaEditar])->putJson(route('finca.update', ['finca' => $finca[$idRandom]]), ['nombre' => 'finca_sesion']);
 
-        $response->assertStatus(422)->assertJson(fn(AssertableJson $json) =>
+        $response->assertStatus(422)->assertJson(fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
         $json->hasAll(['errors.nombre'])->etc());
     }
 
@@ -173,10 +173,10 @@ class FincaTest extends TestCase
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->fincaEnSesion->id])->getJson(route('verificar_sesion_finca'));
 
         $response->assertStatus(200)->assertJson(
-            fn(AssertableJson $json) =>
+            fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
             $json->has(
                 'finca',
-                fn(AssertableJson $json)
+                fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                 => $json->whereAllType([
                     'id' => 'integer',
                     'nombre' => 'string',
@@ -192,10 +192,10 @@ class FincaTest extends TestCase
         $response = $this->actingAs($this->user)->getJson(route('crear_sesion_finca', ['finca' => $this->fincaEnSesion]));
 
         $response->assertStatus(200)->assertJson(
-            fn(AssertableJson $json) =>
+            fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
             $json->has(
                 'finca',
-                fn(AssertableJson $json)
+                fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                 => $json->whereAllType([
                     'id' => 'integer',
                     'nombre' => 'string',
@@ -230,7 +230,7 @@ class FincaTest extends TestCase
     /**
      * @dataProvider ErrorinputProvider
      */
-     public function test_error_validacion_registro_finca($finca, $errores): void
+     public function test_error_validacion_registro_finca(array $finca, array $errores): void
     {
         $fincaTest = Finca::factory()->for($this->user)->create(['nombre' => 'test']);
 

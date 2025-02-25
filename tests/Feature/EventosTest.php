@@ -45,15 +45,15 @@ class EventosTest extends TestCase
         'tipo' => 'monta'
     ];
 
-    private $parto = [
+    private array $parto = [
         'observacion' => 'bien',
         'nombre' => 'test',
         'fecha' => '2020-10-02',
         'numero' => 33,
         'peso_nacimiento' => 50,
     ];
-    private $hembra = ['sexo' => 'H'];
-    private $macho = ['sexo' => 'M'];
+    private array $hembra = ['sexo' => 'H'];
+    private array $macho = ['sexo' => 'M'];
 
 
 
@@ -137,7 +137,7 @@ class EventosTest extends TestCase
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf('api/ganado/%s', $this->ganado->id));
 
         $response->assertStatus(200)->assertJson(
-            fn (AssertableJson $json) => $json->whereAllType([
+            fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
                 'ganado.eventos.prox_revision' => 'string',
                 'servicio_reciente' => 'array',
                 'total_servicios' => 'integer'
@@ -170,7 +170,7 @@ class EventosTest extends TestCase
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf('api/ganado/%s', $this->ganado->id));
 
         $response->assertStatus(200)->assertJson(
-            fn (AssertableJson $json) => $json->whereAllType(
+            fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType(
                 [
                     'ganado.eventos.prox_parto' => 'string',
                     'ganado.eventos.prox_secado' => 'null',
@@ -208,7 +208,7 @@ class EventosTest extends TestCase
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf('api/ganado/%s', $this->ganado->id));
 
         $response->assertStatus(200)->assertJson(
-            fn (AssertableJson $json) => $json->whereAllType(
+            fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType(
                 [
                     'ganado.eventos.prox_parto' => 'string',
                     'ganado.eventos.prox_secado' => 'string',
@@ -239,9 +239,9 @@ class EventosTest extends TestCase
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson('api/ganado_descarte');
 
-        $response->assertStatus(200)->AssertJson(fn (AssertableJson $json) => $json
-                ->has('ganado_descartes', 1, fn (AssertableJson $json) => $json
-                    ->has('estados', 1, fn(AssertableJson $json)=>$json
+        $response->assertStatus(200)->AssertJson(fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
+                ->has('ganado_descartes', 1, fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
+                    ->has('estados', 1, fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson=>$json
                         ->where('estado', 'sano')->etc())->etc()));
     }
 
@@ -264,7 +264,7 @@ class EventosTest extends TestCase
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf('api/ganado/%s', $this->ganado->id));
 
         $response->assertStatus(200)->assertJson(
-            fn (AssertableJson $json) => $json->whereAllType(
+            fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType(
                 [
                     'ganado.eventos.prox_revision' => 'string',
                     'ganado.eventos.prox_parto' => 'null',
@@ -306,7 +306,7 @@ class EventosTest extends TestCase
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf('api/ganado/%s', $cria_id->ganado_cria_id));
 
         $response->assertStatus(200)->assertJson(
-            fn (AssertableJson $json) => $json
+            fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
                 ->has('ganado.estados', 1)
                 ->etc()
         );
@@ -324,7 +324,7 @@ class EventosTest extends TestCase
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf('api/ganado/%s', $this->ganado->id));
 
         $response->assertStatus(200)->assertJson(
-            fn (AssertableJson $json) => $json
+            fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
                 ->has('ganado.estados', 1)
                 ->where(
                     'ganado.estados',
@@ -348,7 +348,7 @@ class EventosTest extends TestCase
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf('api/ganado/%s', $this->ganado->id));
 
         $response->assertStatus(200)->assertJson(
-            fn (AssertableJson $json) => $json
+            fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
             /* ->has('ganado.estados', 1) */
             ->where(
                 'ganado.estados',
@@ -366,7 +366,7 @@ class EventosTest extends TestCase
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf('api/ganado/%s', $this->ganado->id));
 
         $response->assertStatus(200)->assertJson(
-            fn (AssertableJson $json) => $json
+            fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
                 ->has('ganado.estados', 10)
                 ->where(
                     'ganado.estados',
@@ -393,7 +393,7 @@ class EventosTest extends TestCase
             ->hasEvento(1)
             ->has(
                 Leche::factory()->for($this->finca)->state(
-                    fn(array $attributes, Ganado $ganado) => ['ganado_id' => $ganado->id, 'fecha' => $fecha->format('Y-m-d')]
+                    fn(array $attributes, Ganado $ganado): array => ['ganado_id' => $ganado->id, 'fecha' => $fecha->format('Y-m-d')]
                 ),
                 'pesajes_leche'
             )
@@ -406,7 +406,7 @@ class EventosTest extends TestCase
             ->hasEvento(1)
             ->has(
                 Leche::factory()->for($this->finca)->state(
-                    fn(array $attributes, Ganado $ganado) => ['ganado_id' => $ganado->id, 'fecha' => now()->format('Y-m-d')]
+                    fn(array $attributes, Ganado $ganado): array => ['ganado_id' => $ganado->id, 'fecha' => now()->format('Y-m-d')]
                 ),
                 'pesajes_leche'
             )
@@ -420,11 +420,11 @@ class EventosTest extends TestCase
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('ganado.index'));
 
         $response->assertStatus(200)->assertJson(
-            fn (AssertableJson $json) =>
+            fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
             $json->has(
                //ganado pendiente pesaje mensual
                 'cabezas_ganado.1',
-                fn (AssertableJson $json) => $json->has('estados', 3)
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has('estados', 3)
                     ->where(
                         'estados',
                         fn (Collection $estados) => $estados->contains('estado', 'pendiente_pesaje_leche')
@@ -433,7 +433,7 @@ class EventosTest extends TestCase
                 //ganado con pesaje mensual de leche realizado
                 'cabezas_ganado.2',
                 //estado:sano,pendiente_servicio
-                fn (AssertableJson $json) => $json->has('estados', 2)
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has('estados', 2)
                     ->where(
                         'estados',
                         fn (Collection $estados) => $estados->doesntContain('estado', 'pendiente_pesaje_leche')
@@ -479,11 +479,11 @@ class EventosTest extends TestCase
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('notificaciones.index'));
 
-        $response->assertStatus(200)->assertJson(fn (AssertableJson $json)
+        $response->assertStatus(200)->assertJson(fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
         => $json
             ->has(
                 'notificaciones',
-                fn (AssertableJson $json)
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                 => $json
                     ->has('revision', $cantidadGanadoEventoProximo)
                     ->has('secado', $cantidadGanadoEventoProximo)
@@ -515,11 +515,11 @@ class EventosTest extends TestCase
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('ganado.index'));
 
         $response->assertStatus(200)->assertJson(
-            fn (AssertableJson $json) =>
+            fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
             $json->has(
                //ganado pendiente pesaje mensual
                 'cabezas_ganado.1',
-                fn (AssertableJson $json) => $json->has('estados', 2)
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has('estados', 2)
                     ->where(
                         'estados',
                         fn (Collection $estados) => $estados->contains('estado', 'pendiente_servicio')
@@ -527,7 +527,7 @@ class EventosTest extends TestCase
             )->has(
                 //ganado con pesaje mensual de leche realizado
                 'cabezas_ganado.2',
-                fn (AssertableJson $json) => $json->has('estados', 1)
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has('estados', 1)
                     ->where(
                         'estados',
                         fn (Collection $estados) => $estados->doesntContain('estado', 'pendiente_servicio')
@@ -545,7 +545,7 @@ class EventosTest extends TestCase
         ->hasEvento(1)
         ->hasAttached($this->estado)
         ->for($this->finca)
-        ->create(['tipo_id'=>1,'fecha_nacimiento'=>now()->subDay(400)->format('Y-m-d')]);
+        ->create(['tipo_id'=>1,'fecha_nacimiento'=>now()->subDay()->format('Y-m-d')]);
 
         //mautes que deberian pasar a novillo
         $mautes = Ganado::factory()
@@ -554,7 +554,7 @@ class EventosTest extends TestCase
         ->hasEvento(1)
         ->hasAttached($this->estado)
         ->for($this->finca)
-        ->create(['tipo_id'=>2,'fecha_nacimiento'=>now()->subDay(1000)->format('Y-m-d')]);
+        ->create(['tipo_id'=>2,'fecha_nacimiento'=>now()->subDay()->format('Y-m-d')]);
 
  //evento iniciar sesion finca
  $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('crear_sesion_finca', ['finca' => $this->finca->id]));
@@ -563,17 +563,17 @@ class EventosTest extends TestCase
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson('api/ganado');
         $response->assertStatus(200)
             ->assertJson(
-                fn (AssertableJson $json) =>
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                 //se empieza por la posicion 1 ya que  ya hay un ganado registrado
                 $json->has(
                         'cabezas_ganado.1',
-                        fn (AssertableJson $json) =>
+                        fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                             $json->where('tipo','maute')
                             ->etc()
                     )
                     ->has(
                         'cabezas_ganado.4',
-                        fn (AssertableJson $json) =>
+                        fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                             $json->where('tipo','novillo')
                             ->etc()
                     )

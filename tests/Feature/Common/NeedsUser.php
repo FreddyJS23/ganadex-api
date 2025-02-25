@@ -16,12 +16,19 @@ trait NeedsUser
         $this->user->assignRole('admin');
     }
 
-    private function getSessionInitializationArray(): array
+    final protected function getSessionInitializationArray(): array
     {
         return [
             'peso_servicio' => $this->user->configuracion->peso_servicio,
             'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,
             'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna
         ];
+    }
+
+    final protected function cambiarRol(User $user): self
+    {
+        $user->syncRoles('veterinario');
+
+        return $this;
     }
 }

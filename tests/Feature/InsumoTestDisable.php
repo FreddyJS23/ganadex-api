@@ -82,12 +82,12 @@ class InsumoTest extends TestCase
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson('api/insumo');
         $response->assertStatus(200)->assertJson(
-            fn (AssertableJson $json) =>
+            fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
             $json->whereType('insumos', 'array')
                 ->has('insumos', $this->cantidad_insumo)
                 ->has(
                     'insumos.0',
-                    fn (AssertableJson $json)
+                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                     => $json->whereAllType([
                         'id' => 'integer',
                         'insumo' => 'string',
@@ -105,10 +105,10 @@ class InsumoTest extends TestCase
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson('api/insumo', $this->insumo);
 
         $response->assertStatus(201)->assertJson(
-            fn (AssertableJson $json) =>
+            fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
             $json->has(
                 'insumo',
-                fn (AssertableJson $json)
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                 => $json->whereAllType([
                     'id' => 'integer',
                     'insumo' => 'string',
@@ -129,10 +129,10 @@ class InsumoTest extends TestCase
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf('api/insumo/%s', $idInsumo));
 
         $response->assertStatus(200)->assertJson(
-            fn (AssertableJson $json) =>
+            fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
             $json->has(
                 'insumo',
-                fn (AssertableJson $json)
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                 => $json->whereAllType([
                     'id' => 'integer',
                     'insumo' => 'string',
@@ -151,10 +151,10 @@ class InsumoTest extends TestCase
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/insumo/%s', $idInsumoEditar), $this->insumo);
 
         $response->assertStatus(200)->assertJson(
-            fn (AssertableJson $json) =>
+            fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
             $json->has(
                 'insumo',
-                fn (AssertableJson $json) =>
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                 $json->where('insumo', $this->insumo['insumo'])
                     ->where('cantidad', $this->insumo['cantidad'])
                     ->where('precio', $this->insumo['precio'])
@@ -173,7 +173,7 @@ class InsumoTest extends TestCase
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/insumo/%s', $idInsumoEditar), $this->insumo);
 
-        $response->assertStatus(422)->assertJson(fn (AssertableJson $json) =>
+        $response->assertStatus(422)->assertJson(fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
         $json->hasAll(['errors.insumo'])
             ->etc());
     }
@@ -202,7 +202,7 @@ class InsumoTest extends TestCase
     /**
      * @dataProvider ErrorinputProvider
      */
-    public function test_error_validacion_registro_insumo($insumo, $errores): void
+    public function test_error_validacion_registro_insumo(array $insumo, array $errores): void
     {
         Insumo::factory()->for($this->finca)->create(['insumo' => 'test']);
 

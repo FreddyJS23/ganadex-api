@@ -69,11 +69,11 @@ class VacunasTest extends TestCase
 
         $response = $this->actingAs($this->user)->getJson(route('vacunas.index'));
         $response->assertStatus(200)->assertJson(
-            fn(AssertableJson $json) =>
+            fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
             $json->whereType('vacunas', 'array')
                 ->has(
                     'vacunas.0',
-                    fn(AssertableJson $json)
+                    fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                     => $json->whereAllType([
                         'id' => 'integer',
                     'nombre' => 'string',
@@ -91,10 +91,10 @@ class VacunasTest extends TestCase
         $response = $this->actingAs($this->user)->postJson(route('vacunas.store'), $this->vacuna);
 
         $response->assertStatus(201)->assertJson(
-            fn(AssertableJson $json) =>
+            fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
             $json->has(
                 'vacuna',
-                fn(AssertableJson $json)
+                fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                 => $json->whereAllType([
                     'id' => 'integer',
                     'nombre' => 'string',
@@ -115,10 +115,10 @@ class VacunasTest extends TestCase
         $response = $this->actingAs($this->user)->getJson(sprintf('api/vacunas/%s', $idVacuna));
 
         $response->assertStatus(200)->assertJson(
-            fn(AssertableJson $json) =>
+            fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
             $json->has(
                 'vacuna',
-                fn(AssertableJson $json)
+                fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                 => $json->whereAllType([
                     'id' => 'integer',
                     'nombre' => 'string',
@@ -138,10 +138,10 @@ class VacunasTest extends TestCase
         $response = $this->actingAs($this->user)->putJson(sprintf('api/vacunas/%s', $idVacunaEditar), $this->vacuna);
 
         $response->assertStatus(200)->assertJson(
-            fn(AssertableJson $json) =>
+            fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
             $json->has(
                 'vacuna',
-                fn(AssertableJson $json) =>
+                fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                 $json->where('nombre', $this->vacuna['nombre'])
                     ->where('tipo_animal', $this->vacuna['tipo_animal'])
                     ->where('intervalo_dosis', $this->vacuna['intervalo_dosis'])
@@ -166,7 +166,7 @@ class VacunasTest extends TestCase
     /**
      * @dataProvider ErrorinputProvider
      */
-    public function test_error_validacion_registro_vacuna($vacuna, $errores): void
+    public function test_error_validacion_registro_vacuna(array $vacuna, array $errores): void
     {
 
         $response = $this->actingAs($this->user)->postJson('api/vacunas', $vacuna);

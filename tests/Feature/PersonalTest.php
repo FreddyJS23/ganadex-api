@@ -111,10 +111,10 @@ class PersonalTest extends TestCase
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson('api/personal');
         $response->assertStatus(200)
             ->assertJson(
-                fn (AssertableJson $json) => $json->has(
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'todo_personal',
                     $this->cantidad_personal,
-                    fn (AssertableJson $json) => $json->whereAllType([
+                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
                         'id' => 'integer',
                         'ci' => 'integer',
                         'nombre' => 'string',
@@ -135,9 +135,9 @@ class PersonalTest extends TestCase
 
         $response->assertStatus(201)
             ->assertJson(
-                fn (AssertableJson $json) => $json->has(
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'personal',
-                    fn (AssertableJson $json) => $json->whereAllType([
+                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
                         'id' => 'integer',
                         'ci' => 'integer',
                         'nombre' => 'string',
@@ -161,9 +161,9 @@ class PersonalTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson(
-                fn (AssertableJson $json) => $json->has(
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'personal',
-                    fn (AssertableJson $json) => $json->whereAllType([
+                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
                         'id' => 'integer',
                         'ci' => 'integer',
                         'nombre' => 'string',
@@ -186,9 +186,9 @@ class PersonalTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson(
-                fn (AssertableJson $json) => $json->has(
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'personal',
-                    fn (AssertableJson $json) => $json
+                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
                     ->where('ci', $this->personal['ci'])
                     ->where('nombre', $this->personal['nombre'])
                     ->where('apellido', $this->personal['apellido'])
@@ -210,7 +210,7 @@ class PersonalTest extends TestCase
 
         $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/personal/%s', $idPersonalEditar), $this->personal);
 
-        $response->assertStatus(422)->assertJson(fn (AssertableJson $json) =>
+        $response->assertStatus(422)->assertJson(fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
         $json->hasAll(['errors.ci'])
             ->etc());
     }
@@ -240,7 +240,7 @@ class PersonalTest extends TestCase
     /**
      * @dataProvider ErrorinputProvider
      */
-    public function test_error_validacion_registro_personal($personal, $errores): void
+    public function test_error_validacion_registro_personal(array $personal, array $errores): void
     {
         personal::factory()->for($this->finca)->create(['ci' => 28472738]);
 
