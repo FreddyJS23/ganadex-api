@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Events\CrearSesionFinca;
 use App\Events\NaceMacho;
 use App\Events\PartoHecho;
+use App\Events\PartoHechoCriaToro;
 use App\Events\RevisionPrenada;
 use App\Events\ServicioHecho;
 use App\Events\VentaGanado;
@@ -26,6 +27,7 @@ use App\Listeners\VerificarPesajeMensualLeche;
 use App\Listeners\EstadoPosPesajeMensualLeche;
 use App\Listeners\GenerarNotificaciones;
 use App\Listeners\DescartarGanado;
+use App\Listeners\CriarParaToro;
 use App\Listeners\VerificarVacasAptaParaServicio;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Events\Login;
@@ -48,6 +50,7 @@ class EventServiceProvider extends ServiceProvider
         RevisionPrenada::class => [EstadoGestacion::class, Secado::class,],
         RevisionDescarte::class => [DescartarGanado::class],
         PartoHecho::class => [RevisionPosParto::class,EstadoPosParto::class,CambiaAVaca::class],
+        PartoHechoCriaToro::class=>[CriarParaToro::class],
         NaceMacho::class => [CaparBecerro::class,],
         //Login::class=>[],
         CrearSesionFinca::class => [VerificarEdadGanado::class,VerificarPesajeMensualLeche::class,GenerarNotificaciones::class,VerificarVacasAptaParaServicio::class],
