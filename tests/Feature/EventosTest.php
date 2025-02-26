@@ -54,6 +54,7 @@ class EventosTest extends TestCase
     ];
     private array $hembra = ['sexo' => 'H'];
     private array $macho = ['sexo' => 'M'];
+    private array $criaToro = ['sexo' => 'T'];
 
 
 
@@ -312,6 +313,37 @@ class EventosTest extends TestCase
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
                 ->has('ganado.estados', 1)
+                ->etc()
+        );
+    }
+
+    public function test_cuando_se_realiza_un_parto_y_sera_criado_para_toro(): void
+    {
+        //realizar servicio
+        $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(
+            sprintf('api/ganado/%s/servicio', $this->ganado->id),
+            $this->servicio + ['toro_id' => $this->toro->id, 'personal_id' => $this->veterinario->id]
+        );
+
+        //realizar parto
+        $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(
+            sprintf('api/ganado/%s/parto', $this->ganado->id),
+            $this->parto + $this->criaToro + ['personal_id' => $this->veterinario->id]
+        );
+
+        $cria_id = Parto::select('ganado_cria_id')->where('ganado_id', $this->ganado->id)->first();
+
+        $toro_id = Toro::select('id')->where('ganado_id', $cria_id->ganado_cria_id)->first();
+
+        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('toro.show',['toro' => $toro_id->id]));
+
+        $response->assertStatus(200)->assertJson(
+            fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
+                ->has('toro',fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
+                $json->where('tipo','becerro')
+                ->where('sexo','M')
+                ->etc()
+                )
                 ->etc()
         );
     }

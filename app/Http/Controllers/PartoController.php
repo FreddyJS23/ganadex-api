@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Events\NaceMacho;
 use App\Events\PartoHecho;
+use App\Events\PartoHechoCriaToro;
 use App\Http\Requests\StorePartoRequest;
 use App\Http\Requests\UpdatePartoRequest;
 use App\Http\Resources\PartoCollection;
@@ -60,7 +61,14 @@ class PartoController extends Controller
 
         $cria = new Ganado();
 
-        $cria->fill($request->except(['observacion','peso_nacimiento']));
+        $cria->fill($request->except(['observacion','peso_nacimiento','sexo']));
+
+        //evaluacion sera criado para toro
+        if($request->input('sexo')=='T') $cria->sexo='M';
+
+        else $cria->sexo=$request->input('sexo');
+
+
         $cria->fecha_nacimiento = $request->input('fecha');
         $cria->tipo_id = GanadoTipo::where('tipo', 'becerro')->first()->id;
         $cria->origen = 'local';
@@ -80,6 +88,8 @@ class PartoController extends Controller
         $parto->ganado_cria()->associate($cria)->save();
 
         PartoHecho::dispatch($parto);
+
+        PartoHechoCriaToro::dispatchIf($request->input('sexo')=='T',$parto);
 
         return response()->json(
             ['parto' => new PartoResource(

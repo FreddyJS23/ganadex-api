@@ -30,7 +30,7 @@ class StorePartoRequest extends FormRequest
             'observacion' => 'required|min:3|max:255',
             'nombre' => 'required|min:3|max:255|unique:ganados,nombre',
             'numero' => 'numeric|between:1,32767|unique:ganados,numero|nullable',
-            'sexo' => 'required|in:H,M',
+            'sexo' => 'required|in:H,M,T',
             'fecha' => 'date_format:Y-m-d',
             'peso_nacimiento' => 'numeric|between:1,32767',
         ];
