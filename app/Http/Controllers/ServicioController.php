@@ -50,12 +50,15 @@ class ServicioController extends Controller
     {
         $servicio = new Servicio();
         $servicio->fill($request->except(['toro_id','pajuela_toro_id','personal_id']));
-        $servicio->personal_id=$this->veterinarioOperacion($request);
         $servicio->ganado()->associate($ganado);
         /**
          *@var 'monta' | 'inseminacion'
 */
         $tipoServicio = $request->input('tipo');
+
+        //guardar veterinario para servicio de inseminacion, monta no es necesario el veterinario, porque se guarda el personal_id del veterinario
+        $tipoServicio == 'inseminacion' && $servicio->personal_id=$this->veterinarioOperacion($request);
+
 
         if ($tipoServicio == 'monta') {
             $toro = Toro::find($request->input('toro_id'));

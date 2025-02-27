@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('tipo');
             $table->morphs('servicioable');
             $table->foreignId('ganado_id')->constrained();
-            $table->foreignId('personal_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('personal_id')->nullable()->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }
