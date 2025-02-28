@@ -48,6 +48,14 @@ class DatosFormulariosTest extends TestCase
             ->create();
     }
 
+    private function generarPersonal(): Collection
+    {
+        return Personal::factory()
+            ->count(10)
+            ->for($this->finca)
+            ->create();
+    }
+
     private function setUpRequest(): static
     {
         $this
@@ -206,6 +214,46 @@ class DatosFormulariosTest extends TestCase
                     ->has(
                         'veterinarios_sin_usuario',
                         10,
+                        fn(AssertableJson $json): AssertableJson => $json->whereAllType([
+                            'id' => 'integer',
+                            'nombre' => 'string',
+                        ])
+                    )
+            );
+    }
+
+    public function test_obtener_veterinarios_select(): void
+    {
+        $this->generarPersonal();
+
+        $this
+            ->setUpRequest()
+            ->getJson(route('datosParaFormularios.veterinariosDisponibles'))
+            ->assertStatus(200)->assertJson(
+                fn(AssertableJson $json): AssertableJson => $json
+                    ->whereType('veterinarios', 'array')
+                    ->has(
+                        'veterinarios.0',
+                        fn(AssertableJson $json): AssertableJson => $json->whereAllType([
+                            'id' => 'integer',
+                            'nombre' => 'string',
+                        ])
+                    )
+            );
+    }
+
+    public function test_obtener_obreros_select(): void
+    {
+        $this->generarPersonal();
+
+        $this
+            ->setUpRequest()
+            ->getJson(route('datosParaFormularios.obrerosDisponibles'))
+            ->assertStatus(200)->assertJson(
+                fn(AssertableJson $json): AssertableJson => $json
+                    ->whereType('obreros', 'array')
+                    ->has(
+                        'obreros.0',
                         fn(AssertableJson $json): AssertableJson => $json->whereAllType([
                             'id' => 'integer',
                             'nombre' => 'string',

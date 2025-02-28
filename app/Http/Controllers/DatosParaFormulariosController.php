@@ -35,6 +35,7 @@ class DatosParaFormulariosController extends Controller
 
         return new CargosPersonalCollection($cargos);
     }
+
     public function veterinariosDisponibles()
     {
         return new VeterinariosDisponiblesCollection(
@@ -43,6 +44,14 @@ class DatosParaFormulariosController extends Controller
                 ->where('finca_id', session('finca_id'))
                 ->get()
         );
+    }
+
+    public function obrerosDisponibles()
+    {
+        return response()->json(['obreros' => Personal::select('id', 'nombre')
+            ->where('cargo_id', 1)
+            ->where('finca_id', session('finca_id'))
+            ->get()],200);
     }
 
     public function añosVentasGanado()
@@ -91,7 +100,7 @@ class DatosParaFormulariosController extends Controller
     public function sugerirNumeroDisponibleEnBD()
     {
         $numeroSugerido = null;
-        $intervalos = [1,500,501,5000,5001,10000,10001,15000,15001,25000,25001,32767];
+        $intervalos = [1, 500, 501, 5000, 5001, 10000, 10001, 15000, 15001, 25000, 25001, 32767];
         $iteracciones = 0;
         $maximaInteraciones = 100;
         $punteroInicial = 0;

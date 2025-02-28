@@ -144,6 +144,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/novillas_montar', [DatosParaFormulariosController::class, 'novillasParaMontar'])->name('datosParaFormularios.novillasParaMontar');
     Route::get('/cargos_personal', [DatosParaFormulariosController::class, 'cargosPersonalDisponible'])->name('datosParaFormularios.cargosPersonal');
     Route::get('/veterinarios', [DatosParaFormulariosController::class, 'veterinariosDisponibles'])->name('datosParaFormularios.veterinariosDisponibles');
+    Route::get('/obreros', [DatosParaFormulariosController::class, 'obrerosDisponibles'])->name('datosParaFormularios.obrerosDisponibles');
     Route::get('/años_ventas_ganado', [DatosParaFormulariosController::class, 'añosVentasGanado'])->name('datosParaFormularios.añosVentasGanado');
     Route::get('/años_produccion_leche', [DatosParaFormulariosController::class, 'añosProduccionLeche'])->name('datosParaFormularios.añosProduccionLeche');
     Route::get('/vacunas_disponibles', [DatosParaFormulariosController::class, 'vacunasDisponibles'])->name('datosParaFormularios.vacunasDisponibles');
