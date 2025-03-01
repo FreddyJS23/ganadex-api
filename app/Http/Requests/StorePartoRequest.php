@@ -39,7 +39,7 @@ class StorePartoRequest extends FormRequest
         se agrega el campo solo si es un admin */
         $userAdmin = $this->user()->hasRole('admin');
         if ($userAdmin) {
-            return $rules=array_merge($rules,['personal_id' => ['required', new ComprobarVeterianario()]]);
+            return $rules=array_merge($rules,['personal_id' => ['required','numeric']]);
         } else return $rules;
     }
 

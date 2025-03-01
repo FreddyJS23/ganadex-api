@@ -80,5 +80,5 @@ class Personal extends Model
         return $this->hasOne(UsuarioVeterinario::class);
     }
 
-    protected $hidden = ['created_at','updated_at','user_id','cargo_id'];
+    protected $hidden = ['created_at','updated_at','user_id'];
 }

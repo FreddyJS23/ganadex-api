@@ -38,8 +38,9 @@ class PartoController extends Controller
                     'partoable' => function (MorphTo $morphTo) {
                         $morphTo->morphWith([Toro::class => 'ganado:id,numero', PajuelaToro::class]);
                     },
-                    'veterinario' => function (Builder $query) {
-                        $query->select('personals.id', 'nombre');
+                    'personal' => function (Builder $query) {
+                        $query->select('personals.id', 'nombre','cargo')
+                        ->join('cargos', 'cargo_id', 'cargos.id');
                     }
                     ]
                 )->get()
@@ -94,8 +95,9 @@ class PartoController extends Controller
         return response()->json(
             ['parto' => new PartoResource(
                 $parto->load(
-                    ['veterinario' => function (Builder $query) {
-                        $query->select('personals.id', 'nombre');
+                    ['personal' => function (Builder $query) {
+                        $query->select('personals.id', 'nombre','cargo')
+                        ->join('cargos', 'cargo_id', 'cargos.id');
                     }
                     ]
                 )->loadMorph('partoable', [Toro::class => 'ganado:id,numero', PajuelaToro::class])
@@ -113,8 +115,9 @@ class PartoController extends Controller
             ['parto' => new PartoResource(
                 $parto->load(
                     [
-                    'veterinario' => function (Builder $query) {
-                        $query->select('personals.id', 'nombre');
+                    'personal' => function (Builder $query) {
+                        $query->select('personals.id', 'nombre','cargo')
+                        ->join('cargos', 'cargo_id', 'cargos.id');
                     }
                     ]
                 )->loadMorph('partoable', [Toro::class => 'ganado:id,numero', PajuelaToro::class])
@@ -134,8 +137,9 @@ class PartoController extends Controller
             ['parto' => new PartoResource(
                 $parto->load(
                     [
-                    'veterinario' => function (Builder $query) {
-                        $query->select('personals.id', 'nombre');
+                    'personal' => function (Builder $query) {
+                        $query->select('personals.id', 'nombre','cargo')
+                        ->join('cargos', 'cargo_id', 'cargos.id');
                     }
                     ]
                 )->loadMorph('partoable', [Toro::class => 'ganado:id,numero', PajuelaToro::class])
