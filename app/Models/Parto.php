@@ -48,11 +48,11 @@ class Parto extends Model
     }
 
     /**
-     * Get the veterinario that owns the Parto
+     * Get the personal that owns the Parto
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function veterinario(): BelongsTo
+    public function personal(): BelongsTo
     {
         return $this->belongsTo(Personal::class, 'personal_id');
     }
