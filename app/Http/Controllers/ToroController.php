@@ -89,7 +89,6 @@ class ToroController extends Controller
     {
         $ganado = new Ganado($request->all());
         $ganado->finca_id = session('finca_id');
-        $ganado->tipo_id = GanadoTipo::where('tipo', 'adulto')->first()->id;
         $ganado->sexo = "M";
 
         try {
