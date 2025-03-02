@@ -12,7 +12,7 @@ use App\Http\Resources\RevisionResource;
 use App\Http\Resources\ServicioResource;
 use App\Models\Estado;
 use App\Models\Ganado;
-use App\Models\Jornada_vacunacion;
+use App\Models\Plan_sanitario;
 use App\Models\Leche;
 use App\Models\Vacuna;
 use App\Models\Vacunacion;
@@ -110,17 +110,17 @@ class GanadoController extends Controller
     public function show(Ganado $ganado)
     {
 
-        $jornadasVacunacionAnteriores =  Jornada_vacunacion::where('finca_id', [session('finca_id')])
-            ->select('jornada_vacunacions.id', 'nombre as vacuna', 'fecha_inicio as fecha', 'prox_dosis')
-            ->join('vacunas', 'jornada_vacunacions.vacuna_id', 'vacunas.id')
+        $planesSanitarioAnteriores =  Plan_sanitario::where('finca_id', [session('finca_id')])
+            ->select('plan_sanitarios.id', 'nombre as vacuna', 'fecha_inicio as fecha', 'prox_dosis')
+            ->join('vacunas', 'plan_sanitarios.vacuna_id', 'vacunas.id')
             ->orderBy('fecha', 'desc')
             ->where('fecha_inicio', '>', $ganado->fecha_nacimiento ?? $ganado->created_at)
             ->get();
 
 
-        //diferencia dias entre proxima vacunacion individual y jornada vacunacion
+        //diferencia dias entre proxima vacunacion individual y plan sanitario
         $diferencia = session('dias_diferencia_vacuna');
-        $setenciaDiferenciaDias = "DATEDIFF(MAX(jornada_vacunacions.prox_dosis),MAX(vacunacions.prox_dosis))";
+        $setenciaDiferenciaDias = "DATEDIFF(MAX(plan_sanitarios.prox_dosis),MAX(vacunacions.prox_dosis))";
 
         /* Explicacion consulta
         usar un alias para las vacunas.
@@ -132,19 +132,19 @@ class GanadoController extends Controller
         si existen registros en las dos tablas se comprueba que ultima dosis es la mas reciente*/
         $sentenciaSqlAgruparVacunas = "nombre as vacuna,
         CASE
-            WHEN MAX(vacunacions.prox_dosis) IS NULL OR MAX(jornada_vacunacions.prox_dosis) IS NULL THEN COUNT(nombre)
+            WHEN MAX(vacunacions.prox_dosis) IS NULL OR MAX(plan_sanitarios.prox_dosis) IS NULL THEN COUNT(nombre)
             ELSE COUNT(nombre) + 1
             END as cantidad,
         CASE
-            WHEN MAX(vacunacions.prox_dosis) IS NULL THEN MAX(jornada_vacunacions.prox_dosis)
-            WHEN MAX(jornada_vacunacions.prox_dosis) IS NULL THEN MAX(vacunacions.prox_dosis)
+            WHEN MAX(vacunacions.prox_dosis) IS NULL THEN MAX(plan_sanitarios.prox_dosis)
+            WHEN MAX(plan_sanitarios.prox_dosis) IS NULL THEN MAX(vacunacions.prox_dosis)
             WHEN $setenciaDiferenciaDias >= $diferencia THEN MAX(vacunacions.prox_dosis)
-            ELSE MAX(jornada_vacunacions.prox_dosis)
+            ELSE MAX(plan_sanitarios.prox_dosis)
         END as prox_dosis,
         CASE
-            WHEN MAX(vacunacions.fecha) IS NULL THEN MAX(jornada_vacunacions.fecha_inicio)
-            WHEN MAX(jornada_vacunacions.fecha_inicio) IS NULL THEN MAX(vacunacions.fecha)
-            WHEN MAX(jornada_vacunacions.fecha_inicio) > MAX(vacunacions.fecha) THEN MAX(jornada_vacunacions.fecha_inicio)
+            WHEN MAX(vacunacions.fecha) IS NULL THEN MAX(plan_sanitarios.fecha_inicio)
+            WHEN MAX(plan_sanitarios.fecha_inicio) IS NULL THEN MAX(vacunacions.fecha)
+            WHEN MAX(plan_sanitarios.fecha_inicio) > MAX(vacunacions.fecha) THEN MAX(plan_sanitarios.fecha_inicio)
             ELSE MAX(vacunacions.fecha)
         END as ultima_dosis
         ";
@@ -163,14 +163,14 @@ class GanadoController extends Controller
                 }
             )
         ->leftJoin(
-            'jornada_vacunacions',
+            'plan_sanitarios',
             function (JoinClause $join) use ($ganado) {
-                $join->on('vacunas.id', '=', 'jornada_vacunacions.vacuna_id')
-                    ->where('jornada_vacunacions.finca_id', session('finca_id'))
+                $join->on('vacunas.id', '=', 'plan_sanitarios.vacuna_id')
+                    ->where('plan_sanitarios.finca_id', session('finca_id'))
                     ->where('fecha_inicio', '>', $ganado->fecha_nacimiento ?? $ganado->created_at);
             }
         )
-        ->where('jornada_vacunacions.prox_dosis', '!=', 'null')
+        ->where('plan_sanitarios.prox_dosis', '!=', 'null')
         ->orWhere('vacunacions.prox_dosis', '!=', 'null')
         ->groupBy('nombre')
         ->get();
@@ -189,14 +189,14 @@ class GanadoController extends Controller
             ]
         )->loadCount('revision');
 
-        //concatenando los datos de las vacunaciones con las jornadas de vacunacion posteriores
-        $ganado->vacunaciones = $ganado->vacunaciones->makeHidden('ganado_id')->concat($jornadasVacunacionAnteriores);
+        //concatenando los datos de las vacunaciones con las planes sanitarios posteriores
+        $ganado->vacunaciones = $ganado->vacunaciones->makeHidden('ganado_id')->concat($planesSanitarioAnteriores);
 
-        //ordeno todas las vacunaciones y jornadas concadenadas por fecha
+        //ordeno todas las vacunaciones y planes concadenadas por fecha
         $ganado->vacunaciones = $ganado->vacunaciones->sortByDesc('fecha');
-        //transformar el id para evitar duplicados de vacunaciones y jornadas vacunacion
+        //transformar el id para evitar duplicados de vacunaciones y planes sanitarios
         $ganado->vacunaciones = $ganado->vacunaciones->transform(
-            function (Vacunacion|Jornada_vacunacion $item, int $key) {
+            function (Vacunacion|Plan_sanitario $item, int $key) {
                 $item->id = $item->id . $item->prox_dosis;
                 return $item;
             }

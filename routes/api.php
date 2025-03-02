@@ -10,6 +10,7 @@ use App\Http\Controllers\CompradorController;
 use App\Http\Controllers\ConfiguracionController;
 use App\Http\Controllers\DashboardFallecimientosController;
 use App\Http\Controllers\DashboardJornadasVacunacion;
+use App\Http\Controllers\DashboardPlanesSanitario;
 use App\Http\Controllers\DashboardPrincipalController;
 use App\Http\Controllers\DashboardVentaGanadoController;
 use App\Http\Controllers\DatosParaFormulariosController;
@@ -22,7 +23,7 @@ use App\Http\Controllers\NotificacionController;
 use App\Http\Controllers\PartoController;
 use App\Http\Controllers\PersonalController;
 use App\Http\Controllers\GanadoDescarteController;
-use App\Http\Controllers\JornadaVacunacionController;
+use App\Http\Controllers\PlanSanitarioController;
 use App\Http\Controllers\LogsEventos;
 use App\Http\Controllers\ObtenerLogsVeterinario;
 use App\Http\Controllers\PajuelaToroController;
@@ -81,7 +82,7 @@ Route::middleware('auth:sanctum')->group(function () {
     /*  Route::apiResource('/venta_leche',VentaLecheController::class)->only(['index','store']);*/
     Route::apiResource('/pajuela_toros', PajuelaToroController::class);
     Route::apiResource('/fallecimientos', FallecimientoController::class);
-    Route::apiResource('/jornada_vacunacion', JornadaVacunacionController::class);
+    Route::apiResource('/plan_sanitario', PlanSanitarioController::class);
     Route::apiResource('/notificaciones', NotificacionController::class)->only(['index', 'destroy'])->parameters(['notificaciones' => 'notificacion']);;
     Route::get('/borrar_notificaciones', [NotificacionController::class, 'destroyAll'])->name('notificaciones.destroyAll');
     Route::apiResource('/finca', FincaController::class)->only(['index', 'store', 'update']);
@@ -135,7 +136,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
     //rutas de peticiones de datos dashboard jornadas vacunacion
-    Route::get('/dashboard_jornadas_vacunacion/proximas_jornadas_vacunacion', [DashboardJornadasVacunacion::class, 'proximasJornadasVacunacion'])->name('dashboardJornadasVacunacion.proximasJornadasVacunacion');
+    Route::get('/dashboard_planes_sanitario/proximos_planes_sanitario', [DashboardPlanesSanitario::class, 'proximosPlanesSanitario'])->name('dashboardPlanesSanitario.proximosPlanesSanitario');
 
     Route::get('/check_session_activa', checkSesionActivaUsuario::class)->name('checkSession');
 

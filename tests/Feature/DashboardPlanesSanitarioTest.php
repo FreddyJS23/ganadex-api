@@ -2,26 +2,26 @@
 
 namespace Tests\Feature;
 
-use App\Models\Jornada_vacunacion;
+use App\Models\Plan_sanitario;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\Feature\Common\NeedsFinca;
 use Tests\TestCase;
 
-class DashboardJornadasVacunacionTest extends TestCase
+class DashboardPlanesSanitarioTest extends TestCase
 {
     use RefreshDatabase;
     use NeedsFinca;
 
-    private int $cantidad_jornadasVacunacion = 10;
+    private int $cantidad_plaSanitario = 10;
 
-    private function generarJornadasVacunacion(): Collection
+    private function generarPlanesSanitario(): Collection
     {
-        return Jornada_vacunacion::factory()
-            ->count($this->cantidad_jornadasVacunacion)
+        return Plan_sanitario::factory()
+            ->count($this->cantidad_plaSanitario)
             ->for($this->finca)
-            ->create();
+            ->create(['prox_dosis' => now()->addDays(random_int(10,100))]);
     }
 
     private function setUpRequest(): static
@@ -33,19 +33,19 @@ class DashboardJornadasVacunacionTest extends TestCase
         return $this;
     }
 
-    public function test_proximas_jornadas_vacunacion(): void
+    public function test_proximas_planes_sanitario(): void
     {
-        $this->generarJornadasVacunacion();
+        $this->generarPlanesSanitario();
 
         $this
             ->setUpRequest()
-            ->getJson(route('dashboardJornadasVacunacion.proximasJornadasVacunacion'))
+            ->getJson(route('dashboardPlanesSanitario.proximosPlanesSanitario'))
             ->assertStatus(200)
             ->assertJson(
                 fn(AssertableJson $json): AssertableJson => $json
-                    ->whereType('proximas_jornadas_vacunacion', 'array')
+                    ->whereType('proximos_planes_sanitario', 'array')
                     ->has(
-                        key: 'proximas_jornadas_vacunacion.0',
+                        key: 'proximos_planes_sanitario.0',
                         length: fn(AssertableJson $json): AssertableJson => $json->whereAllType([
                             'vacuna' => 'string',
                             'prox_dosis' => 'string',

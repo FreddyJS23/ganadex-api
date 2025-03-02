@@ -104,28 +104,28 @@ class GanadoDescarteController extends Controller
        $ganado=$ganadoDescarte->ganado;
 
        /*sentencia sql para poder generar un id a base de la fecha de creacion, si no se genera un id puede habe un error
-       ya que pueden coincidir los id de la tabla vacunaciones y la de jornada_vacunaciones*/
+       ya que pueden coincidir los id de la tabla vacunaciones y la de plan_sanitarioes*/
        /*Explicacion consulta: se evaluara y los id de algunas de las tablas es nulo,
        ademas se utliza un formato de la fecha (j, para obtener el numero del dia del año, ejem:034)
        ademas se le concatena el id de la tabla que no es nulo*/
        $sentenciaSqlGenerarId="CASE
-           WHEN vacunacions.id IS NULL THEN CONCAT(DATE_FORMAT(jornada_vacunacions.created_at, '%j'),jornada_vacunacions.id)
-           WHEN jornada_vacunacions.created_at IS NULL THEN CONCAT(DATE_FORMAT(vacunacions.created_at, '%j'),vacunacions.id)
-           ELSE CONCAT(DATE_FORMAT(jornada_vacunacions.created_at, '%j'),jornada_vacunacions.id)
+           WHEN vacunacions.id IS NULL THEN CONCAT(DATE_FORMAT(plan_sanitarios.created_at, '%j'),plan_sanitarios.id)
+           WHEN plan_sanitarios.created_at IS NULL THEN CONCAT(DATE_FORMAT(vacunacions.created_at, '%j'),vacunacions.id)
+           ELSE CONCAT(DATE_FORMAT(plan_sanitarios.created_at, '%j'),plan_sanitarios.id)
        END";
 
-       /*sentencia sql para poder obtener el historial de vacunaciones bien sea de las tablas vacunaciones o jornada_vacunaciones*/
+       /*sentencia sql para poder obtener el historial de vacunaciones bien sea de las tablas vacunaciones o plan_sanitarioes*/
        $sentenciaSqlHistorialVacunas = "
        CONCAT(vacunas.id, $sentenciaSqlGenerarId) as id,
        nombre as vacuna,
        CASE
-           WHEN vacunacions.prox_dosis IS NULL THEN jornada_vacunacions.prox_dosis
-           WHEN jornada_vacunacions.prox_dosis IS NULL THEN vacunacions.prox_dosis
-           ELSE jornada_vacunacions.prox_dosis
+           WHEN vacunacions.prox_dosis IS NULL THEN plan_sanitarios.prox_dosis
+           WHEN plan_sanitarios.prox_dosis IS NULL THEN vacunacions.prox_dosis
+           ELSE plan_sanitarios.prox_dosis
        END as prox_dosis,
        CASE
-           WHEN vacunacions.fecha is NULL THEN jornada_vacunacions.fecha_inicio
-           WHEN jornada_vacunacions.fecha_inicio is NULL THEN vacunacions.fecha
+           WHEN vacunacions.fecha is NULL THEN plan_sanitarios.fecha_inicio
+           WHEN plan_sanitarios.fecha_inicio is NULL THEN vacunacions.fecha
        END as fecha
        ";
 
@@ -143,20 +143,20 @@ class GanadoDescarteController extends Controller
                }
            )
        ->leftJoin(
-           'jornada_vacunacions',
+           'plan_sanitarios',
            function (JoinClause $join) use ($ganado) {
-               $join->on('vacunas.id', '=', 'jornada_vacunacions.vacuna_id')
-                   ->where('jornada_vacunacions.finca_id', session('finca_id'))
+               $join->on('vacunas.id', '=', 'plan_sanitarios.vacuna_id')
+                   ->where('plan_sanitarios.finca_id', session('finca_id'))
                    ->where('fecha_inicio', '>', $ganado->fecha_nacimiento ?? $ganado->created_at);
            }
        )
-       ->where('jornada_vacunacions.prox_dosis', '!=', 'null')
+       ->where('plan_sanitarios.prox_dosis', '!=', 'null')
        ->orWhere('vacunacions.prox_dosis', '!=', 'null')
        ->get();
 
-       //diferencia dias entre proxima vacunacion individual y jornada vacunacion
+       //diferencia dias entre proxima vacunacion individual y plan sanitario
        $diferencia = session('dias_diferencia_vacuna');
-       $setenciaDiferenciaDias = "DATEDIFF(MAX(jornada_vacunacions.prox_dosis),MAX(vacunacions.prox_dosis))";
+       $setenciaDiferenciaDias = "DATEDIFF(MAX(plan_sanitarios.prox_dosis),MAX(vacunacions.prox_dosis))";
 
        /* Explicacion consulta
        usar un alias para las vacunas.
@@ -168,19 +168,19 @@ class GanadoDescarteController extends Controller
        si existen registros en las dos tablas se comprueba que ultima dosis es la mas reciente*/
        $sentenciaSqlAgruparVacunas = "nombre as vacuna,
        CASE
-           WHEN MAX(vacunacions.prox_dosis) IS NULL OR MAX(jornada_vacunacions.prox_dosis) IS NULL THEN COUNT(nombre)
+           WHEN MAX(vacunacions.prox_dosis) IS NULL OR MAX(plan_sanitarios.prox_dosis) IS NULL THEN COUNT(nombre)
            ELSE COUNT(nombre) + 1
            END as cantidad,
        CASE
-           WHEN MAX(vacunacions.prox_dosis) IS NULL THEN MAX(jornada_vacunacions.prox_dosis)
-           WHEN MAX(jornada_vacunacions.prox_dosis) IS NULL THEN MAX(vacunacions.prox_dosis)
+           WHEN MAX(vacunacions.prox_dosis) IS NULL THEN MAX(plan_sanitarios.prox_dosis)
+           WHEN MAX(plan_sanitarios.prox_dosis) IS NULL THEN MAX(vacunacions.prox_dosis)
            WHEN $setenciaDiferenciaDias >= $diferencia THEN MAX(vacunacions.prox_dosis)
-           ELSE MAX(jornada_vacunacions.prox_dosis)
+           ELSE MAX(plan_sanitarios.prox_dosis)
        END as prox_dosis,
        CASE
-           WHEN MAX(vacunacions.fecha) IS NULL THEN MAX(jornada_vacunacions.fecha_inicio)
-           WHEN MAX(jornada_vacunacions.fecha_inicio) IS NULL THEN MAX(vacunacions.fecha)
-           WHEN MAX(jornada_vacunacions.fecha_inicio) > MAX(vacunacions.fecha) THEN MAX(jornada_vacunacions.fecha_inicio)
+           WHEN MAX(vacunacions.fecha) IS NULL THEN MAX(plan_sanitarios.fecha_inicio)
+           WHEN MAX(plan_sanitarios.fecha_inicio) IS NULL THEN MAX(vacunacions.fecha)
+           WHEN MAX(plan_sanitarios.fecha_inicio) > MAX(vacunacions.fecha) THEN MAX(plan_sanitarios.fecha_inicio)
            ELSE MAX(vacunacions.fecha)
        END as ultima_dosis
        ";
@@ -199,14 +199,14 @@ class GanadoDescarteController extends Controller
                }
            )
        ->leftJoin(
-           'jornada_vacunacions',
+           'plan_sanitarios',
            function (JoinClause $join) use ($ganado) {
-               $join->on('vacunas.id', '=', 'jornada_vacunacions.vacuna_id')
-                   ->where('jornada_vacunacions.finca_id', session('finca_id'))
+               $join->on('vacunas.id', '=', 'plan_sanitarios.vacuna_id')
+                   ->where('plan_sanitarios.finca_id', session('finca_id'))
                    ->where('fecha_inicio', '>', $ganado->fecha_nacimiento ?? $ganado->created_at);
            }
        )
-       ->where('jornada_vacunacions.prox_dosis', '!=', 'null')
+       ->where('plan_sanitarios.prox_dosis', '!=', 'null')
        ->orWhere('vacunacions.prox_dosis', '!=', 'null')
        ->groupBy('nombre')
        ->get();

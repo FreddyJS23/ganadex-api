@@ -7,7 +7,7 @@ use App\Models\Estado;
 use App\Models\Fallecimiento;
 use App\Models\Finca;
 use App\Models\Ganado;
-use App\Models\Jornada_vacunacion;
+use App\Models\Plan_sanitario;
 use App\Models\Parto;
 use App\Models\Personal;
 use App\Models\Revision;
@@ -225,23 +225,23 @@ class LogsTest extends TestCase
     } */
 
 
-    public function test_verificacion_log_veterinario_atiende_jornada_vacunacion(): void
+    public function test_verificacion_log_veterinario_atiende_plan_sanitario(): void
     {
-        $response = $this->actingAs($this->userVeterinario)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->userAdmin->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->userAdmin->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->userAdmin->configuracion->dias_diferencia_vacuna])->postJson(route('jornada_vacunacion.store'), $this->jornadaVacunacion + [ 'personal_id' => $this->veterinario->id]);
+        $response = $this->actingAs($this->userVeterinario)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->userAdmin->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->userAdmin->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->userAdmin->configuracion->dias_diferencia_vacuna])->postJson(route('plan_sanitario.store'), $this->jornadaVacunacion + [ 'personal_id' => $this->veterinario->id]);
 
         $this->assertDatabaseHas('activity_log', [
-            'subject_type' => Jornada_vacunacion::class,
+            'subject_type' => Plan_sanitario::class,
             'causer_id'   => $this->userVeterinario->id,
             'description'  => 'created',
         ]);
     }
 
- /*    public function test_verificacion_no_generar_log_admin_atiende_jornada_vacunacion(): void
+ /*    public function test_verificacion_no_generar_log_admin_atiende_plan_sanitario(): void
     {
-        $response= $this->actingAs($this->userAdmin)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->userAdmin->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->userAdmin->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->userAdmin->configuracion->dias_diferencia_vacuna])->postJson(route('jornada_vacunacion.store'), $this->jornadaVacunacion + [ 'personal_id'=>$this->veterinario->id]);
+        $response= $this->actingAs($this->userAdmin)->withSession(['finca_id' => $this->finca->id,'peso_servicio'=>$this->userAdmin->configuracion->peso_servicio,'dias_Evento_notificacion'=>$this->userAdmin->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna'=>$this->userAdmin->configuracion->dias_diferencia_vacuna])->postJson(route('plan_sanitario.store'), $this->jornadaVacunacion + [ 'personal_id'=>$this->veterinario->id]);
 
         $this->assertDatabaseMissing('activity_log', [
-            'subject_type' => Jornada_vacunacion::class,
+            'subject_type' => Plan_sanitario::class,
             'causer_id'   => $this->userAdmin->id,
             'description'  => 'created',
         ]);
@@ -291,7 +291,7 @@ class LogsTest extends TestCase
         $this->actingAs($this->userVeterinario)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->userAdmin->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->userAdmin->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->userAdmin->configuracion->dias_diferencia_vacuna])->postJson(route('parto.store', ['ganado' => $this->ganado->id]), $this->parto + [ 'personal_id' => $this->veterinario->id]);
 
         //veteterinario hace jornada vacunacion
-        $response = $this->actingAs($this->userVeterinario)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->userAdmin->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->userAdmin->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->userAdmin->configuracion->dias_diferencia_vacuna])->postJson(route('jornada_vacunacion.store'), $this->jornadaVacunacion + [ 'personal_id' => $this->veterinario->id]);
+        $response = $this->actingAs($this->userVeterinario)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->userAdmin->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->userAdmin->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->userAdmin->configuracion->dias_diferencia_vacuna])->postJson(route('plan_sanitario.store'), $this->jornadaVacunacion + [ 'personal_id' => $this->veterinario->id]);
 
         //veteterinario hace fallecimiento
         $response = $this->actingAs($this->userVeterinario)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->userAdmin->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->userAdmin->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->userAdmin->configuracion->dias_diferencia_vacuna])->postJson(route('fallecimientos.store'), $this->fallecimiento + [ 'ganado_id' => $this->ganado->id]);
@@ -337,7 +337,7 @@ class LogsTest extends TestCase
         $this->actingAs($this->userVeterinario)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->userAdmin->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->userAdmin->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->userAdmin->configuracion->dias_diferencia_vacuna])->postJson(route('parto.store', ['ganado' => $this->ganado->id]), $this->parto + [ 'personal_id' => $this->veterinario->id]);
 
         //veteterinario hace jornada vacunacion
-        $this->actingAs($this->userVeterinario)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->userAdmin->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->userAdmin->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->userAdmin->configuracion->dias_diferencia_vacuna])->postJson(route('jornada_vacunacion.store'), $this->jornadaVacunacion + [ 'personal_id' => $this->veterinario->id]);
+        $this->actingAs($this->userVeterinario)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->userAdmin->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->userAdmin->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->userAdmin->configuracion->dias_diferencia_vacuna])->postJson(route('plan_sanitario.store'), $this->jornadaVacunacion + [ 'personal_id' => $this->veterinario->id]);
 
         $response = $this->actingAs($this->userVeterinario)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->userAdmin->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->userAdmin->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->userAdmin->configuracion->dias_diferencia_vacuna])->getJson(route('logsVeterinario.index', ['usuario_veterinario' => $this->infoUserVeterinario->id]));
 
@@ -368,7 +368,7 @@ class LogsTest extends TestCase
         $this->actingAs($this->userVeterinario)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->userAdmin->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->userAdmin->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->userAdmin->configuracion->dias_diferencia_vacuna])->postJson(route('parto.store', ['ganado' => $this->ganado->id]), $this->parto + [ 'personal_id' => $this->veterinario->id]);
 
         //veteterinario hace jornada vacunacion
-        $this->actingAs($this->userVeterinario)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->userAdmin->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->userAdmin->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->userAdmin->configuracion->dias_diferencia_vacuna])->postJson(route('jornada_vacunacion.store'), $this->jornadaVacunacion + [ 'personal_id' => $this->veterinario->id]);
+        $this->actingAs($this->userVeterinario)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->userAdmin->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->userAdmin->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->userAdmin->configuracion->dias_diferencia_vacuna])->postJson(route('plan_sanitario.store'), $this->jornadaVacunacion + [ 'personal_id' => $this->veterinario->id]);
 
         $response = $this->actingAs($otroAdmin)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->userAdmin->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->userAdmin->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->userAdmin->configuracion->dias_diferencia_vacuna])->getJson(route('logsVeterinario.index', ['usuario_veterinario' => $this->infoUserVeterinario->id]));
 
