@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('origen')->nullable();
             $table->date('fecha_nacimiento')->nullable();
             $table->foreignId('tipo_id')->constrained(table: 'ganado_tipos', indexName: 'ganado_tipo_id');
-            $table->foreignId('finca_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('hacienda_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }

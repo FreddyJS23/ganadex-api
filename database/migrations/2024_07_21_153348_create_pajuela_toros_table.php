@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('codigo')->unique();
             $table->string('descripcion')->nullable($value = true);
             $table->string('fecha');
-            $table->foreignId('finca_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('hacienda_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }

@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\Finca;
+use App\Models\Hacienda;
 use App\Models\Personal;
 use App\Models\User;
 use App\Models\UsuarioVeterinario;
@@ -20,7 +20,7 @@ class UserTest extends TestCase
         'password' => '12345678'
     ];
 
-    private $finca;
+    private $hacienda;
     private $user;
 
     protected function setUp(): void
@@ -30,8 +30,8 @@ class UserTest extends TestCase
         $this->user
             = User::factory()->hasConfiguracion()->create();
 
-            $this->finca
-            = Finca::factory()
+            $this->hacienda
+            = Hacienda::factory()
             ->for($this->user)
             ->create();
 
@@ -39,7 +39,7 @@ class UserTest extends TestCase
 
         UsuarioVeterinario::factory()
         ->count(10)
-        ->for(Personal::factory()->for($this->finca)->create(['cargo_id' => 2]), 'veterinario')
+        ->for(Personal::factory()->for($this->hacienda)->create(['cargo_id' => 2]), 'veterinario')
         ->create(['admin_id' => $this->user->id]);
     }
 
@@ -95,7 +95,7 @@ class UserTest extends TestCase
                        'usuario' => 'string',
                        'email' => 'string',
                        'rol' => 'string',
-                       'fincas' => 'array',
+                       'haciendas' => 'array',
                        'fecha_creacion' => 'string',
                        'configuracion' => 'array',
                    ])

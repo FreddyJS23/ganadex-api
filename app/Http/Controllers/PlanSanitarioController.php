@@ -25,7 +25,7 @@ class PlanSanitarioController extends Controller
     public function index()
     {
         return new PlanSanitarioCollection(
-            Plan_sanitario::where('finca_id', session('finca_id'))
+            Plan_sanitario::where('hacienda_id', session('hacienda_id'))
                 ->orderBy('fecha_inicio', 'desc')
                 ->get()
         );
@@ -55,14 +55,14 @@ class PlanSanitarioController extends Controller
         $cantidadGanadoVacunado = $cantidadGanadoVacunado
         ->whereRelation('estados', 'estado','!=', 'fallecido')
         ->whereRelation('estados', 'estado','!=', 'vendido')
-        ->where('finca_id', session('finca_id'))->count();
+        ->where('hacienda_id', session('hacienda_id'))->count();
 
         $intervaloDosis = Vacuna::find($request->input('vacuna_id'))->intervalo_dosis;
         $proximaDosis = Carbon::create($request->input('fecha_fin'))->addDays($intervaloDosis)->format('Y-m-d');
 
         $jornadaVacunacion = new Plan_sanitario();
         $jornadaVacunacion->fill($request->all());
-        $jornadaVacunacion->finca_id = session('finca_id');
+        $jornadaVacunacion->hacienda_id = session('hacienda_id');
         $jornadaVacunacion->prox_dosis = $proximaDosis;
         $jornadaVacunacion->vacunados = $cantidadGanadoVacunado;
         $jornadaVacunacion->ganado_vacunado = $vacuna->tipo_animal;

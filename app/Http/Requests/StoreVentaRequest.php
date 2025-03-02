@@ -30,14 +30,14 @@ class StoreVentaRequest extends FormRequest
             'ganado_id' => [
                 'required', 'numeric', Rule::exists('ganados', 'id')
                     ->where(
-                        fn($query) => $query->where('finca_id', session('finca_id'))
+                        fn($query) => $query->where('hacienda_id', session('hacienda_id'))
                     ),
                     new ComprobarTienePesoActual()
             ],
             'comprador_id' => [
                 'required', 'numeric', Rule::exists('compradors', 'id')
                     ->where(
-                        fn($query) => $query->where('finca_id', session('finca_id'))
+                        fn($query) => $query->where('hacienda_id', session('hacienda_id'))
                     )
             ],
 

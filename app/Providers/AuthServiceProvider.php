@@ -7,7 +7,7 @@ namespace App\Providers;
 use App\Models\User;
 use App\Models\UsuarioVeterinario;
 use App\Policies\ConfiguracionPolicy;
-use App\Policies\FincaPolicy;
+use App\Policies\HaciendaPolicy;
 use App\Policies\LogsVeterinarioPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
@@ -28,8 +28,8 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Gate::define('verificar_sesion_finca', [FincaPolicy::class,'verificar_sesion_finca']);
-        Gate::define('crear_sesion_finca', [FincaPolicy::class,'crear_sesion_finca']);
+        Gate::define('verificar_sesion_hacienda', [HaciendaPolicy::class,'verificar_sesion_hacienda']);
+        Gate::define('crear_sesion_hacienda', [HaciendaPolicy::class,'crear_sesion_hacienda']);
         Gate::define('update', [ConfiguracionPolicy::class,'update']);
 
         Gate::define(

@@ -8,7 +8,7 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Estado;
 use App\Models\Fallecimiento;
-use App\Models\Finca;
+use App\Models\Hacienda;
 use App\Models\Ganado;
 use App\Models\GanadoDescarte;
 use App\Models\Insumo;
@@ -45,14 +45,14 @@ class DemostracionSeeder extends Seeder
 
         Configuracion::factory()->for($user)->create();
 
-        $finca
-        = Finca::factory()
+        $hacienda
+        = Hacienda::factory()
         ->for($user)
         ->create();
 
 
         $crearUsuarioVeterinario = UsuarioVeterinario::factory()
-        ->for(Personal::factory()->for($finca)->create(['cargo_id' => 2]), 'veterinario')
+        ->for(Personal::factory()->for($hacienda)->create(['cargo_id' => 2]), 'veterinario')
         ->create(['admin_id' => $user->id]);
 
         $userVeterinario = User::find($crearUsuarioVeterinario->user_id);
@@ -67,15 +67,15 @@ class DemostracionSeeder extends Seeder
         $estadoLactancia = Estado::firstWhere('estado', 'lactancia');
 
         $toroParaServicio = Ganado::factory()
-        ->for($finca)
+        ->for($hacienda)
         ->hasPeso(1)
-        ->has(Toro::factory()->for($finca))
+        ->has(Toro::factory()->for($hacienda))
         ->hasAttached($estadoSano)
         ->create(['sexo' => 'M', 'tipo_id' => 4]);
 
         $toros = Ganado::factory()
             ->count($elementos)
-            ->for($finca)
+            ->for($hacienda)
             ->hasPeso(1)
             ->sequence(
                 ['tipo_id' => 1],
@@ -83,7 +83,7 @@ class DemostracionSeeder extends Seeder
                 ['tipo_id' => 3],
                 ['tipo_id' => 4],
             )
-            ->has(Toro::factory()->for($finca))
+            ->has(Toro::factory()->for($hacienda))
             ->hasAttached($estadoSano)
             ->create(['sexo' => 'M']);
 
@@ -92,26 +92,26 @@ class DemostracionSeeder extends Seeder
 
         $pajuelaToros = PajuelaToro::factory()
             ->count($elementos)
-            ->for($finca)
+            ->for($hacienda)
             ->create();
 
         //Ganado descarte
         Ganado::factory()
             ->count($elementos)
-            ->for($finca)
+            ->for($hacienda)
             ->hasPeso(1)
-            ->has(GanadoDescarte::factory()->for($finca))
+            ->has(GanadoDescarte::factory()->for($hacienda))
             ->hasAttached($estadoSano)
             ->create(['sexo' => array_rand(['M' => 'M', 'H' => 'H'])]);
 
         $veterinario
             = Personal::factory()
-            ->for($finca)
+            ->for($hacienda)
             ->create(['cargo_id' => 2]);
 
         Personal::factory()
             ->count($elementos)
-            ->for($finca)
+            ->for($hacienda)
             ->create();
 
         //vacas
@@ -126,7 +126,7 @@ class DemostracionSeeder extends Seeder
             )
             ->hasEvento(['prox_revision' => null, 'prox_parto' => null, 'prox_secado' => null])
             ->hasAttached($estadoSano)
-            ->for($finca)
+            ->for($hacienda)
             ->create();
 
         //vacas con revisiones
@@ -142,7 +142,7 @@ class DemostracionSeeder extends Seeder
             )
             ->hasEvento(['prox_revision' => null, 'prox_parto' => null, 'prox_secado' => null])
             ->hasAttached($estadoSano)
-            ->for($finca)
+            ->for($hacienda)
             ->create();
 
         //vacas con servicios
@@ -152,7 +152,7 @@ class DemostracionSeeder extends Seeder
             ->hasServicios(5, ['servicioable_id' => $toroParaServicio->toro->id,'servicioable_type' => $toroParaServicio->toro->getMorphClass(), 'personal_id' => $veterinario->id])
             ->hasEvento(['prox_revision' => null, 'prox_parto' => null, 'prox_secado' => null])
             ->hasAttached($estadoSano)
-            ->for($finca)
+            ->for($hacienda)
             ->create(['tipo_id' => 3,]);
 
         //vacas con revision preñada
@@ -163,7 +163,7 @@ class DemostracionSeeder extends Seeder
             ->hasServicios(5, ['servicioable_id' => $toroParaServicio->toro->id,'servicioable_type' => $toroParaServicio->toro->getMorphClass(), 'personal_id' => $veterinario->id])
             ->hasEvento(['prox_revision' => null])
             ->hasAttached([$estadoSano, $estadoGestacion])
-            ->for($finca)
+            ->for($hacienda)
             ->create(['tipo_id' => 3]);
 
 
@@ -188,7 +188,7 @@ class DemostracionSeeder extends Seeder
 
                 Parto::factory()
                     ->for($ganados[$i])
-                    ->for(Ganado::factory()->for($finca)->hasAttached([$estadoSano,$estadoLactancia])->hasPeso(1), 'ganado_cria')
+                    ->for(Ganado::factory()->for($hacienda)->hasAttached([$estadoSano,$estadoLactancia])->hasPeso(1), 'ganado_cria')
                     //alternar un parto con monta y otro con inseminacion
                     ->for($i % 2 == 0 ? $toros[rand(0, $elementos - 1)] : $pajuelaToros[rand(0, $elementos - 1)], 'partoable')
                     ->create(['personal_id' => $veterinario]);
@@ -197,37 +197,37 @@ class DemostracionSeeder extends Seeder
             Leche::factory()
                 ->count(5)
                 ->for($ganados[$i])
-                ->for($finca)
+                ->for($hacienda)
                 ->create();
         }
 
 
        /*  VentaLeche::factory()
             ->count($elementos)
-            ->for(Precio::factory()->for($finca))
-            ->for($finca)
+            ->for(Precio::factory()->for($hacienda))
+            ->for($hacienda)
             ->create(); */
 
         Venta::factory()
             ->count($elementos)
-            ->for($finca)
-            ->for(Ganado::factory()->for($finca)->hasPeso(1)->hasAttached($estadoVendido))
-            ->for(Comprador::factory()->for($finca))
+            ->for($hacienda)
+            ->for(Ganado::factory()->for($hacienda)->hasPeso(1)->hasAttached($estadoVendido))
+            ->for(Comprador::factory()->for($hacienda))
             ->create();
 
         Fallecimiento::factory()
             ->count($elementos)
-            ->for(Ganado::factory()->for($finca)->hasAttached($estadoFallecido))
+            ->for(Ganado::factory()->for($hacienda)->hasAttached($estadoFallecido))
             ->create();
 
        /*  Insumo::factory()
             ->count($elementos)
-            ->for($finca)
+            ->for($hacienda)
             ->create(); */
 
         Plan_sanitario::factory()
             ->count($elementos)
-            ->for($finca)
+            ->for($hacienda)
             ->create();
     }
 }

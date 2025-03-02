@@ -21,7 +21,7 @@ class ServicioPolicy
      */
     public function view(User $user, Servicio $servicio): bool
     {
-        return session('finca_id') === $servicio->ganado->finca->id ;
+        return session('hacienda_id') === $servicio->ganado->hacienda->id ;
     }
 
     /**
@@ -37,7 +37,7 @@ class ServicioPolicy
      */
     public function update(User $user, Servicio $servicio): bool
     {
-        return session('finca_id') === $servicio->ganado->finca->id ;
+        return session('hacienda_id') === $servicio->ganado->hacienda->id ;
     }
 
     /**
@@ -45,7 +45,7 @@ class ServicioPolicy
      */
     public function delete(User $user, Servicio $servicio): bool
     {
-        return session('finca_id') === $servicio->ganado->finca->id ;
+        return session('hacienda_id') === $servicio->ganado->hacienda->id ;
     }
 
     /**

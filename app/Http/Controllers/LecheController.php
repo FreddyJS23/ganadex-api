@@ -34,7 +34,7 @@ class LecheController extends Controller
     {
         $leche = new Leche();
         $leche->fill($request->all());
-        $leche->finca_id = session('finca_id');
+        $leche->hacienda_id = session('hacienda_id');
         $leche->ganado()->associate($ganado);
         $leche->save();
 

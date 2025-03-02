@@ -25,7 +25,7 @@ class UserResource extends JsonResource
         $usuarioAdmin = array_merge(
             $usuario,
             [
-            'fincas' => $this->fincas,
+            'haciendas' => $this->haciendas,
             'configuracion' => $this->configuracion
             ]
         );

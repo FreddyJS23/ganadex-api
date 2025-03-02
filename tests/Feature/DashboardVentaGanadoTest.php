@@ -9,15 +9,15 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\Feature\Common\NeedsEstado;
-use Tests\Feature\Common\NeedsFinca;
+use Tests\Feature\Common\NeedsHacienda;
 use Tests\TestCase;
 
 class DashboardVentaGanadoTest extends TestCase
 {
     use RefreshDatabase;
 
-    use NeedsFinca {
-        NeedsFinca::setUp as needsFincaSetUp;
+    use NeedsHacienda {
+        NeedsHacienda::setUp as needsHaciendaSetUp;
     }
 
     use NeedsEstado {
@@ -28,22 +28,22 @@ class DashboardVentaGanadoTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->needsFincaSetUp();
+        $this->needsHaciendaSetUp();
         $this->needsEstadoSetUp();
     }
 
     private function generarVentas(): Collection
     {
         $compradores = Comprador::factory()
-            ->for($this->finca)
+            ->for($this->hacienda)
             ->count(5)
             ->create();
 
         return Venta::factory()
             ->count($this->cantidad_ventas)
-            ->for($this->finca)
+            ->for($this->hacienda)
             ->for(Ganado::factory()
-                ->for($this->finca)
+                ->for($this->hacienda)
                 ->hasPeso(1)
                 ->hasAttached($this->estado)->create())
             ->sequence(
@@ -153,9 +153,9 @@ class DashboardVentaGanadoTest extends TestCase
     {
         Venta::factory()
             ->count($this->cantidad_ventas)
-            ->for($this->finca)
-            ->for(Ganado::factory()->for($this->finca)->hasPeso(1)->hasAttached($this->estado)->create())
-            ->for(Comprador::factory()->for($this->finca)->create())
+            ->for($this->hacienda)
+            ->for(Ganado::factory()->for($this->hacienda)->hasPeso(1)->hasAttached($this->estado)->create())
+            ->for(Comprador::factory()->for($this->hacienda)->create())
             ->create(['fecha' => now()->format('Y-m-d')]);
 
         $this->generarVentas();

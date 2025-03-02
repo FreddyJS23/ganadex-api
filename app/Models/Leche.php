@@ -30,8 +30,8 @@ class Leche extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function finca(): BelongsTo
+    public function hacienda(): BelongsTo
     {
-        return $this->belongsTo(Finca::class);
+        return $this->belongsTo(Hacienda::class);
     }
 }

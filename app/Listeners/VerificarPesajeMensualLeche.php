@@ -2,7 +2,7 @@
 
 namespace App\Listeners;
 
-use App\Events\CrearSesionFinca;
+use App\Events\CrearSesionHacienda;
 use App\Models\Estado;
 use App\Models\Ganado;
 use Illuminate\Auth\Events\Login;
@@ -23,15 +23,15 @@ class VerificarPesajeMensualLeche
     /**
      * Handle the event.
      */
-    public function handle(CrearSesionFinca $event): void
+    public function handle(CrearSesionHacienda $event): void
     {
         $estado = Estado::firstWhere('estado', 'pendiente_pesaje_leche');
 
-        $fincaId = $event->finca->id;
+        $haciendaId = $event->hacienda->id;
 
-        if (Ganado::where('finca_id', $fincaId)->count() > 0) {
+        if (Ganado::where('hacienda_id', $haciendaId)->count() > 0) {
             $vacasSinPesarEsteMes = Ganado::doesntHave('toro')
-                ->where('finca_id', $fincaId)
+                ->where('hacienda_id', $haciendaId)
                 ->whereRelation('estados', 'estado','!=', 'pendiente_pesaje_leche')
                 ->whereRelation('estados', 'estado','!=', 'vendido')
                 ->whereRelation('estados', 'estado','!=', 'fallecido')

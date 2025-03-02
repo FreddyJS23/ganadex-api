@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Comprador;
-use App\Models\Finca;
+use App\Models\Hacienda;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\Feature\Common\NeedsComprador;
@@ -122,7 +122,7 @@ class CompradorTest extends TestCase
 
     public function test_actualizar_comprador_con_otro_existente_repitiendo_campos_unicos(): void
     {
-        Comprador::factory()->for($this->finca)->create(['nombre' => 'test']);
+        Comprador::factory()->for($this->hacienda)->create(['nombre' => 'test']);
 
         $comprador = $this->generarComprador();
         $idRandom = random_int(0, $this->cantidad_comprador - 1);
@@ -142,7 +142,7 @@ class CompradorTest extends TestCase
     public function test_actualizar_comprador_conservando_campos_unicos(): void
     {
         $compradorExistente = Comprador::factory()
-            ->for($this->finca)
+            ->for($this->hacienda)
             ->create(['nombre' => 'test']);
 
         $this
@@ -175,7 +175,7 @@ class CompradorTest extends TestCase
     /** @dataProvider ErrorinputProvider */
     public function test_error_validacion_registro_comprador(array $comprador, array $errores): void
     {
-        Comprador::factory()->for($this->finca)->create(['nombre' => 'test']);
+        Comprador::factory()->for($this->hacienda)->create(['nombre' => 'test']);
 
         $this
             ->setUpRequest()
@@ -186,11 +186,11 @@ class CompradorTest extends TestCase
 
     public function test_autorizacion_maniupular__comprador_otro_usuario(): void
     {
-        $otroFinca = Finca::factory()
+        $otroHacienda = Hacienda::factory()
             ->for($this->user)
-            ->create(['nombre' => 'otro_finca']);
+            ->create(['nombre' => 'otro_hacienda']);
 
-        $compradorOtroUsuario = Comprador::factory()->for($otroFinca)->create();
+        $compradorOtroUsuario = Comprador::factory()->for($otroHacienda)->create();
         $idCompradorOtroUsuario = $compradorOtroUsuario->id;
 
         $this->generarComprador();

@@ -28,7 +28,7 @@ class StoreVentaLecheRequest extends FormRequest
             'fecha' => 'date_format:Y-m-d',
             'precio_id' => ['required', Rule::exists('precios', 'id')
                 ->where(
-                    fn($query) => $query->where('finca_id', session('finca_id'))
+                    fn($query) => $query->where('hacienda_id', session('hacienda_id'))
                 )]
         ];
     }

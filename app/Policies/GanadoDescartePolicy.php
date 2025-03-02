@@ -21,7 +21,7 @@ class GanadoDescartePolicy
      */
     public function view(User $user, GanadoDescarte $ganadoDescarte): bool
     {
-        return session('finca_id') === $ganadoDescarte->finca->id ;
+        return session('hacienda_id') === $ganadoDescarte->hacienda->id ;
     }
 
     /**
@@ -37,7 +37,7 @@ class GanadoDescartePolicy
      */
     public function update(User $user, GanadoDescarte $ganadoDescarte): bool
     {
-        return session('finca_id') === $ganadoDescarte->finca->id && $user->hasRole('admin');
+        return session('hacienda_id') === $ganadoDescarte->hacienda->id && $user->hasRole('admin');
     }
 
     /**
@@ -45,7 +45,7 @@ class GanadoDescartePolicy
      */
     public function delete(User $user, GanadoDescarte $ganadoDescarte): bool
     {
-        return session('finca_id') === $ganadoDescarte->finca->id && $user->hasRole('admin');
+        return session('hacienda_id') === $ganadoDescarte->hacienda->id && $user->hasRole('admin');
     }
 
 

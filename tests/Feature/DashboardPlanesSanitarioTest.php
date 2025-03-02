@@ -6,13 +6,13 @@ use App\Models\Plan_sanitario;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\Fluent\AssertableJson;
-use Tests\Feature\Common\NeedsFinca;
+use Tests\Feature\Common\NeedsHacienda;
 use Tests\TestCase;
 
 class DashboardPlanesSanitarioTest extends TestCase
 {
     use RefreshDatabase;
-    use NeedsFinca;
+    use NeedsHacienda;
 
     private int $cantidad_plaSanitario = 10;
 
@@ -20,7 +20,7 @@ class DashboardPlanesSanitarioTest extends TestCase
     {
         return Plan_sanitario::factory()
             ->count($this->cantidad_plaSanitario)
-            ->for($this->finca)
+            ->for($this->hacienda)
             ->create(['prox_dosis' => now()->addDays(random_int(10,100))]);
     }
 

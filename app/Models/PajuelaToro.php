@@ -22,9 +22,9 @@ class PajuelaToro extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function finca()
+    public function hacienda()
     {
-        return $this->belongsTo(Finca::class);
+        return $this->belongsTo(Hacienda::class);
     }
 
     /**

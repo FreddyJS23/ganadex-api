@@ -21,7 +21,7 @@ class PajuelaToroController extends Controller
      */
     public function index()
     {
-        return new PajuelaToroCollection(PajuelaToro::where('finca_id', session('finca_id'))->get());
+        return new PajuelaToroCollection(PajuelaToro::where('hacienda_id', session('hacienda_id'))->get());
     }
 
     /**
@@ -31,7 +31,7 @@ class PajuelaToroController extends Controller
     {
         $pajuelaToro = new PajuelaToro();
         $pajuelaToro->fill($request->all());
-        $pajuelaToro->finca_id = session('finca_id');
+        $pajuelaToro->hacienda_id = session('hacienda_id');
         $pajuelaToro->save();
 
         return response()->json(['pajuela_toro' => new PajuelaToroResource($pajuelaToro)], 201);

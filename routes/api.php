@@ -15,7 +15,7 @@ use App\Http\Controllers\DashboardPrincipalController;
 use App\Http\Controllers\DashboardVentaGanadoController;
 use App\Http\Controllers\DatosParaFormulariosController;
 use App\Http\Controllers\FallecimientoController;
-use App\Http\Controllers\FincaController;
+use App\Http\Controllers\HaciendaController;
 use App\Http\Controllers\GanadoController;
 use App\Http\Controllers\LecheController;
 use App\Http\Controllers\Logout;
@@ -85,9 +85,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('/plan_sanitario', PlanSanitarioController::class);
     Route::apiResource('/notificaciones', NotificacionController::class)->only(['index', 'destroy'])->parameters(['notificaciones' => 'notificacion']);;
     Route::get('/borrar_notificaciones', [NotificacionController::class, 'destroyAll'])->name('notificaciones.destroyAll');
-    Route::apiResource('/finca', FincaController::class)->only(['index', 'store', 'update']);
-    Route::get('/crear_sesion_finca/{finca}', [FincaController::class, 'crear_sesion_finca'])->name('crear_sesion_finca');
-    Route::get('/verificar_sesion_finca', [FincaController::class, 'verificar_sesion_finca'])->name('verificar_sesion_finca');
+    Route::apiResource('/hacienda', HaciendaController::class)->only(['index', 'store', 'update']);
+    Route::get('/crear_sesion_hacienda/{hacienda}', [HaciendaController::class, 'crear_sesion_hacienda'])->name('crear_sesion_hacienda');
+    Route::get('/verificar_sesion_hacienda', [HaciendaController::class, 'verificar_sesion_hacienda'])->name('verificar_sesion_hacienda');
     Route::apiResource('/causas_fallecimiento', CausasFallecimientoController::class);
     Route::apiResource('/tipos_revision', TipoRevisionController::class);
 

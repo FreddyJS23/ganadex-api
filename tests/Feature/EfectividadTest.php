@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Estado;
-use App\Models\Finca;
+use App\Models\Hacienda;
 use App\Models\Ganado;
 use App\Models\Parto;
 use App\Models\Personal;
@@ -25,7 +25,7 @@ class EfectividadTest extends TestCase
     private $veterinario;
     private $estado;
     private int $cantidadServicios;
-    private $finca;
+    private $hacienda;
 
     protected function setUp(): void
     {
@@ -36,8 +36,8 @@ class EfectividadTest extends TestCase
 
         $this->estado = Estado::all();
 
-        $this->finca
-            = Finca::factory()
+        $this->hacienda
+            = Hacienda::factory()
             ->for($this->user)
             ->create();
 
@@ -46,18 +46,18 @@ class EfectividadTest extends TestCase
             ->hasPeso(1)
             ->hasEvento(1)
             ->hasAttached($this->estado)
-            ->for($this->finca)
+            ->for($this->hacienda)
             ->create();
 
         $this->veterinario
             = Personal::factory()
-            ->for($this->finca)
+            ->for($this->hacienda)
             ->create(['cargo_id' => 2]);
 
 
         $this->toro = Toro::factory()
-            ->for($this->finca)
-            ->for(Ganado::factory()->for($this->finca)->create(['sexo' => 'M']))->create();
+            ->for($this->hacienda)
+            ->for(Ganado::factory()->for($this->hacienda)->create(['sexo' => 'M']))->create();
 
         $this->cantidadServicios = random_int(1, 10);
     }
@@ -77,11 +77,11 @@ class EfectividadTest extends TestCase
         Parto::factory()
             ->count(random_int(1, $this->cantidadServicios))
             ->for($this->ganado)
-            ->for(Ganado::factory()->for($this->finca)->hasAttached(Estado::firstWhere('estado', 'sano')), 'ganado_cria')
+            ->for(Ganado::factory()->for($this->hacienda)->hasAttached(Estado::firstWhere('estado', 'sano')), 'ganado_cria')
             ->for($this->toro, 'partoable')
             ->create(['personal_id' => $this->veterinario]);
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id, 'peso_servicio' => $this->user->configuracion->peso_servicio, 'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion, 'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf('api/ganado/%s', $this->ganado->id));
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id, 'peso_servicio' => $this->user->configuracion->peso_servicio, 'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion, 'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf('api/ganado/%s', $this->ganado->id));
 
         $response->assertStatus(200)->assertJson(
             fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->where(
@@ -104,11 +104,11 @@ class EfectividadTest extends TestCase
             ->count(random_int(1, $this->cantidadServicios))
             ->for($this->ganado)
             ->sequence(fn(Sequence $sequence): array => ['fecha' => now()->subDays(random_int(1, 30))->subMonths(random_int(1, 3))])
-            ->for(Ganado::factory()->for($this->finca)->hasAttached(Estado::firstWhere('estado', 'sano')), 'ganado_cria')
+            ->for(Ganado::factory()->for($this->hacienda)->hasAttached(Estado::firstWhere('estado', 'sano')), 'ganado_cria')
             ->for($this->toro, 'partoable')
             ->create(['personal_id' => $this->veterinario]);
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id, 'peso_servicio' => $this->user->configuracion->peso_servicio, 'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion, 'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf('api/toro/%s', $this->toro->id));
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id, 'peso_servicio' => $this->user->configuracion->peso_servicio, 'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion, 'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf('api/toro/%s', $this->toro->id));
 
         $response->assertStatus(200)->assertJson(
             fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->where(

@@ -20,7 +20,7 @@ class RoleSeeder extends Seeder
 
         $permissionAdmin = Permission::create(['name' => 'todos']);
 
-        $permissionVerTodasFincas = Permission::create(['name' => 'observacion fincas']);
+        $permissionVerTodasHaciendas = Permission::create(['name' => 'observacion haciendas']);
 
         /*
         puede crear,ver partos

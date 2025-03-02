@@ -23,7 +23,7 @@ class CriarParaToro
     public function handle(PartoHechoCriaToro $event): void
     {
         $toro=new Toro();
-        $toro->finca_id = session('finca_id');
+        $toro->hacienda_id = session('hacienda_id');
         $toro->ganado()->associate($event->parto->ganado_cria)->save();
     }
 }

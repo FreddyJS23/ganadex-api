@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreFincaRequest extends FormRequest
+class StoreHaciendaRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,7 +22,7 @@ class StoreFincaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nombre' => 'required|min:3|max:255|unique:fincas,nombre',
+            'nombre' => 'required|min:3|max:255|unique:haciendas,nombre',
         ];
     }
 }

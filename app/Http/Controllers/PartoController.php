@@ -73,7 +73,7 @@ class PartoController extends Controller
         $cria->fecha_nacimiento = $request->input('fecha');
         $cria->tipo_id = GanadoTipo::where('tipo', 'becerro')->first()->id;
         $cria->origen = 'local';
-        $cria->finca_id = session('finca_id');
+        $cria->hacienda_id = session('hacienda_id');
         $cria->save();
         $cria->evento()->create();
 

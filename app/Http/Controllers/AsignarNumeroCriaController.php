@@ -15,7 +15,7 @@ class AsignarNumeroCriaController extends Controller
      */
     public function index()
     {
-         $criasPendienteNumeracion = Ganado::where('finca_id', session('finca_id'))
+         $criasPendienteNumeracion = Ganado::where('hacienda_id', session('hacienda_id'))
              ->whereRelation('estados', 'estado', 'pendiente_numeracion')
              ->get();
 

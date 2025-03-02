@@ -7,7 +7,7 @@ use Illuminate\Support\Collection;
 
 trait NeedsComprador
 {
-    use NeedsFinca;
+    use NeedsHacienda;
 
     private array $comprador = [
         'nombre' => 'test',
@@ -19,7 +19,7 @@ trait NeedsComprador
     {
         return Comprador::factory()
             ->count($this->cantidad_comprador)
-            ->for($this->finca)
+            ->for($this->hacienda)
             ->create();
     }
 }

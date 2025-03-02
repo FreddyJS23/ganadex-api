@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Events\CrearSesionFinca;
+use App\Events\CrearSesionHacienda;
 use App\Events\NaceMacho;
 use App\Events\PartoHecho;
 use App\Events\PartoHechoCriaToro;
@@ -53,7 +53,7 @@ class EventServiceProvider extends ServiceProvider
         PartoHechoCriaToro::class=>[CriarParaToro::class],
         NaceMacho::class => [CaparBecerro::class,],
         //Login::class=>[],
-        CrearSesionFinca::class => [VerificarEdadGanado::class,VerificarPesajeMensualLeche::class,GenerarNotificaciones::class,VerificarVacasAptaParaServicio::class],
+        CrearSesionHacienda::class => [VerificarEdadGanado::class,VerificarPesajeMensualLeche::class,GenerarNotificaciones::class,VerificarVacasAptaParaServicio::class],
         PesajeLecheHecho::class => [EstadoPosPesajeMensualLeche::class],
         VentaGanado::class => [EstadoPosVenta::class],
         FallecimientoGanado::class => [EstadoPosFallecimiento::class],

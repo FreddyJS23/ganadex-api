@@ -66,11 +66,11 @@ class User extends Authenticatable
     }
 
     /**
-     * Get all of the fincas for the User
+     * Get all of the haciendas for the User
      */
-    public function fincas(): HasMany
+    public function haciendas(): HasMany
     {
-        return $this->hasMany(Finca::class,);
+        return $this->hasMany(Hacienda::class,);
     }
 
     /**

@@ -33,7 +33,7 @@ class GanadoDescarteController extends Controller
      */
     public function index()
     {
-        return new GanadoDescarteCollection(GanadoDescarte::where('finca_id', session('finca_id'))->get());
+        return new GanadoDescarteCollection(GanadoDescarte::where('hacienda_id', session('hacienda_id'))->get());
     }
 
 
@@ -43,7 +43,7 @@ class GanadoDescarteController extends Controller
     public function store(StoreGanadoDescarteRequest $request)
     {
         $ganado = new Ganado($request->all());
-        $ganado->finca_id = session('finca_id');
+        $ganado->hacienda_id = session('hacienda_id');
         $ganado->tipo_id = determinar_edad_res($ganado->fecha_nacimiento);
         $ganado->sexo = "M";
 
@@ -65,7 +65,7 @@ class GanadoDescarteController extends Controller
                             'fecha' => $request->input('fecha_venta'),
                             'precio' => $request->input('precio'),
                             'comprador_id' => $request->input('comprador_id'),
-                            'finca_id' => session('finca_id')
+                            'hacienda_id' => session('hacienda_id')
                         ]
                     );
                     //vacunacion
@@ -73,7 +73,7 @@ class GanadoDescarteController extends Controller
                     $vacunas = [];
 
                     foreach ($request->only('vacunas')['vacunas'] as $vacuna) {
-                        array_push($vacunas, $vacuna + ['ganado_id' => $ganado->id, 'finca_id' => $ganado->finca_id]);
+                        array_push($vacunas, $vacuna + ['ganado_id' => $ganado->id, 'hacienda_id' => $ganado->hacienda_id]);
                     }
 
                     $ganado->vacunaciones()->createMany($vacunas);
@@ -89,7 +89,7 @@ class GanadoDescarteController extends Controller
         }
 
         $ganadoDescarte = new GanadoDescarte();
-        $ganadoDescarte->finca_id = session('finca_id');
+        $ganadoDescarte->hacienda_id = session('hacienda_id');
         $ganadoDescarte->ganado()->associate($ganado)->save();
 
         return response()->json(['ganado_descarte' => new GanadoDescarteResource($ganadoDescarte)], 201);
@@ -146,7 +146,7 @@ class GanadoDescarteController extends Controller
            'plan_sanitarios',
            function (JoinClause $join) use ($ganado) {
                $join->on('vacunas.id', '=', 'plan_sanitarios.vacuna_id')
-                   ->where('plan_sanitarios.finca_id', session('finca_id'))
+                   ->where('plan_sanitarios.hacienda_id', session('hacienda_id'))
                    ->where('fecha_inicio', '>', $ganado->fecha_nacimiento ?? $ganado->created_at);
            }
        )
@@ -202,7 +202,7 @@ class GanadoDescarteController extends Controller
            'plan_sanitarios',
            function (JoinClause $join) use ($ganado) {
                $join->on('vacunas.id', '=', 'plan_sanitarios.vacuna_id')
-                   ->where('plan_sanitarios.finca_id', session('finca_id'))
+                   ->where('plan_sanitarios.hacienda_id', session('hacienda_id'))
                    ->where('fecha_inicio', '>', $ganado->fecha_nacimiento ?? $ganado->created_at);
            }
        )
@@ -245,7 +245,7 @@ class GanadoDescarteController extends Controller
     {
         $ganadoDescarte = new GanadoDescarte();
         $ganadoDescarte->ganado_id = $request->ganado_id;
-        $ganadoDescarte->finca_id = session('finca_id');
+        $ganadoDescarte->hacienda_id = session('hacienda_id');
         $ganadoDescarte->save();
         return response()->json(['ganado_descarte' => new GanadoDescarteResource($ganadoDescarte)], 201);
     }

@@ -20,7 +20,7 @@ class PersonalController extends Controller
      */
     public function index()
     {
-        return new PersonalCollection(Personal::where('finca_id', session('finca_id'))->get());
+        return new PersonalCollection(Personal::where('hacienda_id', session('hacienda_id'))->get());
     }
 
     /**
@@ -30,7 +30,7 @@ class PersonalController extends Controller
     {
         $personal = new Personal();
         $personal->fill($request->all());
-        $personal->finca_id = session('finca_id');
+        $personal->hacienda_id = session('hacienda_id');
         $personal->save();
         return response()->json(['personal' => new PersonalResource($personal)], 201);
     }

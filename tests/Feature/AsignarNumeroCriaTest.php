@@ -7,7 +7,7 @@ use App\Models\Ganado;
 use Illuminate\Support\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\Fluent\AssertableJson;
-use Tests\Feature\Common\NeedsFinca;
+use Tests\Feature\Common\NeedsHacienda;
 use Tests\Feature\Common\NeedsGanado;
 use Tests\TestCase;
 
@@ -15,7 +15,7 @@ class AsignarNumeroCriaTest extends TestCase
 {
     use RefreshDatabase;
     use NeedsGanado;
-    use NeedsFinca;
+    use NeedsHacienda;
 
     private function setUpRequest(): static
     {
@@ -35,7 +35,7 @@ class AsignarNumeroCriaTest extends TestCase
             ->hasPeso(1)
             ->hasEvento(1)
             ->hasAttached($this->estado)
-            ->for($this->finca)
+            ->for($this->hacienda)
             ->create(['numero' => null]);
     }
 

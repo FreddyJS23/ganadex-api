@@ -20,7 +20,7 @@ class TodosPartos extends Controller
                     ->whereRelation('estados', 'estado','!=', 'vendido')
                     ->has('parto')
                     ->withCount('parto')
-                    ->where('finca_id', session('finca_id'))
+                    ->where('hacienda_id', session('hacienda_id'))
                     ->get()
             );
     }

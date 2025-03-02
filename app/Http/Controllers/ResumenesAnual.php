@@ -20,7 +20,7 @@ class ResumenesAnual extends Controller
          *
          * @var Collection<{año:int,partos_producidos:int}>
          */
-        $nacimientosAnuales = Ganado::where('finca_id', session('finca_id'))
+        $nacimientosAnuales = Ganado::where('hacienda_id', session('hacienda_id'))
             ->selectRaw("DATE_FORMAT(fecha_nacimiento,'%Y') as año, COUNT(fecha_nacimiento) as partos_producidos")
             ->whereRaw("DATE_FORMAT(fecha_nacimiento,'%Y') >= ? ", [$year - 5])
             ->groupBy('año')
@@ -34,7 +34,7 @@ class ResumenesAnual extends Controller
         //obtener la poblacion de vacas sanas en cada año
         foreach ($nacimientosAnuales as $key => $value) {
             $cantidadVacasSanasAño = Ganado::selectRaw('COUNT(id) as total')
-                ->where('finca_id', session('finca_id'))
+                ->where('hacienda_id', session('hacienda_id'))
                 ->where('sexo', 'H')
                 ->whereRelation('estados', 'estado', 'sano')
                 ->whereRaw("DATE_FORMAT(fecha_nacimiento,'%Y') <= ? ", [$value['año']])
@@ -76,7 +76,7 @@ class ResumenesAnual extends Controller
        COUNT(CASE WHEN sexo = 'H' THEN 1 END) as hembras";
 
         //obtener conteo agrupado de total de hembras y machos nacidos en el año
-        $nacimientosAñoActual = Ganado::where('finca_id', session('finca_id'))
+        $nacimientosAñoActual = Ganado::where('hacienda_id', session('hacienda_id'))
             ->selectRaw($consultaSql)
             ->whereYear('fecha_nacimiento', $year)
             ->groupBy('año')

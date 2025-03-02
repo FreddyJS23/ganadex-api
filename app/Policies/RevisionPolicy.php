@@ -22,7 +22,7 @@ class RevisionPolicy
      */
     public function view(User $user, Revision $revision): bool
     {
-        return session('finca_id') === $revision->ganado->finca->id;
+        return session('hacienda_id') === $revision->ganado->hacienda->id;
     }
 
     /**
@@ -38,7 +38,7 @@ class RevisionPolicy
      */
     public function update(User $user, Revision $revision): bool
     {
-        return session('finca_id') === $revision->ganado->finca->id ;
+        return session('hacienda_id') === $revision->ganado->hacienda->id ;
     }
 
     /**
@@ -46,7 +46,7 @@ class RevisionPolicy
      */
     public function delete(User $user, Revision $revision): bool
     {
-        return session('finca_id') === $revision->ganado->finca->id ;
+        return session('hacienda_id') === $revision->ganado->hacienda->id ;
     }
 
     /**
