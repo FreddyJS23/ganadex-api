@@ -2,11 +2,11 @@
 
 namespace App\Policies;
 
-use App\Models\Jornada_vacunacion;
+use App\Models\Plan_sanitario;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
-class Jornada_vacunacionPolicy
+class Plan_sanitarioPolicy
 {
     /**
      * Determine whether the user can view any models.
@@ -19,9 +19,9 @@ class Jornada_vacunacionPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Jornada_vacunacion $jornadaVacunacion): bool
+    public function view(User $user, Plan_sanitario $planSanitario): bool
     {
-        return session('finca_id') === $jornadaVacunacion->finca->id;
+        return session('finca_id') === $planSanitario->finca->id;
     }
 
     /**
@@ -35,23 +35,23 @@ class Jornada_vacunacionPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Jornada_vacunacion $jornadaVacunacion): bool
+    public function update(User $user, Plan_sanitario $planSanitario): bool
     {
-        return session('finca_id') === $jornadaVacunacion->finca->id && $user->hasRole('admin');
+        return session('finca_id') === $planSanitario->finca->id && $user->hasRole('admin');
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Jornada_vacunacion $jornadaVacunacion): bool
+    public function delete(User $user, Plan_sanitario $planSanitario): bool
     {
-        return session('finca_id') === $jornadaVacunacion->finca->id && $user->hasRole('admin');
+        return session('finca_id') === $planSanitario->finca->id && $user->hasRole('admin');
     }
 
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, Jornada_vacunacion $jornadaVacunacion): bool
+    public function restore(User $user, Plan_sanitario $planSanitario): bool
     {
         return false;
     }
@@ -59,7 +59,7 @@ class Jornada_vacunacionPolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, Jornada_vacunacion $jornadaVacunacion): bool
+    public function forceDelete(User $user, Plan_sanitario $planSanitario): bool
     {
         return false;
     }

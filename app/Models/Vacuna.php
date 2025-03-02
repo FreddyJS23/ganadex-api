@@ -33,12 +33,12 @@ class Vacuna extends Model
     }
 
     /**
-     * Get all of the jornadasVacunacion for the Vacuna
+     * Get all of the planesSanitario for the Vacuna
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function jornadasVacunacion(): HasMany
+    public function planesSanitario(): HasMany
     {
-        return $this->hasMany(Jornada_vacunacion::class);
+        return $this->hasMany(Plan_sanitario::class);
     }
 }

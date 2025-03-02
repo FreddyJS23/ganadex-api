@@ -6,9 +6,9 @@ use App\Models\Vacuna;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Jornada_vacunacion>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Plan_sanitario>
  */
-class Jornada_vacunacionFactory extends Factory
+class Plan_sanitarioFactory extends Factory
 {
     /**
      * Define the model's default state.

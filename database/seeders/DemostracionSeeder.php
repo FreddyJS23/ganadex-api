@@ -12,7 +12,7 @@ use App\Models\Finca;
 use App\Models\Ganado;
 use App\Models\GanadoDescarte;
 use App\Models\Insumo;
-use App\Models\Jornada_vacunacion;
+use App\Models\Plan_sanitario;
 use App\Models\Leche;
 use App\Models\Notificacion;
 use App\Models\PajuelaToro;
@@ -225,7 +225,7 @@ class DemostracionSeeder extends Seeder
             ->for($finca)
             ->create(); */
 
-        Jornada_vacunacion::factory()
+        Plan_sanitario::factory()
             ->count($elementos)
             ->for($finca)
             ->create();

@@ -7,7 +7,7 @@ use App\Models\Comprador;
 use App\Models\Estado;
 use App\Models\Finca;
 use App\Models\Ganado;
-use App\Models\Jornada_vacunacion;
+use App\Models\Plan_sanitario;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -294,7 +294,7 @@ class GanadoTest extends TestCase
 
     public function test_obtener_cabeza_ganado(): void
     {
-        Jornada_vacunacion::factory()->for($this->finca)->count(2)->create();
+        Plan_sanitario::factory()->for($this->finca)->count(2)->create();
         $cabezasGanado = $this->generarGanado();
         $idRandom = random_int(0, $this->cantidad_ganado - 1);
         $idGanado = $cabezasGanado[$idRandom]->id;

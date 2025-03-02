@@ -11,7 +11,7 @@ use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 
-class Jornada_vacunacion extends Model
+class Plan_sanitario extends Model
 {
     use HasFactory;
 
@@ -26,7 +26,7 @@ class Jornada_vacunacion extends Model
     ];
 
     /**
-     * Get the vacuna that owns the Jornada_vacunacion
+     * Get the vacuna that owns the Plan_sanitario
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
@@ -36,7 +36,7 @@ class Jornada_vacunacion extends Model
     }
 
     /**
-     * Get the user that owns the Jornada_vacunacion
+     * Get the user that owns the Plan_sanitario
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */

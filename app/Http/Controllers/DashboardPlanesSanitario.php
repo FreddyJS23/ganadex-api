@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\ProximasJornadasVacunacionCollection;
-use App\Models\Jornada_vacunacion;
+use App\Http\Resources\ProximosPlanesSanitarioCollection;
+use App\Models\Plan_sanitario;
 
-class DashboardJornadasVacunacion extends Controller
+class DashboardPlanesSanitario extends Controller
 {
-    public function proximasJornadasVacunacion()
+    public function proximosPlanesSanitario()
     {
-        $jornadasVacunacion = Jornada_vacunacion::query()
+        $jornadasVacunacion = Plan_sanitario::query()
             ->where(
                 'finca_id',
                 session('finca_id')
@@ -21,6 +21,6 @@ class DashboardJornadasVacunacion extends Controller
             ->groupBy('vacuna', 'tipo_animal')
             ->get();
 
-        return new ProximasJornadasVacunacionCollection($jornadasVacunacion);
+        return new ProximosPlanesSanitarioCollection($jornadasVacunacion);
     }
 }

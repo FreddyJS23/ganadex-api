@@ -5,9 +5,9 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
-class ProximasJornadasVacunacionCollection extends ResourceCollection
+class ProximosPlanesSanitarioCollection extends ResourceCollection
 {
-    public static $wrap = 'proximas_jornadas_vacunacion';
+    public static $wrap = 'proximos_planes_sanitario';
     /**
      * Transform the resource collection into an array.
      *
