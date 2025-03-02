@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\Finca;
+use App\Models\Hacienda;
 use App\Models\User;
 use Database\Seeders\DemostracionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -14,16 +14,16 @@ class ReportesTest extends TestCase
     use RefreshDatabase;
 
 
-    private $finca;
+    private $hacienda;
     private $user;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        if(Finca::count()==0) $this->seed(DemostracionSeeder::class);
+        if(Hacienda::count()==0) $this->seed(DemostracionSeeder::class);
 
-        $this->finca=Finca::first();
+        $this->hacienda=Hacienda::first();
 
         $this->user=User::firstWhere('usuario','admin');
 

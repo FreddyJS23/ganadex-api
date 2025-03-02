@@ -11,7 +11,7 @@ class DashboardFallecimientosController extends Controller
 {
     public function causasMuertesFrecuentes()
     {
-        $causasFrecuentes = Fallecimiento::whereRelation('ganado', 'finca_id', session('finca_id'))
+        $causasFrecuentes = Fallecimiento::whereRelation('ganado', 'hacienda_id', session('hacienda_id'))
             ->select(DB::raw('count(*) as fallecimientos'), 'causa')
             ->join('causas_fallecimientos','causas_fallecimiento_id','=','causas_fallecimientos.id')
             ->groupBy('causa')
@@ -20,7 +20,7 @@ class DashboardFallecimientosController extends Controller
             ->get();
 
         $totalFallecidos
-            = Fallecimiento::whereRelation('ganado', 'finca_id', session('finca_id'))
+            = Fallecimiento::whereRelation('ganado', 'hacienda_id', session('hacienda_id'))
             ->count();
 
         return response()->json(

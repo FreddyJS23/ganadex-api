@@ -23,7 +23,7 @@ class DatosParaFormulariosController extends Controller
         $novillasAmontar = Peso::whereHas(
             'ganado',
             function (Builder $query) {
-                $query->where('finca_id', session('finca_id'));
+                $query->where('hacienda_id', session('hacienda_id'));
             }
         )->where('peso_actual', '>=', 330)->get();
 
@@ -41,7 +41,7 @@ class DatosParaFormulariosController extends Controller
         return new VeterinariosDisponiblesCollection(
             Personal::select('id', 'nombre')
                 ->where('cargo_id', 2)
-                ->where('finca_id', session('finca_id'))
+                ->where('hacienda_id', session('hacienda_id'))
                 ->get()
         );
     }
@@ -50,13 +50,13 @@ class DatosParaFormulariosController extends Controller
     {
         return response()->json(['obreros' => Personal::select('id', 'nombre')
             ->where('cargo_id', 1)
-            ->where('finca_id', session('finca_id'))
+            ->where('hacienda_id', session('hacienda_id'))
             ->get()],200);
     }
 
     public function añosVentasGanado()
     {
-        $añosVentasGanado = Venta::where('finca_id', session('finca_id'))
+        $añosVentasGanado = Venta::where('hacienda_id', session('hacienda_id'))
             ->selectRaw('DATE_FORMAT(fecha,"%Y") as año')
             ->groupBy('año')
             ->orderBy('año', 'desc')
@@ -73,7 +73,7 @@ class DatosParaFormulariosController extends Controller
     }
     public function añosProduccionLeche()
     {
-        $añosVentaProduccionLeche = Leche::where('finca_id', session('finca_id'))
+        $añosVentaProduccionLeche = Leche::where('hacienda_id', session('hacienda_id'))
             ->selectRaw('DATE_FORMAT(fecha,"%Y") as año')
             ->groupBy('año')
             ->orderBy('año', 'desc')
@@ -128,7 +128,7 @@ class DatosParaFormulariosController extends Controller
     {
         $veterinariosSinUsuario = Personal::where('cargo_id', 2)
             ->select('id', 'nombre')
-            ->where('finca_id', session('finca_id'))
+            ->where('hacienda_id', session('hacienda_id'))
             ->whereDoesntHave('usuarioVeterinario')
             ->get();
 

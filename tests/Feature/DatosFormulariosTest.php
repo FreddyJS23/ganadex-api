@@ -14,15 +14,15 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Collection as SupportCollection;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\Feature\Common\NeedsEstado;
-use Tests\Feature\Common\NeedsFinca;
+use Tests\Feature\Common\NeedsHacienda;
 use Tests\TestCase;
 
 class DatosFormulariosTest extends TestCase
 {
     use RefreshDatabase;
 
-    use NeedsFinca {
-        NeedsFinca::setUp as needsFincaSetUp;
+    use NeedsHacienda {
+        NeedsHacienda::setUp as needsHaciendaSetUp;
     }
 
     use NeedsEstado {
@@ -33,7 +33,7 @@ class DatosFormulariosTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->needsFincaSetUp();
+        $this->needsHaciendaSetUp();
         $this->needsEstadoSetUp();
     }
 
@@ -44,7 +44,7 @@ class DatosFormulariosTest extends TestCase
             ->hasPeso(1)
             ->hasEvento(1)
             ->hasAttached($this->estado)
-            ->for($this->finca)
+            ->for($this->hacienda)
             ->create();
     }
 
@@ -52,7 +52,7 @@ class DatosFormulariosTest extends TestCase
     {
         return Personal::factory()
             ->count(10)
-            ->for($this->finca)
+            ->for($this->hacienda)
             ->create();
     }
 
@@ -95,15 +95,15 @@ class DatosFormulariosTest extends TestCase
     {
         Venta::factory()
             ->count(10)
-            ->for($this->finca)
+            ->for($this->hacienda)
             ->for(
                 Ganado::factory()
-                    ->for($this->finca)
+                    ->for($this->hacienda)
                     ->hasPeso(1)
                     ->hasAttached($this->estado)
                     ->create()
             )
-            ->for(Comprador::factory()->for($this->finca)->create())
+            ->for(Comprador::factory()->for($this->hacienda)->create())
             ->create();
 
         $this
@@ -128,12 +128,12 @@ class DatosFormulariosTest extends TestCase
             ->count(10)
             ->for(
                 Ganado::factory()
-                    ->for($this->finca)
+                    ->for($this->hacienda)
                     ->hasPeso(1)
                     ->hasAttached($this->estado)
                     ->create()
             )
-            ->for($this->finca)
+            ->for($this->hacienda)
             ->create();
 
         $this
@@ -197,12 +197,12 @@ class DatosFormulariosTest extends TestCase
     {
         UsuarioVeterinario::factory()
             ->count(10)
-            ->for(Personal::factory()->for($this->finca)->create(['cargo_id' => 2]), 'veterinario')
+            ->for(Personal::factory()->for($this->hacienda)->create(['cargo_id' => 2]), 'veterinario')
             ->create(['admin_id' => $this->user->id]);
 
         Personal::factory()
             ->count(10)
-            ->for($this->finca)
+            ->for($this->hacienda)
             ->create(['cargo_id' => 2]);
 
         $this

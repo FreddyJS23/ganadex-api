@@ -21,7 +21,7 @@ class Plan_sanitarioPolicy
      */
     public function view(User $user, Plan_sanitario $planSanitario): bool
     {
-        return session('finca_id') === $planSanitario->finca->id;
+        return session('hacienda_id') === $planSanitario->hacienda->id;
     }
 
     /**
@@ -37,7 +37,7 @@ class Plan_sanitarioPolicy
      */
     public function update(User $user, Plan_sanitario $planSanitario): bool
     {
-        return session('finca_id') === $planSanitario->finca->id && $user->hasRole('admin');
+        return session('hacienda_id') === $planSanitario->hacienda->id && $user->hasRole('admin');
     }
 
     /**
@@ -45,7 +45,7 @@ class Plan_sanitarioPolicy
      */
     public function delete(User $user, Plan_sanitario $planSanitario): bool
     {
-        return session('finca_id') === $planSanitario->finca->id && $user->hasRole('admin');
+        return session('hacienda_id') === $planSanitario->hacienda->id && $user->hasRole('admin');
     }
 
     /**

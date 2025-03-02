@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->date('fecha');
             $table->float('cantidad');
-            $table->foreignId('finca_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('hacienda_id')->constrained()->cascadeOnDelete();
             $table->foreignId('precio_id')->constrained();
             $table->timestamps();
         });

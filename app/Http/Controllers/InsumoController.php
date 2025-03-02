@@ -21,7 +21,7 @@ class InsumoController extends Controller
      */
     public function index()
     {
-        return new InsumoCollection(Insumo::where('finca_id', session('finca_id'))->get());
+        return new InsumoCollection(Insumo::where('hacienda_id', session('hacienda_id'))->get());
     }
 
     /**
@@ -31,7 +31,7 @@ class InsumoController extends Controller
     {
         $insumo = new Insumo();
         $insumo->fill($request->all());
-        $insumo->finca_id = session('finca_id');
+        $insumo->hacienda_id = session('hacienda_id');
         $insumo->save();
 
         return response()->json(['insumo' => new InsumoResource($insumo)], 201);

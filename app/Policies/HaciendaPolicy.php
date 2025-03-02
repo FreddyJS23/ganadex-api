@@ -2,12 +2,12 @@
 
 namespace App\Policies;
 
-use App\Models\Finca;
+use App\Models\Hacienda;
 use App\Models\User;
 use App\Models\UsuarioVeterinario;
 use Illuminate\Auth\Access\Response;
 
-class FincaPolicy
+class HaciendaPolicy
 {
     /**
      * Determine whether the user can view any models.
@@ -17,18 +17,18 @@ class FincaPolicy
         return $user->hasRole('admin');
     }
 
-    public function crear_sesion_finca(User $user, Finca $finca): bool
+    public function crear_sesion_hacienda(User $user, Hacienda $hacienda): bool
     {
         if ($user->hasRole('admin')) {
-            return $user->id == $finca->user_id;
+            return $user->id == $hacienda->user_id;
         } elseif ($user->hasRole('veterinario')) {
             $usuario_veterinario = UsuarioVeterinario::where('admin_id', $user->id)->first();
-            return $usuario_veterinario->admin_id == $finca->user_id
-            && $usuario_veterinario->veterinario->finca_id ==  $finca->id;
+            return $usuario_veterinario->admin_id == $hacienda->user_id
+            && $usuario_veterinario->veterinario->hacienda_id ==  $hacienda->id;
         }
     }
 
-    public function verificar_sesion_finca(User $user): bool
+    public function verificar_sesion_hacienda(User $user): bool
     {
         return $user->hasRole('admin');
     }
@@ -36,9 +36,9 @@ class FincaPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Finca $finca): bool
+    public function view(User $user, Hacienda $hacienda): bool
     {
-        return session('finca_id') === $finca->id ;
+        return session('hacienda_id') === $hacienda->id ;
     }
 
     /**
@@ -52,23 +52,23 @@ class FincaPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Finca $finca): bool
+    public function update(User $user, Hacienda $hacienda): bool
     {
-        return session('finca_id') === $finca->id && $user->id === $finca->user_id && $user->hasRole('admin');
+        return session('hacienda_id') === $hacienda->id && $user->id === $hacienda->user_id && $user->hasRole('admin');
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Finca $finca): bool
+    public function delete(User $user, Hacienda $hacienda): bool
     {
-        return session('finca_id') === $finca->id && $user->hasRole('admin');
+        return session('hacienda_id') === $hacienda->id && $user->hasRole('admin');
     }
 
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, Finca $finca): bool
+    public function restore(User $user, Hacienda $hacienda): bool
     {
         return false;
     }
@@ -76,7 +76,7 @@ class FincaPolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, Finca $finca): bool
+    public function forceDelete(User $user, Hacienda $hacienda): bool
     {
         return false;
     }

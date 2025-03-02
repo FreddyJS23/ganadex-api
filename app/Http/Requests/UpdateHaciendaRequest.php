@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class UpdateFincaRequest extends FormRequest
+class UpdateHaciendaRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,7 +25,7 @@ class UpdateFincaRequest extends FormRequest
         $parametroPath = preg_replace("/[^0-9]/", "", (string) request()->path());
 
         return [
-            'nombre' => ['required','min:3','max:255',Rule::unique('fincas')->ignore($parametroPath)],
+            'nombre' => ['required','min:3','max:255',Rule::unique('haciendas')->ignore($parametroPath)],
         ];
     }
 }

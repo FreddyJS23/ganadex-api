@@ -17,7 +17,7 @@ class VentaLecheController extends Controller
      */
     public function index()
     {
-        return new VentaLecheCollection(VentaLeche::where('finca_id', session('finca_id'))->latest('fecha')->get());
+        return new VentaLecheCollection(VentaLeche::where('hacienda_id', session('hacienda_id'))->latest('fecha')->get());
     }
 
     /**
@@ -27,7 +27,7 @@ class VentaLecheController extends Controller
     {
         $ventaLeche = new VentaLeche();
         $ventaLeche->fill($request->only('cantidad', 'precio_id'));
-        $ventaLeche->finca_id = session('finca_id');
+        $ventaLeche->hacienda_id = session('hacienda_id');
         $ventaLeche->save();
 
         return response()->json(['venta_leche' => new VentaLecheResource($ventaLeche)], 201);

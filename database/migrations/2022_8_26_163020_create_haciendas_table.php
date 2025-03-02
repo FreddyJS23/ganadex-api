@@ -9,7 +9,7 @@ return new class extends Migration
     /** Run the migrations. */
     public function up(): void
     {
-        Schema::create('fincas', function (Blueprint $table) {
+        Schema::create('haciendas', function (Blueprint $table) {
             $table->id();
             $table->string('nombre');
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
@@ -20,6 +20,6 @@ return new class extends Migration
     /** Reverse the migrations. */
     public function down(): void
     {
-        Schema::dropIfExists('fincas');
+        Schema::dropIfExists('haciendas');
     }
 };

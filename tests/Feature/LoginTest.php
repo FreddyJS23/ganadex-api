@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\Finca;
+use App\Models\Hacienda;
 use App\Models\Personal;
 use App\Models\User;
 use App\Models\UsuarioVeterinario;
@@ -18,7 +18,7 @@ class LoginTest extends TestCase
 
     private $userAdmin;
     private $userVeterinario;
-    private $finca;
+    private $hacienda;
 
     protected function setUp(): void
     {
@@ -32,8 +32,8 @@ class LoginTest extends TestCase
 
             $this->userAdmin->assignRole('admin');
 
-            $this->finca
-            = Finca::factory()
+            $this->hacienda
+            = Hacienda::factory()
             ->for($this->userAdmin)
             ->create();
 
@@ -42,16 +42,16 @@ class LoginTest extends TestCase
             ->create(['usuario' => 'veterinario', 'password' => Hash::make('veterinario')]);
 
             UsuarioVeterinario::factory()
-            ->for(Personal::factory()->for($this->finca)->create(['cargo_id' => 2]), 'veterinario')
+            ->for(Personal::factory()->for($this->hacienda)->create(['cargo_id' => 2]), 'veterinario')
             ->create(['admin_id' => $this->userAdmin->id,
             'user_id' => $this->userVeterinario->id]);
 
             $this->userVeterinario->assignRole('veterinario');
     }
 
-    private function generarFincas(): Collection
+    private function generarHaciendas(): Collection
     {
-        return Finca::factory()
+        return Hacienda::factory()
             ->count(10)
             ->for($this->userAdmin)
             ->create();
@@ -60,7 +60,7 @@ class LoginTest extends TestCase
     /**
      * A basic feature test example.
      */
-    public function test_logear_usuario_admin_tiene_una_finca(): void
+    public function test_logear_usuario_admin_tiene_una_hacienda(): void
     {
         $response = $this->withHeader('origin', config('app.url'))->postJson('api/login', [
            'usuario' => 'admin',
@@ -76,16 +76,16 @@ class LoginTest extends TestCase
             'configuracion.peso_servicio' => 'integer',
             'configuracion.dias_evento_notificacion' => 'integer',
             'configuracion.dias_diferencia_vacuna' => 'integer',
-        ])->where('sesion_finca', true)))->assertSessionHas('finca_id', $this->finca->id)
+        ])->where('sesion_hacienda', true)))->assertSessionHas('hacienda_id', $this->hacienda->id)
         ->assertSessionHas('peso_servicio', $this->userAdmin->configuracion->peso_servicio)
         ->assertSessionHas('dias_evento_notificacion', $this->userAdmin->configuracion->dias_evento_notificacion)
         ->assertSessionHas('dias_diferencia_vacuna', $this->userAdmin->configuracion->dias_diferencia_vacuna);
     }
 
 
-    public function test_logear_usuario_admin_tiene_varias_fincas(): void
+    public function test_logear_usuario_admin_tiene_varias_haciendas(): void
     {
-        $this->generarFincas();
+        $this->generarHaciendas();
 
         $response = $this->withHeader('origin', config('app.url'))->postJson('api/login', [
             'usuario' => 'admin',
@@ -101,17 +101,17 @@ class LoginTest extends TestCase
             'configuracion.peso_servicio' => 'integer',
             'configuracion.dias_evento_notificacion' => 'integer',
             'configuracion.dias_diferencia_vacuna' => 'integer',
-        ])->where('sesion_finca', false)))->assertSessionMissing('finca_id')
+        ])->where('sesion_hacienda', false)))->assertSessionMissing('hacienda_id')
         ->assertSessionHas('peso_servicio', $this->userAdmin->configuracion->peso_servicio)
         ->assertSessionHas('dias_evento_notificacion', $this->userAdmin->configuracion->dias_evento_notificacion)
         ->assertSessionHas('dias_diferencia_vacuna', $this->userAdmin->configuracion->dias_diferencia_vacuna);
     }
 
-    public function test_logear_usuario_admin_tiene_varias_fincas_y_crea_sesion_finca(): void
+    public function test_logear_usuario_admin_tiene_varias_haciendas_y_crea_sesion_hacienda(): void
     {
-        $fincas=$this->generarFincas();
-        $randomFinca=random_int(0,count($fincas)-1);
-        $fincaId=$fincas[$randomFinca]->id;
+        $haciendas=$this->generarHaciendas();
+        $randomHacienda=random_int(0,count($haciendas)-1);
+        $haciendaId=$haciendas[$randomHacienda]->id;
 
         //login
         $this->withHeader('origin', config('app.url'))->postJson('api/login', [
@@ -119,26 +119,26 @@ class LoginTest extends TestCase
             'password' => 'admin',
         ]);
 
-        //crear sesion finca
-        $this->getJson(route('crear_sesion_finca', ['finca' => $fincaId]));
+        //crear sesion hacienda
+        $this->getJson(route('crear_sesion_hacienda', ['hacienda' => $haciendaId]));
 
-        //obtener sesion finca
-        $response = $this->getJson(route('verificar_sesion_finca'));
+        //obtener sesion hacienda
+        $response = $this->getJson(route('verificar_sesion_hacienda'));
 
         $response->assertStatus(200)->assertJson(fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
-        $json->has('finca', fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->where('id', $fincaId)
+        $json->has('hacienda', fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->where('id', $haciendaId)
             ->etc()
             )
         )->assertSessionHas('peso_servicio', $this->userAdmin->configuracion->peso_servicio)
         ->assertSessionHas('dias_evento_notificacion', $this->userAdmin->configuracion->dias_evento_notificacion)
         ->assertSessionHas('dias_diferencia_vacuna', $this->userAdmin->configuracion->dias_diferencia_vacuna)
-        ->assertSessionHas('finca_id', $fincaId);
+        ->assertSessionHas('hacienda_id', $haciendaId);
     }
 
 
-    public function test_logear_usuario_veterinario_con_admin_tiene_varias_fincas(): void
+    public function test_logear_usuario_veterinario_con_admin_tiene_varias_haciendas(): void
     {
-        $this->generarFincas();
+        $this->generarHaciendas();
         $response = $this->withHeader('origin', config('app.url'))->postJson('api/login', [
             'usuario' => 'veterinario',
             'password' => 'veterinario',
@@ -153,14 +153,14 @@ class LoginTest extends TestCase
             'configuracion.peso_servicio' => 'integer',
             'configuracion.dias_evento_notificacion' => 'integer',
             'configuracion.dias_diferencia_vacuna' => 'integer',
-        ])->where('sesion_finca', true))
-            ->where('login.sesion_finca', true))->assertSessionHas('finca_id', $this->finca->id)
+        ])->where('sesion_hacienda', true))
+            ->where('login.sesion_hacienda', true))->assertSessionHas('hacienda_id', $this->hacienda->id)
         ->assertSessionHas('peso_servicio', $this->userAdmin->configuracion->peso_servicio)
         ->assertSessionHas('dias_evento_notificacion', $this->userAdmin->configuracion->dias_evento_notificacion)
         ->assertSessionHas('dias_diferencia_vacuna', $this->userAdmin->configuracion->dias_diferencia_vacuna);
     }
 
-    public function test_logear_usuario_veterinario_con_admin_tiene_una_finca(): void
+    public function test_logear_usuario_veterinario_con_admin_tiene_una_hacienda(): void
     {
         $response = $this->withHeader('origin', config('app.url'))->postJson('api/login', [
             'usuario' => 'veterinario',
@@ -176,7 +176,7 @@ class LoginTest extends TestCase
         'configuracion.peso_servicio' => 'integer',
         'configuracion.dias_evento_notificacion' => 'integer',
         'configuracion.dias_diferencia_vacuna' => 'integer',
-    ])->where('sesion_finca', true)))->assertSessionHas('finca_id', $this->finca->id)
+    ])->where('sesion_hacienda', true)))->assertSessionHas('hacienda_id', $this->hacienda->id)
         ->assertSessionHas('peso_servicio', $this->userAdmin->configuracion->peso_servicio)
         ->assertSessionHas('dias_evento_notificacion', $this->userAdmin->configuracion->dias_evento_notificacion)
         ->assertSessionHas('dias_diferencia_vacuna', $this->userAdmin->configuracion->dias_diferencia_vacuna);

@@ -29,7 +29,7 @@ class TodosServicios extends Controller
                 ]
             )
             ->withCount('servicios')
-            ->where('finca_id', session('finca_id'))->get();
+            ->where('hacienda_id', session('hacienda_id'))->get();
 
         $ganados->transform(
             function (Ganado $ganado) {

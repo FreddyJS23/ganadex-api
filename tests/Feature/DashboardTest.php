@@ -14,15 +14,15 @@ use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Collection as SupportCollection;
 use Illuminate\Testing\Fluent\AssertableJson;
-use Tests\Feature\Common\NeedsFinca;
+use Tests\Feature\Common\NeedsHacienda;
 use Tests\TestCase;
 
 class DashboardTest extends TestCase
 {
     use RefreshDatabase;
 
-    use NeedsFinca {
-        setUp as needsFincaSetUp;
+    use NeedsHacienda {
+        setUp as needsHaciendaSetUp;
     }
 
     private int $cantidad_elementos = 50;
@@ -30,7 +30,7 @@ class DashboardTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->needsFincaSetUp();
+        $this->needsHaciendaSetUp();
 
         $this->estado = Estado::all();
     }
@@ -39,8 +39,8 @@ class DashboardTest extends TestCase
     {
         GanadoDescarte::factory()
             ->count(10)
-            ->for($this->finca)
-            ->forGanado(['finca_id' => $this->finca->id, 'sexo' => 'M', 'tipo_id' => 4])
+            ->for($this->hacienda)
+            ->forGanado(['hacienda_id' => $this->hacienda->id, 'sexo' => 'M', 'tipo_id' => 4])
             ->create();
 
         return Ganado::factory()
@@ -49,7 +49,7 @@ class DashboardTest extends TestCase
             ->hasEvento(1)
             ->hasAttached($this->estado)
             ->has(
-                Leche::factory()->for($this->finca)->state(
+                Leche::factory()->for($this->hacienda)->state(
                     fn(array $attributes, Ganado $ganado): array => [
                         'ganado_id' => $ganado->id,
                         'fecha' => Carbon::now()->format('Y-m-d')
@@ -58,7 +58,7 @@ class DashboardTest extends TestCase
                 'pesajes_leche'
             )
             ->state(new Sequence(fn(): array => ['tipo_id' => random_int(1, 4)]))
-            ->for($this->finca)
+            ->for($this->hacienda)
             ->create();
     }
 
@@ -84,7 +84,7 @@ class DashboardTest extends TestCase
             asi siempre todos los meses estaran cubiertos por lo menos una vez */
             ->has(
                 Leche::factory()
-                    ->for($this->finca)
+                    ->for($this->hacienda)
                     ->count(12)
                     ->state(
                         fn(array $attributes, Ganado $ganado): array => [
@@ -96,7 +96,7 @@ class DashboardTest extends TestCase
                     ]),
                 'pesajes_leche'
             )
-            ->for($this->finca)
+            ->for($this->hacienda)
             ->create();
     }
 
@@ -104,7 +104,7 @@ class DashboardTest extends TestCase
     {
         return Personal::factory()
             ->count($this->cantidad_elementos)
-            ->for($this->finca)
+            ->for($this->hacienda)
             ->create();
     }
 
@@ -112,7 +112,7 @@ class DashboardTest extends TestCase
     {
         return Insumo::factory()
             ->count($this->cantidad_elementos)
-            ->for($this->finca)
+            ->for($this->hacienda)
             ->create();
     }
 

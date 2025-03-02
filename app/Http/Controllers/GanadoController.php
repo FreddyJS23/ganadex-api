@@ -42,7 +42,7 @@ class GanadoController extends Controller
         return new GanadoCollection(
             Ganado::doesntHave('toro')
                 ->doesntHave('ganadoDescarte')
-                ->where('finca_id', [session('finca_id')])
+                ->where('hacienda_id', [session('hacienda_id')])
                 ->with(['peso','evento','estados'])
                 ->get()
         );
@@ -56,7 +56,7 @@ class GanadoController extends Controller
         $ganado = new Ganado();
         $ganado->sexo = "H";
         $ganado->fill($request->except($this->estado + $this->peso));
-        $ganado->finca_id = session('finca_id');
+        $ganado->hacienda_id = session('hacienda_id');
 
         try {
                 DB::transaction(
@@ -76,7 +76,7 @@ class GanadoController extends Controller
                             'fecha' => $request->input('fecha_venta'),
                             'precio' => $request->input('precio'),
                             'comprador_id' => $request->input('comprador_id'),
-                            'finca_id' => session('finca_id')
+                            'hacienda_id' => session('hacienda_id')
 
                             ]
                         );
@@ -90,7 +90,7 @@ class GanadoController extends Controller
                         $vacunas = [];
 
                         foreach ($request->only('vacunas')['vacunas'] as $vacuna) {
-                            array_push($vacunas, $vacuna + ['ganado_id' => $ganado->id, 'finca_id' => $ganado->finca_id]);
+                            array_push($vacunas, $vacuna + ['ganado_id' => $ganado->id, 'hacienda_id' => $ganado->hacienda_id]);
                         }
 
                         $ganado->vacunaciones()->createMany($vacunas);
@@ -110,7 +110,7 @@ class GanadoController extends Controller
     public function show(Ganado $ganado)
     {
 
-        $planesSanitarioAnteriores =  Plan_sanitario::where('finca_id', [session('finca_id')])
+        $planesSanitarioAnteriores =  Plan_sanitario::where('hacienda_id', [session('hacienda_id')])
             ->select('plan_sanitarios.id', 'nombre as vacuna', 'fecha_inicio as fecha', 'prox_dosis')
             ->join('vacunas', 'plan_sanitarios.vacuna_id', 'vacunas.id')
             ->orderBy('fecha', 'desc')
@@ -166,7 +166,7 @@ class GanadoController extends Controller
             'plan_sanitarios',
             function (JoinClause $join) use ($ganado) {
                 $join->on('vacunas.id', '=', 'plan_sanitarios.vacuna_id')
-                    ->where('plan_sanitarios.finca_id', session('finca_id'))
+                    ->where('plan_sanitarios.hacienda_id', session('hacienda_id'))
                     ->where('fecha_inicio', '>', $ganado->fecha_nacimiento ?? $ganado->created_at);
             }
         )

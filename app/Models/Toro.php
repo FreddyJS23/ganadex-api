@@ -55,9 +55,9 @@ class Toro extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function finca(): BelongsTo
+    public function hacienda(): BelongsTo
     {
-        return $this->belongsTo(Finca::class);
+        return $this->belongsTo(Hacienda::class);
     }
 
     protected $hidden = ['created_at', 'updated_at', 'user_id', 'ganado_id'];

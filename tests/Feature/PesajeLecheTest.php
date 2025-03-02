@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Estado;
-use App\Models\Finca;
+use App\Models\Hacienda;
 use App\Models\Ganado;
 use App\Models\Leche;
 use App\Models\User;
@@ -37,7 +37,7 @@ class PesajeLecheTest extends TestCase
     private $estadoVendido;
     private $estadoFallecido;
     private string $url;
-    private $finca;
+    private $hacienda;
 
     protected function setUp(): void
     {
@@ -54,8 +54,8 @@ class PesajeLecheTest extends TestCase
 
         $this->user->assignRole('admin');
 
-            $this->finca
-            = Finca::factory()
+            $this->hacienda
+            = Hacienda::factory()
             ->for($this->user)
             ->create();
 
@@ -64,7 +64,7 @@ class PesajeLecheTest extends TestCase
             ->hasPeso(1)
             ->hasEvento(1)
             ->hasAttached($this->estadoLactancia)
-            ->for($this->finca)
+            ->for($this->hacienda)
             ->create();
 
         $this->url = sprintf('api/ganado/%s/pesaje_leche', $this->ganado->id);
@@ -75,7 +75,7 @@ class PesajeLecheTest extends TestCase
         return Leche::factory()
             ->count($this->cantidad_pesoLeche)
             ->for($this->ganado)
-            ->for($this->finca)
+            ->for($this->hacienda)
             ->create();
     }
 
@@ -112,7 +112,7 @@ class PesajeLecheTest extends TestCase
         $this->generarPesajesLeche();
 
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson($this->url);
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson($this->url);
 
         $response->assertStatus(200)
             ->assertJson(
@@ -132,7 +132,7 @@ class PesajeLecheTest extends TestCase
     public function test_creacion_pesaje_leche(): void
     {
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson($this->url, $this->pesoLeche);
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson($this->url, $this->pesoLeche);
 
         $response->assertStatus(201)
             ->assertJson(
@@ -154,7 +154,7 @@ class PesajeLecheTest extends TestCase
 
         $idRandom = random_int(0, $this->cantidad_pesoLeche - 1);
         $idPesoLeche = $pesajesDeLeche[$idRandom]->id;
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf($this->url . '/%s', $idPesoLeche));
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf($this->url . '/%s', $idPesoLeche));
 
         $response->assertStatus(200)
             ->assertJson(
@@ -174,7 +174,7 @@ class PesajeLecheTest extends TestCase
         $idRandom = random_int(0, $this->cantidad_pesoLeche - 1);
         $idPesoLecheEditar = $pesajesDeLeche[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf($this->url . '/%s', $idPesoLecheEditar), $this->pesoLeche);
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf($this->url . '/%s', $idPesoLecheEditar), $this->pesoLeche);
 
         $response->assertStatus(200)
             ->assertJson(
@@ -194,7 +194,7 @@ class PesajeLecheTest extends TestCase
         $idToDelete = $pesajesDeLeche[$idRandom]->id;
 
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->deleteJson(sprintf($this->url . '/%s', $idToDelete));
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->deleteJson(sprintf($this->url . '/%s', $idToDelete));
 
         $response->assertStatus(200)->assertJson(['pesajeLecheID' => $idToDelete]);
     }
@@ -204,13 +204,13 @@ class PesajeLecheTest extends TestCase
         Ganado::factory()
             ->count(10)
             ->hasPeso(1)
-            ->has(Leche::factory()->for($this->finca)->count(3), 'pesajes_leche')
+            ->has(Leche::factory()->for($this->hacienda)->count(3), 'pesajes_leche')
             ->hasEvento(1)
             ->hasAttached($this->estado)
-            ->for($this->finca)
+            ->for($this->hacienda)
             ->create();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('todosPesajesLeche'));
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('todosPesajesLeche'));
 
         $response->assertStatus(200)
             ->assertJson(
@@ -230,7 +230,7 @@ class PesajeLecheTest extends TestCase
     public function test_error_validacion_registro_pesoLeche(array $pesoLeche, array $errores): void
     {
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson($this->url, $pesoLeche);
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson($this->url, $pesoLeche);
 
         $response->assertStatus(422)->assertInvalid($errores);
     }
@@ -239,7 +239,7 @@ class PesajeLecheTest extends TestCase
     {
         $this->cambiarRol($this->user);
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(route('pesaje_leche.store', ['ganado' => $this->ganado->id]), $this->pesoLeche);
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(route('pesaje_leche.store', ['ganado' => $this->ganado->id]), $this->pesoLeche);
 
         $response->assertStatus(403);
     }
@@ -252,7 +252,7 @@ class PesajeLecheTest extends TestCase
         $idRandom = random_int(0, $this->cantidad_pesoLeche - 1);
         $idPesoLecheEditar = $pajuelasToro[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(route('pesaje_leche.update', ['ganado' => $this->ganado->id,'pesaje_leche' => $idPesoLecheEditar]), $this->pesoLeche);
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(route('pesaje_leche.update', ['ganado' => $this->ganado->id,'pesaje_leche' => $idPesoLecheEditar]), $this->pesoLeche);
 
         $response->assertStatus(403);
     }
@@ -266,7 +266,7 @@ class PesajeLecheTest extends TestCase
         $idRandom = random_int(0, $this->cantidad_pesoLeche - 1);
         $idPajuelaToroEliminar = $pajuelasToro[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->deleteJson(route('pesaje_leche.destroy', ['ganado' => $this->ganado->id,'pesaje_leche' => $idPajuelaToroEliminar]));
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->deleteJson(route('pesaje_leche.destroy', ['ganado' => $this->ganado->id,'pesaje_leche' => $idPajuelaToroEliminar]));
 
         $response->assertStatus(403);
     }

@@ -30,7 +30,7 @@ class DescartarGanado
         $ganadoDescarte->ganado_id = $event->revision->ganado_id;
         $estado = Estado::firstWhere('estado', 'sano');
         $event->revision->ganado->estados()->sync($estado->id);
-        $ganadoDescarte->finca_id = session('finca_id');
+        $ganadoDescarte->hacienda_id = session('hacienda_id');
         $ganadoDescarte->save();
 
         $numero = $event->revision->ganado->numero;

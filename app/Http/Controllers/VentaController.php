@@ -24,7 +24,7 @@ class VentaController extends Controller
      */
     public function index()
     {
-        return new VentaCollection(Venta::where('finca_id', session('finca_id'))->with('ganado:id,numero')->get());
+        return new VentaCollection(Venta::where('hacienda_id', session('hacienda_id'))->with('ganado:id,numero')->get());
     }
 
     /**
@@ -34,7 +34,7 @@ class VentaController extends Controller
     {
         $venta = new Venta();
         $venta->fill($request->all());
-        $venta->finca_id = session('finca_id');
+        $venta->hacienda_id = session('hacienda_id');
         $venta->save();
 
         VentaGanado::dispatch($venta);

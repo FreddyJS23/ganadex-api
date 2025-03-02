@@ -11,8 +11,8 @@ class DashboardPlanesSanitario extends Controller
     {
         $jornadasVacunacion = Plan_sanitario::query()
             ->where(
-                'finca_id',
-                session('finca_id')
+                'hacienda_id',
+                session('hacienda_id')
             )
             ->where('prox_dosis', '>', now()->format('Y-m-d'))
             ->selectRaw('nombre as vacuna , MAX(prox_dosis) as prox_dosis , tipo_animal as ganado_vacunado')

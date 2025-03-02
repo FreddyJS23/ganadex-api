@@ -43,7 +43,7 @@ class StoreGanadoRequest extends FormRequest
                  Rule::requiredIf(fn () => in_array(5, $this->estado_id)),
                 'numeric', Rule::exists('compradors', 'id')
                     ->where(
-                        fn($query) => $query->where('finca_id', session('finca_id'))
+                        fn($query) => $query->where('hacienda_id', session('hacienda_id'))
                     )
             ],
             //campos para registrar ganado muerto

@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\CrearSesionFinca;
+use App\Events\CrearSesionHacienda;
 use App\Http\Requests\LoginRequest;
 use App\Http\Resources\ConfiguracionResource;
 use App\Models\Configuracion;
-use App\Models\Finca;
+use App\Models\Hacienda;
 use App\Models\User;
 use App\Models\UsuarioVeterinario;
 use Illuminate\Support\Facades\Auth;
@@ -34,8 +34,8 @@ class AuthLogin extends Controller
         $request->session()->regenerate();
         activity('Login')->log('Login');
         $rol = $user->hasRole('admin') ? 'admin' : 'veterinario';
-        //notificar en el client si el login incluye inicio de sesion finca
-        $sesion_finca = false;
+        //notificar en el client si el login incluye inicio de sesion hacienda
+        $sesion_hacienda = false;
         $configuracion = null;
 
         if ($rol == 'admin') {
@@ -49,30 +49,30 @@ class AuthLogin extends Controller
                 ]
             );
 
-            if ($user->fincas->count() == 1) {
-                $finca = $user->fincas->first();
-                session()->put('finca_id', $finca->id);
-                event(new CrearSesionFinca($finca));
-                $sesion_finca = true;
+            if ($user->haciendas->count() == 1) {
+                $hacienda = $user->haciendas->first();
+                session()->put('hacienda_id', $hacienda->id);
+                event(new CrearSesionHacienda($hacienda));
+                $sesion_hacienda = true;
             }
         } elseif ($rol == 'veterinario') {
             $usuario_veterinario = UsuarioVeterinario::where('user_id', $user->id)->first();
             $configuracion = Configuracion::firstWhere('user_id', $usuario_veterinario->admin_id);
-            $finca = Finca::find($usuario_veterinario->veterinario->finca_id);
+            $hacienda = Hacienda::find($usuario_veterinario->veterinario->hacienda_id);
 
             session()->put(
                 [
-                    'finca_id' => $finca->id,
+                    'hacienda_id' => $hacienda->id,
                     'peso_servicio' => $configuracion->peso_servicio,
                     'dias_evento_notificacion' => $configuracion->dias_evento_notificacion,
                     'dias_diferencia_vacuna' => $configuracion->dias_diferencia_vacuna,
                 ]
             );
 
-            event(new CrearSesionFinca($finca));
-            $sesion_finca = true;
+            event(new CrearSesionHacienda($hacienda));
+            $sesion_hacienda = true;
         }
-        /* En caso que haya mas fincas creadas se debera asignar manualmente en el contralador finca */
+        /* En caso que haya mas haciendas creadas se debera asignar manualmente en el contralador hacienda */
 
         return response()
             ->json(
@@ -83,7 +83,7 @@ class AuthLogin extends Controller
                         'usuario' => $user->usuario,
                         'rol' => $rol,
                         'token' => $user->createToken('API_TOKEN')->plainTextToken,
-                        'sesion_finca' => $sesion_finca,
+                        'sesion_hacienda' => $sesion_hacienda,
                         'configuracion' => new ConfiguracionResource($configuracion),
                     ]
                 ],

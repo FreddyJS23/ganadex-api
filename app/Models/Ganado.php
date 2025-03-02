@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property ?string $origen
  * @property ?string $fecha_nacimiento
  * @property-read ?GanadoTipo $tipo
- * @property-read ?Finca $finca
+ * @property-read ?Hacienda $hacienda
  */
 class Ganado extends Model
 {
@@ -137,9 +137,9 @@ class Ganado extends Model
     /**
      * Get the user that owns the Ganado
      */
-    public function finca(): BelongsTo
+    public function hacienda(): BelongsTo
     {
-        return $this->belongsTo(Finca::class);
+        return $this->belongsTo(Hacienda::class);
     }
 
     /**

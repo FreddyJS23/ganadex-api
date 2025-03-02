@@ -6,7 +6,7 @@ use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Http\Resources\UserResource;
 use App\Models\Configuracion;
-use App\Models\Finca;
+use App\Models\Hacienda;
 use App\Models\User;
 use App\Models\UsuarioVeterinario;
 use Illuminate\Support\Facades\Auth;
@@ -47,11 +47,11 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        $user->load('fincas');
-        $user->fincas = $user->fincas->map(
-            function (Finca $finca) {
-                $finca->fecha_creacion = $finca->created_at->format('d-m-Y');
-                return $finca;
+        $user->load('haciendas');
+        $user->haciendas = $user->haciendas->map(
+            function (Hacienda $hacienda) {
+                $hacienda->fecha_creacion = $hacienda->created_at->format('d-m-Y');
+                return $hacienda;
             }
         );
 

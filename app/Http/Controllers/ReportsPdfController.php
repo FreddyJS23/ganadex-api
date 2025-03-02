@@ -103,7 +103,7 @@ END as ultima_dosis
             'plan_sanitarios',
             function (JoinClause $join) use ($ganado) {
                 $join->on('vacunas.id', '=', 'plan_sanitarios.vacuna_id')
-                    ->where('plan_sanitarios.finca_id', session('finca_id'))
+                    ->where('plan_sanitarios.hacienda_id', session('hacienda_id'))
                     ->where('fecha_inicio', '>', $ganado->fecha_nacimiento ?? $ganado->created_at);
             }
         )
@@ -171,7 +171,7 @@ END as ultima_dosis
 
         /* ------------------------------ obtene vacas ------------------------------ */
         //tambien abarca las que seran futuras vacas
-        $vacas = Ganado::where('finca_id', session('finca_id'))
+        $vacas = Ganado::where('hacienda_id', session('hacienda_id'))
             ->doesntHave('toro')
             ->doesntHave('ganadoDescarte')
             ->selectRaw('tipo, COUNT(tipo) as cantidad')
@@ -181,7 +181,7 @@ END as ultima_dosis
             ->get()
             ->toArray();
 
-        $totalVacasEnProduccion = Ganado::select('id')->where('finca_id', session('finca_id'))
+        $totalVacasEnProduccion = Ganado::select('id')->where('hacienda_id', session('hacienda_id'))
             ->whereRelation('estados', 'estado', 'lactancia')
             ->count();
         array_push($vacas, ['tipo' => 'total','cantidad' => obtenerSumaTotalPorTipo($vacas)]);
@@ -189,7 +189,7 @@ END as ultima_dosis
         /* ------------------------------ obtene toros ------------------------------ */
         //tambien abacar los que seran futuros toros
         $toros
-        = Ganado::where('finca_id', session('finca_id'))
+        = Ganado::where('hacienda_id', session('hacienda_id'))
             ->has('toro')
             ->doesntHave('ganadoDescarte')
             ->selectRaw('tipo, COUNT(tipo) as cantidad')
@@ -204,7 +204,7 @@ END as ultima_dosis
 
         /* ------------------------------ obtene descartes ------------------------------ */
         $ganadoDescarte
-        = Ganado::where('finca_id', session('finca_id'))
+        = Ganado::where('hacienda_id', session('hacienda_id'))
             ->doesntHave('toro')
             ->has('ganadoDescarte')
             ->selectRaw('tipo, COUNT(tipo) as cantidad')
@@ -218,21 +218,21 @@ END as ultima_dosis
         array_push($ganadoDescarte, ['tipo' => 'total', 'cantidad' => obtenerSumaTotalPorTipo($ganadoDescarte)]);
 
         /* --------------------- obtener natalidad y mortalidad --------------------- */
-        $ganadoMortalida = Fallecimiento::selectRaw('COUNT(id) as total')->whereRelation('ganado', 'finca_id', session('finca_id'))
+        $ganadoMortalida = Fallecimiento::selectRaw('COUNT(id) as total')->whereRelation('ganado', 'hacienda_id', session('hacienda_id'))
             ->whereYear('fecha', $fechaActual->format('Y'))
             ->first()
             ->total;
 
         $ganadoNatalidad = Ganado::selectRaw('COUNT(id) as total')
             ->whereYear('fecha_nacimiento', $fechaActual->format('Y'))
-            ->where('finca_id', session('finca_id'))
+            ->where('hacienda_id', session('hacienda_id'))
             ->first()->total;
 
         /* ------------------------ obtener top vacas productoras y menos productoras ------------------------- */
         $topVacasProductoras = Leche::withWhereHas(
             'ganado',
             function ($query) {
-                $query->where('finca_id', session('finca_id'))
+                $query->where('hacienda_id', session('hacienda_id'))
                     ->select('id', 'numero');
             }
         )->orderBy('peso_leche', 'desc')
@@ -258,7 +258,7 @@ END as ultima_dosis
         $topVacasMenosProductoras = Leche::withWhereHas(
             'ganado',
             function ($query) {
-                $query->where('finca_id', session('finca_id'))->select('id', 'numero');
+                $query->where('hacienda_id', session('hacienda_id'))->select('id', 'numero');
             }
         )->orderBy('peso_leche', 'asc')
         ->whereMonth('fecha', $mesActual)
@@ -277,15 +277,15 @@ END as ultima_dosis
         $topVacasMenosProductoras = $ordernarArrayVacasMenosProductoras;
 
         /* ------------------------ obtener total vacas en gestacio,revision y servicio ------------------------- */
-        $totalVacasEnGestacion = Ganado::where('finca_id', session('finca_id'))
+        $totalVacasEnGestacion = Ganado::where('hacienda_id', session('hacienda_id'))
             ->whereRelation('estados', 'estado', 'gestacion')
             ->count();
 
-        $totalGanadoPendienteRevision = Ganado::where('finca_id', session('finca_id'))
+        $totalGanadoPendienteRevision = Ganado::where('hacienda_id', session('hacienda_id'))
             ->whereRelation('estados', 'estado', 'pendiente_revision')
             ->count();
 
-        $novillasAmontar = Ganado::where('finca_id', session('finca_id'))
+        $novillasAmontar = Ganado::where('hacienda_id', session('hacienda_id'))
             ->whereRelation('estados', 'estado', 'pendiente_servicio')
             ->count();
 
@@ -296,7 +296,7 @@ END as ultima_dosis
         ];
 
         /* ------------------------ obtener total personal ------------------------- */
-        $totalPersonal = Personal::where('finca_id', session('finca_id'))
+        $totalPersonal = Personal::where('hacienda_id', session('hacienda_id'))
             ->selectRaw('cargo, COUNT(cargo) as cantidad')
             ->join('cargos', 'cargo_id', 'cargos.id')
             ->groupBy('cargo')
@@ -364,7 +364,7 @@ END as ultima_dosis
         $inicio = $request->query('start');
         $fin = $request->query('end');
 
-        $ventasLeche = VentaLeche::where('finca_id', session('finca_id'))
+        $ventasLeche = VentaLeche::where('hacienda_id', session('hacienda_id'))
             ->oldest('fecha')
             ->select('venta_leches.fecha', 'cantidad', 'precio')
             ->selectRaw('(cantidad * precio) AS ganancia_total')
@@ -389,7 +389,7 @@ END as ultima_dosis
 
         $year = $request->query('year');
 
-        $ventasGanado = Venta::where('ventas.finca_id', session('finca_id'))
+        $ventasGanado = Venta::where('ventas.hacienda_id', session('hacienda_id'))
             ->join('ganados', 'ganado_id', 'ganados.id')
         //->selectRaw("DATE_FORMAT(fecha,'%m') as mes,numero,precio")
             ->selectRaw("DATE_FORMAT(fecha,'%m') as mes,numero")
@@ -418,7 +418,7 @@ END as ultima_dosis
         $inicio = $request->query('start');
         $fin = $request->query('end');
 
-        $fallecimientos = Fallecimiento::whereRelation('ganado', 'finca_id', session('finca_id'))
+        $fallecimientos = Fallecimiento::whereRelation('ganado', 'hacienda_id', session('hacienda_id'))
             ->join('causas_fallecimientos','causas_fallecimiento_id','=','causas_fallecimientos.id')
             ->selectRaw('causa, COUNT(causa) AS cantidad')
             ->orderby('cantidad', 'desc')
@@ -466,7 +466,7 @@ END as ultima_dosis
         COUNT(CASE WHEN sexo = 'H' THEN 1 END) as hembras";
 
         //obtener conteo agrupado por mes ademas de la cantidad de machos y hembras en ese mes
-        $nacimientosPorMeses = Ganado::where('finca_id', session('finca_id'))
+        $nacimientosPorMeses = Ganado::where('hacienda_id', session('hacienda_id'))
             ->selectRaw($consultaSql)
             ->orderBy('mes', 'asc')
             ->groupBy('mes')
@@ -502,7 +502,7 @@ END as ultima_dosis
     {
 
 
-        $ventaGanado = Venta::where('finca_id', session('finca_id'))
+        $ventaGanado = Venta::where('hacienda_id', session('hacienda_id'))
             ->with(['ganado' => ['peso'],'comprador'])
             ->orderBy('fecha', 'desc')
             ->first();
@@ -531,7 +531,7 @@ END as ultima_dosis
             'plan_sanitarios',
             function (JoinClause $join) use ($ganado) {
                 $join->on('vacunas.id', '=', 'plan_sanitarios.vacuna_id')
-                    ->where('plan_sanitarios.finca_id', session('finca_id'))
+                    ->where('plan_sanitarios.hacienda_id', session('hacienda_id'))
                     ->where('fecha_inicio', '>', $ganado->fecha_nacimiento ?? $ganado->created_at);
             }
         )

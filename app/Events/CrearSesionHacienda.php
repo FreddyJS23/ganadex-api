@@ -2,13 +2,13 @@
 
 namespace App\Events;
 
-use App\Models\Finca;
+use App\Models\Hacienda;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class CrearSesionFinca
+class CrearSesionHacienda
 {
     use Dispatchable;
     use InteractsWithSockets;
@@ -17,7 +17,7 @@ class CrearSesionFinca
     /**
      * Create a new event instance.
      */
-    public function __construct(public readonly Finca $finca) {}
+    public function __construct(public readonly Hacienda $hacienda) {}
 
     /**
      * Get the channels the event should broadcast on.

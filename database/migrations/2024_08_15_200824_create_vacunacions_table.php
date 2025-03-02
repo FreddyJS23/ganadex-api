@@ -17,7 +17,7 @@ return new class extends Migration
             $table->date('fecha');
             $table->foreignId('vacuna_id')->constrained()->cascadeOnDelete();
             $table->foreignId('ganado_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('finca_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('hacienda_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }

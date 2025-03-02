@@ -19,7 +19,7 @@ class TodosRevisiones extends Controller
         ->whereRelation('estados', 'estado','!=', 'vendido')
         ->doesntHave('ganadoDescarte')
         ->withCount('revision')
-        ->where('finca_id', session('finca_id'))->get();
+        ->where('hacienda_id', session('hacienda_id'))->get();
 
         return new TodosRevisionesCollection($ganado);
     }

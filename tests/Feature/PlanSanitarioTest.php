@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Estado;
-use App\Models\Finca;
+use App\Models\Hacienda;
 use App\Models\Ganado;
 use App\Models\Plan_sanitario;
 use App\Models\User;
@@ -26,7 +26,7 @@ class PlanSanitarioTest extends TestCase
 
     private int $cantidad_PlanesSanitario = 10;
     private $user;
-    private $finca;
+    private $hacienda;
     private $estadoSano;
     private $estadoFallecido;
     private $estadoVendido;
@@ -40,8 +40,8 @@ class PlanSanitarioTest extends TestCase
 
             $this->user->assignRole('admin');
 
-            $this->finca
-            = Finca::factory()
+            $this->hacienda
+            = Hacienda::factory()
             ->for($this->user)
             ->create();
 
@@ -51,7 +51,7 @@ class PlanSanitarioTest extends TestCase
 
             Ganado::factory()
             ->count(30)
-            ->for($this->finca)
+            ->for($this->hacienda)
             ->sequence(
                 ['tipo_id' => 1],
                 ['tipo_id' => 2],
@@ -66,7 +66,7 @@ class PlanSanitarioTest extends TestCase
     {
         return Plan_sanitario::factory()
             ->count($this->cantidad_PlanesSanitario)
-            ->for($this->finca)
+            ->for($this->hacienda)
             ->create();
     }
     public static function ErrorInputProvider(): array
@@ -95,7 +95,7 @@ class PlanSanitarioTest extends TestCase
 
 
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('plan_sanitario.index'));
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('plan_sanitario.index'));
 
         $response->assertStatus(200)->assertJson(
             fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
@@ -123,18 +123,18 @@ class PlanSanitarioTest extends TestCase
         /* ganado con estado fallecido */
         Ganado::factory()
         ->count(30)
-        ->for($this->finca)
+        ->for($this->hacienda)
         ->hasAttached($this->estadoFallecido)
         ->create(  ['tipo_id' => 4]);
 
         /* ganado con estado vendido */
         Ganado::factory()
         ->count(30)
-        ->for($this->finca)
+        ->for($this->hacienda)
         ->hasAttached($this->estadoVendido)
         ->create(  ['tipo_id' => 4]);
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(route('plan_sanitario.store'), $this->planSanitario);
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(route('plan_sanitario.store'), $this->planSanitario);
 
         $response->assertStatus(201)->assertJson(
             fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
@@ -156,7 +156,7 @@ class PlanSanitarioTest extends TestCase
         $idRandom = random_int(0, $this->cantidad_PlanesSanitario - 1);
         $idPlanSanitario = $PlanesSanitario[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('plan_sanitario.show', $idPlanSanitario));
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('plan_sanitario.show', $idPlanSanitario));
 
         $response->assertStatus(200)->assertJson(
             fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
@@ -176,7 +176,7 @@ class PlanSanitarioTest extends TestCase
         $idRandom = random_int(0, $this->cantidad_PlanesSanitario - 1);
         $idplanSanitarioEditar = $planSanitario[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(route('plan_sanitario.update', $idplanSanitarioEditar), $this->planSanitario);
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(route('plan_sanitario.update', $idplanSanitarioEditar), $this->planSanitario);
 
         $response->assertStatus(200)->assertJson(
             fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
@@ -202,7 +202,7 @@ class PlanSanitarioTest extends TestCase
         $idRandom = random_int(0, $this->cantidad_PlanesSanitario - 1);
         $idToDelete = $PlanesSanitario[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->deleteJson(route('plan_sanitario.destroy', ['plan_sanitario'  => $idToDelete]));
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->deleteJson(route('plan_sanitario.destroy', ['plan_sanitario'  => $idToDelete]));
 
         $response->assertStatus(200)->assertJson(['plan_sanitarioID' => $idToDelete]);
     }
@@ -212,7 +212,7 @@ class PlanSanitarioTest extends TestCase
      */
     public function test_error_validacion_registro_plan_sanitario(array $planSanitario, array $errores): void
     {
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(route('plan_sanitario.store'), $planSanitario);
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(route('plan_sanitario.store'), $planSanitario);
 
         $response->assertStatus(422)->assertInvalid($errores);
     }

@@ -2,7 +2,7 @@
 
 namespace App\Listeners;
 
-use App\Events\CrearSesionFinca;
+use App\Events\CrearSesionHacienda;
 use App\Models\Evento;
 use App\Models\Ganado;
 use App\Models\Notificacion;
@@ -37,13 +37,13 @@ class GenerarNotificaciones
     }
 
     //Consultar si un evento esta cercano a los 7 dias
-    private function VerificarEventoCercano($evento, $usuarioId, $fincaId, $fechaActual)
+    private function VerificarEventoCercano($evento, $usuarioId, $haciendaId, $fechaActual)
     {
         //eliminar sufijo de la columna eventos
         $tipoEvento = Str::of($evento)->after('prox_');
         $nombreColumna = "dias_para_" . $tipoEvento;
 
-        $eventosProximos = Evento::whereRelation('ganado', 'finca_id', $fincaId)
+        $eventosProximos = Evento::whereRelation('ganado', 'hacienda_id', $haciendaId)
             ->select('id', 'ganado_id')
             ->selectRaw("DATEDIFF($evento,'$fechaActual') AS $nombreColumna")
             ->having("dias_para_$tipoEvento", '<=', session('dias_evento_notificacion'))->get();
@@ -67,11 +67,11 @@ class GenerarNotificaciones
     /**
      * Handle the event.
      */
-    public function handle(CrearSesionFinca $event): void
+    public function handle(CrearSesionHacienda $event): void
     {
-        $fincaId = $event->finca->id;
+        $haciendaId = $event->hacienda->id;
         $fechaActual = now()->format('Y-m-d');
-        if (Ganado::where('finca_id', $fincaId)->count() > 0) {
+        if (Ganado::where('hacienda_id', $haciendaId)->count() > 0) {
             //extraer nombres de columnas de la tabla
             $columnasTablaEvento = Schema::getColumnListing('eventos');
             //intercambiar key=>valor por valor=>key exeptuando
@@ -81,7 +81,7 @@ class GenerarNotificaciones
 
             //iterar columnas
             foreach ($columnasTablaEvento as $columna => $key) {
-                $this->VerificarEventoCercano($columna, $event->finca->user_id, $fincaId, $fechaActual);
+                $this->VerificarEventoCercano($columna, $event->hacienda->user_id, $haciendaId, $fechaActual);
             }
 
 

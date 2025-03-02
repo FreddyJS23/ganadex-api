@@ -2,8 +2,8 @@
 
 namespace App\Listeners;
 
-use App\Events\CrearSesionFinca;
-use App\Models\Finca;
+use App\Events\CrearSesionHacienda;
+use App\Models\Hacienda;
 use App\Models\Ganado;
 use App\Models\User;
 use DateTime;
@@ -25,7 +25,7 @@ class VerificarEdadGanado
     /**
      * Handle the event.
      */
-    public function handle(CrearSesionFinca $event): void
+    public function handle(CrearSesionHacienda $event): void
     {
         $incializarFecha = new DateTime();
         $fechaActual = $incializarFecha->format('Y-m-d');
@@ -33,10 +33,10 @@ class VerificarEdadGanado
         $sentenciaSqlDiferenciaDias = "DATEDIFF('$fechaActual',fecha_nacimiento) as diferencia";
 
 
-        $fincaId = $event->finca->id;
+        $haciendaId = $event->hacienda->id;
 
-        if (Ganado::where('finca_id', $fincaId)->count() > 0) {
-            $becerros = Ganado::where('finca_id', $fincaId)
+        if (Ganado::where('hacienda_id', $haciendaId)->count() > 0) {
+            $becerros = Ganado::where('hacienda_id', $haciendaId)
                 ->where('tipo_id', 1)
                 ->select('id')
                 ->selectRaw($sentenciaSqlDiferenciaDias)
@@ -51,7 +51,7 @@ class VerificarEdadGanado
                     Ganado::whereIn('id',$becerrosIds)->update(['tipo_id' => 2]);
 
 
-            $mautes = Ganado::where('finca_id', $fincaId)
+            $mautes = Ganado::where('hacienda_id', $haciendaId)
                 ->where('tipo_id', 2)
                 ->select('id')
                 ->selectRaw($sentenciaSqlDiferenciaDias)

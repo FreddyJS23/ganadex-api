@@ -4,7 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\CausasFallecimiento;
 use App\Models\Comprador;
-use App\Models\Finca;
+use App\Models\Hacienda;
 use App\Models\Ganado;
 use App\Models\Personal;
 use App\Models\Servicio;
@@ -59,7 +59,7 @@ class ToroTest extends TestCase
     private int $cantidad_toro = 10;
 
     private $user;
-    private $finca;
+    private $hacienda;
     private $toro_fallecido;
     private $toro_vendido;
     private $veterinario;
@@ -73,17 +73,17 @@ class ToroTest extends TestCase
 
             $this->user->assignRole('admin');
 
-            $this->finca
-            = Finca::factory()
+            $this->hacienda
+            = Hacienda::factory()
             ->for($this->user)
             ->create();
 
             $this->veterinario
         = Personal::factory()
-            ->for($this->finca)
+            ->for($this->hacienda)
             ->create(['cargo_id' => 2]);
 
-            $comprador = Comprador::factory()->for($this->finca)->create()->id;
+            $comprador = Comprador::factory()->for($this->hacienda)->create()->id;
             $causaFallecimiento = CausasFallecimiento::factory()->create();
             $this->toro_fallecido = array_merge($this->toro, ['estado_id' => [2,3,4],'fecha_fallecimiento' => '2020-10-02','descripcion'=>'test','causas_fallecimiento_id'=>$causaFallecimiento->id]);
             $this->toro_vendido = array_merge($this->toro, ['estado_id' => [5,6,7],'fecha_venta' => '2020-10-02','precio' => 100,'comprador_id' => $comprador]);
@@ -94,8 +94,8 @@ class ToroTest extends TestCase
     {
         return Toro::factory()
             ->count(10)
-            ->for($this->finca)
-            ->for(Ganado::factory()->hasVacunaciones(3, ['finca_id' => $this->finca->id])->create( ['finca_id' => $this->finca->id, 'sexo' => 'M', 'tipo_id' => 4])  )
+            ->for($this->hacienda)
+            ->for(Ganado::factory()->hasVacunaciones(3, ['hacienda_id' => $this->hacienda->id])->create( ['hacienda_id' => $this->hacienda->id, 'sexo' => 'M', 'tipo_id' => 4])  )
             ->create();
     }
 
@@ -148,7 +148,7 @@ class ToroTest extends TestCase
     {
         $this->generarToros();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson('api/toro');
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson('api/toro');
 
         $response->assertStatus(200)
             ->assertJson(
@@ -180,7 +180,7 @@ class ToroTest extends TestCase
     public function test_creacion_toro(): void
     {
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson('api/toro', $this->toro);
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson('api/toro', $this->toro);
 
         $response->assertStatus(201)
             ->assertJson(
@@ -208,7 +208,7 @@ class ToroTest extends TestCase
 
     public function test_creacion_toro_fallecida(): void
     {
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson('api/toro', $this->toro_fallecido);
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson('api/toro', $this->toro_fallecido);
 
         $response->assertStatus(201)
             ->assertJson(
@@ -225,7 +225,7 @@ class ToroTest extends TestCase
 
     public function test_creacion_toro_vendido(): void
     {
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson('api/toro', $this->toro_vendido);
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson('api/toro', $this->toro_vendido);
 
         $response->assertStatus(201)
             ->assertJson(
@@ -248,7 +248,7 @@ class ToroTest extends TestCase
         $idToro = $toros[$idRandom]->id;
 
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf('api/toro/%s', $idToro));
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf('api/toro/%s', $idToro));
 
         $response->assertStatus(200)
             ->assertJson(
@@ -300,11 +300,11 @@ class ToroTest extends TestCase
 
         Servicio::factory()
             ->count(3)
-            ->for(Ganado::factory()->for($this->finca)->create(['sexo' => 'M']))
+            ->for(Ganado::factory()->for($this->hacienda)->create(['sexo' => 'M']))
             ->for($toro, 'servicioable')
             ->create(['personal_id' => $this->veterinario]);
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('toro.servicios', ['toro' => $toro->id]));
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('toro.servicios', ['toro' => $toro->id]));
 
         $response->assertStatus(200)
             ->assertJson(
@@ -327,8 +327,8 @@ class ToroTest extends TestCase
     {
 
         $toroActual = Toro::factory()
-        ->for($this->finca)
-        ->for(Ganado::factory()->hasPeso()->create(['finca_id' => $this->finca->id,
+        ->for($this->hacienda)
+        ->for(Ganado::factory()->hasPeso()->create(['hacienda_id' => $this->hacienda->id,
         'sexo' => 'M',
         'tipo_id' => 4,
         'nombre' => 'test',
@@ -337,7 +337,7 @@ class ToroTest extends TestCase
         'fecha_nacimiento' => '2015-02-17']))
         ->create();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/toro/%s', $toroActual->id), $this->toroActualizado);
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/toro/%s', $toroActual->id), $this->toroActualizado);
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
@@ -358,15 +358,15 @@ class ToroTest extends TestCase
     public function test_actualizar_toro_con_otro_existente_repitiendo_campos_unicos(): void
     {
         Toro::factory()
-            ->for($this->finca)
-            ->for(Ganado::factory()->for($this->finca)->create(['nombre' => 'test', 'numero' => 392]))
+            ->for($this->hacienda)
+            ->for(Ganado::factory()->for($this->hacienda)->create(['nombre' => 'test', 'numero' => 392]))
             ->create();
 
         $toros = $this->generarToros();
         $idRandom = random_int(0, $this->cantidad_toro - 1);
         $idToroEditar = $toros[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/toro/%s', $idToroEditar), $this->toro);
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/toro/%s', $idToroEditar), $this->toro);
 
         $response->assertStatus(422)->assertJson(fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
         $json->hasAll(['errors.nombre', 'errors.numero'])
@@ -376,11 +376,11 @@ class ToroTest extends TestCase
     public function test_actualizar_toro_sin_modificar_campos_unicos(): void
     {
         $toro = Toro::factory()
-            ->for($this->finca)
-            ->for(Ganado::factory()->hasPeso()->for($this->finca)->create(['nombre' => 'test', 'numero' => 392]))
+            ->for($this->hacienda)
+            ->for(Ganado::factory()->hasPeso()->for($this->hacienda)->create(['nombre' => 'test', 'numero' => 392]))
             ->create();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/toro/%s', $toro->id), $this->toro);
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/toro/%s', $toro->id), $this->toro);
 
         $response->assertStatus(200)->assertJson(['toro' => true]);
     }
@@ -393,7 +393,7 @@ class ToroTest extends TestCase
         $idToDelete = $toros[$idRandom]->id;
 
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->deleteJson(sprintf('api/toro/%s', $idToDelete));
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->deleteJson(sprintf('api/toro/%s', $idToDelete));
 
         $response->assertStatus(200)->assertJson(['toroID' => $idToDelete]);
     }
@@ -404,31 +404,31 @@ class ToroTest extends TestCase
     public function test_error_validacion_registro_toro(array $toro, array $errores): void
     {
         Toro::factory()
-            ->for($this->finca)
-            ->for(Ganado::factory()->for($this->finca)->create(['nombre' => 'test', 'numero' => 300]))
+            ->for($this->hacienda)
+            ->for(Ganado::factory()->for($this->hacienda)->create(['nombre' => 'test', 'numero' => 300]))
             ->create();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson('api/toro', $toro);
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson('api/toro', $toro);
 
         $response->assertStatus(422)->assertInvalid($errores);
     }
 
-    public function test_autorizacion_maniupular__toro_otro_finca(): void
+    public function test_autorizacion_maniupular__toro_otro_hacienda(): void
     {
-        $otroFinca = Finca::factory()
+        $otroHacienda = Hacienda::factory()
         ->for($this->user)
-        ->create(['nombre' => 'otro_finca']);
+        ->create(['nombre' => 'otro_hacienda']);
 
-        $toroOtroFinca = Toro::factory()
-            ->for($otroFinca)
-            ->for(Ganado::factory()->for($otroFinca))
+        $toroOtroHacienda = Toro::factory()
+            ->for($otroHacienda)
+            ->for(Ganado::factory()->for($otroHacienda))
             ->create();
 
-        $idToroOtroFinca = $toroOtroFinca->id;
+        $idToroOtroHacienda = $toroOtroHacienda->id;
 
         $this->generarToros();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/toro/%s', $idToroOtroFinca), $this->toro);
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/toro/%s', $idToroOtroHacienda), $this->toro);
 
         $response->assertStatus(403);
     }
@@ -437,7 +437,7 @@ class ToroTest extends TestCase
     {
         $this->cambiarRol($this->user);
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(route('toro.store'), $this->toro);
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(route('toro.store'), $this->toro);
 
         $response->assertStatus(403);
     }
@@ -450,7 +450,7 @@ class ToroTest extends TestCase
         $idRandom = random_int(0, $this->cantidad_toro - 1);
         $idToroEditar = $toro[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(route('toro.update', ['toro' => $idToroEditar]), $this->toro);
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(route('toro.update', ['toro' => $idToroEditar]), $this->toro);
 
         $response->assertStatus(403);
     }
@@ -464,7 +464,7 @@ class ToroTest extends TestCase
         $idRandom = random_int(0, $this->cantidad_toro - 1);
         $idToroEliminar = $toro[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->deleteJson(route('toro.destroy', ['toro' => $idToroEliminar]));
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->deleteJson(route('toro.destroy', ['toro' => $idToroEliminar]));
 
         $response->assertStatus(403);
     }

@@ -2,28 +2,28 @@
 
 namespace Tests\Feature\Common;
 
-use App\Models\Finca;
+use App\Models\Hacienda;
 
-trait NeedsFinca
+trait NeedsHacienda
 {
     use NeedsUser {
         setUp as needsUserSetUp;
         getSessionInitializationArray as needsUserGetSessionInitializationArray;
     }
 
-    private Finca $finca;
+    private Hacienda $hacienda;
 
     protected function setUp(): void
     {
         $this->needsUserSetUp();
 
-        $this->finca = Finca::factory()->for($this->user)->create();
+        $this->hacienda = Hacienda::factory()->for($this->user)->create();
     }
 
     protected function getSessionInitializationArray(): array
     {
         return $this->needsUserGetSessionInitializationArray() + [
-            'finca_id' => $this->finca->id
+            'hacienda_id' => $this->hacienda->id
         ];
     }
 }

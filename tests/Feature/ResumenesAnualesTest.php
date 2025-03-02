@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Estado;
-use App\Models\Finca;
+use App\Models\Hacienda;
 use App\Models\Ganado;
 use App\Models\Parto;
 use App\Models\Personal;
@@ -24,7 +24,7 @@ class ResumenesAnualesTest extends TestCase
     private $toro;
     private $veterinario;
     private $estado;
-    private $finca;
+    private $hacienda;
 
     protected function setUp(): void
     {
@@ -37,8 +37,8 @@ class ResumenesAnualesTest extends TestCase
 
 
 
-        $this->finca
-            = Finca::factory()
+        $this->hacienda
+            = Hacienda::factory()
             ->for($this->user)
             ->create();
 
@@ -47,17 +47,17 @@ class ResumenesAnualesTest extends TestCase
             ->hasPeso(1)
             ->hasEvento(1)
             ->hasAttached($this->estado)
-            ->for($this->finca)
+            ->for($this->hacienda)
             ->create();
 
         $this->toro = Toro::factory()
-            ->for($this->finca)
-            ->for(Ganado::factory()->for($this->finca)->create(['sexo' => 'M']))->create();
+            ->for($this->hacienda)
+            ->for(Ganado::factory()->for($this->hacienda)->create(['sexo' => 'M']))->create();
 
 
         $this->veterinario
             = Personal::factory()
-            ->for($this->finca)
+            ->for($this->hacienda)
             ->create(['cargo_id' => 2]);
     }
 
@@ -67,21 +67,21 @@ class ResumenesAnualesTest extends TestCase
         Parto::factory()
             ->count(10)
             ->for($this->ganadoServicioMonta)
-            ->for(Ganado::factory()->for($this->finca)->hasAttached($this->estado)->create(['fecha_nacimiento' => now()->format('Y-m-d')]), 'ganado_cria')
+            ->for(Ganado::factory()->for($this->hacienda)->hasAttached($this->estado)->create(['fecha_nacimiento' => now()->format('Y-m-d')]), 'ganado_cria')
             ->for($this->toro, 'partoable')
             ->create(['personal_id' => $this->veterinario]);
 
         Parto::factory()
             ->count(10)
             ->for($this->ganadoServicioMonta)
-            ->for(Ganado::factory()->for($this->finca)->hasAttached($this->estado)->create(['fecha_nacimiento' => now()->subYear()->format('Y-m-d')]), 'ganado_cria')
+            ->for(Ganado::factory()->for($this->hacienda)->hasAttached($this->estado)->create(['fecha_nacimiento' => now()->subYear()->format('Y-m-d')]), 'ganado_cria')
             ->for($this->toro, 'partoable')
             ->create(['personal_id' => $this->veterinario]);
 
         return Parto::factory()
             ->count(10)
             ->for($this->ganadoServicioMonta)
-            ->for(Ganado::factory()->for($this->finca)->hasAttached($this->estado)->create(['fecha_nacimiento' => now()->subYears(2)->format('Y-m-d')]), 'ganado_cria')
+            ->for(Ganado::factory()->for($this->hacienda)->hasAttached($this->estado)->create(['fecha_nacimiento' => now()->subYears(2)->format('Y-m-d')]), 'ganado_cria')
             ->for($this->toro, 'partoable')
             ->create(['personal_id' => $this->veterinario]);
     }
@@ -90,7 +90,7 @@ class ResumenesAnualesTest extends TestCase
     public function test_resumen_natalidad(): void
     {
         $this->generarPartos();
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id])->getJson(route('resumenesAnual.resumenNatalidad'));
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id])->getJson(route('resumenesAnual.resumenNatalidad'));
         $response->assertStatus(200);
         $response->assertJson(fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
         $json->has('nacimientos_ultimos_5_año.0', fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson

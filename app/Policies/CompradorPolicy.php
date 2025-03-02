@@ -21,7 +21,7 @@ class CompradorPolicy
      */
     public function view(User $user, Comprador $comprador): bool
     {
-        return session('finca_id') == $comprador->finca->id;
+        return session('hacienda_id') == $comprador->hacienda->id;
     }
 
     /**
@@ -37,7 +37,7 @@ class CompradorPolicy
      */
     public function update(User $user, Comprador $comprador): bool
     {
-        return session('finca_id') == $comprador->finca->id && $user->hasRole('admin');
+        return session('hacienda_id') == $comprador->hacienda->id && $user->hasRole('admin');
     }
 
     /**
@@ -45,7 +45,7 @@ class CompradorPolicy
      */
     public function delete(User $user, Comprador $comprador): bool
     {
-        return session('finca_id') == $comprador->finca->id && $user->hasRole('admin');
+        return session('hacienda_id') == $comprador->hacienda->id && $user->hasRole('admin');
     }
 
     /**

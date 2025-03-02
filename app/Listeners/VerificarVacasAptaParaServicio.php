@@ -2,9 +2,9 @@
 
 namespace App\Listeners;
 
-use App\Events\CrearSesionFinca;
+use App\Events\CrearSesionHacienda;
 use App\Models\Estado;
-use App\Models\Finca;
+use App\Models\Hacienda;
 use App\Models\Ganado;
 use App\Models\Peso;
 use App\Models\User;
@@ -28,12 +28,12 @@ class VerificarVacasAptaParaServicio
     /**
      * Handle the event.
      */
-    public function handle(CrearSesionFinca $event): void
+    public function handle(CrearSesionHacienda $event): void
     {
         $estado = Estado::firstWhere('estado', 'pendiente_servicio');
-        $fincaId = $event->finca->id;
+        $haciendaId = $event->hacienda->id;
 
-        if (Ganado::where('finca_id', $fincaId)->count() > 0) {
+        if (Ganado::where('hacienda_id', $haciendaId)->count() > 0) {
             $vacasAptasParaServicio = Ganado::doesntHave('toro')
                 ->doesntHave('ganadoDescarte')
                 ->doesntHave('fallecimiento')
@@ -43,7 +43,7 @@ class VerificarVacasAptaParaServicio
                 ->whereRelation('estados', 'estado','!=', 'pendiente_servicio')
                 ->whereRelation('estados', 'estado','!=', 'vendido')
                 ->whereRelation('estados', 'estado','!=', 'fallecido')
-                ->where('finca_id', $fincaId)
+                ->where('hacienda_id', $haciendaId)
                 ->whereHas(
                     'peso',
                     function (Builder $query) {

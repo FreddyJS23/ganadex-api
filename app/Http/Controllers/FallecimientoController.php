@@ -20,7 +20,7 @@ class FallecimientoController extends Controller
      */
     public function index()
     {
-        return new FallecimientoCollection(Fallecimiento::whereRelation('ganado', 'finca_id', session('finca_id'))->with('ganado:id,numero')->get());
+        return new FallecimientoCollection(Fallecimiento::whereRelation('ganado', 'hacienda_id', session('hacienda_id'))->with('ganado:id,numero')->get());
     }
 
     /**

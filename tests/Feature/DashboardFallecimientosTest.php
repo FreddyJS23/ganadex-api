@@ -8,15 +8,15 @@ use App\Models\Ganado;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\Fluent\AssertableJson;
-use Tests\Feature\Common\NeedsFinca;
+use Tests\Feature\Common\NeedsHacienda;
 use Tests\TestCase;
 
 class DashboardFallecimientosTest extends TestCase
 {
     use RefreshDatabase;
 
-    use NeedsFinca {
-        setUp as needsFincaSetUp;
+    use NeedsHacienda {
+        setUp as needsHaciendaSetUp;
     }
 
     private int $cantidad_fallecimientos = 50;
@@ -24,7 +24,7 @@ class DashboardFallecimientosTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->needsFincaSetUp();
+        $this->needsHaciendaSetUp();
 
         $this->estado = Estado::all();
     }
@@ -33,7 +33,7 @@ class DashboardFallecimientosTest extends TestCase
     {
         return Fallecimiento::factory()
             ->count($this->cantidad_fallecimientos)
-            ->for(Ganado::factory()->for($this->finca)->hasAttached($this->estado))
+            ->for(Ganado::factory()->for($this->hacienda)->hasAttached($this->estado))
             ->create();
     }
 

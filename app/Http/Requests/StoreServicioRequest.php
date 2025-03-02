@@ -32,13 +32,13 @@ class StoreServicioRequest extends FormRequest
             'toro_id' => [
                 Rule::requiredIf($this->tipo == 'monta'), Rule::exists('toros', 'id')
                     ->where(
-                        fn($query) => $query->where('finca_id', session('finca_id'))
+                        fn($query) => $query->where('hacienda_id', session('hacienda_id'))
                     )
             ],
             'pajuela_toro_id' => [
                 Rule::requiredIf($this->tipo == 'inseminacion'), Rule::exists('pajuela_toros', 'id')
                     ->where(
-                        fn($query) => $query->where('finca_id', session('finca_id'))
+                        fn($query) => $query->where('hacienda_id', session('hacienda_id'))
                     )
             ],
         ];

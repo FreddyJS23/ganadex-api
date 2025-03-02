@@ -21,7 +21,7 @@ class LechePolicy
      */
     public function view(User $user, Leche $pesaje_leche): bool
     {
-        return session('finca_id') === $pesaje_leche->finca->id;
+        return session('hacienda_id') === $pesaje_leche->hacienda->id;
     }
 
     /**
@@ -37,7 +37,7 @@ class LechePolicy
      */
     public function update(User $user, Leche $pesaje_leche): bool
     {
-        return session('finca_id') === $pesaje_leche->finca->id && $user->hasRole('admin');
+        return session('hacienda_id') === $pesaje_leche->hacienda->id && $user->hasRole('admin');
     }
 
     /**
@@ -45,7 +45,7 @@ class LechePolicy
      */
     public function delete(User $user, Leche $pesaje_leche): bool
     {
-        return session('finca_id') === $pesaje_leche->finca->id && $user->hasRole('admin');
+        return session('hacienda_id') === $pesaje_leche->hacienda->id && $user->hasRole('admin');
     }
 
     /**

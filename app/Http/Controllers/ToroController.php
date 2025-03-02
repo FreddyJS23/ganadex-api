@@ -33,7 +33,7 @@ class ToroController extends Controller
      */
     public function index()
     {
-        $toros = Toro::where('finca_id', session('finca_id'))
+        $toros = Toro::where('hacienda_id', session('hacienda_id'))
             ->with(
                 [
                 'ganado' => function (Builder $query) {
@@ -88,7 +88,7 @@ class ToroController extends Controller
     public function store(StoreToroRequest $request)
     {
         $ganado = new Ganado($request->all());
-        $ganado->finca_id = session('finca_id');
+        $ganado->hacienda_id = session('hacienda_id');
         $ganado->sexo = "M";
 
         try {
@@ -109,7 +109,7 @@ class ToroController extends Controller
                         'fecha' => $request->input('fecha_venta'),
                         'precio' => $request->input('precio'),
                         'comprador_id' => $request->input('comprador_id'),
-                        'finca_id' => session('finca_id')
+                        'hacienda_id' => session('hacienda_id')
                         ]
                     );
                     //vacunacion
@@ -117,7 +117,7 @@ class ToroController extends Controller
                     $vacunas = [];
 
                     foreach ($request->only('vacunas')['vacunas'] as $vacuna) {
-                        array_push($vacunas, $vacuna + ['ganado_id' => $ganado->id, 'finca_id' => $ganado->finca_id]);
+                        array_push($vacunas, $vacuna + ['ganado_id' => $ganado->id, 'hacienda_id' => $ganado->hacienda_id]);
                     }
 
                     $ganado->vacunaciones()->createMany($vacunas);
@@ -133,7 +133,7 @@ class ToroController extends Controller
         }
 
         $toro = new Toro();
-        $toro->finca_id = session('finca_id');
+        $toro->hacienda_id = session('hacienda_id');
         $toro->ganado()->associate($ganado)->save();
 
         return response()->json(['toro' => new ToroResource($toro)], 201);
@@ -199,7 +199,7 @@ class ToroController extends Controller
             'plan_sanitarios',
             function (JoinClause $join) use ($ganado) {
                 $join->on('vacunas.id', '=', 'plan_sanitarios.vacuna_id')
-                    ->where('plan_sanitarios.finca_id', session('finca_id'))
+                    ->where('plan_sanitarios.hacienda_id', session('hacienda_id'))
                     ->where('fecha_inicio', '>', $ganado->fecha_nacimiento ?? $ganado->created_at);
             }
         )
@@ -255,7 +255,7 @@ class ToroController extends Controller
             'plan_sanitarios',
             function (JoinClause $join) use ($ganado) {
                 $join->on('vacunas.id', '=', 'plan_sanitarios.vacuna_id')
-                    ->where('plan_sanitarios.finca_id', session('finca_id'))
+                    ->where('plan_sanitarios.hacienda_id', session('hacienda_id'))
                     ->where('fecha_inicio', '>', $ganado->fecha_nacimiento ?? $ganado->created_at);
             }
         )

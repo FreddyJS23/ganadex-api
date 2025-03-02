@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Estado;
-use App\Models\Finca;
+use App\Models\Hacienda;
 use App\Models\Ganado;
 use App\Models\Personal;
 use App\Models\Revision;
@@ -40,7 +40,7 @@ class RevisionTest extends TestCase
     private $veterinario;
     private $userVeterinario;
     private string $url;
-    private $finca;
+    private $hacienda;
 
     protected function setUp(): void
     {
@@ -61,14 +61,14 @@ class RevisionTest extends TestCase
 
         $this->user->assignRole('admin');
 
-            $this->finca
-            = Finca::factory()
+            $this->hacienda
+            = Hacienda::factory()
             ->for($this->user)
             ->create();
 
         $this->veterinario
         = Personal::factory()
-            ->for($this->finca)
+            ->for($this->hacienda)
             ->create(['cargo_id' => 2]);
 
             $this->ganado
@@ -76,7 +76,7 @@ class RevisionTest extends TestCase
             ->hasPeso(1)
             ->hasEvento(1)
             ->hasAttached($this->estado)
-            ->for($this->finca)
+            ->for($this->hacienda)
             ->create();
 
             $this->userVeterinario
@@ -86,7 +86,7 @@ class RevisionTest extends TestCase
             $this->userVeterinario->assignRole('veterinario');
 
             UsuarioVeterinario::factory()
-            ->for(Personal::factory()->for($this->finca)->create(['nombre'=>'usuarioVeterinario','cargo_id' => 2]), 'veterinario')
+            ->for(Personal::factory()->for($this->hacienda)->create(['nombre'=>'usuarioVeterinario','cargo_id' => 2]), 'veterinario')
             ->create(['admin_id' => $this->user->id,
             'user_id' => $this->userVeterinario->id]);
 
@@ -133,7 +133,7 @@ class RevisionTest extends TestCase
     {
         $this->generarRevision();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson($this->url);
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson($this->url);
 
         $response->assertStatus(200)
             ->assertJson(
@@ -161,7 +161,7 @@ class RevisionTest extends TestCase
     public function test_creacion_revision(): void
     {
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson($this->url, $this->revision + ['personal_id' => $this->veterinario->id]);
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson($this->url, $this->revision + ['personal_id' => $this->veterinario->id]);
 
         $response->assertStatus(201)
             ->assertJson(
@@ -188,7 +188,7 @@ class RevisionTest extends TestCase
     public function test_creacion_revision_usuario_veterinario(): void
     {
 
-        $response = $this->actingAs($this->userVeterinario)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson($this->url, $this->revision + ['personal_id' => $this->veterinario->id]);
+        $response = $this->actingAs($this->userVeterinario)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson($this->url, $this->revision + ['personal_id' => $this->veterinario->id]);
 
         $response->assertStatus(201)
             ->assertJson(
@@ -219,17 +219,17 @@ class RevisionTest extends TestCase
         ->hasPeso(['peso_actual' => 200])
         ->hasEvento(1)
         ->hasAttached($this->estado)
-        ->for($this->finca)
+        ->for($this->hacienda)
         ->create();
 
         $veterinario
         = Personal::factory()
-            ->for($this->finca)
+            ->for($this->hacienda)
             ->create(['cargo_id' => 2]);
 
             $toro = Toro::factory()
-            ->for($this->finca)
-            ->for(Ganado::factory()->for($this->finca)->create(['sexo' => 'M']))->create();
+            ->for($this->hacienda)
+            ->for(Ganado::factory()->for($this->hacienda)->create(['sexo' => 'M']))->create();
 
             Servicio::factory()
             ->count(1)
@@ -239,7 +239,7 @@ class RevisionTest extends TestCase
 
 
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])
         ->postJson(route('revision.store', ['ganado' => $ganadoNoRequisito->id]), ['tipo_revision_id' => 1,'tratamiento' => 'medicina', 'fecha' => '2020-10-02','personal_id' => $this->veterinario->id]);
 
         $response->assertStatus(422)
@@ -255,10 +255,10 @@ class RevisionTest extends TestCase
         ->hasPeso(['peso_actual' => 500])
         ->hasEvento(1)
         ->hasAttached($this->estado)
-        ->for($this->finca)
+        ->for($this->hacienda)
         ->create();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])
         ->postJson(route('revision.store', ['ganado' => $ganadoNoRequisito->id]), ['tipo_revision_id' => 1,'tratamiento' => 'medicina', 'fecha' => '2020-10-02','personal_id' => $this->veterinario->id]);
 
         $response->assertStatus(422)
@@ -279,17 +279,17 @@ class RevisionTest extends TestCase
         ->hasPeso(['peso_actual' => 500])
         ->hasEvento(1)
         ->hasAttached($this->estadoPendienteServicio)
-        ->for($this->finca)
+        ->for($this->hacienda)
         ->create();
 
         $veterinario
         = Personal::factory()
-            ->for($this->finca)
+            ->for($this->hacienda)
             ->create(['cargo_id' => 2]);
 
             $toro = Toro::factory()
-            ->for($this->finca)
-            ->for(Ganado::factory()->for($this->finca)->create(['sexo' => 'M']))->create();
+            ->for($this->hacienda)
+            ->for(Ganado::factory()->for($this->hacienda)->create(['sexo' => 'M']))->create();
 
             Servicio::factory()
             ->count(1)
@@ -298,7 +298,7 @@ class RevisionTest extends TestCase
             ->create(['personal_id' => $this->veterinario]);
 
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])
         ->postJson(route('revision.store', ['ganado' => $ganado->id]), ['tipo_revision_id' => 1,'tratamiento' => 'medicina', 'fecha' => '2020-10-02','personal_id' => $this->veterinario->id]);
 
         $response->assertStatus(422)
@@ -316,7 +316,7 @@ class RevisionTest extends TestCase
 
         $idRandom = random_int(0, $this->cantidad_revision - 1);
         $idRevision = $revisiones[$idRandom]->id;
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf($this->url . '/%s', $idRevision));
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf($this->url . '/%s', $idRevision));
 
         $response->assertStatus(200)
             ->assertJson(
@@ -345,7 +345,7 @@ class RevisionTest extends TestCase
         $idRandom = random_int(0, $this->cantidad_revision - 1);
         $idRevisionEditar = $revisiones[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf($this->url . '/%s', $idRevisionEditar), $this->revision);
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf($this->url . '/%s', $idRevisionEditar), $this->revision);
 
         $response->assertStatus(200)
             ->assertJson(
@@ -374,7 +374,7 @@ class RevisionTest extends TestCase
         $idToDelete = $revisiones[$idRandom]->id;
 
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->deleteJson(sprintf($this->url . '/%s', $idToDelete));
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->deleteJson(sprintf($this->url . '/%s', $idToDelete));
 
         $response->assertStatus(200)->assertJson(['revisionID' => $idToDelete]);
     }
@@ -388,7 +388,7 @@ class RevisionTest extends TestCase
             ->hasRevision(5, ['personal_id' => $this->veterinario->id])
             ->hasEvento(1)
             ->hasAttached($this->estadoFallecido)
-            ->for($this->finca)
+            ->for($this->hacienda)
             ->create();
 
             //creacion ganado vendido
@@ -398,7 +398,7 @@ class RevisionTest extends TestCase
             ->hasRevision(5, ['personal_id' => $this->veterinario->id])
             ->hasEvento(1)
             ->hasAttached($this->estadoVendido)
-            ->for($this->finca)
+            ->for($this->hacienda)
             ->create();
 
             //creacion ganado sano
@@ -408,10 +408,10 @@ class RevisionTest extends TestCase
             ->hasRevision(5, ['personal_id' => $this->veterinario->id])
             ->hasEvento(1)
             ->hasAttached($this->estadoSano)
-            ->for($this->finca)
+            ->for($this->hacienda)
             ->create();
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('todasRevisiones'));
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('todasRevisiones'));
         $response->assertStatus(200)
             ->assertJson(
                 fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has('todas_revisiones', 6 , fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
@@ -433,7 +433,7 @@ class RevisionTest extends TestCase
     {
         //crear personal no veterinario
             Personal::factory()
-            ->for($this->finca)
+            ->for($this->hacienda)
             ->create([
                 'id' => 2,
                 'ci' => 28472738,
@@ -445,7 +445,7 @@ class RevisionTest extends TestCase
             ]);
         ;
 
-        $response = $this->actingAs($this->user)->withSession(['finca_id' => $this->finca->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson($this->url, $revision);
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson($this->url, $revision);
 
         $response->assertStatus(422)->assertInvalid($errores);
     }
