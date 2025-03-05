@@ -123,8 +123,8 @@ END as ultima_dosis
 
         $resumenParto = $ultimoParto ? [
         'ultimo' => $ultimoParto->fecha,
-        'peso_cria' => $ultimoParto->ganado_cria->peso->peso_nacimiento,
-        'numero' => $ultimoParto->ganado_cria->numero ?: $ultimoParto->ganado_cria->nombre,
+        'peso_cria' => $ultimoParto->ganado_cria->ganado->peso->peso_nacimiento,
+        'numero' => $ultimoParto->ganado_cria->numero ?: $ultimoParto->ganado_cria->ganado->nombre,
         'total' => $ganado->parto_count,
         ] : [];
 
@@ -385,9 +385,9 @@ END as ultima_dosis
 
     public function resumenVentaGanadoAnual(Request $request)
     {
+        $regexYear = "/^[2][0-9][0-9][0-9]$/";
 
-
-        $year = $request->query('year');
+        $year = preg_match($regexYear, $request->query('year')) ? $request->query('year') : now()->format('Y');
 
         $ventasGanado = Venta::where('ventas.hacienda_id', session('hacienda_id'))
             ->join('ganados', 'ganado_id', 'ganados.id')
