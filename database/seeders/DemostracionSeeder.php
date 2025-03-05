@@ -17,6 +17,7 @@ use App\Models\Leche;
 use App\Models\Notificacion;
 use App\Models\PajuelaToro;
 use App\Models\Parto;
+use App\Models\PartoCria;
 use App\Models\Personal;
 use App\Models\Precio;
 use App\Models\Revision;
@@ -186,9 +187,13 @@ class DemostracionSeeder extends Seeder
                     ->for($i % 2 == 0 ? $toros[rand(0, $elementos - 1)] : $pajuelaToros[rand(0, $elementos - 1)], 'servicioable')
                     ->create(['personal_id' => $veterinario,'tipo' => $i % 2 == 0 ? 'monta' : 'inseminacion']);
 
+                //agregar un estado lactancia ya que se le va a registrar un parto
+                $ganados[$i]->estados()->attach([$estadoSano->id,$estadoLactancia->id]);
+
                 Parto::factory()
                     ->for($ganados[$i])
-                    ->for(Ganado::factory()->for($hacienda)->hasAttached([$estadoSano,$estadoLactancia])->hasPeso(1), 'ganado_cria')
+                     //se usa el state en lugar de for para asegurarse de que cada parto tenga una cria distinta, con for una misma cria pertenececira a todos los partos
+                    ->has(PartoCria::factory()->state(['ganado_id'=>Ganado::factory()->for($hacienda)->hasPeso(1)->hasAttached($estadoSano)]))
                     //alternar un parto con monta y otro con inseminacion
                     ->for($i % 2 == 0 ? $toros[rand(0, $elementos - 1)] : $pajuelaToros[rand(0, $elementos - 1)], 'partoable')
                     ->create(['personal_id' => $veterinario]);
@@ -211,13 +216,12 @@ class DemostracionSeeder extends Seeder
         Venta::factory()
             ->count($elementos)
             ->for($hacienda)
-            ->for(Ganado::factory()->for($hacienda)->hasPeso(1)->hasAttached($estadoVendido))
-            ->for(Comprador::factory()->for($hacienda))
+            ->state(['ganado_id'=>Ganado::factory()->for($hacienda)->hasPeso(1)->hasAttached($estadoVendido), 'comprador_id'=>Comprador::factory()->for($hacienda)])
             ->create();
 
         Fallecimiento::factory()
             ->count($elementos)
-            ->for(Ganado::factory()->for($hacienda)->hasAttached($estadoFallecido))
+            ->state(['ganado_id'=>Ganado::factory()->for($hacienda)->hasAttached($estadoFallecido)])
             ->create();
 
        /*  Insumo::factory()

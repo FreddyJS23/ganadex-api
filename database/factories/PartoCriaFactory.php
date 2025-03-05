@@ -2,13 +2,12 @@
 
 namespace Database\Factories;
 
-use App\Models\Ganado;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Parto>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\PartoCria>
  */
-class PartoFactory extends Factory
+class PartoCriaFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -18,10 +17,7 @@ class PartoFactory extends Factory
     public function definition(): array
     {
         return [
-            'observacion' => fake()->sentence(),
-            'fecha' => fake()->dateTimeThisYear()->format('Y-m-d'),
-
-
+            'observacion' => $this->faker->sentence(),
         ];
     }
 }

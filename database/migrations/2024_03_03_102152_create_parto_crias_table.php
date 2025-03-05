@@ -11,13 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('partos', function (Blueprint $table) {
+        Schema::create('parto_crias', function (Blueprint $table) {
             $table->id();
-            $table->date('fecha');
-            $table->string('observacion');
-            $table->morphs('partoable');
-            $table->foreignId('ganado_id')->constrained();
-            $table->foreignId('personal_id')->constrained()->cascadeOnDelete();
+            $table->string('observacion')->nullable();
+            $table->foreignId('ganado_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('parto_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }
@@ -27,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('partos');
+        Schema::dropIfExists('parto_crias');
     }
 };

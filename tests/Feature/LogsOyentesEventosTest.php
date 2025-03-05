@@ -48,10 +48,13 @@ class LogsOyentesEventosTest extends TestCase
 
     private array $parto = [
         'observacion' => 'bien',
-        'nombre' => 'test',
         'fecha' => '2020-10-02',
-        'numero' => 33,
-        'peso_nacimiento' => 50,
+       'crias'=>[
+            [ 'nombre' => 'test',
+            'numero' => 33,
+            'sexo' => 'H',
+            'peso_nacimiento' => 50,]
+        ]
     ];
     private array $hembra = ['sexo' => 'H'];
     private array $macho = ['sexo' => 'M'];

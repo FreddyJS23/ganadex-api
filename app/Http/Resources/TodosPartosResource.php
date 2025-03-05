@@ -22,8 +22,8 @@ class TodosPartosResource extends JsonResource
             "ultimo_parto" => $existeParto ? $this->partoReciente->fecha : 'desconocido',
             'total_partos' => $this->parto_count,
             'cria' => (object)([
-                'id' => $this->partoReciente->ganado_cria->id,
-                'numero' => $this->partoReciente->ganado_cria->numero
+                'id' => $this->partoReciente->ganado_cria->ganado->id,
+                'numero' => $this->partoReciente->ganado_cria->ganado->numero
             ])
         ];
 

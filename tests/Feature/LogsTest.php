@@ -42,12 +42,13 @@ class LogsTest extends TestCase
 
     private array $parto = [
         'observacion' => 'bien',
-        'nombre' => 'test',
-        'numero' => 33,
         'fecha' => '2020-10-02',
-
-        'sexo' => 'H',
-        'peso_nacimiento' => 33,
+        'crias'=>[
+            [ 'nombre' => 'test',
+            'numero' => 33,
+            'sexo' => 'H',
+            'peso_nacimiento' => 50,]
+        ]
     ];
 
     private array $jornadaVacunacion = [

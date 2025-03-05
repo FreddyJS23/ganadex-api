@@ -6,6 +6,7 @@ use App\Models\Estado;
 use App\Models\Hacienda;
 use App\Models\Ganado;
 use App\Models\Parto;
+use App\Models\PartoCria;
 use App\Models\Personal;
 use App\Models\Servicio;
 use App\Models\Toro;
@@ -77,7 +78,7 @@ class EfectividadTest extends TestCase
         Parto::factory()
             ->count(random_int(1, $this->cantidadServicios))
             ->for($this->ganado)
-            ->for(Ganado::factory()->for($this->hacienda)->hasAttached(Estado::firstWhere('estado', 'sano')), 'ganado_cria')
+            ->has(PartoCria::factory()->state(['ganado_id'=>Ganado::factory()->for($this->hacienda)->hasAttached($this->estado)]))
             ->for($this->toro, 'partoable')
             ->create(['personal_id' => $this->veterinario]);
 
@@ -104,7 +105,7 @@ class EfectividadTest extends TestCase
             ->count(random_int(1, $this->cantidadServicios))
             ->for($this->ganado)
             ->sequence(fn(Sequence $sequence): array => ['fecha' => now()->subDays(random_int(1, 30))->subMonths(random_int(1, 3))])
-            ->for(Ganado::factory()->for($this->hacienda)->hasAttached(Estado::firstWhere('estado', 'sano')), 'ganado_cria')
+            ->has(PartoCria::factory()->state(['ganado_id'=>Ganado::factory()->for($this->hacienda)->hasAttached($this->estado)]))
             ->for($this->toro, 'partoable')
             ->create(['personal_id' => $this->veterinario]);
 
