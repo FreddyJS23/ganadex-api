@@ -109,7 +109,6 @@ class PartoController extends Controller
             }
           });
         } catch (\Throwable $th) {
-            dd($th);
             return response()->json(['error' => 'error al insertar datos'], 501);
         }
 
