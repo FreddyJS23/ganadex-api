@@ -18,7 +18,7 @@ class PartoFactory extends Factory
     public function definition(): array
     {
         return [
-            'observacion' => fake()->word(),
+            'observacion' => fake()->sentence(),
             'fecha' => fake()->dateTimeThisYear()->format('Y-m-d'),
 
 
