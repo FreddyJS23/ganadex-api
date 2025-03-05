@@ -6,6 +6,7 @@ use App\Models\Estado;
 use App\Models\Hacienda;
 use App\Models\Ganado;
 use App\Models\Parto;
+use App\Models\PartoCria;
 use App\Models\Personal;
 use App\Models\Toro;
 use App\Models\User;
@@ -64,24 +65,30 @@ class ResumenesAnualesTest extends TestCase
 
     private function generarPartos(): Collection
     {
+        //partos añoa actual
         Parto::factory()
             ->count(10)
             ->for($this->ganadoServicioMonta)
-            ->for(Ganado::factory()->for($this->hacienda)->hasAttached($this->estado)->create(['fecha_nacimiento' => now()->format('Y-m-d')]), 'ganado_cria')
+             //se usa el state en lugar de for para asegurarse de que cada parto tenga una cria distinta, con for una misma cria pertenececira a todos los partos
+            ->has(PartoCria::factory()->state(['ganado_id'=>Ganado::factory()->for($this->hacienda)->hasAttached($this->estado)->create(['fecha_nacimiento' => now()->format('Y-m-d')])]))
             ->for($this->toro, 'partoable')
             ->create(['personal_id' => $this->veterinario]);
 
+            //partos un año anterior al actual
         Parto::factory()
             ->count(10)
             ->for($this->ganadoServicioMonta)
-            ->for(Ganado::factory()->for($this->hacienda)->hasAttached($this->estado)->create(['fecha_nacimiento' => now()->subYear()->format('Y-m-d')]), 'ganado_cria')
+            //se usa el state en lugar de for para asegurarse de que cada parto tenga una cria distinta, con for una misma cria pertenececira a todos los partos
+            ->has(PartoCria::factory()->state(['ganado_id'=>Ganado::factory()->for($this->hacienda)->hasAttached($this->estado)->create(['fecha_nacimiento' => now()->subYear()->format('Y-m-d')])]))
             ->for($this->toro, 'partoable')
             ->create(['personal_id' => $this->veterinario]);
 
+            //partos dos años anterior al actualk
         return Parto::factory()
             ->count(10)
             ->for($this->ganadoServicioMonta)
-            ->for(Ganado::factory()->for($this->hacienda)->hasAttached($this->estado)->create(['fecha_nacimiento' => now()->subYears(2)->format('Y-m-d')]), 'ganado_cria')
+           //se usa el state en lugar de for para asegurarse de que cada parto tenga una cria distinta, con for una misma cria pertenececira a todos los partos
+           ->has(PartoCria::factory()->state(['ganado_id'=>Ganado::factory()->for($this->hacienda)->hasAttached($this->estado)->create(['fecha_nacimiento' => now()->subYear(2)->format('Y-m-d')])]))
             ->for($this->toro, 'partoable')
             ->create(['personal_id' => $this->veterinario]);
     }

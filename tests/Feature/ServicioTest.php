@@ -6,6 +6,8 @@ use App\Models\Estado;
 use App\Models\Hacienda;
 use App\Models\Ganado;
 use App\Models\PajuelaToro;
+use App\Models\Parto;
+use App\Models\PartoCria;
 use App\Models\Personal;
 use App\Models\Servicio;
 use App\Models\Toro;
@@ -623,13 +625,13 @@ class ServicioTest extends TestCase
             ->count(5)
             ->hasPeso(1)
             ->hasServicios(7, ['servicioable_id' => $this->toro->id, 'servicioable_type' => $this->toro->getMorphClass(), 'personal_id' => $this->veterinario->id])
-            ->hasParto(3, function (array $attributes, Ganado $ganado): array {
+            ->has(Parto::factory()->has(PartoCria::factory()->state(['ganado_id'=>Ganado::factory()->for($this->hacienda)->hasAttached($this->estado)]))
+            ->state(function (array $attributes, Ganado $ganado): array {
                 $hacienda = $ganado->hacienda->id;
                 $veterinario = Personal::factory()->create(['hacienda_id' => $hacienda, 'cargo_id' => 2]);
-                $cria = Ganado::factory()->create(['hacienda_id' => $hacienda]);
 
-                return ['partoable_id' => $ganado->servicioReciente->servicioable->id, 'partoable_type' => $ganado->servicioReciente->servicioable->getMorphClass(), 'ganado_cria_id' => $cria->id, 'personal_id' => $veterinario->id];
-            })
+                return ['partoable_id' => $ganado->servicioReciente->servicioable->id,'partoable_type' => $ganado->servicioReciente->servicioable->getMorphClass(), 'personal_id' => $veterinario->id];
+            }))
             ->hasEvento(1)
             ->hasAttached($this->estadoFallecido)
             ->for($this->hacienda)
@@ -640,13 +642,13 @@ class ServicioTest extends TestCase
             ->count(5)
             ->hasPeso(1)
             ->hasServicios(7, ['servicioable_id' => $this->toro->id, 'servicioable_type' => $this->toro->getMorphClass(), 'personal_id' => $this->veterinario->id])
-            ->hasParto(3, function (array $attributes, Ganado $ganado): array {
+            ->has(Parto::factory()->has(PartoCria::factory()->state(['ganado_id'=>Ganado::factory()->for($this->hacienda)->hasAttached($this->estado)]))
+            ->state(function (array $attributes, Ganado $ganado): array {
                 $hacienda = $ganado->hacienda->id;
                 $veterinario = Personal::factory()->create(['hacienda_id' => $hacienda, 'cargo_id' => 2]);
-                $cria = Ganado::factory()->create(['hacienda_id' => $hacienda]);
 
-                return ['partoable_id' => $ganado->servicioReciente->servicioable->id, 'partoable_type' => $ganado->servicioReciente->servicioable->getMorphClass(), 'ganado_cria_id' => $cria->id, 'personal_id' => $veterinario->id];
-            })
+                return ['partoable_id' => $ganado->servicioReciente->servicioable->id,'partoable_type' => $ganado->servicioReciente->servicioable->getMorphClass(), 'personal_id' => $veterinario->id];
+            }))
             ->hasEvento(1)
             ->hasAttached($this->estadoVendido)
             ->for($this->hacienda)
@@ -657,13 +659,13 @@ class ServicioTest extends TestCase
             ->count(5)
             ->hasPeso(1)
             ->hasServicios(7, ['servicioable_id' => $this->toro->id, 'servicioable_type' => $this->toro->getMorphClass(), 'personal_id' => $this->veterinario->id])
-            ->hasParto(3, function (array $attributes, Ganado $ganado): array {
+            ->has(Parto::factory()->has(PartoCria::factory()->state(['ganado_id'=>Ganado::factory()->for($this->hacienda)->hasAttached($this->estado)]))
+            ->state(function (array $attributes, Ganado $ganado): array {
                 $hacienda = $ganado->hacienda->id;
                 $veterinario = Personal::factory()->create(['hacienda_id' => $hacienda, 'cargo_id' => 2]);
-                $cria = Ganado::factory()->create(['hacienda_id' => $hacienda]);
 
-                return ['partoable_id' => $ganado->servicioReciente->servicioable->id, 'partoable_type' => $ganado->servicioReciente->servicioable->getMorphClass(), 'ganado_cria_id' => $cria->id, 'personal_id' => $veterinario->id];
-            })
+                return ['partoable_id' => $ganado->servicioReciente->servicioable->id,'partoable_type' => $ganado->servicioReciente->servicioable->getMorphClass(), 'personal_id' => $veterinario->id];
+            }))
             ->hasEvento(1)
             ->hasAttached($this->estadoSano)
             ->for($this->hacienda)
@@ -674,14 +676,13 @@ class ServicioTest extends TestCase
             ->count(5)
             ->hasPeso(1)
             ->hasServicios(7, ['servicioable_id' => $this->pajuelaToro->id, 'servicioable_type' => $this->pajuelaToro->getMorphClass(), 'personal_id' => $this->veterinario->id])
-            ->hasParto(3, function (array $attributes, Ganado $ganado): array {
+            ->has(Parto::factory()->has(PartoCria::factory()->state(['ganado_id'=>Ganado::factory()->for($this->hacienda)->hasAttached($this->estado)]))
+            ->state(function (array $attributes, Ganado $ganado): array {
                 $hacienda = $ganado->hacienda->id;
                 $veterinario = Personal::factory()->create(['hacienda_id' => $hacienda, 'cargo_id' => 2]);
-                $cria = Ganado::factory()->create(['hacienda_id' => $hacienda]);
 
-
-                return ['partoable_id' => $ganado->servicioReciente->servicioable->id, 'partoable_type' => $ganado->servicioReciente->servicioable->getMorphClass(), 'ganado_cria_id' => $cria->id, 'personal_id' => $veterinario->id];
-            })
+                return ['partoable_id' => $ganado->servicioReciente->servicioable->id,'partoable_type' => $ganado->servicioReciente->servicioable->getMorphClass(), 'personal_id' => $veterinario->id];
+            }))
             ->hasEvento(1)
             ->hasAttached($this->estado)
             ->for($this->hacienda)

@@ -14,6 +14,7 @@ use App\Models\Ganado;
 use App\Models\GanadoTipo;
 use App\Models\PajuelaToro;
 use App\Models\Parto;
+use App\Models\PartoCria;
 use App\Models\Peso;
 use App\Models\Toro;
 use App\Traits\GuardarVeterinarioOperacionSegunRol;
@@ -21,6 +22,7 @@ use DateTime;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class PartoController extends Controller
 {
@@ -31,6 +33,7 @@ class PartoController extends Controller
      */
     public function index(Ganado $ganado)
     {
+
         return new PartoCollection(
             Parto::whereBelongsTo($ganado)
                 ->with(
@@ -41,7 +44,8 @@ class PartoController extends Controller
                     'personal' => function (Builder $query) {
                         $query->select('personals.id', 'nombre','cargo')
                         ->join('cargos', 'cargo_id', 'cargos.id');
-                    }
+                    },
+                   'ganado_crias'
                     ]
                 )->get()
         );
@@ -60,37 +64,57 @@ class PartoController extends Controller
         $parto->ganado()->associate($ganado);
         $parto->partoable()->associate($servicio);
 
-        $cria = new Ganado();
 
-        $cria->fill($request->except(['observacion','peso_nacimiento','sexo']));
+        try {
+          DB::transaction(function () use($parto,$request) {
 
-        //evaluacion sera criado para toro
-        if($request->input('sexo')=='T') $cria->sexo='M';
+            $parto->save();
 
-        else $cria->sexo=$request->input('sexo');
+            $idTipoBecerro = GanadoTipo::where('tipo', 'becerro')->first()->id;
+            $idEstadoSano=Estado::where('estado', 'sano')->first()->id;
 
+            $idHaciendaSession = session('hacienda_id');
 
-        $cria->fecha_nacimiento = $request->input('fecha');
-        $cria->tipo_id = GanadoTipo::where('tipo', 'becerro')->first()->id;
-        $cria->origen = 'local';
-        $cria->hacienda_id = session('hacienda_id');
-        $cria->save();
-        $cria->evento()->create();
+            foreach ($request->input('crias') as $cria ) {
+                $nuevaCria = new Ganado();
+                //evaluacion sera criado para toro
+                if($cria['sexo']=='T') $nuevaCria->sexo='M';
+                else $nuevaCria->sexo=$cria['sexo'];
+                //campos cria
+                $nuevaCria->numero = $cria['numero'];
+                $nuevaCria->nombre = $cria['nombre'];
+                $nuevaCria->fecha_nacimiento = $request->input('fecha');
+                $nuevaCria->tipo_id =$idTipoBecerro;
+                $nuevaCria->origen = 'local';
+                $nuevaCria->hacienda_id = $idHaciendaSession;
+                $nuevaCria->save();
+                //eventos
+                $nuevaCria->evento()->create();
+                //estado sano
+                $nuevaCria->estados()->attach($idEstadoSano);
 
-        $estados = Estado::select('id')
-            ->whereIn('estado', ['sano'])
-            ->get()
-            ->modelKeys();
-        $cria->estados()->sync($estados);
+                $peso_nacimiento = new Peso(['peso_nacimiento' => $cria['peso_nacimiento']]);
+                $peso_nacimiento->ganado()->associate($nuevaCria)->save();
 
-        $peso_nacimiento = new Peso($request->only(['peso_nacimiento']));
-        $peso_nacimiento->ganado()->associate($cria)->save();
+                //asociar cria al parto
+                $partoCria=PartoCria::create([
+                    'observacion' => $cria['observacion'] ?? null,
+                    'ganado_id' => $nuevaCria->id,
+                    'parto_id' => $parto->id,
+                    'hacienda_id' => $idHaciendaSession
+                ]);
 
-        $parto->ganado_cria()->associate($cria)->save();
+                PartoHechoCriaToro::dispatchIf($cria['sexo']=='T',$partoCria);
+
+            }
+          });
+        } catch (\Throwable $th) {
+            dd($th);
+            return response()->json(['error' => 'error al insertar datos'], 501);
+        }
+
 
         PartoHecho::dispatch($parto);
-
-        PartoHechoCriaToro::dispatchIf($request->input('sexo')=='T',$parto);
 
         return response()->json(
             ['parto' => new PartoResource(
@@ -118,7 +142,8 @@ class PartoController extends Controller
                     'personal' => function (Builder $query) {
                         $query->select('personals.id', 'nombre','cargo')
                         ->join('cargos', 'cargo_id', 'cargos.id');
-                    }
+                    },
+                    'ganado_crias'
                     ]
                 )->loadMorph('partoable', [Toro::class => 'ganado:id,numero', PajuelaToro::class])
             )],

@@ -28,11 +28,14 @@ class StorePartoRequest extends FormRequest
     {
         $rules=[
             'observacion' => 'required|min:3|max:255',
-            'nombre' => 'required|min:3|max:255|unique:ganados,nombre',
-            'numero' => 'numeric|between:1,32767|unique:ganados,numero|nullable',
-            'sexo' => 'required|in:H,M,T',
             'fecha' => 'date_format:Y-m-d',
-            'peso_nacimiento' => 'numeric|between:1,32767',
+            /* campos crias del parto */
+            'crias'=>'bail|required|array',
+            'crias.*.nombre' => 'distinct|required|min:3|max:255|unique:ganados,nombre',
+            'crias.*.observacion' => 'string|min:3|max:255',
+            'crias.*.numero' => 'distinct|numeric|between:1,32767|unique:ganados,numero|nullable',
+            'crias.*.sexo' => 'required|in:H,M,T',
+            'crias.*.peso_nacimiento' => 'numeric|between:1,32767',
         ];
 
         /* para evitar problema con la validacion de comprabacionVeterinario
@@ -69,6 +72,40 @@ class StorePartoRequest extends FormRequest
                     );
                 }
             }
+        ];
+    }
+
+    public function messages()
+    {
+       if($this->input('crias')) $multiplesCrias=count($this->input('crias')) > 1;
+        else return ['crias'=>'El campo crias debe ser un arreglo'];
+        /* Función para crear el mensaje de error, si son multiples crias se devuelve mensaje completo
+        ejemplo: El campo nombre de la cria #1 es requerido.
+        Caso contrario se devuelve el mensaje sin el segmento 2, ya que seria redundante
+        numerar una sola cria
+         */
+        $mensaje=function ($segmento1,$segmento2,$segmento3) use($multiplesCrias)
+        {
+            if($multiplesCrias) return $segmento1.' '.$segmento2.' '.$segmento3;
+            else return $segmento1.' '.$segmento3;
+        };
+
+        return [
+            'crias.*.nombre.distinct' =>$mensaje( "El campo nombre", "de la cria #:position", "tiene un valor duplicado."),
+            'crias.*.nombre.required' =>$mensaje( "El campo nombre", "de la cria #:position", "es requerido."),
+            'crias.*.nombre.min' => $mensaje( "El campo nombre", "de la cria #:position", "debe tener al menos :min caracteres."),
+            'crias.*.nombre.max' => $mensaje( "El campo nombre", "de la cria #:position", "debe ser menor que :max caracteres."),
+            'crias.*.nombre.unique' => $mensaje( "El nombre", "de la cria #:position", "ya existe."),
+            'crias.*.observacion.min' => $mensaje( "El campo observacion", "de la cria #:position", "debe tener al menos :min caracteres."),
+            'crias.*.observacion.max' => $mensaje( "El campo observacion", "de la cria #:position", "debe ser menor que :max caracteres."),
+            'crias.*.numero.distinct' => $mensaje( "El campo numero", "de la cria #:position", "tiene un valor duplicado."),
+            'crias.*.numero.numeric' => $mensaje( "El campo numero", "de la cria #:position", "debe ser numerico."),
+            'crias.*.numero.between' => $mensaje( "El campo numero", "de la cria #:position", "debe estar entre :min y :max."),
+            'crias.*.numero.unique' => $mensaje( "El numero", "de la cria #:position", "ya existe."),
+            'crias.*.sexo.required' => $mensaje( "El campo sexo", "de la cria #:position", "es requerido."),
+            'crias.*.sexo.in' => $mensaje( "El campo sexo", "de la cria #:position", "debe ser H, M o T."),
+            'crias.*.peso_nacimiento.numeric' => $mensaje( "El campo peso_nacimiento", "de la cria #:position", "debe ser numerico."),
+            'crias.*.peso_nacimiento.between' => $mensaje( "El campo peso_nacimiento", "de la cria #:position", "debe estar entre :min y :max."),
         ];
     }
 }

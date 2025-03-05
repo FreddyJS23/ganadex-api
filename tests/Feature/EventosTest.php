@@ -10,6 +10,7 @@ use App\Models\Hacienda;
 use App\Models\Ganado;
 use App\Models\Leche;
 use App\Models\Parto;
+use App\Models\PartoCria;
 use App\Models\Personal;
 use App\Models\TiposNotifiacion;
 use App\Models\Toro;
@@ -25,6 +26,13 @@ use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
 use Illuminate\Support\Str;
 use Spatie\Activitylog\Models\Activity;
+
+
+enum Sexo: string {
+    case macho = 'M';
+    case hembra = 'H';
+    case toro = 'T';
+};
 
 class EventosTest extends TestCase
 {
@@ -45,17 +53,15 @@ class EventosTest extends TestCase
         'tipo' => 'monta'
     ];
 
-    private array $parto = [
+    private array $partoInputs = [
         'observacion' => 'bien',
-        'nombre' => 'test',
         'fecha' => '2020-10-02',
-        'numero' => 33,
-        'peso_nacimiento' => 50,
+        'crias'=>[
+            [ 'nombre' => 'test',
+            'numero' => 33,
+            'peso_nacimiento' => 50,]
+        ]
     ];
-    private array $hembra = ['sexo' => 'H'];
-    private array $macho = ['sexo' => 'M'];
-    private array $criaToro = ['sexo' => 'T'];
-
 
 
     private array $revision = [
@@ -124,8 +130,15 @@ class EventosTest extends TestCase
             ->for(Ganado::factory()->for($this->hacienda)->create(['sexo' => 'M']))->create();
 
         $this->numero_toro = $this->toro->ganado->numero;
+
     }
 
+    public function parto(Sexo $sexo)
+    {
+        $parto= array_merge($this->partoInputs['crias'][0],['sexo'=>$sexo->value]);
+
+        return array_merge($this->partoInputs,['crias'=>[$parto]]);
+    }
 
     /* -----------------------------Evento Servicio hecho ----------------------------- */
     public function test_cuando_se_realiza_un_servicio_tiene_proxima_revision_y_no_esta_pendiente_de_servicio(): void
@@ -195,10 +208,11 @@ class EventosTest extends TestCase
             sprintf('api/ganado/%s/servicio', $this->ganado->id),
             $this->servicio + ['toro_id' => $this->toro->id,'personal_id' => $this->veterinario->id]
         );
+
         //realizar parto
         $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(
             sprintf('api/ganado/%s/parto', $this->ganado->id),
-            $this->parto + $this->hembra + ['personal_id' => $this->veterinario->id]
+            $this->parto(Sexo::hembra) + ['personal_id' => $this->veterinario->id]
         );
         //realizar revision
         $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(
@@ -259,7 +273,7 @@ class EventosTest extends TestCase
         //realizar parto
         $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(
             sprintf('api/ganado/%s/parto', $this->ganado->id),
-            $this->parto + $this->hembra + ['personal_id' => $this->veterinario->id]
+            $this->parto(Sexo::hembra) + ['personal_id' => $this->veterinario->id]
         );
 
         $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf('api/ganado/%s', $this->ganado->id));
@@ -272,7 +286,7 @@ class EventosTest extends TestCase
                     'servicio_reciente' => 'array',
                     'total_servicios' => 'integer',
                     'parto_reciente' => 'array',
-                    'parto_reciente.cria' => 'array',
+                    'parto_reciente.crias' => 'array',
                     'total_partos' => 'integer',
                 ]
             )->has('ganado.estados', 3)
@@ -303,12 +317,12 @@ class EventosTest extends TestCase
         //realizar parto
         $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(
             sprintf('api/ganado/%s/parto', $this->ganado->id),
-            $this->parto + $this->macho + ['personal_id' => $this->veterinario->id]
+            $this->parto(Sexo::macho) + ['personal_id' => $this->veterinario->id]
         );
 
-        $cria_id = Parto::select('ganado_cria_id')->where('ganado_id', $this->ganado->id)->first();
+        $cria_id = Parto::select('id')->where('ganado_id', $this->ganado->id)->first()->ganado_cria->ganado_id;
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf('api/ganado/%s', $cria_id->ganado_cria_id));
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf('api/ganado/%s', $cria_id));
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
@@ -328,12 +342,12 @@ class EventosTest extends TestCase
         //realizar parto
         $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(
             sprintf('api/ganado/%s/parto', $this->ganado->id),
-            $this->parto + $this->criaToro + ['personal_id' => $this->veterinario->id]
+            $this->parto(Sexo::toro) + ['personal_id' => $this->veterinario->id]
         );
 
-        $cria_id = Parto::select('ganado_cria_id')->where('ganado_id', $this->ganado->id)->first();
+        $cria_id = Parto::select('id')->where('ganado_id', $this->ganado->id)->first()->ganado_cria->ganado_id;
 
-        $toro_id = Toro::select('id')->where('ganado_id', $cria_id->ganado_cria_id)->first();
+        $toro_id = Toro::select('id')->where('ganado_id', $cria_id)->first();
 
         $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('toro.show',['toro' => $toro_id->id]));
 

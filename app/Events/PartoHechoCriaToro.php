@@ -2,7 +2,7 @@
 
 namespace App\Events;
 
-use App\Models\Parto;
+use App\Models\PartoCria;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -15,15 +15,15 @@ class PartoHechoCriaToro
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $parto;
+    public $partoCria;
 
 
     /**
      * Create a new event instance.
      */
-    public function __construct(Parto $parto)
+    public function __construct(PartoCria $partoCria)
     {
-        $this->parto = $parto;
+        $this->partoCria = $partoCria;
     }
 
     /**

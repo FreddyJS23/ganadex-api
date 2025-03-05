@@ -17,7 +17,6 @@ return new class extends Migration
             $table->string('observacion');
             $table->morphs('partoable');
             $table->foreignId('ganado_id')->constrained();
-            $table->foreignId('ganado_cria_id')->constrained(table:'ganados', indexName:'ganado_cria_id')->cascadeOnDelete();
             $table->foreignId('personal_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
