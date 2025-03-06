@@ -59,6 +59,10 @@
             font-size: 13px;
         }
 
+        .footer p:first-child {
+            margin-bottom: 10px;
+        }
+
         .tabla_informacion {
             width: 540px;
             margin: auto;
@@ -207,10 +211,29 @@
     {{ $slot }}
 
     <footer class="footer">
-        <p>Reporte de fecha : @php
-            $fechaActual = new DateTime();
-            echo $fechaActual->format('Y-m-d');
-        @endphp </p>
+        {{-- Obtener nombre de la hacienda en sesion --}}
+        @php
+            use App\Models\Hacienda;
+
+            $nombre=Hacienda::firstWhere('id',session('hacienda_id'))->nombre;
+            $nombre=strtoupper($nombre);
+        @endphp
+
+            <p> <span style="font-style: italic ">Reporte hacienda </span>
+
+                <b>"@php echo $nombre; @endphp"</b>
+
+            </p>
+
+            <p>    <span style="font-style: italic"> Fecha: </span>
+                        @php
+                        $fechaActual = new DateTime();
+                        echo $fechaActual->format('d-m-Y');
+                    @endphp
+
+                </p>
+
+
     </footer>
 </body>
 
