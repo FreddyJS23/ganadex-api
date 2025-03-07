@@ -1,4 +1,4 @@
-<x-layouts.layout-pdf titulo-reporte="Resumen general">
+<x-layouts.layout-pdf titulo-reporte="Resumen general" :$nombreHacienda>
 
     <x-details-cattle.tabla-detalle titulo-detalle="Vacas" :detalles="$vacas" />
     <x-details-cattle.tabla-detalle titulo-detalle="Toros" :detalles="$toros" />

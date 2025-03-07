@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Fallecimiento;
 use App\Models\Ganado;
 use App\Models\GanadoTipo;
+use App\Models\Hacienda;
 use App\Models\Leche;
 use App\Models\Personal;
 use App\Models\Peso;
@@ -19,8 +20,38 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 
+    enum VistasReporte:string{
+        case general='resumenGeneralReporte';
+        case ventasLeche='resumenVentasLeche';
+        case ventaGanadoAnual='resumenVentaGanadoAnual';
+        case causasFallecimientos='resumenCausasFallecimientos';
+        case natalidad='resumenNatalidad';
+        case facturaVentaGanado='notaVentaGanado';
+        case resumenVaca='ganadoReporte';
+    }
+
 class ReportsPdfController extends Controller
 {
+
+    public function obtenerNombreHacienda()
+    {
+        $nombre=Hacienda::firstWhere('id',session('hacienda_id'))->nombre;
+        $nombre=strtoupper($nombre);
+        return $nombre;
+    }
+
+    public function generarPdf(VistasReporte $vista,$dataPdf,$nombrePdf)
+    {
+        $nombreHacienda=$this->obtenerNombreHacienda();
+
+        //agregar nombre a la data que se enviara a la vista
+        $dataPdf['nombreHacienda']=$nombreHacienda;
+
+        $pdf = Pdf::loadView($vista->value, $dataPdf);
+
+        return $pdf->stream($nombrePdf .  " hacienda " . $nombreHacienda . ".pdf");
+    }
+
     public function resumenGanado(Ganado $ganado)
     {
         $ganado->load('peso', 'tipo', 'estados');
@@ -148,9 +179,8 @@ END as ultima_dosis
         'vacunas' => $resumenVacunas,
         ];
 
-        $pdf = Pdf::loadView('ganadoReporte', $dataPdf);
+        return $this->generarPdf(VistasReporte::resumenVaca,$dataPdf,"Resumen vaca " . $ganado->numero);
 
-        return $pdf->stream();
     }
 
 
@@ -353,10 +383,8 @@ END as ultima_dosis
         'balanceSegundoSemestre' => $balanceSegundoSemestre
         ];
 
-        //return view('resumenGeneralReporte', $dataPdf);
-        $pdf = Pdf::loadView('resumenGeneralReporte', $dataPdf);
+        return $this->generarPdf(VistasReporte::general,$dataPdf,"Reporte general " . $fechaActual->format('d-m-Y'));
 
-        return $pdf->stream();
     }
 
     public function resumenVentasLeche(Request $request)
@@ -377,9 +405,7 @@ END as ultima_dosis
         'inicio' => $inicio,
         'fin' => $fin,];
 
-        $pdf = Pdf::loadView('resumenVentasLeche', $dataPdf);
-
-        return $pdf->stream();
+        return $this->generarPdf(VistasReporte::ventasLeche,$dataPdf,"Reporte venta de leche " . $inicio . " - " . $fin);
     }
 
 
@@ -407,9 +433,7 @@ END as ultima_dosis
 
         $dataPdf = ['ventasGanado' => $ventasGanado->groupBy('mes')->toArray(),'year' => $year];
 
-        $pdf = Pdf::loadView('resumenVentaGanadoAnual', $dataPdf);
-
-        return $pdf->stream();
+        return $this->generarPdf(VistasReporte::ventaGanadoAnual,$dataPdf,"Resumen ventas de animales " . "año " . $year);
     }
 
     public function resumenCausasFallecimientos(Request $request)
@@ -445,15 +469,16 @@ END as ultima_dosis
 
         $dataPdf = ['causasFallecimientos' => $fallecimientos];
 
-        $pdf = Pdf::loadView('resumenCausasFallecimientos', $dataPdf);
+        return $this->generarPdf(VistasReporte::causasFallecimientos,$dataPdf,"Resumen causas de fallecimientos " . $inicio . " - " . $fin);
 
-        return $pdf->stream();
     }
 
     public function resumenNatalidad(Request $request)
     {
 
-        $year = $request->query('year');
+        $regexYear = "/^[2][0-9][0-9][0-9]$/";
+
+        $year = preg_match($regexYear, $request->query('year')) ? $request->query('year') : now()->format('Y');
         // Recibir las imágenes en base64 desde la solicitud
         //eliminar comillas ya que viene con comilas por el formdata, para poder usarlo en el src de la etiqueta html img
         $graficoTorta = str_replace("'", "", $request->input('graficoTorta'));
@@ -492,10 +517,7 @@ END as ultima_dosis
         'year' => $year
         ];
 
-        // return view('resumenNatalidad', $dataPdf);
-        $pdf = Pdf::loadView('resumenNatalidad', $dataPdf);
-
-        return $pdf->stream('resumenNatalidad.pdf');
+        return $this->generarPdf(VistasReporte::natalidad,$dataPdf,"Resumen natalidad año $year");
     }
 
     public function facturaVentaGanado()
@@ -569,8 +591,6 @@ END as ultima_dosis
         'precioKg' => round($ventaGanado->precio / intval($ventaGanado->ganado->peso->peso_actual), 2), */
         ];
 
-        $pdf = Pdf::loadView('notaVentaGanado', $dataPdf);
-
-        return $pdf->stream();
+        return $this->generarPdf(VistasReporte::facturaVentaGanado,$dataPdf,"Nota de venta ganado " .  $ventaGanado->ganado->numero ?? '');
     }
 }
