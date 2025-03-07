@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Ganado;
 use App\Models\Hacienda;
 use App\Models\User;
+use App\Models\Venta;
 use Database\Seeders\DemostracionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -29,6 +30,17 @@ class ReportesTest extends TestCase
 
     }
 
+    private function headersResponse($response,$nombreArchivoPdf)
+    {
+        $nombreHacienda=strtoupper($this->hacienda->nombre);
+
+        $nombreArchivoPdf=sprintf('inline; filename="%s hacienda %s.pdf"',$nombreArchivoPdf,$nombreHacienda);
+
+        return $response->assertHeader('content-type', 'application/pdf')
+        ->assertHeader('content-disposition', $nombreArchivoPdf);
+    }
+
+
 
     public function test_reporte_general(): void
     {
@@ -40,10 +52,10 @@ class ReportesTest extends TestCase
        $response=$this->actingAs($this->user)->getJson(route('reportes.general'));
 
 
-       $response->assertHeader('content-type', 'application/pdf')
-       ->assertHeader('content-disposition', 'inline; filename="document.pdf"');
+       $this->headersResponse($response,"Reporte general " . now()->format('d-m-Y'));
 
     }
+
 
     public function test_reporte_individual_vaca(): void
     {
@@ -58,8 +70,7 @@ class ReportesTest extends TestCase
        $response=$this->actingAs($this->user)->getJson(route('reportes.ganado',['ganado'=>$ganadoRandom->id]));
 
 
-       $response->assertHeader('content-type', 'application/pdf')
-       ->assertHeader('content-disposition', 'inline; filename="document.pdf"');
+       $this->headersResponse($response,"Resumen vaca " . $ganadoRandom->numero ?? '');
 
     }
 
@@ -72,25 +83,22 @@ class ReportesTest extends TestCase
 
        $response=$this->actingAs($this->user)->getJson(route('reportes.ventaGanado'));
 
-
-       $response->assertHeader('content-type', 'application/pdf')
-       ->assertHeader('content-disposition', 'inline; filename="document.pdf"');
-
+        $this->headersResponse($response, "Resumen ventas de animales año " . now()->format('Y'));
     }
 
     public function test_reporte_causas_fallecimiento(): void
     {
+        $queryStart='2021-01-01';
+        $queryEnd='2021-01-31';
+
         $this->withHeader('origin', config('app.url'))->postJson('api/login', [
             'usuario' => 'admin',
             'password' => 'admin',
         ]);
 
-       $response=$this->actingAs($this->user)->getJson(route('reportes.fallecimientos'));
+       $response=$this->actingAs($this->user)->getJson(route('reportes.fallecimientos',['start'=>$queryStart,'end'=>$queryEnd]));
 
-
-       $response->assertHeader('content-type', 'application/pdf')
-       ->assertHeader('content-disposition', 'inline; filename="document.pdf"');
-
+        $this->headersResponse($response, "Resumen causas de fallecimientos " . $queryStart . " - " . $queryEnd);
     }
 
     public function test_reporte_natalidad(): void
@@ -102,10 +110,7 @@ class ReportesTest extends TestCase
 
        $response=$this->actingAs($this->user)->postJson(route('reportes.natalidad'));
 
-
-       $response->assertHeader('content-type', 'application/pdf')
-       ->assertHeader('content-disposition', 'inline; filename="resumenNatalidad.pdf"');
-
+       $this->headersResponse($response,"Resumen natalidad año " . now()->format('Y'));
     }
 
     public function test_reporte_nota_de_venta_al_vender_ganado(): void
@@ -115,11 +120,15 @@ class ReportesTest extends TestCase
             'password' => 'admin',
         ]);
 
+        $ventaGanado = Venta::where('hacienda_id', session('hacienda_id'))
+        ->orderBy('fecha', 'desc')
+        ->first();
+
+        $ganado = $ventaGanado->ganado;
+
        $response=$this->actingAs($this->user)->getJson(route('reportes.facturaVentaGanado'));
 
-
-       $response->assertHeader('content-type', 'application/pdf')
-       ->assertHeader('content-disposition', 'inline; filename="document.pdf"');
+       $this->headersResponse($response,"Nota de venta ganado " .  $ganado->numero ?? '');
 
     }
 }
