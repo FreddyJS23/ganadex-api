@@ -163,9 +163,18 @@
     @endforelse
 
     <footer class="footer_nota_venta">
-        <p style="margin-top: 8px; text-align: center">Fecha: @php
+
+        <p style="margin-top: 8px; text-align: center"> <span style="font-style: italic ">Reporte hacienda </span>
+
+            <b>{{ $nombreHacienda }}</b>
+
+        </p>
+
+        <p > <span style="font-style: italic"> Fecha: </span>
+
+            @php
             $fechaActual = new DateTime();
-            echo $fechaActual->format('Y-m-d');
+            echo $fechaActual->format('d-m-Y');
         @endphp</p>
     </footer>
 

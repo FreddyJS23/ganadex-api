@@ -1,4 +1,4 @@
-<x-layouts.layout-pdf titulo-reporte="Resumen de natalidad del año {{ $year }}">
+<x-layouts.layout-pdf titulo-reporte="Resumen de natalidad del año {{ $year }}" :$nombreHacienda>
 
     <div class="container_grafico_torta"><img width="300" src='{{ $graficoTorta }}' height="170" id="chartTorta" />
     </div>

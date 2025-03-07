@@ -1,4 +1,4 @@
-<x-layouts.layout-pdf titulo-reporte="Cabeza ganado {{ $ganadoInfo['numero'] }}">
+<x-layouts.layout-pdf titulo-reporte="Cabeza ganado {{ $ganadoInfo['numero'] }}" :$nombreHacienda>
 
     <x-details-cattle.tabla-detalle titulo-detalle="Información" :detalles="$ganadoInfo" />
     <x-details-cattle.tabla-detalle titulo-detalle="Pesos" :detalles="$ganadoPeso" />
