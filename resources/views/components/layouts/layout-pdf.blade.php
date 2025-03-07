@@ -211,17 +211,9 @@
     {{ $slot }}
 
     <footer class="footer">
-        {{-- Obtener nombre de la hacienda en sesion --}}
-        @php
-            use App\Models\Hacienda;
-
-            $nombre=Hacienda::firstWhere('id',session('hacienda_id'))->nombre;
-            $nombre=strtoupper($nombre);
-        @endphp
-
             <p> <span style="font-style: italic ">Reporte hacienda </span>
 
-                <b>"@php echo $nombre; @endphp"</b>
+                <b>{{ $nombreHacienda }}</b>
 
             </p>
 
