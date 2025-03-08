@@ -26,11 +26,19 @@ class HaciendaPolicy
             return $usuario_veterinario->admin_id == $hacienda->user_id
             && $usuario_veterinario->veterinario->hacienda_id ==  $hacienda->id;
         }
+        return false;
     }
 
     public function verificar_sesion_hacienda(User $user): bool
     {
         return $user->hasRole('admin');
+    }
+
+    public function cambiar_hacienda_sesion(User $user): bool
+    {
+        if(session('hacienda_id')==null) return false;
+
+        return $user->hasRole('admin') || $user->hasRole('veterinario');
     }
 
     /**
