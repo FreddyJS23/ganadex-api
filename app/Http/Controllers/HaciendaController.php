@@ -9,6 +9,7 @@ use App\Http\Resources\HaciendaCollection;
 use App\Http\Resources\HaciendaResource;
 use App\Models\Hacienda;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class HaciendaController extends Controller
@@ -43,6 +44,23 @@ class HaciendaController extends Controller
         }
 
         $hacienda = Hacienda::find($hacienda_id);
+
+        return response()->json(['hacienda' => new HaciendaResource($hacienda)], 200);
+    }
+
+    public function cambiar_hacienda_sesion(Request $request)
+    {
+        $this->authorize('cambiar_hacienda_sesion');
+
+        $nombreHacienda = $request->query('hacienda');
+
+        $hacienda = Hacienda::firstWhere('nombre', $nombreHacienda);
+
+        if($hacienda == null){
+            return response()->json(['message' => 'no existe esa hacienda'], 404);
+        }
+
+        session()->put('hacienda_id', $hacienda->id);
 
         return response()->json(['hacienda' => new HaciendaResource($hacienda)], 200);
     }

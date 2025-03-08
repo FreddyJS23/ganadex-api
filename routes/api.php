@@ -88,6 +88,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('/hacienda', HaciendaController::class)->only(['index', 'store', 'update']);
     Route::get('/crear_sesion_hacienda/{hacienda}', [HaciendaController::class, 'crear_sesion_hacienda'])->name('crear_sesion_hacienda');
     Route::get('/verificar_sesion_hacienda', [HaciendaController::class, 'verificar_sesion_hacienda'])->name('verificar_sesion_hacienda');
+    Route::get('/cambiar_hacienda_sesion', [HaciendaController::class, 'cambiar_hacienda_sesion'])->name('cambiar_hacienda_sesion');
     Route::apiResource('/causas_fallecimiento', CausasFallecimientoController::class);
     Route::apiResource('/tipos_revision', TipoRevisionController::class);
 
