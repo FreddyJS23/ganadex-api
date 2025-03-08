@@ -205,6 +205,78 @@ class HaciendaTest extends TestCase
         );
     }
 
+    public function test_admin_cambia_sesion_hacienda(): void
+    {
+        $hacienda = $this->generarHaciendas();
+        $idRandom = random_int(0, $this->cantidad_haciendas - 1);
+        $nombreHacienda = $hacienda[$idRandom]->nombre;
+
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->haciendaEnSesion->id])->getJson(route('cambiar_hacienda_sesion',['hacienda' => $nombreHacienda]));
+
+        $response->assertStatus(200)->assertJson(
+            fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
+            $json->has(
+                'hacienda',
+                fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
+                => $json->whereAllType([
+                    'id' => 'integer',
+                    'nombre' => 'string',
+                    'fecha_creacion' => 'string'
+                ])
+                ->where('nombre', $nombreHacienda)
+            )
+        );
+    }
+
+    public function test_veterinario_cambia_sesion_hacienda(): void
+    {
+        $hacienda = $this->generarHaciendas();
+        $idRandom = random_int(0, $this->cantidad_haciendas - 1);
+        $nombreHacienda = $hacienda[$idRandom]->nombre;
+
+        $this->user->syncRoles('veterinario');
+
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->haciendaEnSesion->id])->getJson(route('cambiar_hacienda_sesion',['hacienda' => $nombreHacienda]));
+
+        $response->assertStatus(200)->assertJson(
+            fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
+            $json->has(
+                'hacienda',
+                fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
+                => $json->whereAllType([
+                    'id' => 'integer',
+                    'nombre' => 'string',
+                    'fecha_creacion' => 'string'
+                ])
+                ->where('nombre', $nombreHacienda)
+            )
+        );
+    }
+
+    public function test_error_no_hay_sesion_hacienda_y_intenta_cambiar_sesion_hacienda(): void
+    {
+        $hacienda = $this->generarHaciendas();
+        $idRandom = random_int(0, $this->cantidad_haciendas - 1);
+        $nombreHacienda = $hacienda[$idRandom]->nombre;
+
+
+        $response = $this->actingAs($this->user)->getJson(route('cambiar_hacienda_sesion',['hacienda' => $nombreHacienda]));
+
+        $response->assertStatus(403);
+    }
+
+    public function test_error_no_existe_hacienda_y_intenta_cambiar_sesion_hacienda(): void
+    {
+        $hacienda = $this->generarHaciendas();
+        $idRandom = random_int(0, $this->cantidad_haciendas - 1);
+        $nombreHacienda = $hacienda[$idRandom]->nombre;
+
+
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->haciendaEnSesion->id])->getJson(route('cambiar_hacienda_sesion',['hacienda' => "hacienda que no existe"]));
+
+        $response->assertStatus(404);
+    }
+
     public function test_error_creacion_sesion_hacienda_otro_usuario(): void
     {
         $otroUsuario = User::factory()->create();
