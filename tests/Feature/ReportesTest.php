@@ -13,6 +13,7 @@ use Tests\TestCase;
 
 class ReportesTest extends TestCase
 {
+    use RefreshDatabase;
 
 
     private $hacienda;
