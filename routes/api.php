@@ -27,6 +27,8 @@ use App\Http\Controllers\PlanSanitarioController;
 use App\Http\Controllers\LogsEventos;
 use App\Http\Controllers\ObtenerLogsVeterinario;
 use App\Http\Controllers\PajuelaToroController;
+use App\Http\Controllers\PreguntasSeguridadController;
+use App\Http\Controllers\RespuestasSeguridadController;
 use App\Http\Controllers\ResumenesAnual;
 use App\Http\Controllers\RevisionController;
 use App\Http\Controllers\ServicioController;
@@ -91,6 +93,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/cambiar_hacienda_sesion', [HaciendaController::class, 'cambiar_hacienda_sesion'])->name('cambiar_hacienda_sesion');
     Route::apiResource('/causas_fallecimiento', CausasFallecimientoController::class);
     Route::apiResource('/tipos_revision', TipoRevisionController::class);
+    Route::apiResource('/respuesta_seguridad', RespuestasSeguridadController::class);
     Route::apiResource('/preguntas_seguridad', PreguntasSeguridadController::class)->only(['index']);
 
     Route::get('/crias_pendiente_capar', [CaparCriaController::class, 'index'])->name('capar.index');
