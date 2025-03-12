@@ -20,6 +20,7 @@ class UserResource extends JsonResource
             'email' => $this->email,
             'rol' => $this->getRoleNames()[0],
             'fecha_creacion' => $this->created_at->format('d-m-Y'),
+            'tiene_preguntas_seguridad' => $this->tiene_preguntas_seguridad,
         ];
 
         $usuarioAdmin = array_merge(

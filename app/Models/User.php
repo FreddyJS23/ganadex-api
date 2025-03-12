@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use DateTimeInterface;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -55,6 +56,7 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'tiene_preguntas_seguridad' => 'boolean',
     ];
 
     /**
@@ -82,4 +84,28 @@ class User extends Authenticatable
             ->hasMany(UsuarioVeterinario::class, 'admin_id')
             ->with('veterinario');
     }
+
+    /**
+     * relationship to respuestasSeguridad
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function respuestasSeguridad(): HasMany
+    {
+        return $this->hasMany(RespuestasSeguridad::class);
+    }
+
+    /**
+     * Get all of the preguntasSeguridad saved for the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function preguntasSeguridad(): HasMany
+    {
+         return $this->respuestasSeguridad()->selectRaw('respuestas_seguridad.id, preguntas_seguridad.pregunta')
+        ->join('preguntas_seguridad','preguntas_seguridad_id','preguntas_seguridad.id');
+    }
+
+
+
 }

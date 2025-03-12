@@ -90,6 +90,11 @@ class EventosTest extends TestCase
 
     ];
 
+    private array $respuestasSeguridad = [
+        'preguntas' => [1,2,3],
+        'respuestas' => ['muy bien','bienn','perrito'],
+    ];
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -631,6 +636,30 @@ class EventosTest extends TestCase
                     )
                 ->etc()
             );
+
+    }
+
+    /* -------------- evento cuando se crean preguntas de seguridad ------------- */
+    /* por ahora no hay evento como tal, la logica se guarda en el mismo controlador de respuestasSeguridad */
+
+    public function test_evento_cuando_se_crean_preguntas_de_seguridad(): void
+    {
+        $this->user->assignRole('admin');
+
+        //añadir preguntas y respuestas de seguridad al usuario
+        $this->actingAs($this->user)->postJson(route('respuesta_seguridad.store'), $this->respuestasSeguridad);
+
+        $response = $this->actingAs($this->user)->getJson(route('usuario.show', ['user' => $this->user->id]));
+        $response->assertStatus(200)
+        ->assertJson(
+            fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
+                'user',
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
+                $json->where('tiene_preguntas_seguridad', true)
+                ->etc()
+            )
+        );
+
 
     }
 }

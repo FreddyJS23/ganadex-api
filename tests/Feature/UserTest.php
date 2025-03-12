@@ -98,6 +98,7 @@ class UserTest extends TestCase
                        'haciendas' => 'array',
                        'fecha_creacion' => 'string',
                        'configuracion' => 'array',
+                       'tiene_preguntas_seguridad' => 'boolean',
                    ])
                )
            );
@@ -119,6 +120,8 @@ class UserTest extends TestCase
                         'email' => 'string',
                         'rol' => 'string',
                         'fecha_creacion' => 'string',
+                        'tiene_preguntas_seguridad' => 'boolean',
+
                     ])
                 )
             );
