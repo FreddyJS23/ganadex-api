@@ -36,13 +36,24 @@ class DatosParaFormulariosController extends Controller
         return new CargosPersonalCollection($cargos);
     }
 
-    public function veterinariosDisponibles()
+    public function veterinariosDisponiblesHaciendaActual()
     {
         return new VeterinariosDisponiblesCollection(
             Personal::select('id', 'nombre')
                 ->where('cargo_id', 2)
                 ->where('user_id', Auth::id())
                 ->whereRelation('haciendas', 'haciendas.id', session('hacienda_id'))
+                ->get()
+        );
+    }
+    
+    public function veterinariosDisponibles()
+    {
+        return new VeterinariosDisponiblesCollection(
+            Personal::select('id', 'nombre')
+                ->where('cargo_id', 2)
+                ->where('user_id', Auth::id())
+                ->whereRelation('haciendas', 'haciendas.id','!=', session('hacienda_id'))
                 ->get()
         );
     }
