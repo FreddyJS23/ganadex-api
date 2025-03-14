@@ -326,7 +326,7 @@ END as ultima_dosis
         ];
 
         /* ------------------------ obtener total personal ------------------------- */
-        $totalPersonal = Personal::where('hacienda_id', session('hacienda_id'))
+        $totalPersonal = Personal::whereRelation('haciendas','haciendas.id', session('hacienda_id'))
             ->selectRaw('cargo, COUNT(cargo) as cantidad')
             ->join('cargos', 'cargo_id', 'cargos.id')
             ->groupBy('cargo')

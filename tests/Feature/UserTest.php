@@ -39,7 +39,7 @@ class UserTest extends TestCase
 
         UsuarioVeterinario::factory()
         ->count(10)
-        ->for(Personal::factory()->for($this->hacienda)->create(['cargo_id' => 2]), 'veterinario')
+        ->for(Personal::factory()->for($this->user)->create(['cargo_id' => 2]), 'veterinario')
         ->create(['admin_id' => $this->user->id]);
     }
 

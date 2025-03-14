@@ -95,6 +95,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/crear_sesion_hacienda/{hacienda}', [HaciendaController::class, 'crear_sesion_hacienda'])->name('crear_sesion_hacienda');
     Route::get('/verificar_sesion_hacienda', [HaciendaController::class, 'verificar_sesion_hacienda'])->name('verificar_sesion_hacienda');
     Route::get('/cambiar_hacienda_sesion', [HaciendaController::class, 'cambiar_hacienda_sesion'])->name('cambiar_hacienda_sesion');
+    Route::post('/registrar_personal_hacienda/{personal}', [HaciendaController::class, 'registrar_personal_en_hacienda'])->name('registrar_personal_en_hacienda');
     Route::apiResource('/causas_fallecimiento', CausasFallecimientoController::class);
     Route::apiResource('/tipos_revision', TipoRevisionController::class);
     Route::apiResource('/respuesta_seguridad', RespuestasSeguridadController::class);

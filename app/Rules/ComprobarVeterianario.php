@@ -15,8 +15,9 @@ class ComprobarVeterianario implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        if (!Personal::where('id', $value)->where('cargo_id', 2)->first()) {
-            $fail('The :attribute must be veterinary');
+        /* comprobar si el personal es veterinari y ademas que pertenece a la hacienda actual */
+        if (!Personal::where('personals.id', $value)->where('cargo_id', 2)->whereRelation('haciendas','haciendas.id', session('hacienda_id'))->exists()) {
+            $fail('El :attribute debe ser un veterinario de la hacienda actual');
         }
     }
 }

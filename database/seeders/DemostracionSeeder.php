@@ -53,7 +53,7 @@ class DemostracionSeeder extends Seeder
 
 
         $crearUsuarioVeterinario = UsuarioVeterinario::factory()
-        ->for(Personal::factory()->for($hacienda)->create(['cargo_id' => 2]), 'veterinario')
+        ->for(Personal::factory()->hasAttached($hacienda)->for($user)->create(['cargo_id' => 2]), 'veterinario')
         ->create(['admin_id' => $user->id]);
 
         $userVeterinario = User::find($crearUsuarioVeterinario->user_id);
@@ -107,12 +107,14 @@ class DemostracionSeeder extends Seeder
 
         $veterinario
             = Personal::factory()
-            ->for($hacienda)
+                ->for($user)
+            ->hasAttached($hacienda)
             ->create(['cargo_id' => 2]);
 
         Personal::factory()
+            ->for($user)
             ->count($elementos)
-            ->for($hacienda)
+            ->hasAttached($hacienda)
             ->create();
 
         //vacas

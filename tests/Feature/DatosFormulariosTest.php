@@ -52,7 +52,8 @@ class DatosFormulariosTest extends TestCase
     {
         return Personal::factory()
             ->count(10)
-            ->for($this->hacienda)
+            ->for($this->user)
+            ->hasAttached($this->hacienda)
             ->create();
     }
 
@@ -197,12 +198,13 @@ class DatosFormulariosTest extends TestCase
     {
         UsuarioVeterinario::factory()
             ->count(10)
-            ->for(Personal::factory()->for($this->hacienda)->create(['cargo_id' => 2]), 'veterinario')
+            ->for(Personal::factory()->hasAttached($this->hacienda)->for($this->user)->create(['cargo_id' => 2]), 'veterinario')
             ->create(['admin_id' => $this->user->id]);
 
         Personal::factory()
             ->count(10)
-            ->for($this->hacienda)
+            ->for($this->user)
+            ->hasAttached($this->hacienda)
             ->create(['cargo_id' => 2]);
 
         $this
