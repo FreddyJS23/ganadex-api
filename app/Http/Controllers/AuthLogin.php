@@ -59,18 +59,22 @@ class AuthLogin extends Controller
             $usuario_veterinario = UsuarioVeterinario::where('user_id', $user->id)->first();
             $configuracion = Configuracion::firstWhere('user_id', $usuario_veterinario->admin_id);
             $hacienda = Hacienda::find($usuario_veterinario->veterinario->hacienda_id);
-
             session()->put(
                 [
-                    'hacienda_id' => $hacienda->id,
                     'peso_servicio' => $configuracion->peso_servicio,
                     'dias_evento_notificacion' => $configuracion->dias_evento_notificacion,
                     'dias_diferencia_vacuna' => $configuracion->dias_diferencia_vacuna,
                 ]
             );
 
-            event(new CrearSesionHacienda($hacienda));
-            $sesion_hacienda = true;
+            /* verificar si el usuario veterinario esta trabajando en una unica hacienda */
+            if ($usuario_veterinario->haciendas->count() == 1) {
+                $hacienda = $usuario_veterinario->haciendas->first();
+                session()->put('hacienda_id', $hacienda->id);
+                event(new CrearSesionHacienda($hacienda));
+                $sesion_hacienda = true;
+            }
+            
         }
         /* En caso que haya mas haciendas creadas se debera asignar manualmente en el contralador hacienda */
 
