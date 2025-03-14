@@ -41,7 +41,8 @@ class DatosParaFormulariosController extends Controller
         return new VeterinariosDisponiblesCollection(
             Personal::select('id', 'nombre')
                 ->where('cargo_id', 2)
-                ->where('hacienda_id', session('hacienda_id'))
+                ->where('user_id', Auth::id())
+                ->whereRelation('haciendas', 'haciendas.id', session('hacienda_id'))
                 ->get()
         );
     }
@@ -50,7 +51,8 @@ class DatosParaFormulariosController extends Controller
     {
         return response()->json(['obreros' => Personal::select('id', 'nombre')
             ->where('cargo_id', 1)
-            ->where('hacienda_id', session('hacienda_id'))
+            ->where('user_id', Auth::id())
+            ->whereRelation('haciendas', 'haciendas.id', session('hacienda_id'))
             ->get()],200);
     }
 
@@ -128,7 +130,8 @@ class DatosParaFormulariosController extends Controller
     {
         $veterinariosSinUsuario = Personal::where('cargo_id', 2)
             ->select('id', 'nombre')
-            ->where('hacienda_id', session('hacienda_id'))
+            ->where('user_id', Auth::id())
+            ->whereRelation('haciendas', 'haciendas.id', session('hacienda_id'))
             ->whereDoesntHave('usuarioVeterinario')
             ->get();
 

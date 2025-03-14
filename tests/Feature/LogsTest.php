@@ -99,7 +99,7 @@ class LogsTest extends TestCase
             ->create(['usuario' => 'veterinario', 'password' => Hash::make('veterinario')]);
 
           $this->infoUserVeterinario = UsuarioVeterinario::factory()
-            ->for(Personal::factory()->for($this->hacienda)->create(['cargo_id' => 2]), 'veterinario')
+            ->for(Personal::factory()->hasAttached($this->hacienda)->for($this->userAdmin)->create(['cargo_id' => 2]), 'veterinario')
             ->create(['admin_id' => $this->userAdmin->id,
             'user_id' => $this->userVeterinario->id]);
 
@@ -110,7 +110,7 @@ class LogsTest extends TestCase
 
         $this->veterinario
         = Personal::factory()
-            ->for($this->hacienda)
+            ->for($this->userAdmin)->hasAttached($this->hacienda)
             ->create(['cargo_id' => 2]);
 
         $this->ganado

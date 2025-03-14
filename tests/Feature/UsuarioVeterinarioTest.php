@@ -38,7 +38,7 @@ class UsuarioVeterinarioTest extends TestCase
 
         $this->personal
             = Personal::factory()
-            ->for($this->hacienda)
+            ->for($this->user)->hasAttached($this->hacienda)
             ->create(['cargo_id' => 2])->id;
 
         $this->usuarioVeterinario = ['personal_id' => $this->personal];
@@ -66,7 +66,7 @@ class UsuarioVeterinarioTest extends TestCase
     {
         return UsuarioVeterinario::factory()
             ->count(10)
-            ->for(Personal::factory()->for($this->hacienda)->create(['cargo_id' => 2]), 'veterinario')
+            ->for(Personal::factory()->for($this->user)->create(['cargo_id' => 2]), 'veterinario')
             ->create(['admin_id' => $this->user->id]);
     }
 
@@ -116,7 +116,8 @@ class UsuarioVeterinarioTest extends TestCase
     {
         $this->personal
         = Personal::factory()
-        ->for($this->hacienda)
+        ->for($this->user)
+        ->hasAttached($this->hacienda)
         ->create(['nombre' => 'sdsdsfdsfjijwiwwjkhkjbjhkgiggyg','cargo_id' => 2])->id;
 
         $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(route('usuarios_veterinarios.store'), ['personal_id' => $this->personal]);
@@ -134,7 +135,8 @@ class UsuarioVeterinarioTest extends TestCase
     {
         $this->personal
         = Personal::factory()
-        ->for($this->hacienda)
+        ->for($this->user)
+        ->hasAttached($this->hacienda)
         ->create(['nombre' => 's','cargo_id' => 2])->id;
 
         $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(route('usuarios_veterinarios.store'), ['personal_id' => $this->personal]);
@@ -172,7 +174,7 @@ class UsuarioVeterinarioTest extends TestCase
         $otroAdmin->assignRole('admin');
 
         $usuarioVeterinarioOtroAdmin =  UsuarioVeterinario::factory()
-            ->for(Personal::factory()->for($otroHacienda)->create(), 'veterinario')
+            ->for(Personal::factory()->hasAttached($otroHacienda)->for($otroAdmin)->create(), 'veterinario')
             ->create(['admin_id' => $otroAdmin->id]);
 
         $idToDelete = $usuarioVeterinarioOtroAdmin->id;

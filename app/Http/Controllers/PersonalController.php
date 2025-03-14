@@ -7,6 +7,7 @@ use App\Http\Requests\UpdatePersonalRequest;
 use App\Http\Resources\PersonalCollection;
 use App\Http\Resources\PersonalResource;
 use App\Models\Personal;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class PersonalController extends Controller
@@ -18,9 +19,11 @@ class PersonalController extends Controller
     /**
      * Display a listing of the resource.
      */
+
+     /* todo el personal */
     public function index()
     {
-        return new PersonalCollection(Personal::where('hacienda_id', session('hacienda_id'))->get());
+        return new PersonalCollection(Personal::where('user_id', Auth::id())->with('haciendas:id,nombre')->get());
     }
 
     /**
@@ -30,7 +33,7 @@ class PersonalController extends Controller
     {
         $personal = new Personal();
         $personal->fill($request->all());
-        $personal->hacienda_id = session('hacienda_id');
+        $personal->user_id = Auth::id();
         $personal->save();
         return response()->json(['personal' => new PersonalResource($personal)], 201);
     }

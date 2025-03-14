@@ -58,7 +58,7 @@ class ResumenesAnualesTest extends TestCase
 
         $this->veterinario
             = Personal::factory()
-            ->for($this->hacienda)
+            ->for($this->user)->hasAttached($this->hacienda)
             ->create(['cargo_id' => 2]);
     }
 

@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateHaciendaRequest;
 use App\Http\Resources\HaciendaCollection;
 use App\Http\Resources\HaciendaResource;
 use App\Models\Hacienda;
+use App\Models\Personal;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -63,6 +64,16 @@ class HaciendaController extends Controller
         session()->put('hacienda_id', $hacienda->id);
 
         return response()->json(['hacienda' => new HaciendaResource($hacienda)], 200);
+    }
+
+    /* se registrara en la hacienda actual en sesion */
+    public function registrar_personal_en_hacienda(Personal $personal)
+    {
+        $this->authorize('registrar_personal_en_hacienda');
+
+        $personal->haciendas()->attach(session('hacienda_id'));
+
+        return response()->json(['message' => 'Veterinario registrado en la hacienda actual'], 200);
     }
 
     /**

@@ -68,7 +68,7 @@ class RevisionTest extends TestCase
 
         $this->veterinario
         = Personal::factory()
-            ->for($this->hacienda)
+            ->for($this->user)->hasAttached($this->hacienda)
             ->create(['cargo_id' => 2]);
 
             $this->ganado
@@ -86,7 +86,7 @@ class RevisionTest extends TestCase
             $this->userVeterinario->assignRole('veterinario');
 
             UsuarioVeterinario::factory()
-            ->for(Personal::factory()->for($this->hacienda)->create(['nombre'=>'usuarioVeterinario','cargo_id' => 2]), 'veterinario')
+            ->for(Personal::factory()->hasAttached($this->hacienda)->for($this->user)->create(['nombre'=>'usuarioVeterinario','cargo_id' => 2]), 'veterinario')
             ->create(['admin_id' => $this->user->id,
             'user_id' => $this->userVeterinario->id]);
 
@@ -224,7 +224,7 @@ class RevisionTest extends TestCase
 
         $veterinario
         = Personal::factory()
-            ->for($this->hacienda)
+            ->for($this->user)->hasAttached($this->hacienda)
             ->create(['cargo_id' => 2]);
 
             $toro = Toro::factory()
@@ -284,7 +284,7 @@ class RevisionTest extends TestCase
 
         $veterinario
         = Personal::factory()
-            ->for($this->hacienda)
+            ->for($this->user)->hasAttached($this->hacienda)
             ->create(['cargo_id' => 2]);
 
             $toro = Toro::factory()
@@ -433,7 +433,7 @@ class RevisionTest extends TestCase
     {
         //crear personal no veterinario
             Personal::factory()
-            ->for($this->hacienda)
+            ->for($this->user)->hasAttached($this->hacienda)
             ->create([
                 'id' => 2,
                 'ci' => 28472738,

@@ -104,7 +104,8 @@ class DashboardTest extends TestCase
     {
         return Personal::factory()
             ->count($this->cantidad_elementos)
-            ->for($this->hacienda)
+            ->hasAttached($this->hacienda)
+            ->for($this->user)
             ->create();
     }
 

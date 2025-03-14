@@ -42,7 +42,7 @@ class LoginTest extends TestCase
             ->create(['usuario' => 'veterinario', 'password' => Hash::make('veterinario')]);
 
             UsuarioVeterinario::factory()
-            ->for(Personal::factory()->for($this->hacienda)->create(['cargo_id' => 2]), 'veterinario')
+            ->for(Personal::factory()->for($this->userAdmin)->hasAttached($this->hacienda)->create(['cargo_id' => 2]), 'veterinario')
             ->create(['admin_id' => $this->userAdmin->id,
             'user_id' => $this->userVeterinario->id]);
 
@@ -55,6 +55,23 @@ class LoginTest extends TestCase
             ->count(10)
             ->for($this->userAdmin)
             ->create();
+    }
+
+    private function userVeterinarioEnVariasHaciendas(): User
+    {
+        $haciendas=$this->generarHaciendas();
+        $veterinario
+        = User::factory()
+        ->create(['usuario' => 'veterinario2', 'password' => Hash::make('veterinario2')]);
+
+        $userVeterinario=UsuarioVeterinario::factory()
+        ->for(Personal::factory()->for($this->userAdmin)->hasAttached($haciendas)->create(['cargo_id' => 2]), 'veterinario')
+        ->create(['admin_id' => $this->userAdmin->id,
+        'user_id' => $veterinario->id]);
+
+        $veterinario->assignRole('veterinario');
+
+        return $veterinario;
     }
 
     /**
@@ -136,12 +153,13 @@ class LoginTest extends TestCase
     }
 
 
-    public function test_logear_usuario_veterinario_con_admin_tiene_varias_haciendas(): void
+    public function test_logear_usuario_veterinario_trabjando_en_varias_haciendas(): void
     {
-        $this->generarHaciendas();
+        $this->userVeterinarioEnVariasHaciendas();
+        
         $response = $this->withHeader('origin', config('app.url'))->postJson('api/login', [
-            'usuario' => 'veterinario',
-            'password' => 'veterinario',
+            'usuario' => 'veterinario2',
+            'password' => 'veterinario2',
         ]);
 
         $response->assertStatus(200)->assertJson(fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
@@ -153,8 +171,9 @@ class LoginTest extends TestCase
             'configuracion.peso_servicio' => 'integer',
             'configuracion.dias_evento_notificacion' => 'integer',
             'configuracion.dias_diferencia_vacuna' => 'integer',
-        ])->where('sesion_hacienda', true))
-            ->where('login.sesion_hacienda', true))->assertSessionHas('hacienda_id', $this->hacienda->id)
+        ])->where('sesion_hacienda', false))
+        )
+        ->assertSessionMissing('hacienda_id')
         ->assertSessionHas('peso_servicio', $this->userAdmin->configuracion->peso_servicio)
         ->assertSessionHas('dias_evento_notificacion', $this->userAdmin->configuracion->dias_evento_notificacion)
         ->assertSessionHas('dias_diferencia_vacuna', $this->userAdmin->configuracion->dias_diferencia_vacuna);

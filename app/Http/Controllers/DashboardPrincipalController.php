@@ -64,7 +64,7 @@ class DashboardPrincipalController extends Controller
 
     public function totalPersonal(Request $request)
     {
-        return response()->json(['total_personal' => Personal::where('hacienda_id', session('hacienda_id'))->count()]);
+        return response()->json(['total_personal' => Personal::whereRelation('haciendas','haciendas.id', session('hacienda_id'))->count()]);
     }
 
     public function vacasEnGestacion(Request $request)
