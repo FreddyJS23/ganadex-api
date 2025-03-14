@@ -33,4 +33,6 @@ class Hacienda extends Model
     {
         return $this->belongsToMany(Personal::class);
     }
+
+    protected $hidden = ['pivot'];
 }
