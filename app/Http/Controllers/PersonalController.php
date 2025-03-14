@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StorePersonalEnHacienda;
 use App\Http\Requests\StorePersonalRequest;
+use App\Http\Requests\StoreUsuarioVeterinarioRequest;
 use App\Http\Requests\UpdatePersonalRequest;
 use App\Http\Resources\PersonalCollection;
 use App\Http\Resources\PersonalResource;
 use App\Models\Personal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class PersonalController extends Controller
 {
@@ -36,6 +39,36 @@ class PersonalController extends Controller
         $personal->user_id = Auth::id();
         $personal->save();
         return response()->json(['personal' => new PersonalResource($personal)], 201);
+    }
+
+ /* se registrara en la hacienda actual en sesion */
+    /* se usa esa request ya que coincidi con la validacion que se necesita */
+    public function registrar_personal_en_hacienda(StorePersonalEnHacienda $request)
+    {
+        $this->authorize('registrar_personal_hacienda');
+
+       
+
+        /* se hace manualmente ya que en la validacion se consulta la existencia del personal
+        entonces seria reduntante consultar el personal en la validacion y luego volver a consultar en la creacion
+        para insertar datos en la tabla pivote
+         */
+        DB::table('hacienda_personal')->insert([
+            'hacienda_id' => session('hacienda_id'),
+            'personal_id' => $request->input('personal_id')
+        ]);
+
+
+        return response()->json(['message' => 'Veterinario registrado en la hacienda actual'], 200);
+    }
+
+    public function eliminar_personal_en_hacienda(Personal $personal)
+    {
+        $this->authorize('eliminar_personal_hacienda', $personal);
+
+        $personal->haciendas()->detach([session('hacienda_id')]);
+
+        return response()->json(['message' => 'Veterinario eliminado de la hacienda']);
     }
 
     /**

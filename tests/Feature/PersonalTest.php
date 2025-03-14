@@ -153,6 +153,44 @@ class PersonalTest extends TestCase
             );
     }
 
+    public function test_añadir_personal_a_hacienda(): void
+    {
+        $personal=Personal::factory()
+            ->for($this->user)
+            ->create(['cargo_id' => 2]);
+
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id])->postJson(route('registrar_personal_en_hacienda'), ['personal_id' => $personal->id]);
+
+        $response->assertStatus(200)->assertJson(['message' => 'Veterinario registrado en la hacienda actual']);
+    }
+    
+    public function test_error_añadir_personal_a_hacienda_cuando_ya_esta_registrado_en_la_hacienda(): void
+    {
+        $personal=Personal::factory()
+            ->for($this->user)
+            ->hasAttached($this->hacienda)
+            ->create(['cargo_id' => 2]);
+
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id])->postJson(route('registrar_personal_en_hacienda'), ['personal_id' => $personal->id]);
+
+        $response->assertStatus(422)->assertInvalid(['personal_id']);
+
+    }
+
+    public function test_remover_personal_de_hacienda(): void
+    {
+        $personal=Personal::factory()
+            ->for($this->user)
+            ->hasAttached($this->hacienda)
+            ->create(['cargo_id' => 2]);
+
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id])->deleteJson(route('eliminar_personal_en_hacienda', ['personal' => $personal->id]));
+
+        $response->assertStatus(200)->assertJson(['message' => 'Veterinario eliminado de la hacienda']);
+   
+    }
+    
+    
 
     public function test_obtener_personal(): void
     {

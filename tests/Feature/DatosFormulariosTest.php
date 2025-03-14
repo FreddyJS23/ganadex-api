@@ -2,8 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Models\Cargo;
 use App\Models\Comprador;
 use App\Models\Ganado;
+use App\Models\Hacienda;
 use App\Models\Leche;
 use App\Models\Personal;
 use App\Models\UsuarioVeterinario;
@@ -16,6 +18,11 @@ use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\Feature\Common\NeedsEstado;
 use Tests\Feature\Common\NeedsHacienda;
 use Tests\TestCase;
+
+enum cargosPersonal: int{
+    case obrero = 1;
+    case veterinario = 2;
+}
 
 class DatosFormulariosTest extends TestCase
 {
@@ -48,13 +55,13 @@ class DatosFormulariosTest extends TestCase
             ->create();
     }
 
-    private function generarPersonal(): Collection
+    private function generarPersonal(CargosPersonal $cargoPersonal): Collection
     {
         return Personal::factory()
             ->count(10)
             ->for($this->user)
             ->hasAttached($this->hacienda)
-            ->create();
+            ->create(['cargo_id' => $cargoPersonal->value]);
     }
 
     private function setUpRequest(): static
@@ -226,11 +233,53 @@ class DatosFormulariosTest extends TestCase
 
     public function test_obtener_veterinarios_select(): void
     {
-        $this->generarPersonal();
+        $this->generarPersonal(CargosPersonal::veterinario);
+
+        $otraHacienda = Hacienda::factory()
+        ->for($this->user)
+        ->create(['nombre' => 'otra_hacienda']);
+
+        Personal::factory()
+        ->count(20)
+        ->for($this->user)
+        ->hasAttached($otraHacienda)
+        ->create(['cargo_id' => 2]);
+
 
         $this
             ->setUpRequest()
             ->getJson(route('datosParaFormularios.veterinariosDisponibles'))
+            ->assertStatus(200)->assertJson(
+                fn(AssertableJson $json): AssertableJson => $json
+                    ->whereType('veterinarios', 'array')
+                    ->has(
+                        'veterinarios',
+                        20,/* deberian haber 20, ya que solo se trae veterinarios que no se hayan registrado en hacienda en sesion */
+                        fn(AssertableJson $json): AssertableJson => $json->whereAllType([
+                            'id' => 'integer',
+                            'nombre' => 'string',
+                        ])
+                    )
+            );
+    }
+    
+    public function test_obtener_veterinarios_hacienda_actual_select(): void
+    {
+        $this->generarPersonal(CargosPersonal::veterinario);
+
+        $otraHacienda = Hacienda::factory()
+        ->for($this->user)
+        ->create(['nombre' => 'otra_hacienda']);
+
+        Personal::factory()
+        ->count(10)
+        ->for($this->user)
+        ->hasAttached($otraHacienda)
+        ->create(['cargo_id' => 2]);
+
+        $this
+            ->setUpRequest()
+            ->getJson(route('datosParaFormularios.veterinariosDisponiblesHaciendaActual'))
             ->assertStatus(200)->assertJson(
                 fn(AssertableJson $json): AssertableJson => $json
                     ->whereType('veterinarios', 'array')
@@ -246,7 +295,7 @@ class DatosFormulariosTest extends TestCase
 
     public function test_obtener_obreros_select(): void
     {
-        $this->generarPersonal();
+        $this->generarPersonal(CargosPersonal::obrero);
 
         $this
             ->setUpRequest()

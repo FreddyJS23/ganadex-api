@@ -32,6 +32,11 @@ class PersonalPolicy
         return $user->hasRole('admin');
     }
 
+    public function registrar_personal_hacienda(User $user): bool
+    {
+        return  $user->hasRole('admin');
+    }
+
     /**
      * Determine whether the user can update the model.
      */
@@ -44,6 +49,11 @@ class PersonalPolicy
      * Determine whether the user can delete the model.
      */
     public function delete(User $user, Personal $personal): bool
+    {
+        return $user->id === $personal->user_id && $user->hasRole('admin');
+    }
+
+    public function eliminar_personal_hacienda(User $user, Personal $personal): bool
     {
         return $user->id === $personal->user_id && $user->hasRole('admin');
     }

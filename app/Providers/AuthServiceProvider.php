@@ -33,6 +33,9 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('verificar_sesion_hacienda', [HaciendaPolicy::class,'verificar_sesion_hacienda']);
         Gate::define('crear_sesion_hacienda', [HaciendaPolicy::class,'crear_sesion_hacienda']);
         Gate::define('cambiar_hacienda_sesion', [HaciendaPolicy::class,'cambiar_hacienda_sesion']);
+        /* politicas modelo personal */
+        Gate::define('registrar_personal_hacienda', [PersonalPolicy::class,'registrar_personal_hacienda']);
+        Gate::define('eliminar_personal_hacienda', [PersonalPolicy::class,'eliminar_personal_hacienda']);
         /* politicas modelo configuracion */
         Gate::define('update', [ConfiguracionPolicy::class,'update']);
 
