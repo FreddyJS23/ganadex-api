@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Events\CrearSesionHacienda;
 use App\Http\Requests\StoreHaciendaRequest;
+use App\Http\Requests\StoreUsuarioVeterinarioRequest;
 use App\Http\Requests\UpdateHaciendaRequest;
 use App\Http\Resources\HaciendaCollection;
 use App\Http\Resources\HaciendaResource;
@@ -12,6 +13,7 @@ use App\Models\Personal;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class HaciendaController extends Controller
 {
@@ -66,15 +68,6 @@ class HaciendaController extends Controller
         return response()->json(['hacienda' => new HaciendaResource($hacienda)], 200);
     }
 
-    /* se registrara en la hacienda actual en sesion */
-    public function registrar_personal_en_hacienda(Personal $personal)
-    {
-        $this->authorize('registrar_personal_en_hacienda');
-
-        $personal->haciendas()->attach(session('hacienda_id'));
-
-        return response()->json(['message' => 'Veterinario registrado en la hacienda actual'], 200);
-    }
 
     /**
      * Display a listing of the resource.
