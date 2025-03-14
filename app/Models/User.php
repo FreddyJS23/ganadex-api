@@ -76,6 +76,36 @@ class User extends Authenticatable
     }
 
     /**
+     * Get all of the todoPersonal for the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function todoPersonal(): HasMany
+    {
+        return $this->hasMany(Personal::class);
+    }
+
+    /**
+     * Get all of the veterinarios for the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function veterinarios(): HasMany
+    {
+        return $this->todoPersonal()->where('cargo_id', 2);
+    }
+
+    /**
+     * Get all of the obreros for the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function obreros(): HasMany
+    {
+        return $this->todoPersonal()->where('cargo_id', 1);
+    }
+
+    /**
      * Get all of the usuariosVeterinario for the User
      */
     public function usuariosVeterinario(): HasMany
