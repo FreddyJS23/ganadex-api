@@ -31,7 +31,7 @@ class Personal extends Model
      */
     public function haciendas(): BelongsToMany
     {
-        return $this->belongsToMany(Hacienda::class);
+        return $this->belongsToMany(Hacienda::class)->select('haciendas.id','nombre');
     }
 
     /**
