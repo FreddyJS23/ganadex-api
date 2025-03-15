@@ -71,6 +71,16 @@ class PlanSanitarioController extends Controller
         return response()->json(['plan_sanitario' => new PlanSanitarioResource($jornadaVacunacion)], 201);
     }
 
+    public function planesSanitarioPendientes()
+    {
+        return new PlanSanitarioCollection(
+            Plan_sanitario::where('hacienda_id', session('hacienda_id'))
+                ->orderBy('fecha_inicio', 'desc')
+                ->where('prox_dosis','<=',now()->format('Y-m-d'))
+                ->get()
+        );
+    }
+
     /**
      * Display the specified resource.
      */
