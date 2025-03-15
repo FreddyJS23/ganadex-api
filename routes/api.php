@@ -91,6 +91,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('/pajuela_toros', PajuelaToroController::class);
     Route::apiResource('/fallecimientos', FallecimientoController::class);
     Route::apiResource('/plan_sanitario', PlanSanitarioController::class);
+    Route::get('/planes_sanitarios_pendientes',[PlanSanitarioController::class,'planesSanitarioPendientes'])->name('plan_sanitario.pendientes');
     Route::apiResource('/notificaciones', NotificacionController::class)->only(['index', 'destroy'])->parameters(['notificaciones' => 'notificacion']);;
     Route::get('/borrar_notificaciones', [NotificacionController::class, 'destroyAll'])->name('notificaciones.destroyAll');
     Route::apiResource('/hacienda', HaciendaController::class)->only(['index', 'store', 'update']);
