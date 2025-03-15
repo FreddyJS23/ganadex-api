@@ -117,6 +117,42 @@ class PlanSanitarioTest extends TestCase
     }
 
 
+    public function test_obtener_planes_sanitario_pendientes(): void
+    {
+        /* planes sanitarios en el cual su proxima dosis es menor a la fecha actual, por ende deben aplicarse */
+        Plan_sanitario::factory()
+        ->count(3)
+        ->for($this->hacienda)
+        ->create(['prox_dosis' => now()->subDays(random_int(10,100))]);
+        
+        /* planes sanitarios en el cual su proxima dosis es mayor a la fecha actual, por ende estan proximos a aplicarse */
+        Plan_sanitario::factory()
+        ->count(3)
+        ->for($this->hacienda)
+        ->create(['prox_dosis' => now()->addDays(random_int(10,100))]);
+
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('plan_sanitario.pendientes'));
+
+        $response->assertStatus(200)->assertJson(
+            fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
+            $json->whereType('planes_sanitario', 'array')
+                ->has(
+                    'planes_sanitario',
+                    3,
+                    fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
+                    => $json->whereAllType([
+                        'id' => 'integer',
+                        'fecha_inicio' => 'string',
+                        'fecha_fin' => 'string',
+                        'vacuna' => 'string',
+                        'vacunados' => 'integer',
+                        'ganado_vacunado' => 'array',
+                    ])
+                )
+        );
+    }
+
+
     public function test_creacion_plan_sanitario(): void
     {
 
