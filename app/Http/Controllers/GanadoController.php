@@ -14,9 +14,12 @@ use App\Models\Estado;
 use App\Models\Ganado;
 use App\Models\Plan_sanitario;
 use App\Models\Leche;
+use App\Models\Servicio;
 use App\Models\Vacuna;
 use App\Models\Vacunacion;
+use Carbon\Carbon;
 use Illuminate\Contracts\Database\Query\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Facades\Auth;
@@ -177,7 +180,6 @@ class GanadoController extends Controller
 
         $ultimaRevision = $ganado->revisionReciente;
         $ultimoServicio = $ganado->servicioReciente;
-        $ultimoPesajeLeche = $ganado->pesajeLecheReciente;
         $ultimoParto = $ganado->partoReciente;
         $ganado->load(
             ['parto' => function (Builder $query) {
@@ -209,6 +211,8 @@ class GanadoController extends Controller
             $ganado->load('servicios');
 
             $ganado->efectividad = $efectividad($ganado->servicios->count());
+       /* para la efectivida se obtienen los servicios entre el penultimo parto y el ultimo parto,
+       queriendo decir que no se hace una efectividad de todos los servicios que se hicieron en el ganado*/
         } elseif ($ganado->parto->count() >= 2) {
             $fechaInicio = $ganado->parto[1]->fecha;
             $fechaFin = $ganado->parto[0]->fecha;
@@ -226,8 +230,61 @@ class GanadoController extends Controller
         }
 
 
-        $mejorPesajesLeche = Leche::where('ganado_id', $ganado->id)->orderBy('peso_leche', 'desc')->first();
-        $peorPesajesLeche = Leche::where('ganado_id', $ganado->id)->orderBy('peso_leche', 'asc')->first();
+        /* ------------------------ datos de pesajes de leche ----------------------- */
+        $pesajesDeLeche = Leche::where('ganado_id', $ganado->id)->orderBy('peso_leche', 'desc')->get();
+
+        $tienePesajesDeLeche = $pesajesDeLeche->count() > 0;
+
+        if($tienePesajesDeLeche){
+
+            $datosAcumulados= function (Collection $pesajesDeLeche):array
+            {
+                $produccionAcumuladaLeche = 0;
+                $diasEnProduccionLeche = 0;
+
+                //el uso de &$produccionAcumuladaLeche es para que el valor de produccionAcumuladaLeche se actualice en cada iteracion
+                $pesajesDeLeche->each(function (Leche $pesaje) use (&$produccionAcumuladaLeche, &$diasEnProduccionLeche) {
+                    $fecha=new Carbon($pesaje->fecha);
+                    $mes=$fecha->month;
+
+                    //meses con 31 dias
+                    if($mes==1 || $mes==3 || $mes==5 || $mes==7 || $mes==8 || $mes==10 || $mes==12)
+                    {
+                    $produccionAcumuladaLeche += $pesaje->peso_leche * 31;
+                    $diasEnProduccionLeche += 31;
+                    }
+
+                    //meses con 30 dias
+                    if($mes==4 || $mes==6 || $mes==9 || $mes==11)
+                    {
+                    $produccionAcumuladaLeche += $pesaje->peso_leche * 30;
+                    $diasEnProduccionLeche += 31;
+
+                    }
+
+                    //mes febrero
+                    if($mes==2)
+                    {
+                    $añoBiciencio=$fecha->isLeapYear();
+                    $diasMes=$añoBiciencio ? 29 : 28;
+                    $produccionAcumuladaLeche += $pesaje->peso_leche * $diasMes;
+                    $diasEnProduccionLeche += $diasMes;
+                    }
+                });
+
+                return ['dias_produccion' => $diasEnProduccionLeche, 'produccion_acumulada' => $produccionAcumuladaLeche];
+            };
+
+
+            $mejorPesajesLeche = $pesajesDeLeche->first();
+            $peorPesajesLeche = $pesajesDeLeche->last();
+            $promedioPesajesLeche =$pesajesDeLeche->avg('peso_leche');
+            //convertir el array para obtener como variables las propiedades dias_produccion y produccion_acumulada
+            extract($datosAcumulados($pesajesDeLeche));
+
+            $ultimoPesajeLeche = $ganado->pesajeLecheReciente;
+        }
+
         $estadoProduccionLeche = $ganado->estados->contains('estado', 'lactancia') ? "En producción" : 'Inactiva';
 
         return response()->json(
@@ -235,15 +292,21 @@ class GanadoController extends Controller
             'ganado' => new GanadoResource($ganado),
             'servicio_reciente' => $ultimoServicio ? new ServicioResource($ultimoServicio) : null,
             'total_servicios' => $ganado->servicios->count(),
+            'total_servicios_acumulados' => Servicio::where('ganado_id', $ganado->id)->count(),
             'revision_reciente' => $ultimaRevision ? new RevisionResource($ultimaRevision) : null,
             'total_revisiones' => $ganado->revision_count,
             'parto_reciente' => $ultimoParto ? new PartoResource($ultimoParto) : null,
             'total_partos' => $ganado->parto->count(),
             'efectividad' => $ganado->efectividad,
             'info_pesajes_leche' => (object)([
-                'reciente' => $ultimoPesajeLeche ? new LecheResource($ultimoPesajeLeche) : null,
-                'mejor' => $ultimoPesajeLeche ? new LecheResource($mejorPesajesLeche) : null,
-                'peor' => $ultimoPesajeLeche ? new LecheResource($peorPesajesLeche) : null,
+                'reciente' => $tienePesajesDeLeche ? new LecheResource($ultimoPesajeLeche) : null ,
+                'mejor' => $tienePesajesDeLeche ? new LecheResource($mejorPesajesLeche) : null ,
+                'peor' => $tienePesajesDeLeche ? new LecheResource($peorPesajesLeche) : null ,
+                'promedio' =>$tienePesajesDeLeche ? $promedioPesajesLeche . '%' : null ,
+                'produccion_acumulada' =>$tienePesajesDeLeche ? $produccion_acumulada : null ,
+                /* los dias en produccion son un aproximado donde se suman todos los dias del mes de pesaje de leche
+                siendo asi puede que haya ocaciones que se haya hecho el pesaje pero la vaca no termino de dar leche el resto del mes */
+                'dias_produccion' =>$tienePesajesDeLeche ?  $dias_produccion  : null ,
                 'estado' => $estadoProduccionLeche
             ]),
             'vacunaciones' => (object)[
