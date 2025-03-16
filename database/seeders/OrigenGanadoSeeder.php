@@ -14,7 +14,7 @@ class OrigenGanadoSeeder extends Seeder
     public function run(): void
     {
         DB::table('origen_ganados')->insert([
-            'origen' => 1,
+            'origen' => 'Local',
         ]);
 
         DB::table('origen_ganados')->insert([
