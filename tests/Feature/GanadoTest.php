@@ -7,7 +7,13 @@ use App\Models\Comprador;
 use App\Models\Estado;
 use App\Models\Hacienda;
 use App\Models\Ganado;
+use App\Models\Leche;
+use App\Models\Parto;
+use App\Models\PartoCria;
+use App\Models\Personal;
 use App\Models\Plan_sanitario;
+use App\Models\Servicio;
+use App\Models\Toro;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -295,16 +301,101 @@ class GanadoTest extends TestCase
     public function test_obtener_cabeza_ganado(): void
     {
         Plan_sanitario::factory()->for($this->hacienda)->count(2)->create();
-        $cabezasGanado = $this->generarGanado();
-        $idRandom = random_int(0, $this->cantidad_ganado - 1);
-        $idGanado = $cabezasGanado[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf('api/ganado/%s', $idGanado), $this->cabeza_ganado);
+        $toro = Toro::factory()
+        ->for($this->hacienda)
+        ->for(Ganado::factory()->for($this->hacienda)->create(['sexo' => 'M']))->create();
+
+        $veterinario=Personal::factory()
+        ->for($this->user)
+        ->hasAttached($this->hacienda)
+        ->create(['cargo_id' => 2]);
+
+        $ganado=Ganado::factory()
+            ->hasPeso(1)
+            ->hasEvento(['prox_revision' => null, 'prox_parto' => null, 'prox_secado' => null])
+            ->hasRevision(1, ['personal_id' => $veterinario->id])
+            ->hasAttached($this->estado)
+            ->for($this->hacienda)
+            ->create();
+
+            /* se hacen las rondas para poder obtener la cantidad de servicios acumulado y la cantidad de  servicios
+            aplicados para obtener el ultimo parto */
+
+            /* primera ronda de servicios y partos */
+         Servicio::factory()
+            ->for($ganado)
+            ->count(3)
+            ->sequence([
+                'fecha'=>now()->subDays(200),
+                'fecha'=>now()->subDays(190),
+                'fecha'=>now()->subDays(180),
+            ])
+            ->for($toro, 'servicioable')
+            ->create(['personal_id' => $veterinario]);
+
+            Parto::factory()
+            ->for($ganado)
+            ->has(PartoCria::factory()->for(Ganado::factory()->for($this->hacienda)->hasAttached($this->estado)))
+            ->for($toro, 'partoable')
+            ->create(['personal_id' => $veterinario,'fecha'=>now()->subDays(150)]);
+
+            /* segunda ronda de servicios y partos */
+         Servicio::factory()
+            ->for($ganado)
+            ->count(5)
+            ->sequence([
+                'fecha'=>now()->subDays(120),
+                'fecha'=>now()->subDays(110),
+                'fecha'=>now()->subDays(100),
+                'fecha'=>now()->subDays(90),
+                'fecha'=>now()->subDays(80),
+            ])
+            ->for($toro, 'servicioable')
+            ->create(['personal_id' => $veterinario]);
+
+            Parto::factory()
+            ->for($ganado)
+            ->has(PartoCria::factory()->for(Ganado::factory()->for($this->hacienda)->hasAttached($this->estado)))
+            ->for($toro, 'partoable')
+            ->create(['personal_id' => $veterinario,'fecha'=>now()->subDays(50)]);
+
+            Leche::factory()
+            ->count(5)
+            ->for($ganado)
+            ->for($this->hacienda)
+            ->create();
+
+
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf('api/ganado/%s', $ganado->id), $this->cabeza_ganado);
 
         $response->assertStatus(200)
             ->assertJson(
                 fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
-                $json->has(
+                $json->whereAllType([
+                    'ganado' => 'array',
+                    'efectividad' => 'integer|null',
+                    'servicio_reciente' => 'array|null',
+                    'revision_reciente' => 'array|null',
+                    'total_revisiones' => 'integer|null',
+                    'parto_reciente' => 'array|null',
+                ])
+                ->where('total_servicios_acumulados',8) //sumando la cantidad de servicios en las dos rondas da 8
+                ->where('total_servicios',5) //cantidad de servicios de la segunda ronda para efectuar el ultimo parto
+                ->where('total_partos',2) //sumando la cantidad de partos en las dos rondas da 8
+                ->has('info_pesajes_leche',
+                    fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson=>
+                    $json->whereAllType([
+                        'reciente' => 'array|null',
+                        'mejor' => 'array|null',
+                        'peor' => 'array|null',
+                        'promedio' => 'string|null',
+                        'produccion_acumulada' => 'integer|null',
+                        'dias_produccion' => 'integer|null',
+                    ])
+                    ->where('estado', 'En producción')
+                )
+                ->has(
                     'vacunaciones',
                     fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                     $json->has('vacunas.0', fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson=>
@@ -322,7 +413,46 @@ class GanadoTest extends TestCase
                             'fecha' => 'string',
                             'prox_dosis' => 'string',
                         ]))
-                )->etc()
+                )
+            );
+    }
+
+    public function test_obtener_cabeza_ganado_sin_datos(): void
+    {
+        Plan_sanitario::factory()->for($this->hacienda)->count(2)->create();
+
+        $cabezasGanado = $this->generarGanado();
+        $idRandom = random_int(0, $this->cantidad_ganado - 1);
+        $idGanado = $cabezasGanado[$idRandom]->id;
+
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf('api/ganado/%s', $idGanado), $this->cabeza_ganado);
+
+        $response->assertStatus(200)
+            ->assertJson(
+                fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
+                $json->whereAllType([
+                    'ganado' => 'array',
+                    'efectividad' => 'integer|null',
+                    'servicio_reciente' => 'array|null',
+                    'revision_reciente' => 'array|null',
+                    'total_revisiones' => 'integer|null',
+                    'parto_reciente' => 'array|null',
+                    'vacunaciones' => 'array',
+                ])
+                ->where('total_servicios_acumulados',0)
+                ->where('total_servicios',0)
+                ->where('total_partos',0)
+                ->has('info_pesajes_leche',
+                    fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson=>
+                    $json
+                    ->where('reciente', null)
+                    ->where('mejor', null)
+                    ->where('peor', null)
+                    ->where('promedio', null)
+                    ->where('produccion_acumulada', null)
+                    ->where('dias_produccion', null)
+                    ->where('estado', 'En producción')
+                )
             );
     }
 
