@@ -15,6 +15,7 @@ return new class extends Migration
             $table->smallInteger('numero')->unique()->nullable();
             $table->enum('sexo', ['H', 'M']);
             $table->foreignId('origen_id')->constrained(table: 'origen_ganados', indexName: 'ganado_origen_id');
+            $table->date('fecha_ingreso')->nullable();
             $table->date('fecha_nacimiento')->nullable();
             $table->foreignId('tipo_id')->constrained(table: 'ganado_tipos', indexName: 'ganado_tipo_id');
             $table->foreignId('hacienda_id')->constrained()->cascadeOnDelete();

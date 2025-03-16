@@ -8,6 +8,7 @@ use App\Http\Resources\VeterinariosDisponiblesCollection;
 use App\Models\Cargo;
 use App\Models\Ganado;
 use App\Models\Leche;
+use App\Models\OrigenGanado;
 use App\Models\Personal;
 use App\Models\Peso;
 use App\Models\Vacuna;
@@ -46,7 +47,7 @@ class DatosParaFormulariosController extends Controller
                 ->get()
         );
     }
-    
+
     public function veterinariosDisponibles()
     {
         return new VeterinariosDisponiblesCollection(
@@ -147,5 +148,10 @@ class DatosParaFormulariosController extends Controller
             ->get();
 
         return response()->json(['veterinarios_sin_usuario' => $veterinariosSinUsuario]);
+    }
+
+    public function origenGanado()
+    {
+        return response()->json(['origen_ganado' => OrigenGanado::select('id', 'origen')->get()], 200);
     }
 }

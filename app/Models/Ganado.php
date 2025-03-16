@@ -30,6 +30,7 @@ class Ganado extends Model
         'tipo_id',
         'sexo',
         'fecha_nacimiento',
+        'fecha_ingreso',
     ];
 
     /**

@@ -29,6 +29,7 @@ class StoreGanadoRequest extends FormRequest
             'origen_id' => 'required|integer|exists:origen_ganados,id',
             'tipo_id' => 'required|integer|exists:ganado_tipos,id',
             'fecha_nacimiento' => 'date_format:Y-m-d',
+            'fecha_ingreso' => ['date_format:Y-m-d', Rule::requiredIf(fn () => $this->origen_id == 2)], //origen externo
             'peso_nacimiento' => 'numeric|between:1,32767',
             'peso_destete' => 'numeric|between:1,32767',
             'peso_2year' => 'numeric|between:1,32767',

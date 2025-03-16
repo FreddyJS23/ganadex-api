@@ -19,6 +19,7 @@ class GanadoDescarteResource extends JsonResource
             'nombre' => $this->ganado->nombre,
             'numero' => $this->ganado->numero,
             'origen' => $this->ganado->origen->origen,
+            'fecha_ingreso' => $this->ganado->fecha_ingreso,
             'sexo' => $this->ganado->sexo,
             'tipo' => $this->ganado->tipo->tipo,
             'ganado_id' => $this->ganado->id,

@@ -18,6 +18,7 @@ class Toro extends Model
         'numero',
         'origen_id',
         'fecha_nacimiento',
+        'fecha_ingreso',
     ];
 
 
