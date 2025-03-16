@@ -48,6 +48,7 @@ class GanadoDescarteTest extends TestCase
         'nombre' => 'actualizado',
         'origen_id' => 2,
         'fecha_nacimiento' => '2010-02-17',
+        'fecha_ingreso' => '2020-02-17',
         'peso_nacimiento' => 50,
         'peso_destete' => 70,
         'peso_2year' => 90,
@@ -127,6 +128,12 @@ class GanadoDescarteTest extends TestCase
             'caso de no insertar datos requeridos' => [
                 ['estado_id' => [1],], ['nombre']
             ],
+            'caso de insertar que es origen externo y no se coloca fecha de ingreso' => [
+                [
+                    'origen_id' => 2,
+                    'estado_id' => [1]
+                ], ['fecha_ingreso']
+            ],
         ];
     }
 
@@ -154,6 +161,7 @@ class GanadoDescarteTest extends TestCase
                             'numero' => 'integer',
                             'origen' => 'string',
                             'fecha_nacimiento' => 'string',
+                            'fecha_ingreso' => 'string|null',
                             'ganado_id' => 'integer',
                             'estados' => 'array',
                             'pesos' => 'array|null',
@@ -182,12 +190,46 @@ class GanadoDescarteTest extends TestCase
                             'origen' => 'string',
                             'tipo' => 'string',
                             'fecha_nacimiento' => 'string',
+                            'fecha_ingreso' => 'string|null',
                             'ganado_id' => 'integer',
                             'estados' => 'array',
                             'pesos' => 'array|null',
                         ])
                         ->where('sexo', 'M')
                     ->where('tipo', fn (string $tipoGanado) => Str::contains($tipoGanado, ['becerro', 'maute', 'novillo', 'adulto']))
+                )
+            );
+    }
+
+
+    public function test_creacion_ganadoDescarte_externo(): void
+    {
+        //datos que hacen referencia a que el ganado descarte es de origen externo
+        $this->ganadoDescarte['origen_id'] = 2;
+        $this->ganadoDescarte['fecha_ingreso'] = '2020-02-17';
+
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson('api/ganado_descarte', $this->ganadoDescarte);
+
+        $response->assertStatus(201)
+            ->assertJson(
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
+                    'ganado_descarte',
+                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
+                        ->whereAllType([
+                            'id' => 'integer',
+                            'nombre' => 'string',
+                            'numero' => 'integer',
+                            'origen' => 'string',
+                            'tipo' => 'string',
+                            'fecha_nacimiento' => 'string',
+                            'ganado_id' => 'integer',
+                            'estados' => 'array',
+                            'pesos' => 'array|null',
+                            'sexo' => 'string',
+                            'tipo' => 'string',
+                        ])
+                        ->where('origen', 'Externo')
+                        ->where('fecha_ingreso', $this->ganadoDescarte['fecha_ingreso'])
                 )
             );
     }
@@ -251,6 +293,7 @@ class GanadoDescarteTest extends TestCase
                             'origen' => 'string',
                             'tipo' => 'string',
                             'fecha_nacimiento' => 'string',
+                            'fecha_ingreso' => 'string|null',
                             'ganado_id' => 'integer',
                             'estados' => 'array',
                             'pesos' => 'array|null',
@@ -282,6 +325,7 @@ class GanadoDescarteTest extends TestCase
                             'sexo'=>'string',
                             'origen' => 'string',
                             'fecha_nacimiento' => 'string',
+                            'fecha_ingreso' => 'string|null',
                             'ganado_id' => 'integer',
                             'estados' => 'array',
                             'pesos' => 'array|null',
@@ -337,6 +381,7 @@ class GanadoDescarteTest extends TestCase
                 ->where('ganado_descarte.pesos.peso_2year', $this->ganadoDescarteActualizado['peso_2year'] . 'KG')
                 ->where('ganado_descarte.pesos.peso_actual', $this->ganadoDescarteActualizado['peso_actual'] . 'KG')
                 ->where('ganado_descarte.fecha_nacimiento', $this->ganadoDescarteActualizado['fecha_nacimiento'])
+                ->where('ganado_descarte.fecha_ingreso', $this->ganadoDescarteActualizado['fecha_ingreso'])
                 ->where('ganado_descarte.tipo', fn (string $tipoGanado) => Str::contains($tipoGanado, ['becerro', 'maute', 'novillo', 'adulto']))
                 ->etc()
         );
