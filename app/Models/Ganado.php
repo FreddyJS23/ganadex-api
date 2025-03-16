@@ -26,7 +26,7 @@ class Ganado extends Model
     protected $fillable = [
         'nombre',
         'numero',
-        'origen',
+        'origen_id',
         'tipo_id',
         'sexo',
         'fecha_nacimiento',
@@ -38,6 +38,16 @@ class Ganado extends Model
     public function tipo(): BelongsTo
     {
         return $this->belongsTo(GanadoTipo::class);
+    }
+
+    /**
+     * Get the origenGanado that owns the Ganado
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function origen(): BelongsTo
+    {
+        return $this->belongsTo(OrigenGanado::class);
     }
 
     /**
