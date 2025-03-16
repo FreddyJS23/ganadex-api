@@ -29,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('jornada_vacunacions');
+        Schema::dropIfExists('plan_sanitarios');
     }
 };
