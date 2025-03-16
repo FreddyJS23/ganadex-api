@@ -45,7 +45,6 @@ class GanadoDescarteController extends Controller
         $ganado = new Ganado($request->all());
         $ganado->hacienda_id = session('hacienda_id');
         $ganado->tipo_id = determinar_edad_res($ganado->fecha_nacimiento);
-        $ganado->sexo = "M";
 
         try {
             DB::transaction(

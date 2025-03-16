@@ -26,7 +26,7 @@ class ToroTest extends TestCase
     private array $toro = [
         'nombre' => 'test',
         'numero' => 392,
-        'origen' => 'local',
+        'origen_id' => 1,
         'sexo' => 'M',
         'tipo_id' => 4,
         'fecha_nacimiento' => '2015-02-17',
@@ -48,8 +48,9 @@ class ToroTest extends TestCase
 
     private array $toroActualizado = [
         'nombre' => 'actualizado',
-        'origen' => 'externo',
+        'origen_id' => 2,
         'fecha_nacimiento' => '2010-02-17',
+        'fecha_ingreso' => '2020-02-17',
         'peso_nacimiento' => 50,
         'peso_destete' => 70,
         'peso_2year' => 90,
@@ -112,7 +113,7 @@ class ToroTest extends TestCase
                 [
                     'nombre' => 'test',
                     'numero' => 300,
-                    'origen' => 'local',
+                    'origen_id' => 1,
                     'sexo' => 'M',
                     'tipo_id' => '4',
                     'fecha_nacimiento' => '2015-03-02',
@@ -124,16 +125,22 @@ class ToroTest extends TestCase
                 [
                     'nombre' => 'te',
                     'numero' => 'hj',
-                    'origen' => 'ce',
+                    'origen_id' => 86,
                     'estado_id' => [1],
                     'fecha_nacimiento' => '2015-13-02',
                 ], [
-                    'nombre', 'numero', 'origen', 'fecha_nacimiento',
+                    'nombre', 'numero', 'origen_id', 'fecha_nacimiento',
                 ]
             ],
             'caso de no insertar datos requeridos' => [
-                ['origen' => 'local', 'estado_id' => [1],
-            ], ['nombre', 'numero',]
+                [ 'estado_id' => [1],
+            ], ['nombre', 'numero','origen_id']
+            ],
+            'caso de insertar que es origen externo y no se coloca fecha de ingreso' => [
+                [
+                    'origen_id' => 2,
+                    'estado_id' => [1]
+                ], ['fecha_ingreso']
             ],
         ];
     }
@@ -162,6 +169,7 @@ class ToroTest extends TestCase
                             'numero' => 'integer',
                             'origen' => 'string',
                             'fecha_nacimiento' => 'string',
+                            'fecha_ingreso' => 'string|null',
                             'ganado_id' => 'integer',
                             'estados' => 'array',
                             'pesos' => 'array|null',
@@ -193,6 +201,7 @@ class ToroTest extends TestCase
                             'numero' => 'integer',
                             'origen' => 'string',
                             'fecha_nacimiento' => 'string',
+                            'fecha_ingreso' => 'string|null',
                             'ganado_id' => 'integer',
                             'estados' => 'array',
                             'pesos' => 'array|null',
@@ -202,6 +211,41 @@ class ToroTest extends TestCase
                         ])
                         ->where('sexo', 'M')
                         ->where('tipo', 'adulto')
+                )
+            );
+    }
+
+
+    public function test_creacion_toro_externo(): void
+    {
+        //datos que hacen referencia a que el toro es de origen externo
+        $this->toro['origen_id'] = 2;
+        $this->toro['fecha_ingreso'] = '2020-02-17';
+
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson('api/toro', $this->toro);
+
+        $response->assertStatus(201)
+            ->assertJson(
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
+                    'toro',
+                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
+                        ->whereAllType([
+                            'id' => 'integer',
+                            'nombre' => 'string',
+                            'numero' => 'integer',
+                            'origen' => 'string',
+                            'fecha_nacimiento' => 'string',
+                            'ganado_id' => 'integer',
+                            'estados' => 'array',
+                            'pesos' => 'array|null',
+                            'efectividad' => 'double|null',
+                            'padre_en_partos' => 'integer|null',
+                            'servicios' => 'integer|null',
+                            'sexo' => 'string',
+                            'tipo' => 'string',
+                        ])
+                    ->where('origen', 'Externo')
+                    ->where('fecha_ingreso', $this->toro['fecha_ingreso'])
                 )
             );
     }
@@ -261,6 +305,7 @@ class ToroTest extends TestCase
                             'numero' => 'integer',
                             'origen' => 'string',
                             'fecha_nacimiento' => 'string',
+                             'fecha_ingreso' => 'string|null',
                             'ganado_id' => 'integer',
                             'estados' => 'array',
                             'pesos' => 'array|null',
@@ -333,7 +378,7 @@ class ToroTest extends TestCase
         'tipo_id' => 4,
         'nombre' => 'test',
         'numero' => 392,
-        'origen' => 'local',
+        'origen_id' => 1,
         'fecha_nacimiento' => '2015-02-17']))
         ->create();
 
@@ -344,9 +389,10 @@ class ToroTest extends TestCase
             $json
                 ->where('toro.nombre', $this->toroActualizado['nombre'])
                 ->where('toro.numero', $toroActual['ganado']['numero'])
-                ->where('toro.origen', $this->toroActualizado['origen'])
+                ->where('toro.origen',  'Externo') //origen_id = 2
                 ->where('toro.sexo', $toroActual['ganado']['sexo'])
                 ->where('toro.fecha_nacimiento', $this->toroActualizado['fecha_nacimiento'])
+                ->where('toro.fecha_ingreso', $this->toroActualizado['fecha_ingreso'])
                 ->where('toro.pesos.peso_nacimiento', $this->toroActualizado['peso_nacimiento'] . 'KG')
                 ->where('toro.pesos.peso_destete', $this->toroActualizado['peso_destete'] . 'KG')
                 ->where('toro.pesos.peso_2year', $this->toroActualizado['peso_2year'] . 'KG')

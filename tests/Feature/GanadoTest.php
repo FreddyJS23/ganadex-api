@@ -29,7 +29,7 @@ class GanadoTest extends TestCase
     private array $cabeza_ganado = [
         'nombre' => 'test',
         'numero' => 392,
-        'origen' => 'local',
+        'origen_id' => 1,
         'sexo' => 'H',
         'tipo_id' => 4,
         'fecha_nacimiento' => '2015-02-17',
@@ -52,8 +52,9 @@ class GanadoTest extends TestCase
     ];
     private array $cabeza_ganado_actualizada = [
         'nombre' => 'actualizado',
-        'origen' => 'externo',
+        'origen_id' => 2,
         'fecha_nacimiento' => '2010-02-17',
+        'fecha_ingreso' => '2020-02-17',
         'peso_nacimiento' => 50,
         'peso_destete' => 70,
         'peso_2year' => 90,
@@ -116,7 +117,7 @@ class GanadoTest extends TestCase
                 [
                     'nombre' => 'test',
                     'numero' => 300,
-                    'origen' => 'local',
+                    'origen_id' => 1,
                     'tipo_id' => '4',
                     'fecha_nacimiento' => '2015-03-02',
                     'peso_nacimiento' => 30,
@@ -130,7 +131,7 @@ class GanadoTest extends TestCase
                 [
                     'nombre' => 'te',
                     'numero' => 'hj',
-                    'origen' => 'ce',
+                    'origen_id' => 86,
                     'tipo_id' => '30d',
                     'fecha_nacimiento' => '2015-13-02',
                     'peso_nacimiento' => '30KdG',
@@ -139,21 +140,26 @@ class GanadoTest extends TestCase
                     'peso_actual' => '.30KG',
                     'estado_id' => ["f", "fg", 20],
                 ], [
-                    'nombre', 'numero', 'origen', 'tipo_id', 'fecha_nacimiento',
+                    'nombre', 'numero', 'origen_id', 'tipo_id', 'fecha_nacimiento',
                     'peso_nacimiento', 'peso_destete', 'peso_2year', 'peso_actual', 'estado_id'
                 ]
             ],
             'caso de no insertar datos requeridos' => [
                 [
                     'numero' => 300,
-                    'origen' => 'local',
                     'fecha_nacimiento' => '2015-03-02',
                     'peso_nacimiento' => 30,
                     'peso_destete' => 30,
                     'peso_2year' => 30,
                     'peso_actual' => 30,
                     'estado_id' => ["f", "fg", 20],
-                ], ['nombre', 'tipo_id']
+                ], ['nombre', 'tipo_id', 'origen_id']
+            ],
+            'caso de insertar que es origen externo y no se coloca fecha de ingreso' => [
+                [
+                    'origen_id' => 2,
+                    'estado_id' => [1]
+                ], ['fecha_ingreso']
             ],
         ];
     }
@@ -182,6 +188,7 @@ class GanadoTest extends TestCase
                             'numero' => 'integer',
                             'origen' => 'string',
                             'fecha_nacimiento' => 'string',
+                            'fecha_ingreso' => 'string|null',
                             'estados' => 'array',
                             'estados.0.id' => 'integer',
                             'estados.0.estado' => 'string',
@@ -231,6 +238,7 @@ class GanadoTest extends TestCase
                         'numero' => 'integer',
                         'origen' => 'string',
                         'fecha_nacimiento' => 'string',
+                        'fecha_ingreso' => 'string|null',
                         'estados' => 'array',
                         'estados.0.id' => 'integer',
                         'estados.0.estado' => 'string',
@@ -259,6 +267,41 @@ class GanadoTest extends TestCase
                             'prox_secado' => 'string|null',
                                     ])
                         )
+                )
+            );
+    }
+
+
+    public function test_creacion_cabeza_ganado_origen_externo(): void
+    {
+        //datos que hacen referencia a que la vaca es de origen externo
+        $this->cabeza_ganado['origen_id'] = 2;
+        $this->cabeza_ganado['fecha_ingreso'] = '2020-02-17';
+
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson('api/ganado', $this->cabeza_ganado);
+
+        $response->assertStatus(201)
+            ->assertJson(
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
+                $json->has(
+                    'ganado',
+                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
+                    $json->whereAllType([
+                        'id' => 'integer',
+                        'nombre' => 'string',
+                        'numero' => 'integer',
+                        'fecha_nacimiento' => 'string',
+                        'estados' => 'array',
+                        'estados.0.id' => 'integer',
+                        'estados.0.estado' => 'string',
+                        'sexo' => 'string',
+                        'tipo' => 'string',
+                        'pesos' => 'array|null',
+                        'eventos' => 'array|null',
+                    ])
+                    ->where('origen', 'Externo')
+                    ->where('fecha_ingreso', $this->cabeza_ganado['fecha_ingreso'])
+
                 )
             );
     }
@@ -467,7 +510,7 @@ class GanadoTest extends TestCase
         ->create([
         'nombre' => 'test',
         'numero' => 392,
-        'origen' => 'local',
+        'origen_id' => 1,
         'sexo' => 'H',]);
 
         $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/ganado/%s', $ganadoEditar->id), $this->cabeza_ganado_actualizada);
@@ -477,9 +520,10 @@ class GanadoTest extends TestCase
             $json
                 ->where('ganado.nombre', $this->cabeza_ganado_actualizada['nombre'])
                 ->where('ganado.numero', $ganadoEditar['numero'])
-                ->where('ganado.origen', $this->cabeza_ganado_actualizada['origen'])
+                ->where('ganado.origen', 'Externo') //origen_id = 2
                 ->where('ganado.sexo', $ganadoEditar['sexo'])
                 ->where('ganado.fecha_nacimiento', $this->cabeza_ganado_actualizada['fecha_nacimiento'])
+                ->where('ganado.fecha_ingreso', $this->cabeza_ganado_actualizada['fecha_ingreso'])
                 ->where('ganado.pesos.peso_nacimiento', $this->cabeza_ganado_actualizada['peso_nacimiento'] . 'KG')
                 ->where('ganado.pesos.peso_destete', $this->cabeza_ganado_actualizada['peso_destete'] . 'KG')
                 ->where('ganado.pesos.peso_2year', $this->cabeza_ganado_actualizada['peso_2year'] . 'KG')

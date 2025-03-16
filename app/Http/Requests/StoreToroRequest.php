@@ -25,12 +25,13 @@ class StoreToroRequest extends FormRequest
         return [
             'nombre' => 'required|min:3|max:255|unique:ganados,nombre',
             'numero' => 'required|numeric|between:1,32767|unique:ganados,numero',
-            'origen' => 'min:3,|max:255',
+            'origen_id' => 'required|integer|exists:origen_ganados,id',
             'peso_nacimiento' => 'numeric|between:1,32767',
             'peso_destete' => 'numeric|between:1,32767',
             'peso_2year' => 'numeric|between:1,32767',
             'peso_actual' => 'numeric|between:1,32767',
             'fecha_nacimiento' => 'date_format:Y-m-d',
+            'fecha_ingreso' => ['date_format:Y-m-d', Rule::requiredIf(fn () => $this->origen_id == 2)], //origen externo
             'estado_id' => Rule::foreach(
                 fn($value, $attrubute) => Rule::exists('estados', 'id')
             ),

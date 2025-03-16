@@ -85,7 +85,7 @@ class PartoController extends Controller
                 $nuevaCria->nombre = $cria['nombre'];
                 $nuevaCria->fecha_nacimiento = $request->input('fecha');
                 $nuevaCria->tipo_id =$idTipoBecerro;
-                $nuevaCria->origen = 'local';
+                $nuevaCria->origen_id = 1; //local
                 $nuevaCria->hacienda_id = $idHaciendaSession;
                 $nuevaCria->save();
                 //eventos

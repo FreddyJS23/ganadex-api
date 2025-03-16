@@ -21,7 +21,8 @@ class DatabaseSeeder extends Seeder
            TiposNotificacionSeeder::class,
            VacunaSeeder::class,
            TipoRevisionSeeder::class,
-           PreguntasSeguridadSeeder::class
+           PreguntasSeguridadSeeder::class,
+           OrigenGanadoSeeder::class,
            //DemostracionSeeder::class,
         ]);
     }
