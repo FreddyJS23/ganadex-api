@@ -26,7 +26,7 @@ class GanadoDescarteTest extends TestCase
     private array $ganadoDescarte = [
         'nombre' => 'test',
         'numero' => 392,
-        'origen' => 'local',
+        'origen_id' => 1,
         'sexo' => 'M',
         'fecha_nacimiento' => '2015-02-17',
         'vacunas' => [
@@ -46,7 +46,7 @@ class GanadoDescarteTest extends TestCase
 
     private array $ganadoDescarteActualizado = [
         'nombre' => 'actualizado',
-        'origen' => 'externo',
+        'origen_id' => 2,
         'fecha_nacimiento' => '2010-02-17',
         'peso_nacimiento' => 50,
         'peso_destete' => 70,
@@ -106,7 +106,7 @@ class GanadoDescarteTest extends TestCase
                 [
                     'nombre' => 'test',
                     'numero' => 300,
-                    'origen' => 'local',
+                    'origen_id' => 1,
                     'sexo' => 'M',
                     'tipo_id' => '4',
                     'fecha_nacimiento' => '2015-03-02',
@@ -117,15 +117,15 @@ class GanadoDescarteTest extends TestCase
                 [
                     'nombre' => 'te',
                     'numero' => 'hj',
-                    'origen' => 'ce',
+                    'origen_id' => 86,
                     'fecha_nacimiento' => '2015-13-02',
                     'estado_id' => [1],
                 ], [
-                    'nombre', 'numero', 'origen', 'fecha_nacimiento',
+                    'nombre', 'numero', 'origen_id', 'fecha_nacimiento',
                 ]
             ],
             'caso de no insertar datos requeridos' => [
-                ['origen' => 'local','estado_id' => [1],], ['nombre']
+                ['estado_id' => [1],], ['nombre']
             ],
         ];
     }
@@ -319,7 +319,7 @@ class GanadoDescarteTest extends TestCase
         'tipo_id' => 4,
         'nombre' => 'test',
         'numero' => 392,
-        'origen' => 'local',
+        'origen_id' => 1,
         'fecha_nacimiento' => '2015-02-17']))
         ->create();
 
@@ -330,7 +330,7 @@ class GanadoDescarteTest extends TestCase
             $json
                 ->where('ganado_descarte.nombre', $this->ganadoDescarteActualizado['nombre'])
                 ->where('ganado_descarte.numero', $ganadoDescarteActual['ganado']['numero'])
-                ->where('ganado_descarte.origen', $this->ganadoDescarteActualizado['origen'])
+                ->where('ganado_descarte.origen', 'Externo') //origen_id = 2
                 ->where('ganado_descarte.sexo', $ganadoDescarteActual['ganado']['sexo'])
                 ->where('ganado_descarte.pesos.peso_nacimiento', $this->ganadoDescarteActualizado['peso_nacimiento'] . 'KG')
                 ->where('ganado_descarte.pesos.peso_destete', $this->ganadoDescarteActualizado['peso_destete'] . 'KG')

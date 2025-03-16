@@ -19,7 +19,7 @@ class ToroResource extends JsonResource
             'id' => $this->id,
             'nombre' => $this->ganado->nombre,
             'numero' => $this->ganado->numero,
-            'origen' => $this->ganado->origen,
+            'origen' => $this->ganado->origen->origen,
             'sexo' => $this->ganado->sexo,
             'tipo' => $this->ganado->tipo->tipo,
             'fecha_nacimiento' => $this->ganado->fecha_nacimiento,

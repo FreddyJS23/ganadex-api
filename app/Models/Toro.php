@@ -16,7 +16,7 @@ class Toro extends Model
     protected $fillable = [
         'nombre',
         'numero',
-        'origen',
+        'origen_id',
         'fecha_nacimiento',
     ];
 

@@ -18,7 +18,7 @@ class GanadoResource extends JsonResource
             'id' => $this->id,
             'nombre' => $this->nombre,
             'numero' => $this->numero,
-            'origen' => $this->origen,
+            'origen' => $this->origen->origen,
             'sexo' => $this->sexo,
             'tipo' => $this->tipo->tipo,
             'fecha_nacimiento' => $this->fecha_nacimiento,

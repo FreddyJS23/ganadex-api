@@ -26,7 +26,7 @@ class ToroTest extends TestCase
     private array $toro = [
         'nombre' => 'test',
         'numero' => 392,
-        'origen' => 'local',
+        'origen_id' => 1,
         'sexo' => 'M',
         'tipo_id' => 4,
         'fecha_nacimiento' => '2015-02-17',
@@ -48,7 +48,7 @@ class ToroTest extends TestCase
 
     private array $toroActualizado = [
         'nombre' => 'actualizado',
-        'origen' => 'externo',
+        'origen_id' => 2,
         'fecha_nacimiento' => '2010-02-17',
         'peso_nacimiento' => 50,
         'peso_destete' => 70,
@@ -112,7 +112,7 @@ class ToroTest extends TestCase
                 [
                     'nombre' => 'test',
                     'numero' => 300,
-                    'origen' => 'local',
+                    'origen_id' => 1,
                     'sexo' => 'M',
                     'tipo_id' => '4',
                     'fecha_nacimiento' => '2015-03-02',
@@ -124,16 +124,16 @@ class ToroTest extends TestCase
                 [
                     'nombre' => 'te',
                     'numero' => 'hj',
-                    'origen' => 'ce',
+                    'origen_id' => 86,
                     'estado_id' => [1],
                     'fecha_nacimiento' => '2015-13-02',
                 ], [
-                    'nombre', 'numero', 'origen', 'fecha_nacimiento',
+                    'nombre', 'numero', 'origen_id', 'fecha_nacimiento',
                 ]
             ],
             'caso de no insertar datos requeridos' => [
-                ['origen' => 'local', 'estado_id' => [1],
-            ], ['nombre', 'numero',]
+                [ 'estado_id' => [1],
+            ], ['nombre', 'numero','origen_id']
             ],
         ];
     }
@@ -333,7 +333,7 @@ class ToroTest extends TestCase
         'tipo_id' => 4,
         'nombre' => 'test',
         'numero' => 392,
-        'origen' => 'local',
+        'origen_id' => 1,
         'fecha_nacimiento' => '2015-02-17']))
         ->create();
 
@@ -344,7 +344,7 @@ class ToroTest extends TestCase
             $json
                 ->where('toro.nombre', $this->toroActualizado['nombre'])
                 ->where('toro.numero', $toroActual['ganado']['numero'])
-                ->where('toro.origen', $this->toroActualizado['origen'])
+                ->where('toro.origen',  'Externo') //origen_id = 2
                 ->where('toro.sexo', $toroActual['ganado']['sexo'])
                 ->where('toro.fecha_nacimiento', $this->toroActualizado['fecha_nacimiento'])
                 ->where('toro.pesos.peso_nacimiento', $this->toroActualizado['peso_nacimiento'] . 'KG')

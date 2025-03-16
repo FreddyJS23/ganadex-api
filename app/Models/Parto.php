@@ -74,9 +74,9 @@ class Parto extends Model
         ganados.numero as numero,
         ganados.fecha_nacimiento as fecha_nacimiento,
         ganados.sexo as sexo,
-        ganados.origen as origen
-        ')
-        ->join('ganados','ganado_id','ganados.id');;
+        origen_ganados.origen as origen')
+        ->join('ganados','ganado_id','ganados.id')
+        ->join('origen_ganados','origen_id','origen_ganados.id');
     }
 
     /**
