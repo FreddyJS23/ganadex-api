@@ -242,6 +242,18 @@ class DashboardTest extends TestCase
             );
     }
 
+    public function test_total_vacas_en_ordeño(): void
+    {
+        $this->generarGanado();
+
+        $this
+            ->setUpRequest()
+            ->getJson(route('dashboardPrincipal.totalVacasEnOrdeño'))
+            ->assertStatus(200)
+            ->assertJson(fn(AssertableJson $json): AssertableJson => $json
+                ->whereType('total_vacas_en_ordeño', 'integer'));
+    }
+
     public function test_total_vacas_pendientes_de_revision(): void
     {
         $this->generarGanado();

@@ -106,6 +106,14 @@ class DashboardPrincipalController extends Controller
         return new TopVacasMenosProductorasCollection($topVacasMenosProductoras);
     }
 
+    public function totalVacasEnOrdeño(){
+        $totalVacasEnOrdeño = Ganado::where('hacienda_id', session('hacienda_id'))
+            ->whereRelation('estados', 'estado', 'lactancia')
+            ->count();
+
+        return response()->json(['total_vacas_en_ordeño' => $totalVacasEnOrdeño], 200);
+    }
+
     public function totalGanadoPendienteRevision(Request $request)
     {
 
