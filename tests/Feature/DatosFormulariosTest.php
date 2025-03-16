@@ -262,7 +262,7 @@ class DatosFormulariosTest extends TestCase
                     )
             );
     }
-    
+
     public function test_obtener_veterinarios_hacienda_actual_select(): void
     {
         $this->generarPersonal(CargosPersonal::veterinario);
@@ -308,6 +308,25 @@ class DatosFormulariosTest extends TestCase
                         fn(AssertableJson $json): AssertableJson => $json->whereAllType([
                             'id' => 'integer',
                             'nombre' => 'string',
+                        ])
+                    )
+            );
+    }
+
+    public function test_obtener_origen_ganado(): void
+    {
+        $this
+            ->setUpRequest()
+            ->getJson(route('datosParaFormularios.origenGanado'))
+            ->assertStatus(200)
+            ->assertJson(
+                fn(AssertableJson $json): AssertableJson => $json
+                    ->whereType('origen_ganado', 'array')
+                    ->has(
+                        'origen_ganado.0',
+                        fn(AssertableJson $json): AssertableJson => $json->whereAllType([
+                            'id' => 'integer',
+                            'origen' => 'string',
                         ])
                     )
             );
