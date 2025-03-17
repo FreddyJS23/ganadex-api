@@ -64,7 +64,6 @@ class FallecimientoTest extends TestCase
 
             'caso de insertar datos erróneos' => [
                 [
-                    'causa' => 'te',
                     'ganado_id' => 'hj',
                     'descripcion' => 'hj',
                     'causas_fallecimiento_id' => 'hj',
