@@ -189,8 +189,6 @@ class DemostracionSeeder extends Seeder
                     ->for($i % 2 == 0 ? $toros[rand(0, $elementos - 1)] : $pajuelaToros[rand(0, $elementos - 1)], 'servicioable')
                     ->create(['personal_id' => $veterinario,'tipo' => $i % 2 == 0 ? 'monta' : 'inseminacion']);
 
-                //agregar un estado lactancia ya que se le va a registrar un parto
-                $ganados[$i]->estados()->attach([$estadoSano->id,$estadoLactancia->id]);
 
                 Parto::factory()
                     ->for($ganados[$i])
@@ -200,6 +198,10 @@ class DemostracionSeeder extends Seeder
                     ->for($i % 2 == 0 ? $toros[rand(0, $elementos - 1)] : $pajuelaToros[rand(0, $elementos - 1)], 'partoable')
                     ->create(['personal_id' => $veterinario]);
             }
+
+              //sincronizar estado sano y lactancia
+              $ganados[$i]->estados()->sync([$estadoSano->id,$estadoLactancia->id]);
+
 
             Leche::factory()
                 ->count(5)
