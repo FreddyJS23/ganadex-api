@@ -32,7 +32,7 @@ class StorePartoRequest extends FormRequest
             /* campos crias del parto */
             'crias'=>'bail|required|array',
             'crias.*.nombre' => 'distinct|required|min:3|max:255|unique:ganados,nombre',
-            'crias.*.observacion' => 'string|min:3|max:255',
+            'crias.*.observacion' => 'string|nullable|max:255',
             'crias.*.numero' => 'distinct|numeric|between:1,32767|unique:ganados,numero|nullable',
             'crias.*.sexo' => 'required|in:H,M,T',
             'crias.*.peso_nacimiento' => 'numeric|between:1,32767',
