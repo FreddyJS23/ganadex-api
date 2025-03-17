@@ -433,53 +433,67 @@ class EventosTest extends TestCase
     /* ----------------------- Evento inicio sesion hacienda ----------------------- */
     public function test_verificacion_vaca_pendiente_pesaje_leche_este_mes(): void
     {
-        $estado = Estado::firstWhere('estado', 'sano');
-        $numeroMes = now()->month;
-        $fecha = now();
+        //estados para que pueda estar pendiente pesaje de leche o estados cuando el pesaje de leche ya se realizo
+        $estados = Estado::whereIn('estado', ['sano','lactancia',])->get();
 
+        //estados cuando ya esta pendiente pesaje de leche
+        $estadosPendientePesajeLeche = Estado::wherein('estado', ['sano','pendiente_pesaje_leche','lactancia'])
+        ->get();
+
+        $estadoSano=$estados->firstWhere('estado','sano');
+
+        $fecha = now();
+        $numeroMes = $fecha->month;
+
+        /* operacion para el mes de la fecha actual para asi poder crear un ganado
+            con pesaje de leche de meses anterior al mes actual
+         para que asi pueda estar pendiente del pesaje de leche del mes actual */
         if ($numeroMes <= 11) {
             $fecha = now()->addMonths(2);
         } elseif ($numeroMes == 12) {
             $fecha = now()->subMonths(2);
         }
 
-        $ganadoPendientePesajeLeche = Ganado::factory()
-            ->hasPeso(1)
-            ->hasEvento(1)
-            ->has(
-                Leche::factory()->for($this->hacienda)->state(
-                    fn(array $attributes, Ganado $ganado): array => ['ganado_id' => $ganado->id, 'fecha' => $fecha->format('Y-m-d')]
-                ),
-                'pesajes_leche'
-            )
-            ->hasAttached($estado)
-            ->for($this->hacienda)
-            ->create();
 
-        $ganadoConPesajeLecheHecho = Ganado::factory()
+        $posiblesEcenarios=[
+            /*  ganado que deberia estar pendiente pesaje de leche del mes actual */
+            ['estados'=>$estados,'uso_fecha_actual'=>false],
+            /* ganado que ya se le realizo el pesaje de leche del mes actual */
+            ['estados'=>$estados,'uso_fecha_actual'=>true],
+            /* ganado que ya se verifico y tienen el estado pendiente pesaje de leche */
+            ['estados'=>$estadosPendientePesajeLeche,'uso_fecha_actual'=>false],
+            /* //ganado que ya ha tenido pesajes de leche pero actualmente no esta en lactancia */
+            ['estados'=>$estadoSano,'uso_fecha_actual'=>false],
+        ];
+
+        foreach ($posiblesEcenarios as $posibleEcenario) {
+            Ganado::factory()
             ->hasPeso(1)
             ->hasEvento(1)
             ->has(
                 Leche::factory()->for($this->hacienda)->state(
-                    fn(array $attributes, Ganado $ganado): array => ['ganado_id' => $ganado->id, 'fecha' => now()->format('Y-m-d')]
+                    fn(array $attributes, Ganado $ganado): array => ['ganado_id' => $ganado->id,
+                        'fecha' =>$posibleEcenario['uso_fecha_actual'] ? now()->format('Y-m-d') : $fecha->format('Y-m-d')]
                 ),
                 'pesajes_leche'
             )
-            ->hasAttached($estado)
+            ->hasAttached($posibleEcenario['estados'])
             ->for($this->hacienda)
             ->create();
+        }
+
 
         //evento iniciar sesion hacienda
         $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('crear_sesion_hacienda', ['hacienda' => $this->hacienda->id]));
 
         $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('ganado.index'));
 
-        $response->assertStatus(200)->assertJson(
+        $response->dd()->assertStatus(200)->assertJson(
             fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
             $json->has(
                //ganado pendiente pesaje mensual
                 'cabezas_ganado.1',
-                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has('estados', 3)
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has('estados', 4)
                     ->where(
                         'estados',
                         fn (Collection $estados) => $estados->contains('estado', 'pendiente_pesaje_leche')
@@ -487,12 +501,29 @@ class EventosTest extends TestCase
             )->has(
                 //ganado con pesaje mensual de leche realizado
                 'cabezas_ganado.2',
-                //estado:sano,pendiente_servicio
-                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has('estados', 2)
+                //estado:sano,lactancia,pendiente_servicio
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has('estados', 3)
                     ->where(
                         'estados',
                         fn (Collection $estados) => $estados->doesntContain('estado', 'pendiente_pesaje_leche')
                     )->etc()
+            )
+            ->has(
+                //ganado con estado pendiente pesaje de leche
+                'cabezas_ganado.3',
+                //estado:sano,lactancia,pendiente_servicio
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has('estados', 4)
+                    ->where(
+                        'estados',
+                        fn (Collection $estados) => $estados->contains('estado', 'pendiente_pesaje_leche')
+                    )->etc()
+            )
+            ->has(
+                //ganado con estado sasno
+                'cabezas_ganado.4',
+                //estado:sano,pendiente_servicio
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has('estados', 2)
+                   ->etc()
             )
         );
     }
