@@ -60,6 +60,7 @@ class DemostracionSeeder extends Seeder
 
         $userVeterinario->assignRole('veterinario');
 
+        $hacienda->veterinarios()->attach($crearUsuarioVeterinario->veterinario);
 
         $estadoSano = Estado::firstWhere('estado', 'sano');
         $estadoFallecido = Estado::firstWhere('estado', 'fallecido');
