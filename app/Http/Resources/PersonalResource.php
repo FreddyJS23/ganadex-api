@@ -22,7 +22,7 @@ class PersonalResource extends JsonResource
         "fecha_nacimiento" => $this->fecha_nacimiento,
         "telefono" => $this->telefono,
         "cargo" => $this->cargo->cargo,
-        "haciendas"=> $this->haciendas,
+        "haciendas"=> $this->haciendas->makeHidden(['user_id','created_at','updated_at']),
         /*  "sueldo"=> $this->sueldo, */
         ];
     }

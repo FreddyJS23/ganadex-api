@@ -163,7 +163,7 @@ class PersonalTest extends TestCase
 
         $response->assertStatus(200)->assertJson(['message' => 'Veterinario registrado en la hacienda actual']);
     }
-    
+
     public function test_error_añadir_personal_a_hacienda_cuando_ya_esta_registrado_en_la_hacienda(): void
     {
         $personal=Personal::factory()
@@ -187,10 +187,10 @@ class PersonalTest extends TestCase
         $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id])->deleteJson(route('eliminar_personal_en_hacienda', ['personal' => $personal->id]));
 
         $response->assertStatus(200)->assertJson(['message' => 'Veterinario eliminado de la hacienda']);
-   
+
     }
-    
-    
+
+
 
     public function test_obtener_personal(): void
     {
