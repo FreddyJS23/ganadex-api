@@ -15,7 +15,7 @@ class NotificacionController extends Controller
      */
     public function index()
     {
-        $notificaciones = Notificacion::whereBelongsTo(Auth::user())
+        $notificaciones = Notificacion::where('hacienda_id', session('hacienda_id'))
             ->select('notificacions.id', 'tipo', 'ganado_id', 'leido', 'dias_para_evento')
             ->join('tipos_notificacions', 'tipo_id', 'tipos_notificacions.id')
             ->with('ganado:id,numero')
@@ -60,7 +60,7 @@ class NotificacionController extends Controller
      */
     public function destroyAll()
     {
-        $notificaciones = Notificacion::whereBelongsTo(Auth::user())->get();
+        $notificaciones = Notificacion::where('hacienda_id', session('hacienda_id'))->get();
 
         $notificaciones->modelKeys();
 
