@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('notificacions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('tipo_id')->constrained(table:'tipos_notificacions', indexName: 'notificacions_tipo_id')->cascadeOnDelete();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('hacienda_id')->constrained()->cascadeOnDelete();
             $table->foreignId('ganado_id')->constrained()->cascadeOnDelete();
             $table->boolean('leido')->default(false);
             $table->integer('dias_para_evento');
