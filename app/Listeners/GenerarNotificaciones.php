@@ -28,7 +28,7 @@ class GenerarNotificaciones
 
         Notificacion::firstOrCreate(
             [
-            'user_id' => $userId,
+            'hacienda_id' => session('hacienda_id'),
             'ganado_id' => $ganadoId,
             'dias_para_evento' => $diferenciaDiasEvento,
             'tipo_id' => $columnaTipoNotificacion["$tipo"]

@@ -37,7 +37,7 @@ class NotificacionTest extends TestCase
 
         return Notificacion::factory()
             ->count($this->cantidad_notificaciones)
-            ->for($this->user)
+            ->for($this->hacienda)
             ->for(Ganado::factory()->for($this->hacienda)->hasEvento()->create())
             ->create();
     }

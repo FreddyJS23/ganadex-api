@@ -12,7 +12,7 @@ class Notificacion extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
+        'hacienda_id',
         'tipo_id',
         'ganado_id',
         'dias_para_evento'
@@ -43,9 +43,9 @@ class Notificacion extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function user(): BelongsTo
+    public function hacienda(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Hacienda::class);
     }
 
     public function leido(): Attribute
