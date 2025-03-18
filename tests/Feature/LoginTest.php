@@ -93,6 +93,7 @@ class LoginTest extends TestCase
             'configuracion.peso_servicio' => 'integer',
             'configuracion.dias_evento_notificacion' => 'integer',
             'configuracion.dias_diferencia_vacuna' => 'integer',
+            'hacienda'=>'array|null',
         ])->where('sesion_hacienda', true)))->assertSessionHas('hacienda_id', $this->hacienda->id)
         ->assertSessionHas('peso_servicio', $this->userAdmin->configuracion->peso_servicio)
         ->assertSessionHas('dias_evento_notificacion', $this->userAdmin->configuracion->dias_evento_notificacion)
@@ -118,6 +119,7 @@ class LoginTest extends TestCase
             'configuracion.peso_servicio' => 'integer',
             'configuracion.dias_evento_notificacion' => 'integer',
             'configuracion.dias_diferencia_vacuna' => 'integer',
+            'hacienda'=>'array|null',
         ])->where('sesion_hacienda', false)))->assertSessionMissing('hacienda_id')
         ->assertSessionHas('peso_servicio', $this->userAdmin->configuracion->peso_servicio)
         ->assertSessionHas('dias_evento_notificacion', $this->userAdmin->configuracion->dias_evento_notificacion)
@@ -156,7 +158,7 @@ class LoginTest extends TestCase
     public function test_logear_usuario_veterinario_trabjando_en_varias_haciendas(): void
     {
         $this->userVeterinarioEnVariasHaciendas();
-        
+
         $response = $this->withHeader('origin', config('app.url'))->postJson('api/login', [
             'usuario' => 'veterinario2',
             'password' => 'veterinario2',
@@ -171,6 +173,7 @@ class LoginTest extends TestCase
             'configuracion.peso_servicio' => 'integer',
             'configuracion.dias_evento_notificacion' => 'integer',
             'configuracion.dias_diferencia_vacuna' => 'integer',
+            'hacienda'=>'array|null',
         ])->where('sesion_hacienda', false))
         )
         ->assertSessionMissing('hacienda_id')
@@ -195,6 +198,7 @@ class LoginTest extends TestCase
         'configuracion.peso_servicio' => 'integer',
         'configuracion.dias_evento_notificacion' => 'integer',
         'configuracion.dias_diferencia_vacuna' => 'integer',
+        'hacienda'=>'array|null',
     ])->where('sesion_hacienda', true)))->assertSessionHas('hacienda_id', $this->hacienda->id)
         ->assertSessionHas('peso_servicio', $this->userAdmin->configuracion->peso_servicio)
         ->assertSessionHas('dias_evento_notificacion', $this->userAdmin->configuracion->dias_evento_notificacion)

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Events\CrearSesionHacienda;
 use App\Http\Requests\LoginRequest;
 use App\Http\Resources\ConfiguracionResource;
+use App\Http\Resources\HaciendaResource;
 use App\Models\Configuracion;
 use App\Models\Hacienda;
 use App\Models\User;
@@ -36,6 +37,7 @@ class AuthLogin extends Controller
         $rol = $user->hasRole('admin') ? 'admin' : 'veterinario';
         //notificar en el client si el login incluye inicio de sesion hacienda
         $sesion_hacienda = false;
+        $hacienda = null;
         $configuracion = null;
 
         if ($rol == 'admin') {
@@ -74,7 +76,7 @@ class AuthLogin extends Controller
                 event(new CrearSesionHacienda($hacienda));
                 $sesion_hacienda = true;
             }
-            
+
         }
         /* En caso que haya mas haciendas creadas se debera asignar manualmente en el contralador hacienda */
 
@@ -89,6 +91,7 @@ class AuthLogin extends Controller
                         'token' => $user->createToken('API_TOKEN')->plainTextToken,
                         'sesion_hacienda' => $sesion_hacienda,
                         'configuracion' => new ConfiguracionResource($configuracion),
+                        'hacienda'=>$hacienda ?  new HaciendaResource($hacienda) : null,
                     ]
                 ],
                 200
