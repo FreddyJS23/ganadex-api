@@ -193,7 +193,7 @@ class PartoTest extends TestCase
                     'personal_id' => 'be',
                     'crias'=>[
                         [
-                    'observacion' => 'bi',
+                    'observacion' => 32,
                     'nombre' => 'te',
                     'numero' => 'd3',
                     'sexo' => 'macho',
