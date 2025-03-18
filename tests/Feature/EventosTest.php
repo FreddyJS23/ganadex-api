@@ -488,7 +488,7 @@ class EventosTest extends TestCase
 
         $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('ganado.index'));
 
-        $response->dd()->assertStatus(200)->assertJson(
+        $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
             $json->has(
                //ganado pendiente pesaje mensual
