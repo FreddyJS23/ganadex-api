@@ -51,13 +51,9 @@ class HaciendaController extends Controller
         return response()->json(['hacienda' => new HaciendaResource($hacienda)], 200);
     }
 
-    public function cambiar_hacienda_sesion(Request $request)
+    public function cambiar_hacienda_sesion(Request $request,Hacienda $hacienda)
     {
         $this->authorize('cambiar_hacienda_sesion');
-
-        $nombreHacienda = $request->query('hacienda');
-
-        $hacienda = Hacienda::firstWhere('nombre', $nombreHacienda);
 
         if($hacienda == null){
             return response()->json(['message' => 'no existe esa hacienda'], 404);
