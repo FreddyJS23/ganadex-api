@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Estado;
 use App\Models\Hacienda;
 use App\Models\Ganado;
+use App\Models\GanadoDescarte;
 use App\Models\PajuelaToro;
 use App\Models\Parto;
 use App\Models\PartoCria;
@@ -523,6 +524,102 @@ class PartoTest extends TestCase
                 )
             );
     }
+
+    /* para poder identificar a las crias a futuro, cuando se descarteno sea una cria toro */
+    public function test_obtener_parto_monta_cria_es_toro(): void
+    {
+        $cria=Ganado::factory(['nombre'=>'vaca de prueba'])->for($this->hacienda)->hasAttached($this->estado)->create();
+
+        $parto= Parto::factory()
+        ->for($this->ganadoServicioMonta)
+        ->has(PartoCria::factory()->for($cria))
+        ->for($this->toro, 'partoable')
+        ->create(['personal_id' => $this->veterinario]);
+
+        //convertir en toro
+         $this->toro=Toro::factory()
+            ->for($this->hacienda)
+            ->for($cria)
+            ->create();
+
+
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf($this->urlServicioMonta . '/%s', $parto->id));
+
+        $response->assertStatus(200)
+            ->assertJson(
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
+                    'parto',
+                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
+                    $json->whereAllType([
+                        'id' => 'integer',
+                        'fecha' => 'string',
+                        'observacion' => 'string',
+                        'crias' => 'array',
+                    ])
+                    ->where('crias.0.toro_id', $this->toro->id)
+                    ->where('crias.0.descarte_id', null)
+                    ->has(
+                        'padre_toro',
+                        fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
+                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
+                    )->has(
+                        'personal',
+                        fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
+                        => $json->whereAllType(['id' => 'integer', 'nombre' => 'string'])
+                            ->where('cargo', 'veterinario')
+                    )
+                )
+            );
+    }
+
+    /* para poder identificar a las crias a futuro, cuando se descarten o sea una cria toro */
+    public function test_obtener_parto_monta_cria_es_descarte(): void
+    {
+        $cria=Ganado::factory(['nombre'=>'vaca de prueba'])->for($this->hacienda)->hasAttached($this->estado)->create();
+
+        $parto= Parto::factory()
+        ->for($this->ganadoServicioMonta)
+        ->has(PartoCria::factory()->for($cria))
+        ->for($this->toro, 'partoable')
+        ->create(['personal_id' => $this->veterinario]);
+
+        //convertir a ganado de descarte
+         $this->toro=GanadoDescarte::factory()
+            ->for($this->hacienda)
+            ->for($cria)
+            ->create();
+
+
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf($this->urlServicioMonta . '/%s', $parto->id));
+
+        $response->assertStatus(200)
+            ->assertJson(
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
+                    'parto',
+                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
+                    $json->whereAllType([
+                        'id' => 'integer',
+                        'fecha' => 'string',
+                        'observacion' => 'string',
+                        'crias' => 'array',
+                    ])
+                    ->where('crias.0.toro_id', null)
+                    ->where('crias.0.descarte_id', $this->toro->id)
+                    ->has(
+                        'padre_toro',
+                        fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
+                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
+                    )->has(
+                        'personal',
+                        fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
+                        => $json->whereAllType(['id' => 'integer', 'nombre' => 'string'])
+                            ->where('cargo', 'veterinario')
+                    )
+                )
+            );
+    }
+
+
     public function test_actualizar_parto_monta(): void
     {
         $partos = $this->generarpartosMonta();
