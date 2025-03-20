@@ -38,11 +38,9 @@ class VerificarVacasAptaParaServicio
                 ->doesntHave('ganadoDescarte')
                 ->doesntHave('fallecimiento')
                 ->doesntHave('venta')
-                ->whereRelation('estados', 'estado', 'sano')
-                ->whereRelation('estados', 'estado','!=', 'gestacion')
-                ->whereRelation('estados', 'estado','!=', 'pendiente_servicio')
-                ->whereRelation('estados', 'estado','!=', 'vendido')
-                ->whereRelation('estados', 'estado','!=', 'fallecido')
+                ->whereHas('estados',function (Builder $query) {
+                    $query->whereNotIn('estado',['vendido','fallecido','pendiente_servicio','gestacion'])
+                })
                 ->where('hacienda_id', $haciendaId)
                 ->whereHas(
                     'peso',
@@ -53,6 +51,10 @@ class VerificarVacasAptaParaServicio
             ->get();
 
             foreach ($vacasAptasParaServicio as $vacaAptaParaServicio) {
+
+                //si ya tiene el estado pendiente pesaje de leche no se hace nada
+                //sin esto los estados pendientes de pesaje de leche se acumulan
+                if($vacaSinPesarEsteMes->estados->contains('estado', 'pendiente_servicio')) return;
                 $vacaAptaParaServicio->estados()->attach($estado->id);
             }
         }
