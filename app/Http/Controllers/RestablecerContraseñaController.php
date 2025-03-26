@@ -103,6 +103,7 @@ class RestablecerContraseñaController extends Controller
     }
 
         $usuario->password = Hash::make($password);
+        $usuario->save();
 
         //eliminar token
         DB::table('password_reset_tokens')
