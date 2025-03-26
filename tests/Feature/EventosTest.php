@@ -91,8 +91,8 @@ class EventosTest extends TestCase
     ];
 
     private array $respuestasSeguridad = [
-        'preguntas' => [1,2,3],
-        'respuestas' => ['muy bien','bienn','perrito'],
+        'pregunta_seguridad_id' => 1,
+        'respuesta' => 'muy bien',
     ];
 
     protected function setUp(): void
@@ -678,7 +678,13 @@ class EventosTest extends TestCase
         $this->user->assignRole('admin');
 
         //añadir preguntas y respuestas de seguridad al usuario
-        $this->actingAs($this->user)->postJson(route('respuesta_seguridad.store'), $this->respuestasSeguridad);
+        /* se añaden dos por factorys y una manual, para que en la manual,
+        se active que el usuario tiene el minimo de preguntas de seguridad, el minimo es 3 */
+        RespuestasSeguridad::factory()
+        ->count(3)
+        ->for($this->user)
+        ->create();
+        $this->actingAs($this->user)->postJson(route('respuestas_seguridad.store'), $this->respuestasSeguridad);
 
         $response = $this->actingAs($this->user)->getJson(route('usuario.show', ['user' => $this->user->id]));
         $response->assertStatus(200)
