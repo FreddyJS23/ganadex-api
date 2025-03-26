@@ -34,6 +34,6 @@ class RespuestasSeguridad extends Model
      */
     public function preguntaSeguridad(): BelongsTo
     {
-        return $this->belongsTo(PreguntasSeguridad::class);
+        return $this->belongsTo(PreguntasSeguridad::class, 'preguntas_seguridad_id');
     }
 }

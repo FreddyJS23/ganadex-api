@@ -16,11 +16,10 @@ class RespuestasSeguridadResource extends JsonResource
     public function toArray(Request $request): array
     {
         $data=Carbon::create($this->updated_at);
-
         return [
             'id' => $this->id,
-            'pregunta' => $this->pregunta,
-            'pregunta_seguridad_id' => $this->pregunta_seguridad_id,
+            'pregunta' =>$this->pregunta ??  $this->preguntaSeguridad->pregunta,
+            'pregunta_seguridad_id' => $this->preguntas_seguridad_id,
             'respuesta' => '********',
             'updated_at' => $data->format('d-m-Y'),
         ];

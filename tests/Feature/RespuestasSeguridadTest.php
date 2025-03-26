@@ -49,7 +49,7 @@ class RespuestasSeguridadTest extends TestCase
         return RespuestasSeguridad::factory()
             ->count($count)
             ->for($this->user)
-            ->create();
+            ->create(['updated_at'=>now()->subDays(10)]);
     }
 
     private function cambiarRol(User $user): void
@@ -182,7 +182,7 @@ class RespuestasSeguridadTest extends TestCase
                 fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
                     ->has('respuesta_seguridad',fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                     $json->where('pregunta_seguridad_id',$this->nuevaRespuestaSeguridad['pregunta_seguridad_id'])
-                    ->where('respuesta',$this->nuevaRespuestaSeguridad['respuesta'])
+                    ->where('updated_at',now()->format('d-m-Y'))
                     ->etc())
             );
     }
@@ -240,7 +240,7 @@ class RespuestasSeguridadTest extends TestCase
                 fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
                     ->has('respuesta_seguridad',fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                     $json->where('pregunta_seguridad_id',$this->nuevaRespuestaSeguridad['pregunta_seguridad_id'])
-                    ->where('respuesta',$this->nuevaRespuestaSeguridad['respuesta'])
+                    ->where('updated_at',now()->format('d-m-Y'))
                     ->etc())
             );
     }

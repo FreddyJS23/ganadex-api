@@ -21,15 +21,8 @@ class RespuestasSeguridadController extends Controller
      */
     public function index()
     {
-        /* los detalles des las respuestas se hacen aqui ya que el metodo del
-         modelo user solo se devuelven las preguntas de seguridad que tiene el usuario */
-        $query=RespuestasSeguridad::selectRaw('respuestas_seguridad.id,
-        preguntas_seguridad.pregunta,
-        respuestas_seguridad.updated_at,
-        preguntas_seguridad.id as pregunta_seguridad_id')
-        ->join('preguntas_seguridad','preguntas_seguridad_id','preguntas_seguridad.id')
-        ->where('user_id',Auth::id())->get()    ;
-
+    
+        $query=RespuestasSeguridad::with('preguntaSeguridad')->where('user_id',Auth::id())->get()    ;
 
        /* en lugar de enviar las respuestas de seguridad con su pregunta, solo se envian las preguntas
         ya que las respuestas estan cifradas */
