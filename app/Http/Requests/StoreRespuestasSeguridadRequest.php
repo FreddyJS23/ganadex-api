@@ -23,10 +23,8 @@ class StoreRespuestasSeguridadRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'preguntas' => 'required|array|min:3',
-            'respuestas' => 'required|array|min:3',
-            'preguntas.*' => ['integer',Rule::exists('preguntas_seguridad', 'id')],
-            'respuestas.*' => 'required|string|max:255',
+            'pregunta_seguridad_id' =>  ['required','integer',Rule::exists('preguntas_seguridad', 'id')],
+            'respuesta'=>'required|min:4|string|max:255',
         ];
     }
 }
