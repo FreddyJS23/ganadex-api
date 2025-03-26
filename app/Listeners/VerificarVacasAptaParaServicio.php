@@ -50,13 +50,16 @@ class VerificarVacasAptaParaServicio
                 )
             ->get();
 
-            foreach ($vacasAptasParaServicio as $vacaAptaParaServicio) {
 
-                //si ya tiene el estado pendiente pesaje de leche no se hace nada
-                //sin esto los estados pendientes de pesaje de leche se acumulan
-                if($vacaAptaParaServicio->estados->contains('estado', 'pendiente_servicio')) return;
-                $vacaAptaParaServicio->estados()->attach($estado->id);
-            }
+            if(  $vacasAptasParaServicio->count() > 0){
+                foreach ($vacasAptasParaServicio as $vacaAptaParaServicio) {
+
+                    //si ya tiene el estado pendiente servicio no se hace nada
+                    //sin esto los estados pendientes de servicio se acumulan
+                    if($vacaAptaParaServicio->estados->contains('estado', 'pendiente_servicio')) continue;
+                    $vacaAptaParaServicio->estados()->attach($estado->id);
+                }
+            };
         }
         activity('servicio')
             ->withProperties('evento')
