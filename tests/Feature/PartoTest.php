@@ -168,7 +168,7 @@ class PartoTest extends TestCase
         return Parto::factory()
             ->count($this->cantidad_parto)
             ->for($this->ganadoServicioMonta)
-            ->has(PartoCria::factory()->for(Ganado::factory()->for($this->hacienda)->hasAttached($this->estado)))
+            ->has(PartoCria::factory()->for(Ganado::factory()->hasPeso(1)->for($this->hacienda)->hasAttached($this->estado)))
             ->for($this->toro, 'partoable')
             ->create(['personal_id' => $this->veterinario]);
     }
@@ -179,7 +179,7 @@ class PartoTest extends TestCase
             ->count($this->cantidad_parto)
             ->for($this->ganadoServicioMonta)
             //se usa el state en lugar de for para asegurarse de que cada parto tenga una cria distinta, con for una misma cria pertenececira a todos los partos
-            ->has(PartoCria::factory()->state(['ganado_id'=>Ganado::factory()->for($this->hacienda)->hasAttached($this->estado)]))
+            ->has(PartoCria::factory()->state(['ganado_id'=>Ganado::factory()->hasPeso()->for($this->hacienda)->hasAttached($this->estado)]))
             ->for($this->pajuelaToro, 'partoable')
             ->create(['personal_id' => $this->veterinario]);
     }
@@ -308,6 +308,7 @@ class PartoTest extends TestCase
                         'crias.0.sexo' => 'string',
                         'crias.0.origen' => 'string',
                         'crias.0.fecha_nacimiento' => 'string',
+                        'crias.0.peso_nacimiento'=>'integer'
                     ])->has(
                         'padre_toro',
                         fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
@@ -511,6 +512,8 @@ class PartoTest extends TestCase
                         'crias.0.sexo' => 'string',
                         'crias.0.origen' => 'string',
                         'crias.0.fecha_nacimiento' => 'string',
+                        'crias.0.peso_nacimiento'=>'integer'
+
                     ])->has(
                         'padre_toro',
                         fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
