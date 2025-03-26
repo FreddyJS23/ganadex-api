@@ -41,13 +41,18 @@ class RestablecerContraseñaController extends Controller
 
         $usuario = User::firstWhere('usuario', $usuario);
 
+         //si el usuario no tiene preguntas de seguridad, no se puede restablecer la contraseña
+         if(!$usuario){
+            return response()->json(['message' => 'Usuario no encontrado'],404);
+        }
+
          //vaciar tokens existente por si se intento restablecer la contraseña y no se haya culminado el proceso
         DB::table('password_reset_tokens')->where(['usuario'=> $usuario->usuario])->delete();
 
 
         //si el usuario no tiene preguntas de seguridad, no se puede restablecer la contraseña
         if($usuario->preguntasSeguridad->count()==0){
-            return response()->json(['error' => 'El usuario no tiene preguntas de seguridad'],403);
+            return response()->json(['message' => 'El usuario no tiene preguntas de seguridad'],403);
         }
 
         $token = Str::random(64);
@@ -86,8 +91,10 @@ class RestablecerContraseñaController extends Controller
 
         //verificar respuestas
         foreach ($usuario->respuestasSeguridad as $index => $respuesta) {
-            /* convertir a minúsculas las respuestas para que a la hora de colocar la respuesta no tenga disticion de la primera letra */
-            /* esto se hace con el fin de que el usuario pueda ingresar las respuestas en minúsculas y que la comparación sea case insensitive */
+            /* convertir a minúsculas las respuestas ya que cuando se guardan o actualizan, las respuestas
+            se almacenan en minúsculas para que a la hora de comparar con la respuesta cifrada no tenga
+            distinción de la primera letra */
+
             $respuestaForm=strtolower($respuestasForm[$index]);
 
             //si la respuesta cifrada no coincide con la respuesta en la base de datos, devuelve error
@@ -104,6 +111,6 @@ class RestablecerContraseñaController extends Controller
         ])
         ->delete();
 
-        return response()->json(['message' => 'contraseña cambiada'],200);
+        return response()->json(['message' => 'Contraseña restablecida exitosamente'],200);
     }
 }
