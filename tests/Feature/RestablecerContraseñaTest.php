@@ -70,6 +70,9 @@ class RestablecerContraseñaTest extends TestCase
 
         $response->assertStatus(200)->assertJson(fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
             $json->whereAllType(['token' => 'string','preguntas' => 'array'])
+            ->has('preguntas.0', fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
+            $json->whereAllType(['id' => 'integer','pregunta' => 'string'])
+            )
     );
     }
 
@@ -81,7 +84,7 @@ class RestablecerContraseñaTest extends TestCase
         ]);
 
         $response->assertStatus(403)->assertJson(fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
-            $json->where('error','El usuario no tiene preguntas de seguridad')
+            $json->where('message','El usuario no tiene preguntas de seguridad')
     );
     }
 
@@ -97,7 +100,7 @@ class RestablecerContraseñaTest extends TestCase
             'respuestas' => ['perro','abuelo','favorito'],
         ]);
 
-        $response->assertStatus(200)->assertJson(['message' => 'contraseña cambiada']);
+        $response->assertStatus(200)->assertJson(['message' => 'Contraseña restablecida exitosamente']);
     }
 
     public function test_restablecer_contraseña_con_insensible_a_mayúscula_y_minúscula(): void
@@ -111,7 +114,7 @@ class RestablecerContraseñaTest extends TestCase
             'respuestas' => ['perro','ABUELO','Favorito'],
         ]);
 
-        $response->assertStatus(200)->assertJson(['message' => 'contraseña cambiada']);
+        $response->assertStatus(200)->assertJson(['message' => 'Contraseña restablecida exitosamente']);
     }
 
 
