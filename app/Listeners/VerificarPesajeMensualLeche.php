@@ -45,12 +45,13 @@ class VerificarPesajeMensualLeche
                 )
                 ->get();
 
+                if($vacasSinPesarEsteMes->count()==0) return;
             foreach ($vacasSinPesarEsteMes as $vacaSinPesarEsteMes) {
-                
+
                 //si ya tiene el estado pendiente pesaje de leche no se hace nada
                 //sin esto los estados pendientes de pesaje de leche se acumulan
                 if($vacaSinPesarEsteMes->estados->contains('estado', 'pendiente_pesaje_leche')) return;
-                
+
                 $vacaSinPesarEsteMes->estados()->attach($estado->id);
             }
         }
