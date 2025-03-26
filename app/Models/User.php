@@ -130,9 +130,12 @@ class User extends Authenticatable
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
+
     public function preguntasSeguridad(): HasMany
     {
-         return $this->respuestasSeguridad()->selectRaw('respuestas_seguridad.id, preguntas_seguridad.pregunta')
+         return $this->respuestasSeguridad()->selectRaw('preguntas_seguridad.id as id,
+         preguntas_seguridad.pregunta
+')
         ->join('preguntas_seguridad','preguntas_seguridad_id','preguntas_seguridad.id');
     }
 
