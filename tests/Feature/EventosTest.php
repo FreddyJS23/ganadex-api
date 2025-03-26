@@ -12,6 +12,7 @@ use App\Models\Leche;
 use App\Models\Parto;
 use App\Models\PartoCria;
 use App\Models\Personal;
+use App\Models\RespuestasSeguridad;
 use App\Models\TiposNotifiacion;
 use App\Models\Toro;
 use App\Models\User;
@@ -603,7 +604,8 @@ class EventosTest extends TestCase
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
             $json->has(
-               //ganado pendiente pesaje mensual
+               //ganado pendiente apta para servicio
+               //estado:sano,pendiente_servicio
                 'cabezas_ganado.1',
                 fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has('estados', 2)
                     ->where(
@@ -611,7 +613,8 @@ class EventosTest extends TestCase
                         fn (Collection $estados) => $estados->contains('estado', 'pendiente_servicio')
                     )->etc()
             )->has(
-                //ganado con pesaje mensual de leche realizado
+                //ganado no apto para servicio
+                //estado:sano
                 'cabezas_ganado.2',
                 fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has('estados', 1)
                     ->where(
