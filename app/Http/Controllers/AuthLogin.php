@@ -92,6 +92,7 @@ class AuthLogin extends Controller
                         'sesion_hacienda' => $sesion_hacienda,
                         'configuracion' => new ConfiguracionResource($configuracion),
                         'hacienda'=>$hacienda ?  new HaciendaResource($hacienda) : null,
+                        'tiene_preguntas_seguridad' => $user->tiene_preguntas_seguridad,
                     ]
                 ],
                 200
