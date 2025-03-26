@@ -39,7 +39,7 @@ class VerificarVacasAptaParaServicio
                 ->doesntHave('fallecimiento')
                 ->doesntHave('venta')
                 ->whereHas('estados',function (Builder $query) {
-                    $query->whereNotIn('estado',['vendido','fallecido','pendiente_servicio','gestacion'])
+                    $query->whereNotIn('estado',['vendido','fallecido','pendiente_servicio','gestacion']);
                 })
                 ->where('hacienda_id', $haciendaId)
                 ->whereHas(
@@ -54,7 +54,7 @@ class VerificarVacasAptaParaServicio
 
                 //si ya tiene el estado pendiente pesaje de leche no se hace nada
                 //sin esto los estados pendientes de pesaje de leche se acumulan
-                if($vacaSinPesarEsteMes->estados->contains('estado', 'pendiente_servicio')) return;
+                if($vacaAptaParaServicio->estados->contains('estado', 'pendiente_servicio')) return;
                 $vacaAptaParaServicio->estados()->attach($estado->id);
             }
         }
