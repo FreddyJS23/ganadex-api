@@ -69,6 +69,7 @@ class Parto extends Model
     {
         return $this->partoCrias()->selectRaw('ganados.id as id,
         observacion,
+        pesos.peso_nacimiento as peso_nacimiento,
         parto_id,
         toros.id as toro_id,
         ganado_descartes.id as descarte_id,
@@ -79,6 +80,7 @@ class Parto extends Model
         origen_ganados.origen as origen')
         ->join('ganados','ganado_id','ganados.id')
         ->join('origen_ganados','origen_id','origen_ganados.id')
+        ->leftJoin('pesos','ganados.id','pesos.ganado_id')
         /* relaciones para poder identificar a las crias a futuro, cuando se descarten o sea una cria toro
         para asi en el frontend poder saber donde redireccionar cuando se quiera consultar */
         ->leftJoin('toros','ganados.id','toros.ganado_id')
