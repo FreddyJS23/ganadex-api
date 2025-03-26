@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreRespuestasSeguridadRequest;
 use App\Http\Requests\UpdateRespuestasSeguridadRequest;
 use App\Http\Resources\PreguntasSeguridadCollection;
+use App\Http\Resources\RespuestasSeguridadCollection;
+use App\Http\Resources\RespuestasSeguridadResource;
 use App\Models\RespuestasSeguridad;
 use App\Models\User;
+use Illuminate\Http\Client\Request as ClientRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -18,9 +21,19 @@ class RespuestasSeguridadController extends Controller
      */
     public function index()
     {
-        /* en lugar de enviar las respuestas de seguridad con su pregunta, solo se envian las preguntas
+        /* los detalles des las respuestas se hacen aqui ya que el metodo del
+         modelo user solo se devuelven las preguntas de seguridad que tiene el usuario */
+        $query=RespuestasSeguridad::selectRaw('respuestas_seguridad.id,
+        preguntas_seguridad.pregunta,
+        respuestas_seguridad.updated_at,
+        preguntas_seguridad.id as pregunta_seguridad_id')
+        ->join('preguntas_seguridad','preguntas_seguridad_id','preguntas_seguridad.id')
+        ->where('user_id',Auth::id())->get()    ;
+
+
+       /* en lugar de enviar las respuestas de seguridad con su pregunta, solo se envian las preguntas
         ya que las respuestas estan cifradas */
-     return new PreguntasSeguridadCollection(Auth::user()->preguntasSeguridad);
+     return new RespuestasSeguridadCollection($query);
     }
 
 
@@ -29,27 +42,27 @@ class RespuestasSeguridadController extends Controller
      */
     public function store(StoreRespuestasSeguridadRequest $request)
     {
-        $respuestasSeguridad=[];
+        $user=$request->user();
 
-        //iteraccion para guardar las preguntas de seguridad y las respuestas
-        foreach ($request->input('preguntas') as $index => $pregunta) {
-
-           /* convertir a minúsculas las respuestas para que a la hora de colocar la respuesta no tenga disticion de la primera letra */
+        $respuestaSeguridad=New RespuestasSeguridad();
+        $respuestaSeguridad->preguntas_seguridad_id=$request->pregunta_seguridad_id;
+         /* convertir a minúsculas las respuestas para que a la hora de colocar la respuesta no tenga disticion de la primera letra */
             /* esto se hace con el fin de que el usuario pueda ingresar las respuestas en minúsculas y que la comparación sea case insensitive */
-             $respuesta=strtolower($request->input('respuestas')[$index]);
+        $respuestaUser=strtolower($request->respuesta);
+        $respuestaSeguridad->respuesta=Hash::make($respuestaUser);
+        $respuestaSeguridad->user_id=$user->id;
+        $respuestaSeguridad->save();
 
-            $respuestaSeguridad=['preguntas_seguridad_id'=>$pregunta,
-            'respuesta'=>Hash::make($respuesta)];
+        /* no se hace un solo if para evitar consulta innecesaria */
+        if(!$user->tiene_preguntas_seguridad)
+      {
+        //refresh de la tabla para que se actualice el valor de tiene_preguntaSeguridad
+        $user->refresh();
+        //si el usuario cumple con el minimo de preguntas se guardara en la bd
+        if($user->respuestasSeguridad->count() >= 3 ){
+            User::where('id',$user->id)->update(['tiene_preguntas_seguridad'=>1]);
+        };}
 
-            array_push($respuestasSeguridad,$respuestaSeguridad);
-        }
-
-        //si el usuario no tiene preguntas de seguridad, se guarda en la base de datos que ya tiene
-        if(!$request->user()->tiene_preguntas_seguridad){
-            User::where('id',$request->user()->id)->update(['tiene_preguntas_seguridad'=>1]);
-        };
-
-        $request->user()->respuestasSeguridad()->createMany($respuestasSeguridad);
 
         return response()->json(['message' => 'preguntas de seguridad creadas'], 201);
     }
@@ -68,9 +81,15 @@ class RespuestasSeguridadController extends Controller
      */
     public function update(UpdateRespuestasSeguridadRequest $request, RespuestasSeguridad $respuestaSeguridad)
     {
-        $respuestaSeguridad->update($request->all());
+        /* convertir a minúsculas las respuestas para que a la hora de colocar la respuesta no tenga disticion de la primera letra,
+        esto se hace con el fin de que el usuario pueda ingresar las respuestas en minúsculas y que la comparación sea case insensitive */
+       $respuestaUser=strtolower($request->respuesta);
 
-        return response()->json(['message' => 'pregunta de seguridad actualizadas'], 200);
+       $respuestaSeguridad->preguntas_seguridad_id=$request->pregunta_seguridad_id;
+       $respuestaSeguridad->respuesta=Hash::make($respuestaUser);
+       $respuestaSeguridad->save();
+
+        return response()->json(['respuesta_seguridad' => new RespuestasSeguridadResource($respuestaSeguridad)], 200);
     }
 
     /**
@@ -78,7 +97,20 @@ class RespuestasSeguridadController extends Controller
      */
     public function destroy(RespuestasSeguridad $respuestaSeguridad)
     {
-        return  response()->json(['respuestaSeguridadID' => RespuestasSeguridad::destroy($respuestaSeguridad->id) ?  $respuestaSeguridad->id : ''], 200);
+        $user=$respuestaSeguridad->user;
+        $eliminar=boolval(RespuestasSeguridad::destroy($respuestaSeguridad->id));
+
+        /* para evitar consulta innecesaria, si el usuario no tiene preguntas de seguridad no hace falta chequear si tiene preguntas de seguridad minima */
+       if($user->tiene_preguntas_seguridad)
+       {
+        //refresh de la tabla para que se actualice el valor de tiene_preguntaSeguridad
+        $user->refresh();
+
+        /* si la eliminacion hace que el usuario no tenga el minimo de preguntas de seguridad, se cambiara en la bd para poder
+        advertir al usuario que no tiene las preguntas de seguridad minimas */
+        if($eliminar && $user->respuestasSeguridad->count() < 3)    User::where('id',$user->id)->update(['tiene_preguntas_seguridad'=>0]);}
+
+        return  response()->json(['respuestaSeguridadID' => $eliminar ?  $respuestaSeguridad->id : ''], 200);
 
     }
 }
