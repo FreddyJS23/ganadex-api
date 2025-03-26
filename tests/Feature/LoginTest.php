@@ -94,6 +94,7 @@ class LoginTest extends TestCase
             'configuracion.dias_evento_notificacion' => 'integer',
             'configuracion.dias_diferencia_vacuna' => 'integer',
             'hacienda'=>'array|null',
+            'tiene_preguntas_seguridad'=>'boolean'
         ])->where('sesion_hacienda', true)))->assertSessionHas('hacienda_id', $this->hacienda->id)
         ->assertSessionHas('peso_servicio', $this->userAdmin->configuracion->peso_servicio)
         ->assertSessionHas('dias_evento_notificacion', $this->userAdmin->configuracion->dias_evento_notificacion)
@@ -120,6 +121,7 @@ class LoginTest extends TestCase
             'configuracion.dias_evento_notificacion' => 'integer',
             'configuracion.dias_diferencia_vacuna' => 'integer',
             'hacienda'=>'array|null',
+            'tiene_preguntas_seguridad'=>'boolean'
         ])->where('sesion_hacienda', false)))->assertSessionMissing('hacienda_id')
         ->assertSessionHas('peso_servicio', $this->userAdmin->configuracion->peso_servicio)
         ->assertSessionHas('dias_evento_notificacion', $this->userAdmin->configuracion->dias_evento_notificacion)
@@ -174,6 +176,7 @@ class LoginTest extends TestCase
             'configuracion.dias_evento_notificacion' => 'integer',
             'configuracion.dias_diferencia_vacuna' => 'integer',
             'hacienda'=>'array|null',
+            'tiene_preguntas_seguridad'=>'boolean'
         ])->where('sesion_hacienda', false))
         )
         ->assertSessionMissing('hacienda_id')
@@ -199,6 +202,7 @@ class LoginTest extends TestCase
         'configuracion.dias_evento_notificacion' => 'integer',
         'configuracion.dias_diferencia_vacuna' => 'integer',
         'hacienda'=>'array|null',
+        'tiene_preguntas_seguridad'=>'boolean'
     ])->where('sesion_hacienda', true)))->assertSessionHas('hacienda_id', $this->hacienda->id)
         ->assertSessionHas('peso_servicio', $this->userAdmin->configuracion->peso_servicio)
         ->assertSessionHas('dias_evento_notificacion', $this->userAdmin->configuracion->dias_evento_notificacion)
