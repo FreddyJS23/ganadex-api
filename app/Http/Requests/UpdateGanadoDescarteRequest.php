@@ -33,7 +33,7 @@ class UpdateGanadoDescarteRequest extends FormRequest
         return [
             'nombre' => ['min:3','max:255',Rule::unique('ganados')->ignore($ganadoId)],
             'numero' => ['numeric','between:1,32767',Rule::unique('ganados')->ignore($ganadoId)],
-            'origen_id' => 'required|integer|exists:origen_ganados,id',
+            'origen_id' => 'integer|exists:origen_ganados,id',
             'fecha_nacimiento' => 'date_format:Y-m-d',
             'peso_nacimiento' => 'numeric|between:1,32767',
             'peso_destete' => 'numeric|between:1,32767',
