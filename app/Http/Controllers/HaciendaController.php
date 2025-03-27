@@ -11,6 +11,7 @@ use App\Http\Resources\HaciendaResource;
 use App\Models\Hacienda;
 use App\Models\Personal;
 use App\Models\User;
+use App\Models\UsuarioVeterinario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -68,9 +69,16 @@ class HaciendaController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return new HaciendaCollection(Hacienda::where('user_id', Auth::id())->get());
+        $rol=$request->user()->hasRole('admin') ? 'admin' : 'veterinario';
+        if($rol == 'admin') return new HaciendaCollection(Hacienda::where('user_id', Auth::id())->get());
+        /* devolver las haciendas en la que el veterinario se ha registrado */
+        else{
+            $usuario_veterinario = UsuarioVeterinario::where('user_id', $request->user()->id)->first();
+            return new HaciendaCollection($usuario_veterinario->haciendas);
+        }
+
     }
 
     /**

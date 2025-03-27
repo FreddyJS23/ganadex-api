@@ -14,7 +14,7 @@ class HaciendaPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasRole('admin');
+        return $user->hasRole('admin') || $user->hasRole('veterinario');
     }
 
     public function crear_sesion_hacienda(User $user, Hacienda $hacienda): bool
