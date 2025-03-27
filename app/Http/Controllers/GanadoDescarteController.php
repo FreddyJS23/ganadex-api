@@ -45,6 +45,9 @@ class GanadoDescarteController extends Controller
         $ganado = new Ganado($request->all());
         $ganado->hacienda_id = session('hacienda_id');
         $ganado->tipo_id = determinar_edad_res($ganado->fecha_nacimiento);
+        /* por defecto los nuevos ganados para descarte son machos, de ser necesario una vaca,
+         se debe registrar como vaca y luego en la revision descartar */
+        $ganado->sexo='M';
 
         try {
             DB::transaction(
