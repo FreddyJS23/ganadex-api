@@ -25,7 +25,6 @@ class StoreGanadoDescarteRequest extends FormRequest
         return [
             'nombre' => 'required|min:3|max:255|unique:ganados,nombre',
             'numero' => 'numeric|between:1,32767|unique:ganados,numero',
-            'sexo' => 'required',
             'origen_id' => 'required|integer|exists:origen_ganados,id',
             'peso_nacimiento' => 'numeric|between:1,32767',
             'peso_destete' => 'numeric|between:1,32767',
