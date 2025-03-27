@@ -13,9 +13,9 @@ class GanadoTipoSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('ganado_tipos')->insert(['tipo' => 'becerro']);
-        DB::table('ganado_tipos')->insert(['tipo' => 'maute']);
-        DB::table('ganado_tipos')->insert(['tipo' => 'novillo']);
-        DB::table('ganado_tipos')->insert(['tipo' => 'adulto']);
+        DB::table('ganado_tipos')->insert(['tipo' => 'Becerro']);
+        DB::table('ganado_tipos')->insert(['tipo' => 'Maute']);
+        DB::table('ganado_tipos')->insert(['tipo' => 'Novillo']);
+        DB::table('ganado_tipos')->insert(['tipo' => 'Adulto']);
     }
 }
