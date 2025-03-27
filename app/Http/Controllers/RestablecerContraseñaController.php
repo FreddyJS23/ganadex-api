@@ -41,7 +41,7 @@ class RestablecerContraseñaController extends Controller
 
         $usuario = User::firstWhere('usuario', $usuario);
 
-         //si el usuario no tiene preguntas de seguridad, no se puede restablecer la contraseña
+         //usuario no encontrado
          if(!$usuario){
             return response()->json(['message' => 'Usuario no encontrado'],404);
         }
@@ -53,6 +53,11 @@ class RestablecerContraseñaController extends Controller
         //si el usuario no tiene preguntas de seguridad, no se puede restablecer la contraseña
         if($usuario->preguntasSeguridad->count()==0){
             return response()->json(['message' => 'El usuario no tiene preguntas de seguridad'],403);
+        }
+
+        //si el usuario no tiene preguntas de seguridad, minimo 3 preguntas de seguridad
+        if($usuario->preguntasSeguridad->count() < 3){
+            return response()->json(['message' => 'El usuario no tiene preguntas de seguridad mínimas'],403);
         }
 
         $token = Str::random(64);
