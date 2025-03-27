@@ -38,6 +38,7 @@ class PlanSanitarioController extends Controller
     {
         $vacuna = Vacuna::find($request->input('vacuna_id'));
         $cantidadGanadoVacunado = Ganado::selectRaw('ganados.id,tipo')
+        ->where('hacienda_id', session('hacienda_id'))
         ->join('ganado_tipos', 'ganados.tipo_id', 'ganado_tipos.id');
 
         /* iterarar sobre los tipo de animal correspondiente a la vacuna
