@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Ganado;
 use App\Rules\ComprobarVeterianario;
 use App\Rules\VerificarGeneroToro;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -50,4 +52,28 @@ class StoreServicioRequest extends FormRequest
             return $rules=array_merge($rules,['personal_id' => ['required_if:tipo,inseminacion', new ComprobarVeterianario()]]);
         } else return $rules;
     }
+
+    public function after()
+    {
+        $idGanado = preg_replace("/[^0-9]/", "", (string) request()->path());
+        $ganado = Ganado::firstWhere('id', $idGanado);
+        //consultar si la vaca esta en gestacion
+        $ganadoGestacion = Ganado::firstWhere('id', $idGanado)
+        ->whereRelation('estados', 'estado', 'gestacion')
+        ->count();
+
+        /* una vaca en gestacion no debe permitirse regitrar un servicio */
+        return[
+            function(Validator $validator) use ($ganadoGestacion){
+                if($ganadoGestacion == 1){
+                    $validator->errors()->add(
+                        'servicio',
+                        'La vaca esta en gestación, si ocurrió un aborto registre una revision con con el diagnostico de "aborto"'
+                    );
+                }
+
+            }
+        ];
+    }
+
 }
