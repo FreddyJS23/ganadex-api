@@ -35,7 +35,7 @@ class StorePartoRequest extends FormRequest
             'crias.*.observacion' => 'string|nullable|max:255',
             'crias.*.numero' => 'distinct|numeric|between:1,32767|unique:ganados,numero|nullable',
             'crias.*.sexo' => 'required|in:H,M,T',
-            'crias.*.peso_nacimiento' => 'numeric|between:1,32767',
+            'crias.*.peso_nacimiento' => 'numeric|between:1,100',
         ];
 
         /* para evitar problema con la validacion de comprabacionVeterinario

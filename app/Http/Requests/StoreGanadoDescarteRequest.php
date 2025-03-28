@@ -26,9 +26,9 @@ class StoreGanadoDescarteRequest extends FormRequest
             'nombre' => 'required|min:3|max:255|unique:ganados,nombre',
             'numero' => 'numeric|between:1,32767|unique:ganados,numero',
             'origen_id' => 'required|integer|exists:origen_ganados,id',
-            'peso_nacimiento' => 'numeric|between:1,32767',
-            'peso_destete' => 'numeric|between:1,32767',
-            'peso_2year' => 'numeric|between:1,32767',
+            'peso_nacimiento' => 'numeric|between:1,100',
+            'peso_destete' => 'numeric|between:1,200',
+            'peso_2year' => 'numeric|between:1,500',
             'peso_actual' => 'numeric|between:1,32767',
             'fecha_nacimiento' => 'date_format:Y-m-d',
             'fecha_ingreso' => ['date_format:Y-m-d', Rule::requiredIf(fn () => $this->origen_id == 2)], //origen externo
