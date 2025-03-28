@@ -69,7 +69,7 @@ class ServicioTest extends TestCase
             ->for($this->user)
             ->create();
 
-        $this->estado = Estado::all();
+        $this->estado = Estado::where('estado','sano')->get();
 
         $this->veterinario
         = Personal::factory()
@@ -251,6 +251,41 @@ class ServicioTest extends TestCase
                 )
             );
     }
+
+
+    public function test_error_creacion_servicio_a_una_vaca_con_estado_gestacion(): void
+    {
+        $estadoGestacion = Estado::firstWhere('estado', 'gestacion');
+
+        $ganado=Ganado::factory()
+        ->hasEvento(['prox_revision' => null])
+        ->hasAttached([ $estadoGestacion])
+        ->for($this->hacienda)
+        ->create(['tipo_id' => 3]);
+
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(route('servicio.store',[$ganado->id]), $this->servicioMonta + ['toro_id' => $this->toro->id,'personal_id' => $this->veterinario->id]);
+
+        $response->assertStatus(422)->assertJson(['message' => 'La vaca esta en gestación, si ocurrió un aborto registre una revision con con el diagnostico de "aborto"']);
+
+    }
+
+/* en caso de que que el ganado tenga muchos estados, por si hay colisiones con los demas estados */
+    public function test_error_creacion_servicio_a_una_vaca_con_muchos_estados(): void
+    {
+        $estados = Estado::all();
+
+        $ganado=Ganado::factory()
+        ->hasEvento(['prox_revision' => null])
+        ->hasAttached($estados)
+        ->for($this->hacienda)
+        ->create(['tipo_id' => 3]);
+
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(route('servicio.store',[$ganado->id]), $this->servicioMonta + ['toro_id' => $this->toro->id,'personal_id' => $this->veterinario->id]);
+
+        $response->assertStatus(422)->assertJson(['message' => 'La vaca esta en gestación, si ocurrió un aborto registre una revision con con el diagnostico de "aborto"']);
+
+    }
+
 
     public function test_creacion_servicio_monta_sin_veterinario(): void
     {
