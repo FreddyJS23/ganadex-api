@@ -31,9 +31,9 @@ class EstadoGestacion
         $eventoGanado->prox_parto = $fechaParto;
         $eventoGanado->save();
 
-        $estado = Estado::whereIn('estado', ['sano','gestacion'])->get();
+        $estado = Estado::whereIn('estado', ['gestacion'])->get();
 
-        $event->revision->ganado->estados()->sync($estado);
+        $event->revision->ganado->estados()->attach($estado);
 
         $numero = $event->revision->ganado->numero;
         activity("revision")
