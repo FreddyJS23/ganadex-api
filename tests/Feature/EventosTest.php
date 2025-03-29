@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Events\FallecimientoGanado;
+use App\Models\CausasFallecimiento;
 use App\Models\Comprador;
 use App\Models\Estado;
 use App\Models\Fallecimiento;
@@ -42,11 +43,13 @@ class EventosTest extends TestCase
     private $user;
     private $toro;
     private $ganado;
-    private $estado;
+    private $estadoSano;
+    private $estadoPendientePesajeLeche;
     private $veterinario;
     private $numero_toro;
     private int $cantidad_ganado = 50;
     private $hacienda;
+    private $revisionGestacion;
 
     private array $servicio = [
         'observacion' => 'bien',
@@ -81,7 +84,6 @@ class EventosTest extends TestCase
     ];
 
     private array $fallecimiento = [
-        'causa' => 'enferma',
         'fecha' => '2020-10-02',
     ];
 
@@ -101,7 +103,7 @@ class EventosTest extends TestCase
         parent::setUp();
 
         //tipo de revision preñada
-        $this->revision=$this->revision + ['tipo_revision_id' => 1];
+        $this->revisionGestacion=$this->revision + ['tipo_revision_id' => 1];
 
         //tipo de revision descartear
         $this->revisionDescarte=$this->revisionDescarte + ['tipo_revision_id' => 2];
@@ -116,7 +118,10 @@ class EventosTest extends TestCase
 
         $this->user->assignRole('admin');
 
-        $this->estado = Estado::all();
+        $this->estadoSano = Estado::find(1);
+
+        $this->estadoPendientePesajeLeche = Estado::find(11);
+
 
         $this->veterinario
         = Personal::factory()
@@ -127,7 +132,7 @@ class EventosTest extends TestCase
             = Ganado::factory()
             ->hasPeso(1)
             ->hasEvento(['prox_revision' => null,'prox_parto' => null,'prox_secado' => null])
-            ->hasAttached($this->estado)
+            ->hasAttached($this->estadoSano)
             ->for($this->hacienda)
             ->create(['sexo' => 'H', 'tipo_id' => 3]);
 
@@ -184,7 +189,7 @@ class EventosTest extends TestCase
         //realizar revision
         $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(
             sprintf('api/ganado/%s/revision', $this->ganado->id),
-            $this->revision + ['personal_id' => $this->veterinario->id]
+            $this->revisionGestacion + ['personal_id' => $this->veterinario->id]
         );
 
         $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf('api/ganado/%s', $this->ganado->id));
@@ -206,6 +211,8 @@ class EventosTest extends TestCase
         );
     }
 
+    /* como ya tiene un becerro, al diagnosticar una revision gestacion,
+    se debe activar el campo de secado para retirar la cria dias antes del parto */
     public function test_cuando_se_realiza_una_revision_y_sale_preñada_ya_tuvo_parto(): void
     {
 
@@ -215,15 +222,22 @@ class EventosTest extends TestCase
             $this->servicio + ['toro_id' => $this->toro->id,'personal_id' => $this->veterinario->id]
         );
 
+         //realizar revision gestacion
+         $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(
+            sprintf('api/ganado/%s/revision', $this->ganado->id),
+            $this->revisionGestacion + ['personal_id' => $this->veterinario->id]
+        );
+
         //realizar parto
         $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(
             sprintf('api/ganado/%s/parto', $this->ganado->id),
             $this->parto(Sexo::hembra) + ['personal_id' => $this->veterinario->id]
         );
-        //realizar revision
+
+        //realizar revision gestacion
         $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(
             sprintf('api/ganado/%s/revision', $this->ganado->id),
-            $this->revision + ['personal_id' => $this->veterinario->id]
+            $this->revisionGestacion + ['personal_id' => $this->veterinario->id]
         );
 
         $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf('api/ganado/%s', $this->ganado->id));
@@ -276,6 +290,12 @@ class EventosTest extends TestCase
             $this->servicio + ['toro_id' => $this->toro->id, 'personal_id' => $this->veterinario->id]
         );
 
+         //realizar revision gestacion
+         $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(
+            sprintf('api/ganado/%s/revision', $this->ganado->id),
+            $this->revisionGestacion + ['personal_id' => $this->veterinario->id]
+        );
+
         //realizar parto
         $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(
             sprintf('api/ganado/%s/parto', $this->ganado->id),
@@ -296,7 +316,7 @@ class EventosTest extends TestCase
                     'total_partos' => 'integer',
                 ]
             )->has('ganado.estados', 3)
-                ->where('ganado.tipo', 'adulto')
+                ->where('ganado.tipo', 'Adulto')
                 ->where(
                     'ganado.estados',
                     fn (Collection $estados) => $estados->contains('estado', 'sano')
@@ -318,6 +338,12 @@ class EventosTest extends TestCase
         $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(
             sprintf('api/ganado/%s/servicio', $this->ganado->id),
             $this->servicio + ['toro_id' => $this->toro->id, 'personal_id' => $this->veterinario->id]
+        );
+
+         //realizar revision gestacion
+         $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(
+            sprintf('api/ganado/%s/revision', $this->ganado->id),
+            $this->revisionGestacion + ['personal_id' => $this->veterinario->id]
         );
 
         //realizar parto
@@ -345,6 +371,12 @@ class EventosTest extends TestCase
             $this->servicio + ['toro_id' => $this->toro->id, 'personal_id' => $this->veterinario->id]
         );
 
+         //realizar revision gestacion
+         $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(
+            sprintf('api/ganado/%s/revision', $this->ganado->id),
+            $this->revisionGestacion + ['personal_id' => $this->veterinario->id]
+        );
+
         //realizar parto
         $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(
             sprintf('api/ganado/%s/parto', $this->ganado->id),
@@ -360,7 +392,7 @@ class EventosTest extends TestCase
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
                 ->has('toro',fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
-                $json->where('tipo','becerro')
+                $json->where('tipo','Becerro')
                 ->where('sexo','M')
                 ->etc()
                 )
@@ -393,7 +425,8 @@ class EventosTest extends TestCase
     public function test_cuando_se_registra_fallecimiento_de_una_cabeza_ganado(): void
     {
 
-        $this->fallecimiento = $this->fallecimiento + ['numero_ganado' => $this->ganado->numero];
+        $this->fallecimiento = $this->fallecimiento + ['ganado_id' => $this->ganado->id];
+        $this->fallecimiento['causas_fallecimiento_id'] = CausasFallecimiento::factory()->create()->id;
 
 
         //registrar fallecimiento
@@ -416,6 +449,9 @@ class EventosTest extends TestCase
     /* ---------------------- Evento pesaje de leche hecho ---------------------- */
     public function test_cuando_se_realiza_pesaje_mensual_de_leche_ya_no_esta_pendiente_de_pesaje_de_leche(): void
     {
+        //añadir estado pendiente de pesaje de leche
+        $this->ganado->estados()->attach($this->estadoPendientePesajeLeche);
+
         //realizar pesaje de leche
         $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(route('pesaje_leche.store', ['ganado' => $this->ganado->id]), $this->pesoLeche);
 
@@ -423,7 +459,7 @@ class EventosTest extends TestCase
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
-                ->has('ganado.estados', 10)
+                ->has('ganado.estados', 1)
                 ->where(
                     'ganado.estados',
                     fn (Collection $estados) => $estados->doesntContain('estado', 'pendiente_pesaje_leche')
@@ -632,7 +668,7 @@ class EventosTest extends TestCase
         ->hasPeso(1)
         ->count(2)
         ->hasEvento(1)
-        ->hasAttached($this->estado)
+        ->hasAttached($this->estadoSano)
         ->for($this->hacienda)
         //fecha de nacimiento 400 dias atras
         ->create(['tipo_id'=>1,'fecha_nacimiento'=>now()->subDay(400)->format('Y-m-d')]);
@@ -642,7 +678,7 @@ class EventosTest extends TestCase
         ->hasPeso(1)
         ->count(2)
         ->hasEvento(1)
-        ->hasAttached($this->estado)
+        ->hasAttached($this->estadoSano)
         ->for($this->hacienda)
         //fecha de nacimiento 1000 dias atras
         ->create(['tipo_id'=>2,'fecha_nacimiento'=>now()->subDay(1000)->format('Y-m-d')]);
@@ -659,13 +695,13 @@ class EventosTest extends TestCase
                 $json->has(
                         'cabezas_ganado.1',
                         fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
-                            $json->where('tipo','maute')
+                            $json->where('tipo','Maute')
                             ->etc()
                     )
                     ->has(
                         'cabezas_ganado.4',
                         fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
-                            $json->where('tipo','novillo')
+                            $json->where('tipo','Novillo')
                             ->etc()
                     )
                 ->etc()
