@@ -179,7 +179,7 @@ class ToroTest extends TestCase
 
                         ])
                     ->where('sexo', 'M')
-                    ->where('tipo', 'adulto')
+                    ->where('tipo', 'Adulto')
                 )
             );
     }
@@ -210,7 +210,7 @@ class ToroTest extends TestCase
                             'servicios' => 'integer|null',
                         ])
                         ->where('sexo', 'M')
-                        ->where('tipo', 'adulto')
+                        ->where('tipo', 'Adulto')
                 )
             );
     }
@@ -314,7 +314,7 @@ class ToroTest extends TestCase
                             'servicios' => 'integer|null',
                         ])
                         ->where('sexo', 'M')
-                        ->where('tipo', 'adulto')
+                        ->where('tipo', 'Adulto')
                 )->has(
                     'vacunaciones',
                     fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>

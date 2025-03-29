@@ -38,8 +38,8 @@ class PlanSanitarioController extends Controller
     {
         $vacuna = Vacuna::find($request->input('vacuna_id'));
         $cantidadGanadoVacunado = Ganado::selectRaw('ganados.id,tipo')
-        ->where('hacienda_id', session('hacienda_id'))
         ->join('ganado_tipos', 'ganados.tipo_id', 'ganado_tipos.id');
+
 
         /* iterarar sobre los tipo de animal correspondiente a la vacuna
         para agregar clausulas de busqueda para buscar los ganados de esos tipos*/
@@ -54,9 +54,9 @@ class PlanSanitarioController extends Controller
         }
 
         $cantidadGanadoVacunado = $cantidadGanadoVacunado
-        ->whereRelation('estados', 'estado','!=', 'fallecido')
-        ->whereRelation('estados', 'estado','!=', 'vendido')
-        ->where('hacienda_id', session('hacienda_id'))->count();
+        ->whereRelation('estados', 'estado','=', 'sano')
+        ->where('hacienda_id', session('hacienda_id'))
+        ->count();
 
         $intervaloDosis = Vacuna::find($request->input('vacuna_id'))->intervalo_dosis;
         $proximaDosis = Carbon::create($request->input('fecha_fin'))->addDays($intervaloDosis)->format('Y-m-d');

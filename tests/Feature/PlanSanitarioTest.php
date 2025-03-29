@@ -21,7 +21,7 @@ class PlanSanitarioTest extends TestCase
     private array $planSanitario = [
         'fecha_inicio' => '2020-10-02',
         'fecha_fin' => '2020-10-02',
-        'vacuna_id' => 4,
+        'vacuna_id' => 1,
     ];
 
     private int $cantidad_PlanesSanitario = 10;
@@ -124,7 +124,7 @@ class PlanSanitarioTest extends TestCase
         ->count(3)
         ->for($this->hacienda)
         ->create(['prox_dosis' => now()->subDays(random_int(10,100))]);
-        
+
         /* planes sanitarios en el cual su proxima dosis es mayor a la fecha actual, por ende estan proximos a aplicarse */
         Plan_sanitario::factory()
         ->count(3)
@@ -181,6 +181,8 @@ class PlanSanitarioTest extends TestCase
                 'plan_sanitario.vacunados' => 'integer',
                 'plan_sanitario.ganado_vacunado' => 'array',
             ])
+            /* deberian haber haber 30 vacunados, ya que la vacuna que se esta aplicando
+            es valida para todo el reba;o */
             ->where('plan_sanitario.vacunados',fn(int $vacunados): bool=> $vacunados <= 30)
 
         );

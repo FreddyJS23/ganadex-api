@@ -73,7 +73,7 @@ class TipoRevisionTest extends TestCase
             ->assertJson(
                 fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     key: 'tipos_revision',
-                    length: $this->cantidad_tipoRevision + 3,
+                    length: $this->cantidad_tipoRevision + 4,
                     callback: fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType(
                         [
                             'id' => 'integer',
