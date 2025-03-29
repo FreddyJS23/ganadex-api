@@ -37,6 +37,9 @@ class VacaPosAborto
         /* anular estado pendiente secar */
         $event->revision->ganado->estados()->detach([$estadoPendienteSecarId]);
 
+        $numero = $event->revision->ganado->numero;
+        activity("revision")
+        ->log("Vaca $numero ha tenido un aborto");
 
     }
 }
