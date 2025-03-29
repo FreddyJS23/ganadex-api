@@ -3,8 +3,8 @@
 namespace App\Http\Requests;
 
 use App\Models\Ganado;
-use App\Rules\ComprobarRequisitosPrenada;
 use App\Rules\ComprobarVeterianario;
+use App\Rules\ValidacionTipoRevision;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -27,7 +27,7 @@ class StoreRevisionRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-            'tipo_revision_id' => ['required', 'numeric', Rule::exists('tipo_revisions', 'id'), new ComprobarRequisitosPrenada()],
+            'tipo_revision_id' => ['required', 'numeric', Rule::exists('tipo_revisions', 'id'), new ValidacionTipoRevision()],
             'tratamiento' => 'required|min:3,|max:255',
             'fecha' => 'date_format:Y-m-d',
         ];
