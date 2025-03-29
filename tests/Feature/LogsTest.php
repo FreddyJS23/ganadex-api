@@ -106,7 +106,7 @@ class LogsTest extends TestCase
             $this->userVeterinario->assignRole('veterinario');
 
             //estado:sano,gestacion
-        $this->estado = Estado::where('id',1)->orWhere('id',3)->get();
+        $this->estado = Estado::where('id',1)->get();
 
         $this->veterinario
         = Personal::factory()
@@ -205,6 +205,9 @@ class LogsTest extends TestCase
 
     public function test_verificacion_log_veterinario_atiende_parto(): void
     {
+        //añadir estado gestacion
+        $this->ganado->estados()->attach([3]);
+
         $response = $this->actingAs($this->userVeterinario)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->userAdmin->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->userAdmin->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->userAdmin->configuracion->dias_diferencia_vacuna])->postJson(route('parto.store', ['ganado' => $this->ganado->id]), $this->parto + [ 'personal_id' => $this->veterinario->id]);
 
         $this->assertDatabaseHas('activity_log', [
@@ -282,28 +285,53 @@ class LogsTest extends TestCase
             'password' => 'veterinario',
         ]);
 
-        //veteterinario hace revision
-        $this->actingAs($this->userVeterinario)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->userAdmin->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->userAdmin->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->userAdmin->configuracion->dias_diferencia_vacuna])->postJson(route('revision.store', ['ganado' => $this->ganado->id]), $this->revision + ['personal_id' => $this->veterinario->id]);
-
         //veteterinario hace servicio
         $this->actingAs($this->userVeterinario)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->userAdmin->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->userAdmin->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->userAdmin->configuracion->dias_diferencia_vacuna])->postJson(route('servicio.store', ['ganado' => $this->ganado->id]), $this->servicio + ['toro_id' => $this->toro->id, 'personal_id' => $this->veterinario->id]);
+
+        //veteterinario hace revision
+        $this->actingAs($this->userVeterinario)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->userAdmin->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->userAdmin->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->userAdmin->configuracion->dias_diferencia_vacuna])->postJson(route('revision.store', ['ganado' => $this->ganado->id]), $this->revision + ['personal_id' => $this->veterinario->id]);
 
         //veteterinario hace parto
         $this->actingAs($this->userVeterinario)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->userAdmin->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->userAdmin->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->userAdmin->configuracion->dias_diferencia_vacuna])->postJson(route('parto.store', ['ganado' => $this->ganado->id]), $this->parto + [ 'personal_id' => $this->veterinario->id]);
 
         //veteterinario hace jornada vacunacion
-        $response = $this->actingAs($this->userVeterinario)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->userAdmin->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->userAdmin->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->userAdmin->configuracion->dias_diferencia_vacuna])->postJson(route('plan_sanitario.store'), $this->jornadaVacunacion + [ 'personal_id' => $this->veterinario->id]);
+         $this->actingAs($this->userVeterinario)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->userAdmin->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->userAdmin->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->userAdmin->configuracion->dias_diferencia_vacuna])->postJson(route('plan_sanitario.store'), $this->jornadaVacunacion + [ 'personal_id' => $this->veterinario->id]);
 
         //veteterinario hace fallecimiento
-        $response = $this->actingAs($this->userVeterinario)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->userAdmin->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->userAdmin->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->userAdmin->configuracion->dias_diferencia_vacuna])->postJson(route('fallecimientos.store'), $this->fallecimiento + [ 'ganado_id' => $this->ganado->id]);
+         $this->actingAs($this->userVeterinario)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->userAdmin->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->userAdmin->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->userAdmin->configuracion->dias_diferencia_vacuna])->postJson(route('fallecimientos.store'), $this->fallecimiento + [ 'ganado_id' => $this->ganado->id]);
 
+             /* el veterinario hasta aqui deberia tener 16 registros:
+            // login sesion hacienda
+                login
+                edad_ganado
+                pesaje mensual leche
+                generacion de notificaciones
+                verificacion de vacas aptas para servicio
+            //operaciones
+                servicio
+                    creacion
+                    // animal tiene proxima revision
+                revision
+                    creacion
+                    animal esta en gestacion
+                parto
+                    creacion
+                    fecha proxima revision despues parto
+                    ahora tiiene estado lactancia
+                    animal cambia a vaca despues del parto
+                plan sanitatio
+                    creacion
+                fallecimiento
+                    creacion
+                    estado fallecido al animal
+             */
 
         $response = $this->actingAs($this->userAdmin)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->userAdmin->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->userAdmin->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->userAdmin->configuracion->dias_diferencia_vacuna])->getJson(route('logsVeterinario.index', ['usuario_veterinario' => $this->infoUserVeterinario->id]));
 
         $response->assertStatus(200)->assertJson(fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
          => $json->has(
              'logs',
-             14,
+             16,
              fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
                 'id' => 'integer',
                 'actividad' => 'string',

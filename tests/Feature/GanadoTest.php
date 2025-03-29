@@ -194,7 +194,7 @@ class GanadoTest extends TestCase
                             'estados.0.estado' => 'string',
                         ])
                             ->where('sexo', fn (string $sexo) => Str::contains($sexo, ['M', 'H']))
-                            ->where('tipo', fn (string $tipo) => Str::contains($tipo, ['becerro', 'maute', 'novillo', 'adulto']))
+                            ->where('tipo', fn (string $tipo) => Str::contains($tipo, ['Becerro', 'Maute','Novillo','Adulto']))
                         ->has(
                             'pesos',
                             fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
@@ -244,7 +244,7 @@ class GanadoTest extends TestCase
                         'estados.0.estado' => 'string',
                     ])
                         ->where('sexo', fn (string $sexo) => Str::contains($sexo, ['M', 'H']))
-                        ->where('tipo', fn (string $tipo) => Str::contains($tipo, ['becerro', 'maute', 'novillo', 'adulto']))
+                        ->where('tipo', fn (string $tipo) => Str::contains($tipo, ['Becerro', 'Maute','Novillo','Adulto']))
                         ->has(
                             'pesos',
                             fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson=>$json

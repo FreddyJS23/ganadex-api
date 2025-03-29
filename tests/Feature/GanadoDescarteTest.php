@@ -167,7 +167,7 @@ class GanadoDescarteTest extends TestCase
                             'pesos' => 'array|null',
                         ])
                         ->where('sexo', 'M')
-                        ->where('tipo', fn (string $tipoGanado) => Str::contains($tipoGanado, ['becerro', 'maute','novillo','adulto']))
+                        ->where('tipo', fn (string $tipoGanado) => Str::contains($tipoGanado, ['Becerro', 'Maute','Novillo','Adulto']))
                 )
             );
     }
@@ -196,7 +196,7 @@ class GanadoDescarteTest extends TestCase
                             'pesos' => 'array|null',
                         ])
                         ->where('sexo', 'M')
-                    ->where('tipo', fn (string $tipoGanado) => Str::contains($tipoGanado, ['becerro', 'maute', 'novillo', 'adulto']))
+                    ->where('tipo', fn (string $tipoGanado) => Str::contains($tipoGanado, ['Becerro', 'Maute','Novillo','Adulto']))
                 )
             );
     }
@@ -298,7 +298,7 @@ class GanadoDescarteTest extends TestCase
                             'estados' => 'array',
                             'pesos' => 'array|null',
                         ])
-                    ->where('tipo', fn (string $tipoGanado) => Str::contains($tipoGanado, ['becerro', 'maute', 'novillo', 'adulto']))
+                    ->where('tipo', fn (string $tipoGanado) => Str::contains($tipoGanado, ['Becerro', 'Maute','Novillo','Adulto']))
                 )
             );
     }
@@ -331,7 +331,7 @@ class GanadoDescarteTest extends TestCase
                             'pesos' => 'array|null',
                         ])
                         ->where('sexo', 'M')
-                    ->where('tipo', fn (string $tipoGanado) => Str::contains($tipoGanado, ['becerro', 'maute', 'novillo', 'adulto']))
+                    ->where('tipo', fn (string $tipoGanado) => Str::contains($tipoGanado, ['Becerro', 'Maute','Novillo','Adulto']))
                 )->has(
                     'vacunaciones',
                     fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
@@ -382,7 +382,7 @@ class GanadoDescarteTest extends TestCase
                 ->where('ganado_descarte.pesos.peso_actual', $this->ganadoDescarteActualizado['peso_actual'] . 'KG')
                 ->where('ganado_descarte.fecha_nacimiento', $this->ganadoDescarteActualizado['fecha_nacimiento'])
                 ->where('ganado_descarte.fecha_ingreso', $this->ganadoDescarteActualizado['fecha_ingreso'])
-                ->where('ganado_descarte.tipo', fn (string $tipoGanado) => Str::contains($tipoGanado, ['becerro', 'maute', 'novillo', 'adulto']))
+                ->where('ganado_descarte.tipo', fn (string $tipoGanado) => Str::contains($tipoGanado, ['Becerro', 'Maute','Novillo','Adulto']))
                 ->etc()
         );
     }

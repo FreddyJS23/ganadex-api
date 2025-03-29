@@ -144,14 +144,14 @@ class DashboardTest extends TestCase
                     fn(SupportCollection $tipos): bool => count($tipos) === 9
                 )
                 ->whereAllType([
-                    'total_tipos_ganado.0.becerra' => 'integer',
-                    'total_tipos_ganado.1.mauta' => 'integer',
-                    'total_tipos_ganado.2.novilla' => 'integer',
-                    'total_tipos_ganado.3.adulta' => 'integer',
-                    'total_tipos_ganado.4.becerro' => 'integer',
-                    'total_tipos_ganado.5.maute' => 'integer',
-                    'total_tipos_ganado.6.novillo' => 'integer',
-                    'total_tipos_ganado.7.adulto' => 'integer',
+                    'total_tipos_ganado.0.Becerra' => 'integer',
+                    'total_tipos_ganado.1.Mauta' => 'integer',
+                    'total_tipos_ganado.2.Novilla' => 'integer',
+                    'total_tipos_ganado.3.Adulta' => 'integer',
+                    'total_tipos_ganado.4.Becerro' => 'integer',
+                    'total_tipos_ganado.5.Maute' => 'integer',
+                    'total_tipos_ganado.6.Novillo' => 'integer',
+                    'total_tipos_ganado.7.Adulto' => 'integer',
                     'total_tipos_ganado.8.descarte' => 'integer',
                 ]));
     }
