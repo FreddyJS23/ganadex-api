@@ -24,11 +24,13 @@ class ValidacionTipoRevision implements ValidationRule
         vez que se valida una revision, ya que los estados
         estan predefinidos en un seeder se hacen manual param mayor rendimiento*/
         $estadoServicioBD=['id'=>7,'estado'=>'pendiente_servicio'];
+        $estadoGestacionBD=['id'=>3,'estado'=>'gestacion'];
 
-        
+
         $estados = $ganado->estados()->get()->toArray();
 
         $estadoPendienteServicio = in_array($estadoServicioBD, $estados);
+        $estadoGestacion = in_array($estadoGestacionBD, $estados);
 
         $pesoActualGanado = $ganado->peso->getRawOriginal('peso_actual');
         //validacion aplicada a una revision tipo gestacion
@@ -46,6 +48,12 @@ class ValidacionTipoRevision implements ValidationRule
                 esto con el fin de evitar poder registrar una revision con gestacion del mismo servicio*/
             if ($estadoPendienteServicio) {
                 $fail('Realize un nuevo servicio, el servicio anterior ya se utilizo para el parto ya registrado');
+            }
+        }
+        //validacion aplicada a una revision tipo aborto
+        if($value == 3){
+            if(!$estadoGestacion){
+                $fail('La vaca debe estar en gestación para poder realizar una revision aborto');
             }
         }
     }

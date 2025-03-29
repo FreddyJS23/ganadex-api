@@ -12,6 +12,7 @@ use App\Events\VentaGanado;
 use App\Events\FallecimientoGanado;
 use App\Events\PesajeLecheHecho;
 use App\Events\RevisionDescarte;
+use App\Events\RevisionAborto;
 use App\Listeners\CaparBecerro;
 use App\Listeners\EstadoPosVenta;
 use App\Listeners\EstadoGestacion;
@@ -29,6 +30,7 @@ use App\Listeners\GenerarNotificaciones;
 use App\Listeners\DescartarGanado;
 use App\Listeners\CriarParaToro;
 use App\Listeners\VerificarVacasAptaParaServicio;
+use App\Listeners\VacaPosAborto;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
@@ -49,6 +51,7 @@ class EventServiceProvider extends ServiceProvider
         ServicioHecho::class => [RevisionServicio::class,EstadoDespuesServicio::class],
         RevisionPrenada::class => [EstadoGestacion::class, Secado::class,],
         RevisionDescarte::class => [DescartarGanado::class],
+        RevisionAborto::class=>[VacaPosAborto::class],
         PartoHecho::class => [RevisionPosParto::class,EstadoPosParto::class,CambiaAVaca::class],
         PartoHechoCriaToro::class=>[CriarParaToro::class],
         NaceMacho::class => [CaparBecerro::class,],

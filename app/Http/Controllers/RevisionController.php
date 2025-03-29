@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\RevisionAborto;
 use App\Events\RevisionDescarte;
 use App\Events\RevisionPrenada;
 use App\Http\Requests\StoreRevisionRequest;
@@ -51,6 +52,8 @@ class RevisionController extends Controller
          RevisionPrenada::dispatchIf($revision->tipo_revision_id == 1, $revision);
 
          RevisionDescarte::dispatchIf($revision->tipo_revision_id == 2, $revision);
+
+         RevisionAborto::dispatchIf($revision->tipo_revision_id == 3, $revision);
 
         return response()->json(
             ['revision' => new RevisionResource(

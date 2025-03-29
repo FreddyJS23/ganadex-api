@@ -46,8 +46,8 @@ class RevisionTest extends TestCase
     {
         parent::setUp();
 
-        //tipo de revision preñada
-        $this->revision=$this->revision + ['tipo_revision_id' => 3];
+        //tipo de revision rutina
+        $this->revision=$this->revision + ['tipo_revision_id' => 4];
 
         $this->estado = Estado::all();
 
@@ -264,6 +264,27 @@ class RevisionTest extends TestCase
         $response->assertStatus(422)
             ->assertJson(
                 fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->where('errors.tipo_revision_id.0', 'La vaca debe de tener un servicio previo')
+                ->etc()
+            )
+            ;
+    }
+
+
+    public function test_creacion_revision_aborto_y_vaca_no_esta_en_gestacion(): void
+    {
+        $ganadoNoRequisito = Ganado::factory()
+        ->hasPeso(['peso_actual' => 700])
+        ->hasEvento(1)
+        ->hasAttached($this->estadoSano)
+        ->for($this->hacienda)
+        ->create();
+
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])
+        ->postJson(route('revision.store', ['ganado' => $ganadoNoRequisito->id]), ['tipo_revision_id' => 3,'tratamiento' => 'medicina', 'fecha' => '2020-10-02','personal_id' => $this->veterinario->id]);
+
+        $response->assertStatus(422)
+            ->assertJson(
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->where('errors.tipo_revision_id.0', 'La vaca debe estar en gestación para poder realizar una revision aborto')
                 ->etc()
             )
             ;

@@ -14,8 +14,10 @@ class TipoRevisionSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('tipo_revisions')->insert(['tipo' => 'Gestacion']);
+        DB::table('tipo_revisions')->insert(['tipo' => 'Gestación']);
         DB::table('tipo_revisions')->insert(['tipo' => 'Descartar']);
+        DB::table('tipo_revisions')->insert(['tipo' => 'Aborto']);
         DB::table('tipo_revisions')->insert(['tipo' => 'Rutina']);
+
     }
 }
