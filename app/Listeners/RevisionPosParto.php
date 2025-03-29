@@ -29,6 +29,7 @@ class RevisionPosParto
         $proxRevision = $fechaParto->add(new DateInterval('P30D'))->format('Y-m-d');
         $eventoGanado->prox_revision = $proxRevision;
         $eventoGanado->prox_parto = null;
+        $eventoGanado->prox_secado = null;
         $eventoGanado->save();
 
         $numero = $event->parto->ganado->numero;
