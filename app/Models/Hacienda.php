@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property-read ?int $id
@@ -32,6 +33,16 @@ class Hacienda extends Model
     public function veterinarios(): BelongsToMany
     {
         return $this->belongsToMany(Personal::class);
+    }
+
+    /**
+     * Get all of the ganados for the Hacienda
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function ganados(): HasMany
+    {
+        return $this->hasMany(Ganado::class);
     }
 
     protected $hidden = ['pivot'];

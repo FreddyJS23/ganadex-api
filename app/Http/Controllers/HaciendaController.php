@@ -127,6 +127,11 @@ class HaciendaController extends Controller
      */
     public function destroy(Hacienda $hacienda)
     {
-        //
+        $hacienda->load('ganados');
+
+      if($hacienda->ganados->count() == 0)
+      return  response()->json(['haciendaID' => Hacienda::destroy($hacienda->id) ?  $hacienda->id : ''], 200);
+        else return response()->json(['message' => 'No se puede eliminar una hacienda con registros de animales'], 403);
+
     }
 }

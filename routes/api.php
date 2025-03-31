@@ -94,7 +94,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/planes_sanitarios_pendientes',[PlanSanitarioController::class,'planesSanitarioPendientes'])->name('plan_sanitario.pendientes');
     Route::apiResource('/notificaciones', NotificacionController::class)->only(['index', 'destroy'])->parameters(['notificaciones' => 'notificacion']);;
     Route::get('/borrar_notificaciones', [NotificacionController::class, 'destroyAll'])->name('notificaciones.destroyAll');
-    Route::apiResource('/hacienda', HaciendaController::class)->only(['index', 'store', 'update']);
+    Route::apiResource('/hacienda', HaciendaController::class);
     Route::get('/crear_sesion_hacienda/{hacienda}', [HaciendaController::class, 'crear_sesion_hacienda'])->name('crear_sesion_hacienda');
     Route::get('/verificar_sesion_hacienda', [HaciendaController::class, 'verificar_sesion_hacienda'])->name('verificar_sesion_hacienda');
     Route::get('/cambiar_hacienda_sesion/{hacienda}', [HaciendaController::class, 'cambiar_hacienda_sesion'])->name('cambiar_hacienda_sesion');

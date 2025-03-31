@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Models\Estado;
+use App\Models\Ganado;
 use App\Models\Hacienda;
 use App\Models\Personal;
 use App\Models\User;
@@ -312,6 +314,52 @@ class HaciendaTest extends TestCase
 
         $response->assertStatus(422)->assertInvalid($errores);
     }
+
+    public function test_eliminar_hacienda(): void
+    {
+        $hacienda = $this->generarHaciendas();
+        $idRandom = random_int(0, $this->cantidad_haciendas - 1);
+        $idToDelete = $hacienda[$idRandom]->id;
+
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->haciendaEnSesion->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->deleteJson(route('hacienda.destroy', ['hacienda' => $idToDelete]));
+
+        $response->assertStatus(200)->assertJson(['haciendaID' => $idToDelete]);
+    }
+
+
+    public function test_error_eliminar_hacienda_con_registros(): void
+    {
+        $hacienda = $this->generarHaciendas();
+        $idRandom = random_int(0, $this->cantidad_haciendas - 1);
+        $idToDelete = $hacienda[$idRandom]->id;
+        $estado = Estado::find(1);
+
+        Ganado::factory()
+        ->hasPeso(1)
+        ->hasEvento(1)
+        ->hasAttached($estado)
+        ->create(['hacienda_id' => $idToDelete]);
+
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->haciendaEnSesion->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->deleteJson(route('hacienda.destroy', ['hacienda' => $idToDelete]));
+
+        $response->assertStatus(403)->assertJson(['message' => 'No se puede eliminar una hacienda con registros de animales']);
+    }
+
+    public function test_error_eliminar_hacienda_otro_usuario(): void
+    {
+        $otroUsuario = User::factory()->create();
+
+        $haciendaOtroUsuario = hacienda::factory()->for($otroUsuario)->create();
+
+        $idhaciendaOtroUsuario = $haciendaOtroUsuario->id;
+
+
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->haciendaEnSesion->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->deleteJson(route('hacienda.destroy', ['hacienda' => $idhaciendaOtroUsuario]));
+
+        $response->assertStatus(403);
+    }
+
+
 
     public function test_autorizacion_maniupular__hacienda_otro_usuario(): void
     {

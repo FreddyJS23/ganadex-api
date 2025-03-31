@@ -62,7 +62,7 @@ class HaciendaPolicy
      */
     public function update(User $user, Hacienda $hacienda): bool
     {
-        return session('hacienda_id') === $hacienda->id && $user->id === $hacienda->user_id && $user->hasRole('admin');
+        return $hacienda->user_id == $user->id && $user->hasRole('admin');
     }
 
     /**
@@ -70,7 +70,7 @@ class HaciendaPolicy
      */
     public function delete(User $user, Hacienda $hacienda): bool
     {
-        return session('hacienda_id') === $hacienda->id && $user->hasRole('admin');
+        return $hacienda->user_id == $user->id && $user->hasRole('admin');
     }
 
     /**
