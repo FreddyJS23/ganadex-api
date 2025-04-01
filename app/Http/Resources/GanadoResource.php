@@ -23,6 +23,10 @@ class GanadoResource extends JsonResource
             'tipo' => $this->tipo->tipo,
             'fecha_nacimiento' => $this->fecha_nacimiento,
             'fecha_ingreso' => $this->fecha_ingreso,
+            'fallecimiento' =>$this->fallecimiento ? (object)[
+                'fecha'=>$this->fallecimiento->fecha,
+                'causas'=>$this->fallecimiento->causas_fallecimiento
+            ] : null,
             'pesos' => $this->peso,
             'estados' => $this->estados,
             'eventos' => $this->evento,
