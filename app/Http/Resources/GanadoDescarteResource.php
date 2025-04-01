@@ -21,8 +21,9 @@ class GanadoDescarteResource extends JsonResource
             'origen' => $this->ganado->origen->origen,
             'fecha_ingreso' => $this->ganado->fecha_ingreso,
             'fallecimiento' =>$this->ganado->fallecimiento ? (object)[
-                'fecha'=>$this->fallecimiento->fecha,
-                'causas'=>$this->fallecimiento->causas_fallecimiento
+                'fecha' => $this->ganado->fallecimiento->fecha,
+                'causa' => $this->ganado->fallecimiento->causa_fallecimiento->causa,
+                'descripcion' => $this->ganado->fallecimiento->descripcion,
             ] : null,
             'sexo' => $this->ganado->sexo,
             'tipo' => $this->ganado->tipo->tipo,

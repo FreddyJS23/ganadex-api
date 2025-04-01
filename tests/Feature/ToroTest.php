@@ -176,6 +176,8 @@ class ToroTest extends TestCase
                             'efectividad' => 'double|null',
                             'padre_en_partos' => 'integer',
                             'servicios' => 'integer|null',
+                            'fallecimiento' => 'array|null',
+
 
                         ])
                     ->where('sexo', 'M')
@@ -208,6 +210,8 @@ class ToroTest extends TestCase
                             'efectividad' => 'double|null',
                             'padre_en_partos' => 'integer|null',
                             'servicios' => 'integer|null',
+                            'fallecimiento' => 'array|null',
+
                         ])
                         ->where('sexo', 'M')
                         ->where('tipo', 'Adulto')
@@ -243,6 +247,8 @@ class ToroTest extends TestCase
                             'servicios' => 'integer|null',
                             'sexo' => 'string',
                             'tipo' => 'string',
+                            'fallecimiento' => 'array|null',
+
                         ])
                     ->where('origen', 'Externo')
                     ->where('fecha_ingreso', $this->toro['fecha_ingreso'])
@@ -261,9 +267,16 @@ class ToroTest extends TestCase
                     'toro',
                     fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                     $json
-                        ->where('estados.0.estado', 'fallecido')
+                    ->has('fallecimiento',
+                        fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson=>
+                        $json->where('fecha', $this->toro_fallecido['fecha_fallecimiento'])
+                        ->where('descripcion', $this->toro_fallecido['descripcion'])
+                         ->whereType('causa','string')
+                    )
+                    ->where('estados.0.estado', 'fallecido')
                         ->etc()
                 )
+
             );
     }
 
@@ -312,6 +325,8 @@ class ToroTest extends TestCase
                             'efectividad' => 'double|null',
                             'padre_en_partos' => 'integer',
                             'servicios' => 'integer|null',
+                            'fallecimiento' => 'array|null',
+
                         ])
                         ->where('sexo', 'M')
                         ->where('tipo', 'Adulto')

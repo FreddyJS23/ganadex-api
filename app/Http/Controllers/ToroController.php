@@ -99,7 +99,9 @@ class ToroController extends Controller
                     $request->only('estado_id')['estado_id'][0] == 2 && $ganado->fallecimiento()->create(
                         [
                         'fecha' => $request->input('fecha_fallecimiento'),
-                        'causas_fallecimiento_id' => $request->input('causas_fallecimiento_id')
+                        'causas_fallecimiento_id' => $request->input('causas_fallecimiento_id'),
+                        'descripcion' => $request->input('descripcion')
+
                         ]
                     );
 

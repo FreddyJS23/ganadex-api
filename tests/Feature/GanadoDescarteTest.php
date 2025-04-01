@@ -165,6 +165,7 @@ class GanadoDescarteTest extends TestCase
                             'ganado_id' => 'integer',
                             'estados' => 'array',
                             'pesos' => 'array|null',
+                            'fallecimiento' => 'array|null',
                         ])
                         ->where('sexo', 'M')
                         ->where('tipo', fn (string $tipoGanado) => Str::contains($tipoGanado, ['Becerro', 'Maute','Novillo','Adulto']))
@@ -194,6 +195,8 @@ class GanadoDescarteTest extends TestCase
                             'ganado_id' => 'integer',
                             'estados' => 'array',
                             'pesos' => 'array|null',
+                            'fallecimiento' => 'array|null',
+
                         ])
                         ->where('sexo', 'M')
                     ->where('tipo', fn (string $tipoGanado) => Str::contains($tipoGanado, ['Becerro', 'Maute','Novillo','Adulto']))
@@ -227,6 +230,8 @@ class GanadoDescarteTest extends TestCase
                             'pesos' => 'array|null',
                             'sexo' => 'string',
                             'tipo' => 'string',
+                            'fallecimiento' => 'array|null',
+
                         ])
                         ->where('origen', 'Externo')
                         ->where('fecha_ingreso', $this->ganadoDescarte['fecha_ingreso'])
@@ -246,8 +251,15 @@ class GanadoDescarteTest extends TestCase
                     fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                     $json
                         ->where('estados.0.estado', 'fallecido')
+                         ->has('fallecimiento',
+                        fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson=>
+                        $json->where('fecha', $this->descarte_fallecido['fecha_fallecimiento'])
+                        ->where('descripcion', $this->descarte_fallecido['descripcion'])
+                         ->whereType('causa','string')
+                    )
                         ->etc()
                 )
+
             );
     }
 
@@ -297,6 +309,8 @@ class GanadoDescarteTest extends TestCase
                             'ganado_id' => 'integer',
                             'estados' => 'array',
                             'pesos' => 'array|null',
+                            'fallecimiento' => 'array|null',
+
                         ])
                     ->where('tipo', fn (string $tipoGanado) => Str::contains($tipoGanado, ['Becerro', 'Maute','Novillo','Adulto']))
                 )
@@ -329,6 +343,8 @@ class GanadoDescarteTest extends TestCase
                             'ganado_id' => 'integer',
                             'estados' => 'array',
                             'pesos' => 'array|null',
+                            'fallecimiento' => 'array|null',
+
                         ])
                         ->where('sexo', 'M')
                     ->where('tipo', fn (string $tipoGanado) => Str::contains($tipoGanado, ['Becerro', 'Maute','Novillo','Adulto']))

@@ -25,8 +25,9 @@ class ToroResource extends JsonResource
             'fecha_nacimiento' => $this->ganado->fecha_nacimiento,
             'fecha_ingreso' => $this->ganado->fecha_ingreso,
             'fallecimiento' =>$this->ganado->fallecimiento ? (object)[
-                'fecha'=>$this->fallecimiento->fecha,
-                'causas'=>$this->fallecimiento->causas_fallecimiento
+                'fecha' => $this->ganado->fallecimiento->fecha,
+                'causa' => $this->ganado->fallecimiento->causa_fallecimiento->causa,
+                'descripcion' => $this->ganado->fallecimiento->descripcion,
             ] : null,
             'pesos' => $this->ganado->peso,
             'ganado_id' => $this->ganado->id,

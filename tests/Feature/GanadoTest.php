@@ -192,6 +192,8 @@ class GanadoTest extends TestCase
                             'estados' => 'array',
                             'estados.0.id' => 'integer',
                             'estados.0.estado' => 'string',
+                            'fallecimiento' => 'array|null',
+
                         ])
                             ->where('sexo', fn (string $sexo) => Str::contains($sexo, ['M', 'H']))
                             ->where('tipo', fn (string $tipo) => Str::contains($tipo, ['Becerro', 'Maute','Novillo','Adulto']))
@@ -242,6 +244,8 @@ class GanadoTest extends TestCase
                         'estados' => 'array',
                         'estados.0.id' => 'integer',
                         'estados.0.estado' => 'string',
+                        'fallecimiento' => 'array|null',
+
                     ])
                         ->where('sexo', fn (string $sexo) => Str::contains($sexo, ['M', 'H']))
                         ->where('tipo', fn (string $tipo) => Str::contains($tipo, ['Becerro', 'Maute','Novillo','Adulto']))
@@ -298,6 +302,8 @@ class GanadoTest extends TestCase
                         'tipo' => 'string',
                         'pesos' => 'array|null',
                         'eventos' => 'array|null',
+                        'fallecimiento' => 'array|null',
+
                     ])
                     ->where('origen', 'Externo')
                     ->where('fecha_ingreso', $this->cabeza_ganado['fecha_ingreso'])
@@ -318,8 +324,15 @@ class GanadoTest extends TestCase
                     fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                     $json
                         ->where('estados.0.estado', 'fallecido')
+                        ->has('fallecimiento',
+                        fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson=>
+                        $json->where('fecha', $this->cabeza_ganado_fallecida['fecha_fallecimiento'])
+                        ->where('descripcion', $this->cabeza_ganado_fallecida['descripcion'])
+                         ->whereType('causa','string')
+                    )
                         ->etc()
                 )
+
             );
     }
 
