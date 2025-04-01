@@ -36,6 +36,7 @@ class UpdateToroRequest extends FormRequest
             'numero' => ['numeric','between:1,32767',Rule::unique('ganados')->ignore($ganadoId)],
             'origen_id' => 'integer|exists:origen_ganados,id',
             'fecha_nacimiento' => 'date_format:Y-m-d',
+            'fecha_ingreso' => 'date_format:Y-m-d|nullable',
             'peso_nacimiento' => 'numeric|between:1,100',
             'peso_destete' => 'numeric|between:1,200',
             'peso_2year' => 'numeric|between:1,500',

@@ -27,19 +27,7 @@ class UpdateServicioRequest extends FormRequest
     {
         return [
             'observacion' => 'required|min:3|max:255',
-            'toro_id' => [
-                Rule::requiredIf($this->tipo == 'monta'),Rule::exists('toros', 'id')
-                    ->where(
-                        fn($query) => $query->where('hacienda_id', session('hacienda_id'))
-                    )
-            ],
-            'pajuela_toro_id' => [
-                Rule::requiredIf($this->tipo == 'inseminacion'), Rule::exists('pajuela_toros', 'id')
-                    ->where(
-                        fn($query) => $query->where('hacienda_id', session('hacienda_id'))
-                    )
-            ],
-            'tipo' => 'required|in:monta,inseminacion',
+            'fecha' => 'date_format:Y-m-d',
 
         ];
     }

@@ -25,6 +25,7 @@ class UpdatePartoRequest extends FormRequest
     {
         return [
             'observacion' => 'required|min:3|max:255',
+            'fecha' => 'date_format:Y-m-d',
         ];
     }
 }

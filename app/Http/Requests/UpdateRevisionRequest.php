@@ -22,7 +22,8 @@ class UpdateRevisionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'tratamiento' => 'required|min:3,|max:255'
+            'tratamiento' => 'required|min:3,|max:255',
+            'fecha' => 'date_format:Y-m-d',
         ];
     }
 }
