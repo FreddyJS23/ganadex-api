@@ -24,6 +24,7 @@ class StoreUserRequest extends FormRequest
         return [
             'usuario' => 'required|min:3|max:15|unique:users,usuario',
             'password' => 'required|min:3|max:15',
+            'email' => 'email:rfc,dns',
         ];
     }
 }
