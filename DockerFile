@@ -7,9 +7,10 @@ ENV TZ=America/Caracas
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime
 
 #  permisos para el usuario www-data
-RUN mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache && \
-    chown -R www-data:www-data storage bootstrap/cache && \
-    chmod -R 775 storage bootstrap/cache
+RUN mkdir -p /var/www/app/storage/framework/{cache,sessions,views} /var/www/app/storage/logs /var/www/app/bootstrap/cache && \
+    chown -R www-data:www-data /var/www/app/storage /var/www/app/bootstrap/cache && \
+    chmod -R 775 /var/www/app/storage /var/www/app/bootstrap/cache
+
 
 
 #paquetes para php
