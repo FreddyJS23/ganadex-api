@@ -7,6 +7,7 @@ use App\Models\Ganado;
 use App\Models\GanadoTipo;
 use App\Models\Hacienda;
 use App\Models\Leche;
+use App\Models\Parto;
 use App\Models\Personal;
 use App\Models\Peso;
 use App\Models\Vacuna;
