@@ -31,7 +31,7 @@ class HaciendaPolicy
 
     public function verificar_sesion_hacienda(User $user): bool
     {
-        return $user->hasRole('admin');
+        return $user->hasRole('admin') || $user->hasRole('veterinario');
     }
 
     public function cambiar_hacienda_sesion(User $user): bool
