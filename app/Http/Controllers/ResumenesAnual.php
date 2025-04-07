@@ -84,8 +84,8 @@ class ResumenesAnual extends Controller
 
         return response()->json(
             [
-            'nacimientos_ultimos_5_año' => $nacimientosAnuales->toArray(),
-            'nacimientos_año_actual' => $nacimientosAñoActual->toArray(),
+            'nacimientos_ultimos_5_año' =>$nacimientosAnuales ? $nacimientosAnuales->toArray() : [],
+            'nacimientos_año_actual' =>$nacimientosAñoActual ? $nacimientosAñoActual->toArray() : [],
             ]
         );
     }
