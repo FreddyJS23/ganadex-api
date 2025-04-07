@@ -46,7 +46,9 @@ services:
     environment:
       DB_HOST: mysql  #los host frecuentemente son las mismo el nombre del servicio
       DB_PASSWORD: root
-      AP_URL: http://localhost
+      APP_URL: http://nginx_laravel
+      SESSION_DOMAIN: ganadex_frontend
+      SANCTUM_STATEFUL_DOMAINS: ganadex_frontend
     container_name: php
     #dar permisos para el usuario www-data, asi laravel podra escribir en el directorio storage
     command: >
