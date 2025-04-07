@@ -19,7 +19,7 @@ class TodosServiciosResource extends JsonResource
         $resource =  [
             "id" => $this->id,
             "numero" => $this->numero,
-            "ultimo_servicio" => $existeServicio ? $this->servicioReciente->fecha : 'desconocido',
+            "ultimo_servicio" => $existeServicio ? $this->servicioReciente->fecha : 'Sin servicio',
             "efectividad" => $this->efectividad,
             "total_servicios" => $this->servicios_count
         ];
