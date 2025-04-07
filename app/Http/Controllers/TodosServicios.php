@@ -20,7 +20,8 @@ class TodosServicios extends Controller
             ->whereRelation('estados', 'estado','!=', 'fallecido')
             ->whereRelation('estados', 'estado','!=', 'vendido')
             ->doesntHave('ganadoDescarte')
-            ->has('servicios')
+            ->whereRelation('estados', 'estado', 'pendiente_servicio')
+            ->with('servicios')
             ->with(
                 [
                 'parto' => function (Builder $query) {
