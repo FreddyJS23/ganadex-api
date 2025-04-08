@@ -6,10 +6,6 @@ RUN  apk add --no-cache linux-headers
 ENV TZ=America/Caracas
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime
 
-
-
-
-
 #paquetes para php
 RUN apk --no-cache upgrade && \
     apk --no-cache add bash git sudo openssh  libxml2-dev oniguruma-dev autoconf gcc g++ make npm freetype-dev libjpeg-turbo-dev libpng-dev libzip-dev ssmtp
@@ -29,15 +25,10 @@ RUN curl -sS https://getcomposer.org/installer | php -- \
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-RUN mkdir -p /app/storage/logs
-
 # Seteo el directorio de trabajo
 WORKDIR /var/www/app
 #copio el codigo de la aplicacion
 COPY . .
-
-RUN mkdir -p /app/storage/logs
-
 
 # copia el archivo composer.json y instala las dependencias
 COPY composer.json composer.lock ./
