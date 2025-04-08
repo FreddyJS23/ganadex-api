@@ -6,10 +6,7 @@ RUN  apk add --no-cache linux-headers
 ENV TZ=America/Caracas
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime
 
-#  permisos para el usuario www-data
-RUN mkdir -p /var/www/app/storage/framework/{cache,sessions,views} /var/www/app/storage/logs /var/www/app/bootstrap/cache && \
-    chown -R www-data:www-data /var/www/app/storage /var/www/app/bootstrap/cache && \
-    chmod -R 775 /var/www/app/storage /var/www/app/bootstrap/cache
+
 
 
 
@@ -46,6 +43,11 @@ RUN mkdir -p /app/storage/logs
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
+#  permisos para el usuario www-data
+RUN mkdir -p /var/www/app/storage/framework/{cache,sessions,views} /var/www/app/storage/logs /var/www/app/bootstrap/cache && \
+    chown -R www-data:www-data /var/www/app/storage /var/www/app/bootstrap/cache && \
+    chmod -R 775 /var/www/app/storage /var/www/app/bootstrap/cache
+
 #comando artisan para laravel produccion
 RUN php artisan config:clear
 RUN php artisan view:clear
@@ -53,6 +55,7 @@ RUN php artisan config:cache
 RUN php artisan event:cache
 RUN php artisan route:cache
 RUN php artisan view:cache
+RUN php artisan migrate
 
 # Set the default command to run php-fpm
 CMD ["php-fpm"]

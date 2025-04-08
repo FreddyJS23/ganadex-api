@@ -52,17 +52,12 @@ services:
       APP_URL: http://nginx_laravel
       SESSION_DOMAIN: ganadex_frontend
       SANCTUM_STATEFUL_DOMAINS: ganadex_frontend
-    #dar permisos para el usuario www-data, asi laravel podra escribir en el directorio storage
-    command: >
-      sh -c "
-      chown -R www-data:www-data /var/www/app/storage /var/www/app/bootstrap/cache &&
-      chmod -R 775 /var/www/app/storage /var/www/app/bootstrap/cache &&
-      php-fpm
-      "
     ports:
       - "9000:9000"
     volumes:
       - ./:/var/www/app
     networks:
       - laravel
+    depends_on:
+      - mysql
 
