@@ -39,7 +39,7 @@ services:
     container_name: ganadex_backend
     build:
       context: .
-      dockerfile: DockerFile
+      dockerfile: Dockerfile
     environment:
       DB_HOST: mysql  #los host frecuentemente son las mismo el nombre del servicio
       DB_PASSWORD: root
