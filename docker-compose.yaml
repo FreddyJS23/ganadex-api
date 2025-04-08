@@ -1,6 +1,6 @@
 
 networks:
-  laravel:
+  ganadex:
     driver: bridge
 
 services:
@@ -20,8 +20,6 @@ services:
     depends_on:
       - php
       - mysql
-    networks:
-      - laravel
   #database
   mysql:
       image: mariadb:10.4.8
@@ -38,8 +36,6 @@ services:
         SERVICE_NAME: mysql
       volumes:
         - ./mysql/data:/var/lib/mysql
-      networks:
-        - laravel
   #laravel
   php:
     container_name: ganadex_backend
@@ -56,8 +52,6 @@ services:
       - "9000:9000"
     volumes:
       - ./:/var/www/app
-    networks:
-      - laravel
     depends_on:
       - mysql
 
