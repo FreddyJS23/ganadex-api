@@ -1,0 +1,6 @@
+services:
+  migrations:
+    image: ganadex_backend
+    command: php artisan migrate --force
+    depends_on:
+      - mysql
