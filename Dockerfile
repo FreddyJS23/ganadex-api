@@ -40,9 +40,7 @@ RUN mkdir -p /var/www/app/storage/framework/{cache,sessions,views} /var/www/app/
     chmod -R 775 /var/www/app/storage /var/www/app/bootstrap/cache
 
 #comando artisan para laravel produccion
-RUN php artisan config:clear
 RUN php artisan view:clear
-RUN php artisan config:cache
 RUN php artisan event:cache
 RUN php artisan route:cache
 RUN php artisan view:cache

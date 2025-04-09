@@ -30,7 +30,6 @@ services:
         MYSQL_DATABASE: ${DB_DATABASE:-laravel}
         MYSQL_USER: ${DB_USERNAME:-root}
         MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root}
-        MYSQL_PASSWORD: ${DB_PASSWORD:-laravel}
         SERVICE_NAME: mysql
       volumes:
         - ./mysql/data:/var/lib/mysql
@@ -40,14 +39,23 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    env_file:
+      - ./.env
     environment:
       DB_HOST: mysql  #los host frecuentemente son las mismo el nombre del servicio
-      DB_PASSWORD: root
       APP_URL: http://nginx_laravel
       SESSION_DOMAIN: ganadex_frontend
       SANCTUM_STATEFUL_DOMAINS: ganadex_frontend
     ports:
       - "9000:9000"
+      #se ejecuta un clear de la config para volve a generar la config, ya que en la contruccion no estan estas variables
+    #variables dinamicas como el dominio de la aplicacion, db host, se obtienen al levantar el contenedor
+    #se debe eliminar la cache de la configuracion para que se actualicen las variables dinamicas
+    #se ejecuta el comando php-fpm para mantener el contenedor en ejecución:
+    command: >
+      sh -c "php artisan config:clear &&
+        php artisan config:cache && php-fpm"
+
     depends_on:
       - mysql
 
