@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('tipo_revisions', function (Blueprint $table) {
             $table->id();
             $table->string('tipo');
+            $table->string('codigo')->nullable();
             $table->timestamps();
         });
     }

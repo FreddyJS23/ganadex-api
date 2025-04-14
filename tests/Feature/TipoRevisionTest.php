@@ -18,9 +18,11 @@ class TipoRevisionTest extends TestCase
 
     private array $tipo_revision = [
         'tipo' => 'enferma',
+        'codigo' => 'DGF',
     ];
     private array $tipo_revision_actualizado = [
         'tipo' => 'envenenada',
+        'codigo' => 'DAX',
     ];
 
     private int $cantidad_tipoRevision= 10;
@@ -43,12 +45,13 @@ class TipoRevisionTest extends TestCase
             'caso de insertar datos erróneos' => [
                 [
                     'tipo' => 'te',
+                    'codigo' => '',
                 ],
                 ['tipo']
             ],
             'caso de no insertar datos requeridos' => [
                 [],
-                ['tipo']
+                ['tipo','codigo']
             ],
         ];
     }
@@ -77,7 +80,8 @@ class TipoRevisionTest extends TestCase
                     callback: fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType(
                         [
                             'id' => 'integer',
-                            'tipo' => 'string'
+                            'tipo' => 'string',
+                            'codigo' => 'string|null',
                         ]
                     )
                 )
@@ -96,7 +100,8 @@ class TipoRevisionTest extends TestCase
                     ->where(
                         key: 'tipo_revision.tipo',
                         expected: $this->tipo_revision['tipo']
-                    )
+                    )->where(  key: 'tipo_revision.codigo',
+                    expected: $this->tipo_revision['codigo'])
                 ->etc()
             );
     }
@@ -117,6 +122,7 @@ class TipoRevisionTest extends TestCase
             ->assertJson(
                 fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
                     ->where('tipo_revision.tipo', $this->tipo_revision_actualizado['tipo'])
+                    ->where('tipo_revision.codigo', $this->tipo_revision_actualizado['codigo'])
                     ->etc()
             );
     }
@@ -124,7 +130,7 @@ class TipoRevisionTest extends TestCase
     public function test_actualizar_tipo_revision_prederteminadas(): void
     {
         //los tipos de revision predertminadas no se pueden editar, las cuales son:gestacion, descarte y rutina
-        $idRandom = random_int(1,3);
+        $idRandom = random_int(1,4);
 
         $this
             ->setUpRequest()

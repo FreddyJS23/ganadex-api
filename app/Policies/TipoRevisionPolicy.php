@@ -38,7 +38,7 @@ class TipoRevisionPolicy
     public function update(User $user, TipoRevision $tiposRevision): bool
     {
         //no permitimos editar los tipos de revision predeterminadas
-        if($tiposRevision->id == 1 || $tiposRevision->id == 2 || $tiposRevision->id == 3) return false;
+        if($tiposRevision->id == 1 || $tiposRevision->id == 2 || $tiposRevision->id == 3 || $tiposRevision->id == 4) return false;
 
     return $user->hasRole('admin');
     }

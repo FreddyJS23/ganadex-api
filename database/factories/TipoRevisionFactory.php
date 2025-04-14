@@ -18,6 +18,7 @@ class TipoRevisionFactory extends Factory
     {
         return [
             'tipo' => $this->faker->word(),
+            'codigo'=> strtoupper($this->faker->lexify('???')),
         ];
     }
 }
