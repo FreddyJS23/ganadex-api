@@ -23,6 +23,8 @@ class UpdateTipoRevisionRequest extends FormRequest
     {
         return [
             'tipo' => 'required|min:3|max:255',
+            'codigo' => 'required|min:1|max:10',
+
         ];
     }
 }

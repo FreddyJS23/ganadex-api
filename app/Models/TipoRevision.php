@@ -10,7 +10,7 @@ class TipoRevision extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['tipo'];
+    protected $fillable = ['tipo','codigo'];
 
     /**
      * Get all of the revisiones for the TipoRevision

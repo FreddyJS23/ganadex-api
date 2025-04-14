@@ -17,6 +17,7 @@ class TipoRevisionResource extends JsonResource
         return [
             'id'=>$this->id,
             'tipo'=>$this->tipo,
+            'codigo'=>$this->codigo,
         ];
     }
 }

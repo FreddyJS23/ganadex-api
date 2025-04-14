@@ -30,7 +30,8 @@ class TipoRevisionController extends Controller
     public function store(StoreTipoRevisionRequest $request)
     {
         $tipoRevision = new TipoRevision();
-        $tipoRevision->fill($request->all());
+        $tipoRevision->tipo=$request->tipo;
+        $tipoRevision->codigo=strtoupper($request->codigo);
         $tipoRevision->save();
 
         return response()->json(['tipo_revision' => new TipoRevisionResource($tipoRevision)], 201);
@@ -49,7 +50,8 @@ class TipoRevisionController extends Controller
      */
     public function update(UpdateTipoRevisionRequest $request, TipoRevision $tiposRevision)
     {
-        $tiposRevision->fill($request->all());
+        $tiposRevision->tipo=$request->tipo;
+        $tiposRevision->codigo=strtoupper($request->codigo);
         $tiposRevision->save();
 
         return response()->json(['tipo_revision' => new TipoRevisionResource($tiposRevision)], 200);
