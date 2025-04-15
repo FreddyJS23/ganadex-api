@@ -16,6 +16,7 @@ use App\Models\UsuarioVeterinario;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Illuminate\Support\Str;
 use Tests\TestCase;
@@ -657,6 +658,9 @@ class ServicioTest extends TestCase
 
     public function test_obtener_servicios_de_todas_las_vacas(): void
     {
+        //eliminar estados previos de los ganados que se generan en el setUp
+        DB::table('estado_ganado')->truncate();
+
         /* partos con monta fallecidas */
         Ganado::factory()
             ->count(5)
@@ -751,8 +755,7 @@ class ServicioTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson(
-                //26 ya que 25 son los generados para este test, y 1 viene del setUp
-                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has('todos_servicios',26, fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has('todos_servicios',25, fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
                     'id' => 'integer',
                     'numero' => 'integer',
                     'ultimo_servicio' => 'string',
@@ -775,7 +778,7 @@ class ServicioTest extends TestCase
                 'estado'=>'string'
                 ]))
                 //vaca con estado pendiente de servicio
-                ->has('todos_servicios.14', fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->where('pendiente',true)->etc())
+                ->has('todos_servicios.13', fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->where('pendiente',true)->etc())
             );
     }
 }
