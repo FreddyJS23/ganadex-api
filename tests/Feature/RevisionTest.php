@@ -15,6 +15,7 @@ use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
 
@@ -37,6 +38,7 @@ class RevisionTest extends TestCase
     private $estadoVendido;
     private $estadoFallecido;
     private $estadoPendienteServicio;
+    private $estadoPendienteRevision;
     private $veterinario;
     private $userVeterinario;
     private string $url;
@@ -55,6 +57,7 @@ class RevisionTest extends TestCase
         $this->estadoVendido = Estado::find(2);
         $this->estadoFallecido = Estado::find(5);
         $this->estadoPendienteServicio = Estado::find(7);
+        $this-> estadoPendienteRevision = Estado::find(6);
 
         $this->user
             = User::factory()->hasConfiguracion()->create();
@@ -422,6 +425,16 @@ class RevisionTest extends TestCase
             ->for($this->hacienda)
             ->create();
 
+            //creacion ganado sano y pendiente de reivision
+        Ganado::factory()
+            ->count(3)
+            ->hasPeso(1)
+            ->hasRevision(5, ['personal_id' => $this->veterinario->id])
+            ->hasEvento(1)
+            ->hasAttached([$this->estadoSano,$this->estadoPendienteRevision])
+            ->for($this->hacienda)
+            ->create();
+
             //creacion ganado sano
         Ganado::factory()
             ->count(5)
@@ -432,17 +445,24 @@ class RevisionTest extends TestCase
             ->for($this->hacienda)
             ->create();
 
+
         $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('todasRevisiones'));
         $response->assertStatus(200)
             ->assertJson(
-                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has('todas_revisiones', 6 , fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
+                //15 ya que 14 son los generados para este test, y 1 viene del setUp
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has('todas_revisiones', 15 , fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
                     'id' => 'integer',
                     'numero' => 'integer',
                     'diagnostico' => 'string',
                     'ultima_revision' => 'string',
                     'proxima_revision' => 'string|null',
                     'total_revisiones' => 'integer'
-                ]))
+                ])
+                ->where('pendiente', false)
+                ->where('estado', 'sano')
+                )
+                //revisiones con ganado estado pendiente de revision
+            ->where('todas_revisiones.6.pendiente', true)
             );
     }
 
