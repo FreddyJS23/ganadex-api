@@ -21,10 +21,11 @@ class TodosPartosResource extends JsonResource
             'numero' => $this->numero,
             "ultimo_parto" => $existeParto ? $this->partoReciente->fecha : 'desconocido',
             'total_partos' => $this->parto_count,
-            'cria' => (object)([
+            'estado' => $this->estado,
+            'cria' =>$existeParto ? (object)([
                 'id' => $this->partoReciente->ganado_cria->ganado->id,
                 'numero' => $this->partoReciente->ganado_cria->ganado->numero
-            ])
+            ]) : null,
         ];
 
         if ($existeParto && $this->partoReciente->partoable_type == \App\Models\Toro::class) {

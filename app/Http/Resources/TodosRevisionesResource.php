@@ -19,6 +19,8 @@ class TodosRevisionesResource extends JsonResource
         return[
         "id" => $this->id,
         "numero" => $this->numero,
+        "pendiente"=> $this->pendiente,
+        "estado" => $this->estado->estado,
         "ultima_revision" => $existeRevision ? $this->revisionReciente->fecha : 'desconocido',
         "diagnostico" => $existeRevision ? $this->revisionReciente->tipoRevision->tipo : 'desconocido',
         "proxima_revision" => $this->evento ? $this->evento->prox_revision : null ,

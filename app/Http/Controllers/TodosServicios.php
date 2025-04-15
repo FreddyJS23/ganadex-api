@@ -17,11 +17,20 @@ class TodosServicios extends Controller
     {
 
         $ganados = Ganado::doesntHave('toro')
-            ->whereRelation('estados', 'estado','!=', 'fallecido')
-            ->whereRelation('estados', 'estado','!=', 'vendido')
             ->doesntHave('ganadoDescarte')
-            ->whereRelation('estados', 'estado', 'pendiente_servicio')
+            //peso minimo para servicio
+            ->whereHas(
+                'peso',
+                function (Builder $query) {
+                    $query->where('peso_actual', '>=', session('peso_servicio'));
+                }
+            )
             ->with('servicios')
+            ->with('estados')
+            //ordenenar por estado sano primeros
+            ->join('estado_ganado','ganados.id','=','estado_ganado.ganado_id')
+            ->distinct()
+            ->orderBy('estado_id')
             ->with(
                 [
                 'parto' => function (Builder $query) {
@@ -31,11 +40,15 @@ class TodosServicios extends Controller
             )
             ->withCount('servicios')
             ->where('hacienda_id', session('hacienda_id'))->get();
-
         $ganados->transform(
             function (Ganado $ganado) {
 
                 $ganado->efectividad = null;
+                //comprobar si esta pendiente de un servicio, para poder filtrar
+                $ganado->pendiente = $ganado->estados->contains('estado','pendiente_servicio');
+
+                //estado
+                $ganado->estado = $ganado->estados->first();
 
                 /*efectividad respecto a cuantos servicios fueron realizados para que la vaca quede prenada */
                 $efectividad = fn (int $resultadoAlcanzado) => round(1 / $resultadoAlcanzado * 100, 2);
