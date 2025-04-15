@@ -279,6 +279,10 @@ class EventosTest extends TestCase
     /* ------------------------ Evento revision descarte ------------------------ */
     public function test_cuando_se_realiza_una_revision_y_se_descarta(): void
     {
+        $estados=Estado::all();
+        //añadir estados a un ganado que sera descartado
+        $this->ganado->estados()->sync($estados);
+
         //realizar revision
         $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(
             sprintf('api/ganado/%s/revision', $this->ganado->id),
@@ -287,7 +291,7 @@ class EventosTest extends TestCase
 
         $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson('api/ganado_descarte');
 
-        $response->assertStatus(200)->AssertJson(fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
+        $response->dd()->assertStatus(200)->AssertJson(fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
                 ->has('ganado_descartes', 1, fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
                     ->has('estados', 1, fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson=>$json
                         ->where('estado', 'sano')->etc())->etc()));
