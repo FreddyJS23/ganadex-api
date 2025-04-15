@@ -953,7 +953,7 @@ class PartoTest extends TestCase
                         'total_partos' => 'integer|null'
 
                     ])
-                    ->where('estado','Gestacion')
+                    ->where('estado','Vacia')
                     ->has(
                         'toro',
                         fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
@@ -971,9 +971,9 @@ class PartoTest extends TestCase
                     )
                 )
                 //vaca que con estado vacia
-                ->where('todos_partos.1.estado','Vacia')
+                ->where('todos_partos.1.estado','Gestacion')
                 ->has(
-                    'todos_partos.9',
+                    'todos_partos.10',
                     fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
                         'id' => 'integer',
                         'numero' => 'integer',
