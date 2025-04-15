@@ -172,8 +172,28 @@ class HaciendaTest extends TestCase
         $json->hasAll(['errors.nombre'])->etc());
     }
 
-    public function test_obtener_hacienda_en_sesion(): void
+    public function test_admin_obtiene_hacienda_en_sesion(): void
     {
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->haciendaEnSesion->id])->getJson(route('verificar_sesion_hacienda'));
+
+        $response->assertStatus(200)->assertJson(
+            fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
+            $json->has(
+                'hacienda',
+                fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
+                => $json->whereAllType([
+                    'id' => 'integer',
+                    'nombre' => 'string',
+                    'fecha_creacion' => 'string'
+                ])
+            )
+        );
+    }
+
+    public function test_veterinario_obtiene_hacienda_en_sesion(): void
+    {
+        $this->user->syncRoles('veterinario');
+
         $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->haciendaEnSesion->id])->getJson(route('verificar_sesion_hacienda'));
 
         $response->assertStatus(200)->assertJson(
@@ -290,14 +310,6 @@ class HaciendaTest extends TestCase
         $idhaciendaOtroUsuario = $haciendaOtroUsuario->id;
 
         $response = $this->actingAs($this->user)->getJson(route('crear_sesion_hacienda', ['hacienda' => $idhaciendaOtroUsuario]));
-
-        $response->assertStatus(403);
-    }
-
-    public function test_error_obtener_hacienda_en_sesion_no_siendo_administrador(): void
-    {
-        $this->user->syncRoles('veterinario');
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->haciendaEnSesion])->getJson(route('verificar_sesion_hacienda'));
 
         $response->assertStatus(403);
     }
