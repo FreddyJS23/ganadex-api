@@ -29,6 +29,7 @@ class TodosServicios extends Controller
             ->with('estados')
             //ordenenar por estado sano primeros
             ->join('estado_ganado','ganados.id','=','estado_ganado.ganado_id')
+            ->distinct()
             ->orderBy('estado_id')
             ->with(
                 [

@@ -846,6 +846,7 @@ class PartoTest extends TestCase
 
     public function test_obtener_partos_de_todas_las_vacas(): void
     {
+        //eliminar estados previos de los ganados que se generan en el setUp
         DB::table('estado_ganado')->truncate();
 
         /* partos con monta fallecidos */
@@ -952,7 +953,7 @@ class PartoTest extends TestCase
                         'total_partos' => 'integer|null'
 
                     ])
-                    ->where('estado','Vacia')
+                    ->where('estado','Gestacion')
                     ->has(
                         'toro',
                         fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
@@ -970,9 +971,9 @@ class PartoTest extends TestCase
                     )
                 )
                 //vaca que con estado vacia
-                ->where('todos_partos.1.estado','Gestacion')
+                ->where('todos_partos.1.estado','Vacia')
                 ->has(
-                    'todos_partos.6',
+                    'todos_partos.9',
                     fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
                         'id' => 'integer',
                         'numero' => 'integer',

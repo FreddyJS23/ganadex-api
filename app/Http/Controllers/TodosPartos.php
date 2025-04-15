@@ -38,6 +38,7 @@ class TodosPartos extends Controller
         //ordenenar por estado sano primeros
         ->join('estado_ganado','ganados.id','=','estado_ganado.ganado_id')
         ->orderBy('estado_id')
+        ->distinct()
         ->where('hacienda_id', session('hacienda_id'))
         ->get();
 

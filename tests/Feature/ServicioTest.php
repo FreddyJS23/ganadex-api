@@ -751,11 +751,12 @@ class ServicioTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson(
-                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has('todos_servicios',31, fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
+                //26 ya que 25 son los generados para este test, y 1 viene del setUp
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has('todos_servicios',26, fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
                     'id' => 'integer',
                     'numero' => 'integer',
                     'ultimo_servicio' => 'string',
-                    'toro' => 'array',
+                    'pajuela_toro' => 'array',
                     'efectividad' => 'double|integer|null',
                     'total_servicios' => 'integer',
                     'pendiente'=>'boolean',
@@ -767,14 +768,14 @@ class ServicioTest extends TestCase
                 'id' => 'integer',
                 'numero' => 'integer',
                 'ultimo_servicio' => 'string',
-                'pajuela_toro' => 'array',
+                'toro' => 'array',
                 'efectividad' => 'double|integer|null',
                 'total_servicios' => 'integer',
                 'pendiente'=>'boolean',
                 'estado'=>'string'
                 ]))
                 //vaca con estado pendiente de servicio
-                ->has('todos_servicios.26', fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->where('pendiente',true)->etc())
+                ->has('todos_servicios.14', fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->where('pendiente',true)->etc())
             );
     }
 }
