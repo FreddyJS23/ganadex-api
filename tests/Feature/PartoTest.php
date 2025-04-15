@@ -17,6 +17,7 @@ use App\Models\UsuarioVeterinario;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
 
@@ -74,6 +75,7 @@ class PartoTest extends TestCase
     private $estadoSano;
     private $estadoVendido;
     private $estadoFallecido;
+    private $estadoGestacion;
     private $numero_toro;
     private string $urlServicioMonta;
     private string $urlServicioInseminacion;
@@ -88,6 +90,7 @@ class PartoTest extends TestCase
         $this->estadoSano = Estado::find(1);
         $this->estadoVendido = Estado::find(2);
         $this->estadoFallecido = Estado::find(5);
+        $this->estadoGestacion=Estado::find(3);
 
         $this->user
             = User::factory()->hasConfiguracion()->create();
@@ -843,12 +846,14 @@ class PartoTest extends TestCase
 
     public function test_obtener_partos_de_todas_las_vacas(): void
     {
+        DB::table('estado_ganado')->truncate();
+
         /* partos con monta fallecidos */
         Ganado::factory()
             ->count(5)
             ->hasPeso(1)
             ->hasServicios(7, ['servicioable_id' => $this->toro->id,'servicioable_type' => $this->toro->getMorphClass(), 'personal_id' => $this->veterinario->id])
-            ->has(Parto::factory()->has(PartoCria::factory()->state(['ganado_id'=>Ganado::factory()->for($this->hacienda)->hasAttached($this->estado)]))
+            ->has(Parto::factory()->has(PartoCria::factory()->state(['ganado_id'=>Ganado::factory()->for($this->hacienda)->hasAttached($this->estadoSano)]))
             ->state(function (array $attributes, Ganado $ganado): array {
                 $hacienda = $ganado->hacienda;
                 $user=$ganado->hacienda->user->id;
@@ -866,7 +871,7 @@ class PartoTest extends TestCase
             ->count(5)
             ->hasPeso(1)
             ->hasServicios(7, ['servicioable_id' => $this->toro->id,'servicioable_type' => $this->toro->getMorphClass(), 'personal_id' => $this->veterinario->id])
-            ->has(Parto::factory()->has(PartoCria::factory()->state(['ganado_id'=>Ganado::factory()->for($this->hacienda)->hasAttached($this->estado)]))
+            ->has(Parto::factory()->has(PartoCria::factory()->state(['ganado_id'=>Ganado::factory()->for($this->hacienda)->hasAttached($this->estadoSano)]))
             ->state(function (array $attributes, Ganado $ganado): array {
                 $hacienda = $ganado->hacienda;
                 $user=$ganado->hacienda->user->id;
@@ -883,7 +888,7 @@ class PartoTest extends TestCase
         Ganado::factory()
         ->hasPeso(1)
         ->hasServicios(7, ['servicioable_id' => $this->toro->id,'servicioable_type' => $this->toro->getMorphClass(), 'personal_id' => $this->veterinario->id])
-        ->has(Parto::factory()->has(PartoCria::factory()->state(['ganado_id'=>Ganado::factory()->for($this->hacienda)->hasAttached($this->estado)]))
+        ->has(Parto::factory()->has(PartoCria::factory()->state(['ganado_id'=>Ganado::factory()->for($this->hacienda)->hasAttached($this->estadoSano)]))
             ->state(function (array $attributes, Ganado $ganado): array {
                 $hacienda = $ganado->hacienda;
                 $user=$ganado->hacienda->user->id;
@@ -901,7 +906,7 @@ class PartoTest extends TestCase
         Ganado::factory()
         ->hasPeso(1)
         ->hasServicios(7, ['servicioable_id' => $this->pajuelaToro->id,'servicioable_type' => $this->pajuelaToro->getMorphClass(), 'personal_id' => $this->veterinario->id])
-        ->has(Parto::factory()->has(PartoCria::factory()->state(['ganado_id'=>Ganado::factory()->for($this->hacienda)->hasAttached($this->estado)]))
+        ->has(Parto::factory()->has(PartoCria::factory()->state(['ganado_id'=>Ganado::factory()->for($this->hacienda)->hasAttached($this->estadoSano)]))
             ->state(function (array $attributes, Ganado $ganado): array {
                 $hacienda = $ganado->hacienda;
                 $user=$ganado->hacienda->user->id;
@@ -910,23 +915,45 @@ class PartoTest extends TestCase
             return ['partoable_id' => $ganado->servicioReciente->servicioable->id,'partoable_type' => $ganado->servicioReciente->servicioable->getMorphClass(), 'personal_id' => $veterinario->id];
     }))
         ->hasEvento(1)
-        ->hasAttached($this->estado)
+        ->hasAttached($this->estadoSano)
         ->for($this->hacienda)
         ->count(5)
         ->create();
+
+            /* partos con monta, y estan de nuevo en gestacion */
+        Ganado::factory()
+        ->hasPeso(1)
+        ->hasServicios(7, ['servicioable_id' => $this->toro->id,'servicioable_type' => $this->toro->getMorphClass(), 'personal_id' => $this->veterinario->id])
+        ->has(Parto::factory()->has(PartoCria::factory()->state(['ganado_id'=>Ganado::factory()->for($this->hacienda)->hasAttached($this->estadoSano)]))
+            ->state(function (array $attributes, Ganado $ganado): array {
+                $hacienda = $ganado->hacienda;
+                $user=$ganado->hacienda->user->id;
+                $veterinario = Personal::factory()->hasAttached($hacienda)->create(['user_id'=>$user,'cargo_id' => 2]);
+
+            return ['partoable_id' => $ganado->servicioReciente->servicioable->id,'partoable_type' => $ganado->servicioReciente->servicioable->getMorphClass(), 'personal_id' => $veterinario->id];
+        }))
+            ->hasEvento(1)
+            ->hasAttached([$this->estadoSano,$this->estadoGestacion])
+            ->for($this->hacienda)
+            ->count(5)
+            ->create();
+
 
         $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('todosPartos'));
 
         $response->assertStatus(200)
             ->assertJson(
                 fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
-                    'todos_partos',10,
+                    'todos_partos',15,
                     fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
                         'id' => 'integer',
                         'numero' => 'integer',
-                        'ultimo_parto' => 'string',
-                        'total_partos' => 'integer'
-                    ])->has(
+                        'ultimo_parto' => 'string|null',
+                        'total_partos' => 'integer|null'
+
+                    ])
+                    ->where('estado','Vacia')
+                    ->has(
                         'toro',
                         fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                         => $json->whereAllType([
@@ -941,13 +968,17 @@ class PartoTest extends TestCase
                             'numero' => 'integer',
                         ])
                     )
-                )->has(
+                )
+                //vaca que con estado vacia
+                ->where('todos_partos.1.estado','Gestacion')
+                ->has(
                     'todos_partos.6',
                     fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
                         'id' => 'integer',
                         'numero' => 'integer',
-                        'ultimo_parto' => 'string',
-                        'total_partos' => 'integer'
+                        'ultimo_parto' => 'string|null',
+                        'total_partos' => 'integer|null',
+                        'estado'=>'string'
                     ])->has(
                         'pajuela_toro',
                         fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson

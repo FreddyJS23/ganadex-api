@@ -45,6 +45,7 @@ class ServicioTest extends TestCase
     private $estadoSano;
     private $estadoVendido;
     private $estadoFallecido;
+    private $estadoPendienteServicio;
     private $userVeterinario;
     private $toro;
     private $pajuelaToro ;
@@ -63,6 +64,7 @@ class ServicioTest extends TestCase
         $this->estadoSano = Estado::find(1);
         $this->estadoVendido = Estado::find(2);
         $this->estadoFallecido = Estado::find(5);
+        $this->estadoPendienteServicio=Estado::find(7);
 
             $this->hacienda
             = Hacienda::factory()
@@ -727,25 +729,52 @@ class ServicioTest extends TestCase
             ->for($this->hacienda)
             ->create();
 
+                /* partos con monta sanas y estado pendiente servicio*/
+        Ganado::factory()
+        ->count(5)
+        ->hasPeso(1)
+        ->hasServicios(1, ['servicioable_id' => $this->toro->id, 'servicioable_type' => $this->toro->getMorphClass(), 'personal_id' => $this->veterinario->id])
+        ->has(Parto::factory()->has(PartoCria::factory()->state(['ganado_id'=>Ganado::factory()->for($this->hacienda)->hasAttached($this->estado)]))
+        ->state(function (array $attributes, Ganado $ganado): array {
+            $hacienda = $ganado->hacienda;
+            $user=$ganado->hacienda->user->id;
+            $veterinario = Personal::factory()->hasAttached($hacienda)->create(['user_id'=>$user,'cargo_id' => 2]);
+
+            return ['partoable_id' => $ganado->servicioReciente->servicioable->id,'partoable_type' => $ganado->servicioReciente->servicioable->getMorphClass(), 'personal_id' => $veterinario->id];
+        }))
+        ->hasEvento(1)
+        ->hasAttached([$this->estadoSano,$this->estadoPendienteServicio],)
+        ->for($this->hacienda)
+        ->create();
+
         $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('todasServicios'));
 
         $response->assertStatus(200)
             ->assertJson(
-                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has('todos_servicios',10, fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has('todos_servicios',31, fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
                     'id' => 'integer',
                     'numero' => 'integer',
                     'ultimo_servicio' => 'string',
                     'toro' => 'array',
                     'efectividad' => 'double|integer|null',
-                    'total_servicios' => 'integer'
-                ]))->has('todos_servicios.6', fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
+                    'total_servicios' => 'integer',
+                    'pendiente'=>'boolean',
+                    'estado'=>'string',
+                ]))
+                //comprabar que vienen primero las sanas
+                ->has('todos_servicios.2', fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->where('estado','sano')->etc())
+                ->has('todos_servicios.1', fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
                 'id' => 'integer',
                 'numero' => 'integer',
                 'ultimo_servicio' => 'string',
                 'pajuela_toro' => 'array',
                 'efectividad' => 'double|integer|null',
-                'total_servicios' => 'integer'
+                'total_servicios' => 'integer',
+                'pendiente'=>'boolean',
+                'estado'=>'string'
                 ]))
+                //vaca con estado pendiente de servicio
+                ->has('todos_servicios.26', fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->where('pendiente',true)->etc())
             );
     }
 }
