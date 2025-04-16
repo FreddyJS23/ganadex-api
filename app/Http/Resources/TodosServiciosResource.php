@@ -23,7 +23,7 @@ class TodosServiciosResource extends JsonResource
             "efectividad" => $this->efectividad,
             "total_servicios" => $this->servicios_count,
             "pendiente"=>$this->pendiente,
-            "estado"=>$this->estado->estado
+            "estado"=>ucfirst($this->estado->estado)
         ];
         if ($existeServicio && $this->servicioReciente->servicioable_type == \App\Models\Toro::class) {
             $resource['toro'] = (object)
