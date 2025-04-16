@@ -284,10 +284,12 @@ class GanadoDescarteTest extends TestCase
 
     public function test_descartar_ganado(): void
     {
+        $estados = Estado::all();
         $ganado = Ganado::factory()
             ->hasPeso(1)
             ->hasEvento(1)
             ->for($this->hacienda)
+            ->hasAttached($estados)
             ->create();
 
         $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson('api/descartar_ganado', ['ganado_id' => $ganado->id]);
@@ -313,6 +315,7 @@ class GanadoDescarteTest extends TestCase
 
                         ])
                     ->where('tipo', fn (string $tipoGanado) => Str::contains($tipoGanado, ['Becerro', 'Maute','Novillo','Adulto']))
+                    ->has('estados', 1)
                 )
             );
     }

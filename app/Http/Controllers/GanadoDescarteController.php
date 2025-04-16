@@ -246,10 +246,16 @@ class GanadoDescarteController extends Controller
 
     public function descartar(StoreDescartarGanado $request)
     {
+        $ganado=Ganado::find($request->ganado_id);
+
+        //sincronizar estado sano
+        $ganado->estados()->sync(1);
+
         $ganadoDescarte = new GanadoDescarte();
         $ganadoDescarte->ganado_id = $request->ganado_id;
         $ganadoDescarte->hacienda_id = session('hacienda_id');
         $ganadoDescarte->save();
+
         return response()->json(['ganado_descarte' => new GanadoDescarteResource($ganadoDescarte)], 201);
     }
 }
