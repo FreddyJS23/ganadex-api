@@ -147,8 +147,9 @@ class PersonalTest extends TestCase
                         'fecha_nacimiento' => 'string',
                         'telefono' => 'string',
                         'cargo' => 'string',
-                        'haciendas' => 'array',
+
                     ])
+                    ->where('haciendas.0.id', $this->hacienda->id)
                 )
             );
     }

@@ -38,6 +38,14 @@ class PersonalController extends Controller
         $personal->fill($request->all());
         $personal->user_id = Auth::id();
         $personal->save();
+        $personal->refresh();
+
+        //guardar personal en la hacienda actual
+        DB::table('hacienda_personal')->insert([
+            'hacienda_id' => session('hacienda_id'),
+            'personal_id' => $personal->id
+        ]);
+
         return response()->json(['personal' => new PersonalResource($personal)], 201);
     }
 
