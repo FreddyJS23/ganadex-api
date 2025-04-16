@@ -32,9 +32,6 @@ class TodosPartos extends Controller
         ->with('parto')
         ->withCount('parto')
         ->with('estados')
-        ->whereHas('estados',function (Builder $query) {
-            $query->whereNotIn('estado',['vendido','fallecido']);
-        })
         //ordenenar por estado sano primeros
         ->join('estado_ganado','ganados.id','=','estado_ganado.ganado_id')
         ->orderBy('estado_id')
@@ -46,10 +43,20 @@ class TodosPartos extends Controller
 
         $ganados->transform(
             function (Ganado $ganado) {
-              /*   colocar estado segun si esta en gestacion o no, ya que al trae vaca con partos
-                algunas pueden estar en gestacion y otras vacias */
-                $ganado->estado =  $ganado->estados->contains('estado','gestacion') ? 'Gestacion' : 'Vacia';
-                return $ganado;
+            /*   colocar estado segun si esta en gestacion o no, ya que al trae vaca con partos
+            algunas pueden estar en gestacion y otras vacias */
+            if($ganado->estados->contains('estado','gestacion'))
+                $ganado->estado =  'Gestacion';
+
+            else if($ganado->estados->contains('estado','vendido'))
+                $ganado->estado =  'Vendida';
+
+            else if($ganado->estados->contains('estado','fallecido'))
+                $ganado->estado =  'Fallecida';
+
+            else $ganado->estado =  'Vacia';
+
+            return $ganado;
             }
         );
 
