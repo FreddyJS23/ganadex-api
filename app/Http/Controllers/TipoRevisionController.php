@@ -20,7 +20,7 @@ class TipoRevisionController extends Controller
      */
     public function index()
     {
-        return new TipoRevisionCollection(TipoRevision::select('id', 'tipo')->get());
+        return new TipoRevisionCollection(TipoRevision::select('id', 'tipo','codigo')->get());
     }
 
 

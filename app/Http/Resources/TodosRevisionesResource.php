@@ -21,8 +21,8 @@ class TodosRevisionesResource extends JsonResource
         "numero" => $this->numero,
         "pendiente"=> $this->pendiente,
         "estado"=>ucfirst($this->estado->estado),
-        "ultima_revision" => $existeRevision ? $this->revisionReciente->fecha : 'desconocido',
-        "diagnostico" => $existeRevision ? $this->revisionReciente->tipoRevision->tipo : 'desconocido',
+        "ultima_revision" => $existeRevision ? $this->revisionReciente->fecha : 'Desconocido',
+        "diagnostico" => $existeRevision ? $this->revisionReciente->tipoRevision->makeHidden('id','created_at','updated_at'): 'Desconocido',
         "proxima_revision" => $this->evento ? $this->evento->prox_revision : null ,
         "total_revisiones" => $this->revision_count
         ];

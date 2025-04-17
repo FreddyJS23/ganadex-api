@@ -31,7 +31,8 @@ class RevisionController extends Controller
     {
         return new RevisionCollection(
             Revision::whereBelongsTo($ganado)->with(
-                ['veterinario' => function (Builder $query) {
+                ['tipoRevision',
+                'veterinario' => function (Builder $query) {
                     $query->select('personals.id', 'nombre');
                 }]
             )->get()

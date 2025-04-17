@@ -147,7 +147,7 @@ class RevisionTest extends TestCase
                     $json->whereAllType([
                         'id' => 'integer',
                         'fecha' => 'string',
-                        'diagnostico' => 'string',
+                        'diagnostico' => 'array|string',
                         'tratamiento' => 'string',
                     ])->has(
                         'veterinario',
@@ -174,7 +174,7 @@ class RevisionTest extends TestCase
                     $json->whereAllType([
                         'id' => 'integer',
                         'fecha' => 'string',
-                        'diagnostico' => 'string',
+                        'diagnostico' => 'array|string',
                         'tratamiento' => 'string',
                     ])->has(
                         'veterinario',
@@ -201,7 +201,7 @@ class RevisionTest extends TestCase
                     $json->whereAllType([
                         'id' => 'integer',
                         'fecha' => 'string',
-                        'diagnostico' => 'string',
+                        'diagnostico' => 'array|string',
                         'tratamiento' => 'string',
                     ])->has(
                         'veterinario',
@@ -350,7 +350,7 @@ class RevisionTest extends TestCase
                     $json->whereAllType([
                         'id' => 'integer',
                         'fecha' => 'string',
-                        'diagnostico' => 'string',
+                        'diagnostico' => 'array|string',
                         'tratamiento' => 'string',
                     ])->has(
                         'veterinario',
@@ -376,7 +376,7 @@ class RevisionTest extends TestCase
                 fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'revision',
                     fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
-                    $json->where('diagnostico', 'Rutina')
+                    $json->where('diagnostico.tipo', 'Rutina')
                     ->where('tratamiento', $this->revision['tratamiento'])
                     ->has(
                         'veterinario',
@@ -453,17 +453,23 @@ class RevisionTest extends TestCase
                 fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has('todas_revisiones', 15 , fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
                     'id' => 'integer',
                     'numero' => 'integer',
-                    'diagnostico' => 'string',
+                    'diagnostico' => 'array|string',
                     'ultima_revision' => 'string',
                     'proxima_revision' => 'string|null',
                     'total_revisiones' => 'integer'
                 ])
                 ->where('pendiente', false)
-                ->where('estado', 'sano')
+                ->where('estado', 'Sano')
+                ->has('diagnostico',fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson=>
+                    $json->whereAllType([
+                        'tipo' => 'string',
+                        'codigo' => 'string|null',
+                    ])
                 )
-                //revisiones con ganado estado pendiente de revision
+            )
+            //revisiones con ganado estado pendiente de revision
             ->where('todas_revisiones.6.pendiente', true)
-            );
+        );
     }
 
 
