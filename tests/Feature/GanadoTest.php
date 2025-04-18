@@ -439,7 +439,7 @@ class GanadoTest extends TestCase
                 ])
                 ->where('total_servicios_acumulados',8) //sumando la cantidad de servicios en las dos rondas da 8
                 ->where('total_servicios',5) //cantidad de servicios de la segunda ronda para efectuar el ultimo parto
-                ->where('total_partos',2) //sumando la cantidad de partos en las dos rondas da 8
+                ->where('total_partos',2) //sumando la cantidad de partos en las dos rondas da 2
                 ->has('info_pesajes_leche',
                     fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson=>
                     $json->whereAllType([
