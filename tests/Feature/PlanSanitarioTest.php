@@ -7,6 +7,7 @@ use App\Models\Hacienda;
 use App\Models\Ganado;
 use App\Models\Plan_sanitario;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -219,8 +220,8 @@ class PlanSanitarioTest extends TestCase
         $response->assertStatus(200)->assertJson(
             fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
             $json
-                ->where('plan_sanitario.fecha_inicio', $this->planSanitario['fecha_inicio'])
-                ->where('plan_sanitario.fecha_fin', $this->planSanitario['fecha_fin'])
+                ->where('plan_sanitario.fecha_inicio',Carbon::parse( $this->planSanitario['fecha_inicio'])->format('d-m-Y'))
+                ->where('plan_sanitario.fecha_fin', Carbon::parse( $this->planSanitario['fecha_fin'])->format('d-m-Y'))
                 ->whereAllType([
                     'plan_sanitario.id' => 'integer',
                     'plan_sanitario.fecha_inicio' => 'string',
