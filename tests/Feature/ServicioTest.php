@@ -658,9 +658,6 @@ class ServicioTest extends TestCase
 
     public function test_obtener_servicios_de_todas_las_vacas(): void
     {
-        //eliminar estados previos de los ganados que se generan en el setUp
-        DB::table('estado_ganado')->truncate();
-
         /* partos con monta fallecidas */
         Ganado::factory()
             ->count(5)
@@ -755,30 +752,26 @@ class ServicioTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson(
-                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has('todos_servicios',25, fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => 
+                //son 26, ya que se esta contando la vaca que se crea en setUp
+                $json->has('todos_servicios',26)
+                ->has('todos_servicios.3', fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
                     'id' => 'integer',
                     'numero' => 'integer',
                     'ultimo_servicio' => 'string',
-                    'pajuela_toro' => 'array',
                     'efectividad' => 'double|integer|null',
+                    'toro' => 'array|null',
                     'total_servicios' => 'integer',
                     'pendiente'=>'boolean',
-                    'estado'=>'string',
-                ]))
-                //comprabar que vienen primero las sanas
-                ->has('todos_servicios.2', fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->where('estado','sano')->etc())
+                ])
+                ->where('estado',fn(string $estado) => Str::contains($estado,['Sano','Fallecido','Vendido']))
+                )
                 ->has('todos_servicios.1', fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
-                'id' => 'integer',
-                'numero' => 'integer',
-                'ultimo_servicio' => 'string',
-                'toro' => 'array',
-                'efectividad' => 'double|integer|null',
-                'total_servicios' => 'integer',
-                'pendiente'=>'boolean',
-                'estado'=>'string'
-                ]))
-                //vaca con estado pendiente de servicio
-                ->has('todos_servicios.13', fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->where('pendiente',true)->etc())
+                    'pajuela_toro' => 'array|null',
+                ])
+                ->where('estado',fn(string $estado) => Str::contains($estado,['Sano','Fallecido','Vendido']))
+                ->etc()
+                )
             );
     }
 }

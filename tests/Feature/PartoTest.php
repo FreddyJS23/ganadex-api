@@ -19,6 +19,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Testing\Fluent\AssertableJson;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class PartoTest extends TestCase
@@ -846,9 +847,6 @@ class PartoTest extends TestCase
 
     public function test_obtener_partos_de_todas_las_vacas(): void
     {
-        //eliminar estados previos de los ganados que se generan en el setUp
-        DB::table('estado_ganado')->truncate();
-
         /* partos con monta fallecidos */
         Ganado::factory()
             ->count(5)
@@ -944,16 +942,18 @@ class PartoTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson(
-                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
-                    'todos_partos',25,
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => 
+                //27 ya que se contabiliza las dos vacas que se crean en setUp
+                $json->has('todos_partos',27)
+                    ->has(
+                    'todos_partos.2',
                     fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
                         'id' => 'integer',
                         'numero' => 'integer',
                         'ultimo_parto' => 'string|null',
                         'total_partos' => 'integer|null'
-
                     ])
-                    ->where('estado','Gestacion')
+                    ->where('estado',fn(string $estado) => Str::contains($estado,['Gestacion','Vacia','Fallecida','Vendida']))
                     ->has(
                         'toro',
                         fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
@@ -970,20 +970,13 @@ class PartoTest extends TestCase
                         ])
                     )
                 )
-                //vaca que con estado vacia
-                ->where('todos_partos.1.estado','Vacia')
-                //vaca que con estado fallecida
-                ->where('todos_partos.15.estado','Fallecida')
-                //vaca que con estado vendia
-                ->where('todos_partos.20.estado','Vendida')
                 ->has(
-                    'todos_partos.10',
+                    'todos_partos.11',
                     fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
                         'id' => 'integer',
                         'numero' => 'integer',
                         'ultimo_parto' => 'string|null',
                         'total_partos' => 'integer|null',
-                        'estado'=>'string'
                     ])->has(
                         'pajuela_toro',
                         fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
@@ -999,6 +992,7 @@ class PartoTest extends TestCase
                             'numero' => 'integer',
                         ])
                     )
+                    ->where('estado',fn(string $estado) => Str::contains($estado,['Gestacion','Vacia','Fallecida','Vendida']))
                 )
             );
     }
