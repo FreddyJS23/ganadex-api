@@ -10,6 +10,7 @@ use App\Models\Personal;
 use App\Models\Servicio;
 use App\Models\Toro;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -251,7 +252,7 @@ class ToroTest extends TestCase
 
                         ])
                     ->where('origen', 'Externo')
-                    ->where('fecha_ingreso', $this->toro['fecha_ingreso'])
+                    ->where('fecha_ingreso', Carbon::parse( $this->toro['fecha_ingreso'])->format('d-m-Y'))
                 )
             );
     }
@@ -269,7 +270,7 @@ class ToroTest extends TestCase
                     $json
                     ->has('fallecimiento',
                         fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson=>
-                        $json->where('fecha', $this->toro_fallecido['fecha_fallecimiento'])
+                        $json->where('fecha',Carbon::parse( $this->toro_fallecido['fecha_fallecimiento'])->format('d-m-Y'))
                         ->where('descripcion', $this->toro_fallecido['descripcion'])
                          ->whereType('causa','string')
                     )
@@ -406,8 +407,8 @@ class ToroTest extends TestCase
                 ->where('toro.numero', $toroActual['ganado']['numero'])
                 ->where('toro.origen',  'Externo') //origen_id = 2
                 ->where('toro.sexo', $toroActual['ganado']['sexo'])
-                ->where('toro.fecha_nacimiento', $this->toroActualizado['fecha_nacimiento'])
-                ->where('toro.fecha_ingreso', $this->toroActualizado['fecha_ingreso'])
+                ->where('toro.fecha_nacimiento', Carbon::parse( $this->toroActualizado['fecha_nacimiento'])->format('d-m-Y'))
+                ->where('toro.fecha_ingreso', Carbon::parse( $this->toroActualizado['fecha_ingreso'])->format('d-m-Y'))
                 ->where('toro.pesos.peso_nacimiento', $this->toroActualizado['peso_nacimiento'] . 'KG')
                 ->where('toro.pesos.peso_destete', $this->toroActualizado['peso_destete'] . 'KG')
                 ->where('toro.pesos.peso_2year', $this->toroActualizado['peso_2year'] . 'KG')

@@ -9,6 +9,7 @@ use App\Models\Hacienda;
 use App\Models\Ganado;
 use App\Models\GanadoDescarte;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -234,7 +235,7 @@ class GanadoDescarteTest extends TestCase
 
                         ])
                         ->where('origen', 'Externo')
-                        ->where('fecha_ingreso', $this->ganadoDescarte['fecha_ingreso'])
+                        ->where('fecha_ingreso',Carbon::parse( $this->ganadoDescarte['fecha_ingreso'])->format('d-m-Y'))
                 )
             );
     }
@@ -253,7 +254,7 @@ class GanadoDescarteTest extends TestCase
                         ->where('estados.0.estado', 'fallecido')
                          ->has('fallecimiento',
                         fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson=>
-                        $json->where('fecha', $this->descarte_fallecido['fecha_fallecimiento'])
+                        $json->where('fecha', Carbon::parse( $this->descarte_fallecido['fecha_fallecimiento'])->format('d-m-Y'))
                         ->where('descripcion', $this->descarte_fallecido['descripcion'])
                          ->whereType('causa','string')
                     )
@@ -399,8 +400,8 @@ class GanadoDescarteTest extends TestCase
                 ->where('ganado_descarte.pesos.peso_destete', $this->ganadoDescarteActualizado['peso_destete'] . 'KG')
                 ->where('ganado_descarte.pesos.peso_2year', $this->ganadoDescarteActualizado['peso_2year'] . 'KG')
                 ->where('ganado_descarte.pesos.peso_actual', $this->ganadoDescarteActualizado['peso_actual'] . 'KG')
-                ->where('ganado_descarte.fecha_nacimiento', $this->ganadoDescarteActualizado['fecha_nacimiento'])
-                ->where('ganado_descarte.fecha_ingreso', $this->ganadoDescarteActualizado['fecha_ingreso'])
+                ->where('ganado_descarte.fecha_nacimiento', Carbon::parse( $this->ganadoDescarteActualizado['fecha_nacimiento'])->format('d-m-Y'))
+                ->where('ganado_descarte.fecha_ingreso', Carbon::parse( $this->ganadoDescarteActualizado['fecha_ingreso'])->format('d-m-Y'))
                 ->where('ganado_descarte.tipo', fn (string $tipoGanado) => Str::contains($tipoGanado, ['Becerro', 'Maute','Novillo','Adulto']))
                 ->etc()
         );

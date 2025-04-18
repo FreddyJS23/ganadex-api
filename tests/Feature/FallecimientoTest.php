@@ -8,6 +8,7 @@ use App\Models\Fallecimiento;
 use App\Models\Hacienda;
 use App\Models\Ganado;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -172,7 +173,7 @@ class FallecimientoTest extends TestCase
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
             $json
-                ->where('fallecimiento.fecha', $this->fallecimientoActualizado['fecha'])
+                ->where('fallecimiento.fecha',Carbon::parse( $this->fallecimientoActualizado['fecha'])->format('d-m-Y'))
                 ->where('fallecimiento.descripcion', $this->fallecimientoActualizado['descripcion'])
                 ->whereAllType([
                     'fallecimiento.id' => 'integer',

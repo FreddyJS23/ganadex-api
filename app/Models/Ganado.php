@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Casts\Fecha;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -31,6 +34,11 @@ class Ganado extends Model
         'sexo',
         'fecha_nacimiento',
         'fecha_ingreso',
+    ];
+
+    protected $casts = [
+        'fecha_nacimiento' => Fecha::class,
+        'fecha_ingreso' => Fecha::class,
     ];
 
     /**

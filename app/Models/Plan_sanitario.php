@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\Fecha;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -23,6 +24,8 @@ class Plan_sanitario extends Model
 
     protected $casts = [
         'ganado_vacunado' => AsArrayObject::class,
+        'fecha_inicio' => Fecha::class,
+        'fecha_fin' => Fecha::class,
     ];
 
     /**

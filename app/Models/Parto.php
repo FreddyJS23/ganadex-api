@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\Fecha;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -22,6 +23,10 @@ class Parto extends Model
         'observacion',
         'fecha',
         'personal_id'
+    ];
+
+    protected $casts=[
+        'fecha' => Fecha::class,
     ];
 
     /**

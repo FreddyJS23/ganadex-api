@@ -15,6 +15,7 @@ use App\Models\Plan_sanitario;
 use App\Models\Servicio;
 use App\Models\Toro;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -306,7 +307,7 @@ class GanadoTest extends TestCase
 
                     ])
                     ->where('origen', 'Externo')
-                    ->where('fecha_ingreso', $this->cabeza_ganado['fecha_ingreso'])
+                    ->where('fecha_ingreso', Carbon::parse( $this->cabeza_ganado['fecha_ingreso'])->format('d-m-Y'))
 
                 )
             );
@@ -326,7 +327,7 @@ class GanadoTest extends TestCase
                         ->where('estados.0.estado', 'fallecido')
                         ->has('fallecimiento',
                         fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson=>
-                        $json->where('fecha', $this->cabeza_ganado_fallecida['fecha_fallecimiento'])
+                        $json->where('fecha',Carbon::parse( $this->cabeza_ganado_fallecida['fecha_fallecimiento'])->format('d-m-Y'))
                         ->where('descripcion', $this->cabeza_ganado_fallecida['descripcion'])
                          ->whereType('causa','string')
                     )
@@ -534,9 +535,8 @@ class GanadoTest extends TestCase
                 ->where('ganado.nombre', $this->cabeza_ganado_actualizada['nombre'])
                 ->where('ganado.numero', $ganadoEditar['numero'])
                 ->where('ganado.origen', 'Externo') //origen_id = 2
-                ->where('ganado.sexo', $ganadoEditar['sexo'])
-                ->where('ganado.fecha_nacimiento', $this->cabeza_ganado_actualizada['fecha_nacimiento'])
-                ->where('ganado.fecha_ingreso', $this->cabeza_ganado_actualizada['fecha_ingreso'])
+                ->where('ganado.fecha_nacimiento',Carbon::parse( $this->cabeza_ganado_actualizada['fecha_nacimiento'])->format('d-m-Y'))
+                ->where('ganado.fecha_ingreso', Carbon::parse( $this->cabeza_ganado_actualizada['fecha_ingreso'])->format('d-m-Y'))
                 ->where('ganado.pesos.peso_nacimiento', $this->cabeza_ganado_actualizada['peso_nacimiento'] . 'KG')
                 ->where('ganado.pesos.peso_destete', $this->cabeza_ganado_actualizada['peso_destete'] . 'KG')
                 ->where('ganado.pesos.peso_2year', $this->cabeza_ganado_actualizada['peso_2year'] . 'KG')

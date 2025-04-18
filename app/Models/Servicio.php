@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\Fecha;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -22,6 +23,11 @@ class Servicio extends Model
         'fecha',
         'personal_id',
     ];
+
+    protected $casts=[
+        'fecha' => Fecha::class,
+    ];
+
     /**
      * Get the ganado that owns the Servicio
      *

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\Fecha;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -17,6 +18,11 @@ class Vacunacion extends Model
         'fecha',
         'prox_dosis',
     ];
+
+    protected $casts = [
+        'fecha' => Fecha::class,
+    ];
+
     /**
      * Get the user that owns the Vacunacion
      *
