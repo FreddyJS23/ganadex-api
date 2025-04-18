@@ -215,8 +215,9 @@ class GanadoController extends Controller
        /* para la efectivida se obtienen los servicios entre el penultimo parto y el ultimo parto,
        queriendo decir que no se hace una efectividad de todos los servicios que se hicieron en el ganado*/
         } elseif ($ganado->parto->count() >= 2) {
-            $fechaInicio = $ganado->parto[1]->fecha;
-            $fechaFin = $ganado->parto[0]->fecha;
+            //se debe  usar raw ya que el modelo tiene un cast para las fechas en formar d-m-Y, pero para la query se usa el formato Y-m-d
+            $fechaInicio = $ganado->parto[1]->getRawOriginal("fecha");
+            $fechaFin = $ganado->parto[0]->getRawOriginal("fecha");
 
             $ganado->fechaInicio = $fechaInicio;
             $ganado->fechaFin = $fechaFin;
