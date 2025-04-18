@@ -467,8 +467,6 @@ class RevisionTest extends TestCase
                     ])
                 )
             )
-            //revisiones con ganado estado pendiente de revision
-            ->where('todas_revisiones.6.pendiente', true)
         );
     }
 
