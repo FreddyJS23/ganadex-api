@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property string $nombre
  * @property ?int $numero
  * @property 'H'|'M' $sexo
- * @property ?string $origen
+ * @property ?OrigenGanado $origen
  * @property ?string $fecha_nacimiento
  * @property-read ?GanadoTipo $tipo
  * @property-read ?Hacienda $hacienda
