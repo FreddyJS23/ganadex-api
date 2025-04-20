@@ -1,6 +1,6 @@
 <div class="container_tablas_vacas_productoras">
 
-    <table class="tabla_informacion_pequeña">
+    <table class="tabla_informacion_pequena">
         <thead class="titulo_tabla">
             <tr>
                 <th colspan="3">
@@ -31,7 +31,7 @@
             </tr>
         </tbody>
     </table>
-    <table class="tabla_informacion_pequeña">
+    <table class="tabla_informacion_pequena">
         <thead class="titulo_tabla">
             <tr>
                 <th colspan="3">

@@ -69,7 +69,7 @@
             height: 75px;
         }
 
-        .tabla_informacion_pequeña {
+        .tabla_informacion_pequena {
             width: 270px;
             height: 75px;
         }
