@@ -55,6 +55,12 @@ class ReportsPdfController extends Controller
 
     public function resumenGanado(Ganado $ganado)
     {
+
+      /*  //descomentar para acceder a la ruta manualmente desde el navegador y debuguear
+       //incustruar id para debug
+        session(['hacienda_id' => 1]); */
+
+
         $ganado->load('peso', 'tipo', 'estados');
         $ganado->loadCount('servicios')->loadCount('revision')->loadCount('parto');
         $ultimaRevision = $ganado->revisionReciente;
@@ -181,6 +187,12 @@ END as ultima_dosis
         'vacunas' => $resumenVacunas,
         ];
 
+
+/*
+      //descomentar para acceder a la ruta manualmente desde el navegador y debuguear
+      $nombreHacienda=$this->obtenerNombreHacienda();
+        $dataPdf['nombreHacienda']=$nombreHacienda;
+        return view(VistasReporte::resumenVaca->value,$dataPdf); */
         return $this->generarPdf(VistasReporte::resumenVaca,$dataPdf,"Resumen vaca " . $ganado->numero);
 
     }
@@ -188,6 +200,11 @@ END as ultima_dosis
 
     public function resumenGeneral()
     {
+       /*
+       //descomentar para acceder a la ruta manualmente desde el navegador y debuguear
+       //incustruar id para debug
+        session(['hacienda_id' => 1]);
+        */
         function obtenerSumaTotalPorTipo(array $tipo): int
         {
             $sumaTotalPorTipo = 0;
@@ -385,6 +402,12 @@ END as ultima_dosis
         'balanceSegundoSemestre' => $balanceSegundoSemestre
         ];
 
+      /*
+      //descomentar para acceder a la ruta manualmente desde el navegador y debuguear
+      $nombreHacienda=$this->obtenerNombreHacienda();
+        $dataPdf['nombreHacienda']=$nombreHacienda;
+        return view(VistasReporte::general->value,$dataPdf); */
+
         return $this->generarPdf(VistasReporte::general,$dataPdf,"Reporte general " . $fechaActual->format('d-m-Y'));
 
     }
@@ -413,6 +436,13 @@ END as ultima_dosis
 
     public function resumenVentaGanadoAnual(Request $request)
     {
+
+
+       //descomentar para acceder a la ruta manualmente desde el navegador y debuguear
+       //incustruar id para debug
+        session(['hacienda_id' => 1]);
+
+
         $regexYear = "/^[2][0-9][0-9][0-9]$/";
 
         $year = preg_match($regexYear, $request->query('year')) ? $request->query('year') : now()->format('Y');
@@ -435,6 +465,12 @@ END as ultima_dosis
 
         $dataPdf = ['ventasGanado' => $ventasGanado->groupBy('mes')->toArray(),'year' => $year];
 
+
+   /*    //descomentar para acceder a la ruta manualmente desde el navegador y debuguear
+      $nombreHacienda=$this->obtenerNombreHacienda();
+        $dataPdf['nombreHacienda']=$nombreHacienda;
+        //return view(VistasReporte::ventaGanadoAnual->value,$dataPdf);
+ */
         return $this->generarPdf(VistasReporte::ventaGanadoAnual,$dataPdf,"Resumen ventas de animales " . "año " . $year);
     }
 
