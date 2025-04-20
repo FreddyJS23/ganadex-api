@@ -63,8 +63,9 @@ class ReportsPdfController extends Controller
         $ultimoPesajeLeche = $ganado->pesajeLecheReciente;
         $efectividad = fn (int $resultadoAlcanzado, int $resultadoPrevisto) => $resultadoAlcanzado * 100 / $resultadoPrevisto;
 
-        $ganadoInfo = $ganado->only(['nombre', 'numero', 'sexo', 'origen', 'fecha_nacimiento']);
+        $ganadoInfo = $ganado->only(['nombre', 'numero', 'sexo', 'fecha_nacimiento']);
         $ganadoInfo = array_merge($ganadoInfo, ['tipo' => $ganado->tipo->tipo]);
+        $ganadoInfo = array_merge($ganadoInfo, ['origen' => $ganado->origen->origen]);
         $ganadoPeso = $ganado->peso ? Arr::except($ganado->peso->toArray(), ['id']) : [];
 
         $resumenServicio = [];
