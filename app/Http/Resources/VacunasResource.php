@@ -17,8 +17,17 @@ class VacunasResource extends JsonResource
         return [
             'id' => $this->id,
             'nombre' => $this->nombre,
-            'tipo_animal' => $this->tipo_animal,
             'intervalo_dosis' => $this->intervalo_dosis,
+            'dosis_recomendada_anual' => $this->dosis_recomendada_anual,
+            'tipo_vacuna' => $this->tipo_vacuna,
+            'aplicable_a_todos' => $this->aplicable_a_todos,
+            'tipos_ganado' => $this->tiposGanado->map(function ($tipoGanado) {
+                return [
+                    'id' => $tipoGanado->id,
+                    'tipo' => $tipoGanado->tipo,
+                    'sexo' => $tipoGanado->pivot->sexo,
+                ];
+            }),
         ];
     }
 }

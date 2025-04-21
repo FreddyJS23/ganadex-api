@@ -22,50 +22,85 @@ class VacunaSeeder extends Seeder
 
         DB::table("vacunas")->insert([
             "nombre" => "Fiebre aftosa",
-            "tipo_animal" => json_encode(["rebano"]),
             "intervalo_dosis" => 182,
+            "dosis_recomendada_anual" => 2,
+            "tipo_vacuna" => "plan_sanitario",
+            "aplicable_a_todos" => true,
         ]);
 
         DB::table("vacunas")->insert([
             "nombre" => "Costridial",
-            "tipo_animal" => json_encode(["rebano"]),
             "intervalo_dosis" => 180,
+            "dosis_recomendada_anual" => 2,
+            "tipo_vacuna" => "plan_sanitario",
+            "aplicable_a_todos" => true,
         ]);
 
         DB::table("vacunas")->insert([
             "nombre" => "Rabia",
-            "tipo_animal" => json_encode(["rebano"]),
             "intervalo_dosis" => 365,
+            "dosis_recomendada_anual" => 1,
+            "tipo_vacuna" => "plan_sanitario",
+            "aplicable_a_todos" => true,
         ]);
 
         DB::table("vacunas")->insert([
             "nombre" => "Leptospirosis",
-            "tipo_animal" => json_encode(["novillo", "adulto"]),
             "intervalo_dosis" => 365,
+            "dosis_recomendada_anual" => 1,
+            "tipo_vacuna" => "plan_sanitario",
+            "aplicable_a_todos" => false,
+        ]);
+        //tipos animal para vacuna
+        DB::table("ganado_tipo_vacuna")->insert([
+            ["vacuna_id" => 4, "ganado_tipo_id" => 3, "sexo" => "M"],
+            ["vacuna_id" => 4, "ganado_tipo_id" => 4, "sexo" => "H"],
         ]);
 
         DB::table("vacunas")->insert([
             "nombre" => "RB51",
-            "tipo_animal" => json_encode(["rebano"]),
             "intervalo_dosis" => 20,
+            "dosis_recomendada_anual" => 18,
+            "tipo_vacuna" => "plan_sanitario",
+            "aplicable_a_todos" => true,
         ]);
 
         DB::table("vacunas")->insert([
             "nombre" => "RB51",
-            "tipo_animal" => json_encode(["becerras"]),
             "intervalo_dosis" => 150,
+            "dosis_recomendada_anual" => 2,
+            "tipo_vacuna" => "plan_sanitario",
+            "aplicable_a_todos" => false,
+        ]);
+        //tipos animal para vacuna
+        DB::table("ganado_tipo_vacuna")->insert([
+            ["vacuna_id" => 6, "ganado_tipo_id" => 1, "sexo" => "H"],
         ]);
 
         DB::table("vacunas")->insert([
             "nombre" => "IBR",
-            "tipo_animal" => json_encode(["novillo", "adulto"]),
             "intervalo_dosis" => 365,
+            "dosis_recomendada_anual" => 1,
+            "tipo_vacuna" => "plan_sanitario",
+            "aplicable_a_todos" => false,
+        ]);
+        //tipos animal para vacuna
+        DB::table("ganado_tipo_vacuna")->insert([
+            ["vacuna_id" => 7, "ganado_tipo_id" => 3, "sexo" => "M"],
+            ["vacuna_id" => 7, "ganado_tipo_id" => 4, "sexo" => "H"],
         ]);
 
         DB::table("vacunas")->insert([
             "nombre" => "Diarrea viral bobina",
-            "tipo_animal" => json_encode(["novillo", "adulto"]),
             "intervalo_dosis" => 365,
+            "dosis_recomendada_anual" => 1,
+            "tipo_vacuna" => "plan_sanitario",
+            "aplicable_a_todos" => false,
+        ]);
+        //tipos animal para vacuna
+        DB::table("ganado_tipo_vacuna")->insert([
+            ["vacuna_id" => 8, "ganado_tipo_id" => 3, "sexo" => "M"],
+            ["vacuna_id" => 8, "ganado_tipo_id" => 4, "sexo" => "H"],
         ]);
     }
 }

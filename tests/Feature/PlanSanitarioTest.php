@@ -111,7 +111,7 @@ class PlanSanitarioTest extends TestCase
                         'fecha_fin' => 'string',
                         'vacuna' => 'string',
                         'vacunados' => 'integer',
-                        'ganado_vacunado' => 'array',
+                        'ganado_vacunado' => 'string',
                     ])
                 )
         );
@@ -147,14 +147,15 @@ class PlanSanitarioTest extends TestCase
                         'fecha_fin' => 'string',
                         'vacuna' => 'string',
                         'vacunados' => 'integer',
-                        'ganado_vacunado' => 'array',
+                        'ganado_vacunado' => 'string',
                     ])
                 )
         );
     }
 
 
-    public function test_creacion_plan_sanitario(): void
+
+    public function test_creacion_plan_sanitario_vacuna_aplica_algunos(): void
     {
 
         /* ganado con estado fallecido */
@@ -171,6 +172,7 @@ class PlanSanitarioTest extends TestCase
         ->hasAttached($this->estadoVendido)
         ->create(  ['tipo_id' => 4]);
 
+        $this->planSanitario['vacuna_id']=4;
         $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(route('plan_sanitario.store'), $this->planSanitario);
 
         $response->assertStatus(201)->assertJson(
@@ -180,11 +182,13 @@ class PlanSanitarioTest extends TestCase
                 'plan_sanitario.fecha_fin' => 'string',
                 'plan_sanitario.vacuna' => 'string',
                 'plan_sanitario.vacunados' => 'integer',
-                'plan_sanitario.ganado_vacunado' => 'array',
+                'plan_sanitario.ganado_vacunado' =>'string' ,
             ])
             /* deberian haber haber 30 vacunados, ya que la vacuna que se esta aplicando
             es valida para todo el reba;o */
             ->where('plan_sanitario.vacunados',fn(int $vacunados): bool=> $vacunados <= 30)
+            ->where('plan_sanitario.ganado_vacunado',"Novillo,Adulta")
+
 
         );
     }
@@ -204,7 +208,7 @@ class PlanSanitarioTest extends TestCase
                 'plan_sanitario.fecha_fin' => 'string',
                 'plan_sanitario.vacuna' => 'string',
                 'plan_sanitario.vacunados' => 'integer',
-                'plan_sanitario.ganado_vacunado' => 'array',
+                'plan_sanitario.ganado_vacunado' =>'string'
             ])
         );
     }
@@ -228,7 +232,7 @@ class PlanSanitarioTest extends TestCase
                     'plan_sanitario.fecha_fin' => 'string',
                     'plan_sanitario.vacuna' => 'string',
                     'plan_sanitario.vacunados' => 'integer',
-                    'plan_sanitario.ganado_vacunado' => 'array',
+                    'plan_sanitario.ganado_vacunado' =>'string' ,
                 ])
                 ->etc()
         );

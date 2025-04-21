@@ -179,8 +179,19 @@ class DatosFormulariosTest extends TestCase
                             'id' => 'integer',
                             'nombre' => 'string',
                             'intervalo_dosis' => 'integer',
-                            'tipo_animal' => 'array'
+                            'tipo_vacuna' => 'string',
+                            'dosis_recomendada_anual' => 'integer|null',
+                            'aplicable_a_todos' => 'boolean',
+                            'tipos_ganado' => 'array',
                         ])
+                    )
+                    //vacuna aplicable a algunos tipos de ganado
+                    ->has(
+                        'vacunas_disponibles.3.tipos_ganado.0',
+                        fn(AssertableJson $json): AssertableJson => $json->whereAllType([
+                            'tipo' => 'string',
+                            'sexo' => 'string',
+                        ])->etc()
                     )
             );
     }

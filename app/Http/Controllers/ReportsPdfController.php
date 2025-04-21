@@ -437,10 +437,10 @@ END as ultima_dosis
     public function resumenVentaGanadoAnual(Request $request)
     {
 
-
+/*
        //descomentar para acceder a la ruta manualmente desde el navegador y debuguear
        //incustruar id para debug
-        session(['hacienda_id' => 1]);
+        session(['hacienda_id' => 1]); */
 
 
         $regexYear = "/^[2][0-9][0-9][0-9]$/";

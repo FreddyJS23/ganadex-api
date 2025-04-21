@@ -14,8 +14,10 @@ return new class extends Migration
         Schema::create('vacunas', function (Blueprint $table) {
             $table->id();
             $table->string('nombre');
-            $table->json('tipo_animal');
             $table->smallInteger('intervalo_dosis');
+            $table->enum('tipo_vacuna', ['medica', 'plan_sanitario']);
+            $table->integer('dosis_recomendada_anual')->nullable();
+            $table->boolean('aplicable_a_todos')->default(false);
             $table->timestamps();
         });
     }

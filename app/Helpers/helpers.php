@@ -29,3 +29,43 @@ if (!function_exists('determinar_edad_res')) {
         }
     }
 }
+if (!function_exists('determinar_genero_tipo_ganado')) {
+    /**
+     * Cambia el tipo de ganado a su forma femenina si el sexo es 'H'.
+     *
+     * @param Vacuna $vacuna
+     * @return string
+     */
+    function determinar_genero_tipo_ganado($vacuna): string
+    {
+        $tipoGanadoVacunado = [];
+        foreach ($vacuna->tiposGanado as $tipo) {
+            $tipoGanado = $tipo->tipo;
+            $sexo = $tipo->pivot->sexo;
+
+            if ($sexo === 'H') {
+                $tipoGanado = match ($tipo->tipo) {
+                    'Becerro' => 'Becerra',
+                    'Maute' => 'Mauta',
+                    'Novillo' => 'Novilla',
+                    'Adulto' => 'Adulta',
+                    default => $tipo, // Mantener el tipo original si no hay un cambio
+                };
+            }
+            array_push($tipoGanadoVacunado, $tipoGanado);
+        }
+        // Convertir el array a una cadena separada por comas
+        $tipo = implode(',', $tipoGanadoVacunado);
+        // Si la vacuna es aplicable a todos los ganados, agregar "Todos"
+        if ($vacuna->aplicable_a_todos) {
+            $tipo = "Todos";
+        }
+        // Devolver el tipo de ganado vacunado
+        // Si el tipo es un string vacio, devolver "Todos"
+        if (empty($tipo)) {
+            return "Todos";
+        }
+        // Devolver el tipo de ganado vacunado
+        return $tipo;
+    }
+}

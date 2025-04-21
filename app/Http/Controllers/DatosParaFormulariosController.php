@@ -105,8 +105,19 @@ class DatosParaFormulariosController extends Controller
 
     public function vacunasDisponibles()
     {
-        $vacunasDisponibles = Vacuna::select('id', 'nombre', 'intervalo_dosis', 'tipo_animal')
-            ->get();
+        $vacunasDisponibles = Vacuna::with('tiposGanado')->get()->makeHidden(["created_at", "updated_at"]);
+
+        $vacunasDisponibles->transform(function (Vacuna $item) {
+            $item->tipos_ganado = $item->tiposGanado->map(function ($tipoGanado) {
+                return [
+                    'tipo' => $tipoGanado->tipo,
+                    'sexo' => $tipoGanado->pivot->sexo,
+                ];
+            });
+            //Elimina la relación original tiposGanado para evitar redundancia en la respuesta.
+            unset($item->tiposGanado);
+            return $item;
+        });
 
         return response()->json(['vacunas_disponibles' => $vacunasDisponibles]);
     }
