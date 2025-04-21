@@ -7,6 +7,7 @@ use App\Http\Requests\UpdatePlan_sanitarioRequest;
 use App\Http\Resources\PlanSanitarioCollection;
 use App\Http\Resources\PlanSanitarioResource;
 use App\Models\Ganado;
+use App\Models\GanadoTipo;
 use App\Models\Plan_sanitario;
 use App\Models\Vacuna;
 use Carbon\Carbon;
@@ -39,26 +40,31 @@ class PlanSanitarioController extends Controller
         $vacuna = Vacuna::find($request->input('vacuna_id'));
         $cantidadGanadoVacunado = Ganado::selectRaw('ganados.id,tipo')
         ->join('ganado_tipos', 'ganados.tipo_id', 'ganado_tipos.id');
-
+       /** @var string[]*/
+        $tipoGanadoVacunado=[];
 
         /* iterarar sobre los tipo de animal correspondiente a la vacuna
         para agregar clausulas de busqueda para buscar los ganados de esos tipos*/
-        foreach ($vacuna->tipo_animal->toArray() as $key => $tipoAnimalVacuna) {
-            if ($tipoAnimalVacuna == 'rebano') {
-                break;
-            }
+        foreach ($vacuna->tiposGanado as $tipoAnimalVacuna) {
 
-            //eliminar los últimos dos caracteres para no distinguir terminos femeninos y masculinos
-            $tipoAnimalVacuna = substr((string) $tipoAnimalVacuna, 0, -2);
-            $cantidadGanadoVacunado->orWhere('tipo', 'like', "$tipoAnimalVacuna%");
+            array_push($tipoGanadoVacunado,$tipoAnimalVacuna->tipo);
+            //filtrar por sexo y tipo de animal
+            $cantidadGanadoVacunado->orWhere('tipo',  $tipoAnimalVacuna->tipo)
+            ->where('sexo', $tipoAnimalVacuna->pivot->sexo);
         }
+
+        //si la vacuna es aplicable a todos los ganados quiere decir que tiposGanado estara vacio por ende, se agrega la opcion de todos
+        if($vacuna->aplicable_a_todos) array_push($tipoGanadoVacunado,"Todos");
+
+        //convertir en string array de string
+        $tipoGanadoVacunado=implode(",",$tipoGanadoVacunado);
 
         $cantidadGanadoVacunado = $cantidadGanadoVacunado
         ->whereRelation('estados', 'estado','=', 'sano')
         ->where('hacienda_id', session('hacienda_id'))
         ->count();
 
-        $intervaloDosis = Vacuna::find($request->input('vacuna_id'))->intervalo_dosis;
+        $intervaloDosis = $vacuna->intervalo_dosis;
         $proximaDosis = Carbon::create($request->input('fecha_fin'))->addDays($intervaloDosis)->format('Y-m-d');
 
         $jornadaVacunacion = new Plan_sanitario();
@@ -66,7 +72,7 @@ class PlanSanitarioController extends Controller
         $jornadaVacunacion->hacienda_id = session('hacienda_id');
         $jornadaVacunacion->prox_dosis = $proximaDosis;
         $jornadaVacunacion->vacunados = $cantidadGanadoVacunado;
-        $jornadaVacunacion->ganado_vacunado = $vacuna->tipo_animal;
+        $jornadaVacunacion->ganado_vacunado = $tipoGanadoVacunado;
         $jornadaVacunacion->save();
 
         return response()->json(['plan_sanitario' => new PlanSanitarioResource($jornadaVacunacion)], 201);

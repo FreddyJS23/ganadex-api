@@ -22,9 +22,9 @@ class Plan_sanitarioFactory extends Factory
             'fecha_inicio' => fake()->dateTimeThisYear()->format('y-m-d'),
             'fecha_fin' => fake()->dateTimeThisYear()->format('y-m-d'),
             'prox_dosis' => fake()->dateTimeThisYear()->format('y-m-d'),
-            'vacuna_id' => $vacuna->id,
+            'vacuna_id' => 1,
             'vacunados' => rand(1, 100),
-            'ganado_vacunado' => $vacuna->tipo_animal,
+            'ganado_vacunado' =>$vacuna->aplicable_a_todos ? "Todos" :  $vacuna->tiposGanado[0]->tipo,
         ];
     }
 }
