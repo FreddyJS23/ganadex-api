@@ -15,11 +15,14 @@ class Vacuna extends Model
     protected $fillable = [
         'nombre',
         'tipo_animal',
-        'intervalo_dosis'
+        'intervalo_dosis',
+        'dosis_recomendada_anual',
+        'tipo_vacuna',
+        'aplicable_a_todos'
     ];
 
     protected $casts = [
-        'tipo_animal' => AsArrayObject::class,
+        'aplicable_a_todos' => 'boolean',
     ];
 
     /**
@@ -40,5 +43,17 @@ class Vacuna extends Model
     public function planesSanitario(): HasMany
     {
         return $this->hasMany(Plan_sanitario::class);
+    }
+
+    /**
+     * The tipoGanados that belong to the Vacuna
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function tiposGanado(): BelongsToMany
+    {
+        return $this->belongsToMany(GanadoTipo::class)
+                    ->withPivot('sexo')
+                    ->withTimestamps();
     }
 }

@@ -25,8 +25,15 @@ class VacunaController extends Controller
     public function store(StoreVacunaRequest $request)
     {
         $vacuna = new Vacuna();
-        $vacuna->fill($request->all());
+        $vacuna->fill($request->except(['tipo_ganados']));
         $vacuna->save();
+
+        if ($request->has('tipo_ganados')) {
+            $tiposGanado = collect($request->input('tipo_ganados'))->mapWithKeys(function ($item) {
+                return [$item['id'] => ['sexo' => $item['sexo']]];
+            });
+            $vacuna->tiposGanado()->sync($tiposGanado);
+        }
 
         return response()->json(['vacuna' => new VacunasResource($vacuna)], 201);
     }
@@ -45,8 +52,15 @@ class VacunaController extends Controller
      */
     public function update(UpdateVacunaRequest $request, Vacuna $vacuna)
     {
-        $vacuna->fill($request->all());
+        $vacuna->fill($request->except(['tipo_ganados']));
         $vacuna->save();
+
+        if ($request->has('tipo_ganados')) {
+            $tipoGanados = collect($request->input('tipo_ganados'))->mapWithKeys(function ($item) {
+                return [$item['id'] => ['sexo' => $item['sexo']]];
+            });
+            $vacuna->tiposGanado()->sync($tipoGanados);
+        }
 
         return response()->json(['vacuna' => new VacunasResource($vacuna)], 200);
     }

@@ -18,8 +18,10 @@ class VacunaFactory extends Factory
     {
         return [
             'nombre' => fake()->word(),
-            'tipo_animal' => ['rebano','becerro','maute','novillo','adulto'],
             'intervalo_dosis' => fake()->numberBetween(1, 100),
+            'dosis_recomendada_anual' => fake()->numberBetween(1, 5),
+            'tipo_vacuna' => fake()->randomElement(['medica', 'plan_sanitario']),
+            'aplicable_a_todos' => fake()->boolean(),
         ];
     }
 }

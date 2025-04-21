@@ -16,8 +16,14 @@ class VacunasTest extends TestCase
 
     private array $vacuna = [
         'nombre' => 'vacuna',
-        'tipo_animal' => ['rebano', 'becerro'],
         'intervalo_dosis' => 33,
+        'dosis_recomendada_anual' => 2,
+        'tipo_vacuna' => 'medica',
+        'aplicable_a_todos' => false,
+        'tipo_ganados' => [
+            ['id' => 1, 'sexo' => 'H'],
+            ['id' => 2, 'sexo' => 'M']
+        ]
     ];
 
     private int $cantidad_vacunas = 10;
@@ -41,18 +47,22 @@ class VacunasTest extends TestCase
     public static function ErrorInputProvider(): array
     {
         return [
-
             'caso de insertar datos erróneos' => [
                 [
                     'nombre' => 'te',
-                    'tipo_animal' => 'uuuu',
                     'intervalo_dosis' => 'd32',
+                    'dosis_recomendada_anual' => 'invalid',
+                    'tipo_vacuna' => 'invalid',
+                    'aplicable_a_todos' => 'invalid',
+                    'tipo_ganados' => [
+                        ['id' => 999, 'sexo' => 'invalid']
+                    ]
                 ],
-                ['nombre', 'tipo_animal', 'intervalo_dosis']
+                ['nombre', 'intervalo_dosis', 'dosis_recomendada_anual', 'tipo_vacuna', 'aplicable_a_todos', 'tipo_ganados.0.id', 'tipo_ganados.0.sexo']
             ],
             'caso de no insertar datos requeridos' => [
                 [],
-                ['nombre', 'tipo_animal', 'intervalo_dosis']
+                ['nombre', 'intervalo_dosis', 'tipo_vacuna']
             ],
         ];
     }
@@ -76,11 +86,24 @@ class VacunasTest extends TestCase
                     fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                     => $json->whereAllType([
                         'id' => 'integer',
-                    'nombre' => 'string',
-                    'tipo_animal' => 'array',
-                    'intervalo_dosis' => 'integer',
+                        'nombre' => 'string',
+                        'intervalo_dosis' => 'integer',
+                        'dosis_recomendada_anual' => 'integer',
+                        'tipo_vacuna' => 'string',
+                        'aplicable_a_todos' => 'boolean',
+                        'tipos_ganado' => 'array'
                     ])
                 )
+                //tipo vacuna Leptospirosis aplicable a tipo ganado novillo y adulto
+                ->has(
+                    'vacunas.3.tipos_ganado.0',
+                    fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
+                    => $json->whereAllType([
+                        'id' => 'integer',
+                        'tipo' => 'string',
+                        'sexo' => 'string'
+                    ])
+                    )
         );
     }
 
@@ -94,12 +117,15 @@ class VacunasTest extends TestCase
             fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
             $json->has(
                 'vacuna',
-                fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
-                => $json->whereAllType([
+                fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
+                $json->whereAllType([
                     'id' => 'integer',
                     'nombre' => 'string',
-                    'tipo_animal' => 'array',
                     'intervalo_dosis' => 'integer',
+                    'dosis_recomendada_anual' => 'integer',
+                    'tipo_vacuna' => 'string',
+                    'aplicable_a_todos' => 'boolean',
+                    'tipos_ganado' => 'array'
                 ])
             )
         );
@@ -122,8 +148,11 @@ class VacunasTest extends TestCase
                 => $json->whereAllType([
                     'id' => 'integer',
                     'nombre' => 'string',
-                    'tipo_animal' => 'array',
                     'intervalo_dosis' => 'integer',
+                    'dosis_recomendada_anual' => 'integer',
+                    'tipo_vacuna' => 'string',
+                    'aplicable_a_todos' => 'boolean',
+                    'tipos_ganado' => 'array'
                 ])
             )
         );
@@ -143,8 +172,10 @@ class VacunasTest extends TestCase
                 'vacuna',
                 fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                 $json->where('nombre', $this->vacuna['nombre'])
-                    ->where('tipo_animal', $this->vacuna['tipo_animal'])
                     ->where('intervalo_dosis', $this->vacuna['intervalo_dosis'])
+                    ->where('dosis_recomendada_anual', $this->vacuna['dosis_recomendada_anual'])
+                    ->where('tipo_vacuna', $this->vacuna['tipo_vacuna'])
+                    ->where('aplicable_a_todos', $this->vacuna['aplicable_a_todos'])
                     ->etc()
             )
         );

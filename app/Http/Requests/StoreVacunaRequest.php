@@ -24,8 +24,13 @@ class StoreVacunaRequest extends FormRequest
     {
         return [
             'nombre' => 'required|min:3|max:255',
-            'tipo_animal' => ['array','required',Rule::in(['rebano', 'becerro', 'maute', 'novillo', 'adulto'])],
             'intervalo_dosis' => 'required|numeric|between:1,32767',
+            'dosis_recomendada_anual' => 'nullable|integer|min:0',
+            'tipo_vacuna' => ['required', Rule::in(['medica', 'plan_sanitario'])],
+            'aplicable_a_todos' => 'boolean',
+            'tipo_ganados' => 'array',
+            'tipo_ganados.*.id' => 'required|exists:ganado_tipos,id',
+            'tipo_ganados.*.sexo' => ['required', Rule::in(['H', 'M'])],
         ];
     }
 }
