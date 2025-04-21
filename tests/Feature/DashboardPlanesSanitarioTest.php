@@ -49,7 +49,7 @@ class DashboardPlanesSanitarioTest extends TestCase
                         length: fn(AssertableJson $json): AssertableJson => $json->whereAllType([
                             'vacuna' => 'string',
                             'prox_dosis' => 'string',
-                            'ganado_vacunado' => 'array',
+                            'ganado_vacunado' => 'string',
                         ])
                     )
             );

@@ -10,17 +10,20 @@ class DashboardPlanesSanitario extends Controller
     public function proximosPlanesSanitario()
     {
         $jornadasVacunacion = Plan_sanitario::query()
-            ->where(
-                'hacienda_id',
-                session('hacienda_id')
-            )
-            ->where('prox_dosis', '>', now()->format('Y-m-d'))
-            ->selectRaw('nombre as vacuna , MAX(prox_dosis) as prox_dosis , tipo_animal as ganado_vacunado')
-            ->join('vacunas', 'vacuna_id', 'vacunas.id')
-            ->orderBy('prox_dosis')
-            ->groupBy('vacuna', 'tipo_animal')
-            ->get();
+        ->select('nombre as vacuna','prox_dosis','ganado_vacunado')
+        ->join('vacunas', 'plan_sanitarios.vacuna_id', '=', 'vacunas.id')
+        ->where('plan_sanitarios.hacienda_id', session('hacienda_id'))
+        ->where('plan_sanitarios.prox_dosis', '>', now()->format('Y-m-d'))
+        ->whereIn('plan_sanitarios.id', function ($query) {
+            $query->selectRaw('MAX(id)')
+                ->from('plan_sanitarios')
+                ->where('hacienda_id', session('hacienda_id'))
+                ->groupBy('vacuna_id');
+        })
+        ->orderBy('plan_sanitarios.prox_dosis')
+        ->get();
 
-        return new ProximosPlanesSanitarioCollection($jornadasVacunacion);
+    return new ProximosPlanesSanitarioCollection($jornadasVacunacion);
+
     }
 }

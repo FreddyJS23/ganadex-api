@@ -40,24 +40,18 @@ class PlanSanitarioController extends Controller
         $vacuna = Vacuna::find($request->input('vacuna_id'));
         $cantidadGanadoVacunado = Ganado::selectRaw('ganados.id,tipo')
         ->join('ganado_tipos', 'ganados.tipo_id', 'ganado_tipos.id');
-       /** @var string[]*/
-        $tipoGanadoVacunado=[];
+
+        $tipoGanadoVacunado=determinar_genero_tipo_ganado($vacuna);
 
         /* iterarar sobre los tipo de animal correspondiente a la vacuna
         para agregar clausulas de busqueda para buscar los ganados de esos tipos*/
         foreach ($vacuna->tiposGanado as $tipoAnimalVacuna) {
 
-            array_push($tipoGanadoVacunado,$tipoAnimalVacuna->tipo);
             //filtrar por sexo y tipo de animal
             $cantidadGanadoVacunado->orWhere('tipo',  $tipoAnimalVacuna->tipo)
             ->where('sexo', $tipoAnimalVacuna->pivot->sexo);
         }
 
-        //si la vacuna es aplicable a todos los ganados quiere decir que tiposGanado estara vacio por ende, se agrega la opcion de todos
-        if($vacuna->aplicable_a_todos) array_push($tipoGanadoVacunado,"Todos");
-
-        //convertir en string array de string
-        $tipoGanadoVacunado=implode(",",$tipoGanadoVacunado);
 
         $cantidadGanadoVacunado = $cantidadGanadoVacunado
         ->whereRelation('estados', 'estado','=', 'sano')
