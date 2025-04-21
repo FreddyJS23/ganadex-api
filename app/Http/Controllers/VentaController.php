@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Events\VentaGanado;
 use App\Http\Requests\StoreVentaRequest;
 use App\Http\Requests\UpdateVentaRequest;
+use App\Http\Requests\StoreVentaLoteRequest;
 use App\Http\Resources\VentaCollection;
 use App\Http\Resources\VentaResource;
 use App\Models\Venta;
@@ -40,6 +41,29 @@ class VentaController extends Controller
         VentaGanado::dispatch($venta);
 
         return response()->json(['venta' => new VentaResource($venta->load('ganado:id,numero'))], 201);
+    }
+
+    /**
+     * Store a newly created resource in storage for batch sales.
+     */
+    public function storeBatch(StoreVentaLoteRequest $request)
+    {
+        $ventas = collect($request->ganado_ids)->map(function ($ganadoId) use ($request) {
+            $venta = new Venta();
+            $venta->fill([
+                'fecha' => $request->fecha,
+                'ganado_id' => $ganadoId,
+                'comprador_id' => $request->comprador_id,
+                'hacienda_id' => session('hacienda_id'),
+            ]);
+            $venta->save();
+
+            VentaGanado::dispatch($venta);
+
+            return $venta;
+        });
+
+        return response()->json(['ventas' => VentaResource::collection($ventas)], 201);
     }
 
     /**

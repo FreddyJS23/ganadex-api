@@ -69,6 +69,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('usuarios_veterinarios', UsuarioVeterinarioController::class)->only(['index', 'store', 'update', 'destroy']);
     Route::apiResource('/comprador', CompradorController::class);
     Route::apiResource('/ventas', VentaController::class);
+    Route::post('/ventas/lote', [VentaController::class, 'storeBatch'])->name('ventas.storeBatch');
     Route::apiResource('/toro', ToroController::class);
     Route::get('/toro/{toro}/servicio', [ToroController::class, 'servicios'])->name('toro.servicios');
     Route::apiResource('/ganado', GanadoController::class);

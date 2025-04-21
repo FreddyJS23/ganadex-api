@@ -160,6 +160,24 @@ class VentaTest extends TestCase
             );
     }
 
+    public function test_creacion_venta_lote(): void
+    {
+        $ganados = Ganado::factory()->count(3)->for($this->hacienda)->hasPeso(1)->hasAttached($this->estado)->create();
+        $comprador = Comprador::factory()->for($this->hacienda)->create();
+
+        $data = [
+            'fecha' => '2025-04-20',
+            'ganado_ids' => $ganados->pluck('id')->toArray(),
+            'comprador_id' => $comprador->id,
+        ];
+
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id])->postJson(route('ventas.storeBatch'), $data);
+
+        $response->assertStatus(201)
+            ->assertJson(
+                fn (AssertableJson $json) => $json->has('ventas', 3)
+            );
+    }
 
     public function test_obtener_venta(): void
     {
