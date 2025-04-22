@@ -15,6 +15,7 @@ use App\Models\GanadoTipo;
 use App\Models\GanadoDescarte;
 use App\Models\Vacuna;
 use Illuminate\Contracts\Cache\Store;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -33,7 +34,16 @@ class GanadoDescarteController extends Controller
      */
     public function index()
     {
-        return new GanadoDescarteCollection(GanadoDescarte::where('hacienda_id', session('hacienda_id'))->get());
+        $ganados = GanadoDescarte::with('ganado')
+        ->whereHas('ganado',function(Builder $query){
+                $query->whereHas('estados',function (Builder $query) {
+                    $query->whereIn('estado',['sano']);
+                });
+            }
+        )->where('hacienda_id', session('hacienda_id'))->get();
+
+        return new GanadoDescarteCollection($ganados);
+
     }
 
 
