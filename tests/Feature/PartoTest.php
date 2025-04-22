@@ -279,7 +279,7 @@ class PartoTest extends TestCase
                     ])->has(
                         'padre_toro',
                         fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
-                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
+                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer|null'])
                     )->has(
                         'personal',
                         fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
@@ -316,7 +316,7 @@ class PartoTest extends TestCase
                     ])->has(
                         'padre_toro',
                         fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
-                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
+                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer|null'])
                     )->has(
                         'personal',
                         fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
@@ -357,7 +357,7 @@ class PartoTest extends TestCase
                     ->has(
                         'padre_toro',
                         fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
-                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
+                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer|null'])
                     )->has(
                         'personal',
                         fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
@@ -392,7 +392,7 @@ class PartoTest extends TestCase
                     ])->has(
                         'padre_toro',
                         fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
-                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
+                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer|null'])
                     )->has(
                         'personal',
                         fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
@@ -427,7 +427,7 @@ class PartoTest extends TestCase
                     ])->has(
                         'padre_toro',
                         fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
-                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
+                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer|null'])
                     )->has(
                         'personal',
                         fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
@@ -521,7 +521,7 @@ class PartoTest extends TestCase
                     ])->has(
                         'padre_toro',
                         fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
-                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
+                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer|null'])
                     )->has(
                         'personal',
                         fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
@@ -568,7 +568,7 @@ class PartoTest extends TestCase
                     ->has(
                         'padre_toro',
                         fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
-                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
+                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer|null'])
                     )->has(
                         'personal',
                         fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
@@ -615,7 +615,7 @@ class PartoTest extends TestCase
                     ->has(
                         'padre_toro',
                         fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
-                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
+                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer|null'])
                     )->has(
                         'personal',
                         fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
@@ -942,14 +942,14 @@ class PartoTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson(
-                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => 
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                 //27 ya que se contabiliza las dos vacas que se crean en setUp
                 $json->has('todos_partos',27)
                     ->has(
                     'todos_partos.2',
                     fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
                         'id' => 'integer',
-                        'numero' => 'integer',
+                        'numero' => 'integer|null',
                         'ultimo_parto' => 'string|null',
                         'total_partos' => 'integer|null'
                     ])
@@ -959,14 +959,14 @@ class PartoTest extends TestCase
                         fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                         => $json->whereAllType([
                             'id' => 'integer',
-                            'numero' => 'integer',
+                            'numero' => 'integer|null',
                         ])
                     )->has(
                         'cria',
                         fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                         => $json->whereAllType([
                             'id' => 'integer',
-                            'numero' => 'integer',
+                            'numero' => 'integer|null',
                         ])
                     )
                 )
@@ -974,7 +974,7 @@ class PartoTest extends TestCase
                     'todos_partos.11',
                     fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
                         'id' => 'integer',
-                        'numero' => 'integer',
+                        'numero' => 'integer|null',
                         'ultimo_parto' => 'string|null',
                         'total_partos' => 'integer|null',
                     ])->has(
@@ -989,7 +989,7 @@ class PartoTest extends TestCase
                         fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                         => $json->whereAllType([
                             'id' => 'integer',
-                            'numero' => 'integer',
+                            'numero' => 'integer|null',
                         ])
                     )
                     ->where('estado',fn(string $estado) => Str::contains($estado,['Gestacion','Vacia','Fallecida','Vendida']))

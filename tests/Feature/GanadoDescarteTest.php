@@ -92,7 +92,12 @@ class GanadoDescarteTest extends TestCase
         return GanadoDescarte::factory()
             ->count(10)
             ->for($this->hacienda)
-            ->for(Ganado::factory()->hasVacunaciones(3, ['hacienda_id' => $this->hacienda->id])->create( ['hacienda_id' => $this->hacienda->id, 'sexo' => 'M', 'tipo_id' => 4])  )
+             ->state(
+                ['ganado_id' => Ganado::factory()->hasAttached($this->estado)->hasVacunaciones(
+                    3,
+                    ['hacienda_id' => $this->hacienda->id]
+                )->state(['hacienda_id' => $this->hacienda->id, 'sexo' => 'M', 'tipo_id' => 4])]
+            )
             ->create();
     }
 
@@ -159,7 +164,7 @@ class GanadoDescarteTest extends TestCase
                         ->whereAllType([
                             'id' => 'integer',
                             'nombre' => 'string',
-                            'numero' => 'integer',
+                            'numero' => 'integer|null',
                             'origen' => 'string',
                             'fecha_nacimiento' => 'string',
                             'fecha_ingreso' => 'string|null',
@@ -188,7 +193,7 @@ class GanadoDescarteTest extends TestCase
                         ->whereAllType([
                             'id' => 'integer',
                             'nombre' => 'string',
-                            'numero' => 'integer',
+                            'numero' => 'integer|null',
                             'origen' => 'string',
                             'tipo' => 'string',
                             'fecha_nacimiento' => 'string',
@@ -222,7 +227,7 @@ class GanadoDescarteTest extends TestCase
                         ->whereAllType([
                             'id' => 'integer',
                             'nombre' => 'string',
-                            'numero' => 'integer',
+                            'numero' => 'integer|null',
                             'origen' => 'string',
                             'tipo' => 'string',
                             'fecha_nacimiento' => 'string',
@@ -304,7 +309,7 @@ class GanadoDescarteTest extends TestCase
                             'id' => 'integer',
                             'nombre' => 'string',
                             'sexo' => 'string',
-                            'numero' => 'integer',
+                            'numero' => 'integer|null',
                             'origen' => 'string',
                             'tipo' => 'string',
                             'fecha_nacimiento' => 'string',
@@ -339,7 +344,7 @@ class GanadoDescarteTest extends TestCase
                         ->whereAllType([
                             'id' => 'integer',
                             'nombre' => 'string',
-                            'numero' => 'integer',
+                            'numero' => 'integer|null',
                             'sexo'=>'string',
                             'origen' => 'string',
                             'fecha_nacimiento' => 'string',

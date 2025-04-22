@@ -59,7 +59,7 @@ class NotificacionTest extends TestCase
                         ->has(
                             'ganado',
                             fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
-                            => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
+                            => $json->whereAllType(['id' => 'integer', 'numero' => 'integer|null'])
                         )
                 )->has(
                     'secado.0',
@@ -68,7 +68,7 @@ class NotificacionTest extends TestCase
                         ->has(
                             'ganado',
                             fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
-                            => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
+                            => $json->whereAllType(['id' => 'integer', 'numero' => 'integer|null'])
                         )
                 )->has(
                     'parto.0',
@@ -77,7 +77,7 @@ class NotificacionTest extends TestCase
                         ->has(
                             'ganado',
                             fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
-                            => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
+                            => $json->whereAllType(['id' => 'integer', 'numero' => 'integer|null'])
                         )
                 ))
         );

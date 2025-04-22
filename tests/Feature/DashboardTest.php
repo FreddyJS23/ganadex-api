@@ -205,7 +205,7 @@ class DashboardTest extends TestCase
                                 fn(AssertableJson $json): AssertableJson => $json
                                     ->whereAllType([
                                         'id' => 'integer',
-                                        'numero' => 'integer'
+                                        'numero' => 'integer|null'
                                     ])
                             )
                     )
@@ -235,7 +235,7 @@ class DashboardTest extends TestCase
                                 fn(AssertableJson $json): AssertableJson => $json
                                     ->whereAllType([
                                         'id' => 'integer',
-                                        'numero' => 'integer'
+                                        'numero' => 'integer|null'
                                     ])
                             )
                     )

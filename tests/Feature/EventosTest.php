@@ -271,7 +271,7 @@ class EventosTest extends TestCase
                     'ganado.estados',
                     fn (Collection $estados) => $estados->contains('estado', 'pendiente_secar')
                 )
-               
+
                 ->etc()
         );
     }
@@ -540,6 +540,43 @@ class EventosTest extends TestCase
                     'ganado.estados',
                     fn (Collection $estados) => $estados->contains('estado', 'vendido')
                 )->etc()
+        );
+    }
+    public function test_cuando_se_realiza_una_venta_por_lotes(): void
+    {
+       $ganados= $this->ganado
+        = Ganado::factory()
+        ->count(3)
+        ->hasPeso(1)
+        ->hasEvento(['prox_revision' => null,'prox_parto' => null,'prox_secado' => null])
+        ->hasAttached($this->estadoSano)
+        ->for($this->hacienda)
+        ->create(['sexo' => 'H', 'tipo_id' => 3]);
+
+        $comprador = Comprador::factory()->for($this->hacienda)->create();
+
+        $data = [
+            'fecha' => '2025-04-20',
+            'ganado_ids' => $ganados->pluck('id')->toArray(),
+            'comprador_id' => $comprador->id,
+        ];
+        //realizar venta
+         $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(route('ventas.storeBatch'), $data);
+
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('ganado.index'));
+
+        $response->assertStatus(200)
+        ->assertJson(
+            fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
+            $json->has(
+                    'cabezas_ganado.1',
+                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
+                    $json->where(
+                            'estados',
+                            fn (Collection $estados) => $estados->contains('estado', 'vendido')
+                        )->etc()
+
+                )
         );
     }
 

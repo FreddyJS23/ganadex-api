@@ -182,7 +182,7 @@ class DashboardVentaGanadoTest extends TestCase
                                 'ganado',
                                 fn(AssertableJson $json): AssertableJson => $json->whereAllType([
                                     'id' => 'integer',
-                                    'numero' => 'integer',
+                                    'numero' => 'integer|null',
                                 ])
                             )
                     )

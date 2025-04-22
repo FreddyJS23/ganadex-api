@@ -452,7 +452,7 @@ class RevisionTest extends TestCase
                 //15 ya que 14 son los generados para este test, y 1 viene del setUp
                 fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has('todas_revisiones', 15 , fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
                     'id' => 'integer',
-                    'numero' => 'integer',
+                    'numero' => 'integer|null',
                     'diagnostico' => 'array|string',
                     'ultima_revision' => 'string',
                     'proxima_revision' => 'string|null',

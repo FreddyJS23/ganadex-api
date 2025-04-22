@@ -219,7 +219,7 @@ class ServicioTest extends TestCase
                     ->has(
                         'toro',
                         fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
-                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
+                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer|null'])
                     )
                     ->has(
                         'veterinario',
@@ -249,7 +249,7 @@ class ServicioTest extends TestCase
                     ->has(
                         'toro',
                         fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
-                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
+                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer|null'])
                     )->where('veterinario',null)
                 )
             );
@@ -308,7 +308,7 @@ class ServicioTest extends TestCase
                     ->has(
                         'toro',
                         fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
-                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
+                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer|null'])
                     )
                     ->where('veterinario',null)
                 )
@@ -333,7 +333,7 @@ class ServicioTest extends TestCase
                     ->has(
                         'toro',
                         fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
-                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
+                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer|null'])
                     )->where('veterinario',null)
                 )
             );
@@ -361,7 +361,7 @@ class ServicioTest extends TestCase
                     ->has(
                         'toro',
                         fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
-                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
+                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer|null'])
                     )->has(
                         'veterinario',
                         fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
@@ -394,7 +394,7 @@ class ServicioTest extends TestCase
                     ->has(
                         'toro',
                         fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
-                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
+                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer|null'])
                     )->where('veterinario',null)
                 )
             );
@@ -422,7 +422,7 @@ class ServicioTest extends TestCase
                     ->has(
                         'toro',
                         fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
-                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
+                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer|null'])
                     )->has(
                         'veterinario',
                         fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
@@ -752,12 +752,12 @@ class ServicioTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson(
-                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => 
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                 //son 26, ya que se esta contando la vaca que se crea en setUp
                 $json->has('todos_servicios',26)
                 ->has('todos_servicios.3', fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
                     'id' => 'integer',
-                    'numero' => 'integer',
+                    'numero' => 'integer|null',
                     'ultimo_servicio' => 'string',
                     'efectividad' => 'double|integer|null',
                     'toro' => 'array|null',

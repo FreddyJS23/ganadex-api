@@ -110,7 +110,7 @@ class FallecimientoTest extends TestCase
                     ->has(
                         'ganado',
                         fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
-                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
+                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer|null'])
                     )
                 )
         );
@@ -135,7 +135,7 @@ class FallecimientoTest extends TestCase
             ])->has(
                 'fallecimiento.ganado',
                 fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
-                => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
+                => $json->whereAllType(['id' => 'integer', 'numero' => 'integer|null'])
             )
         );
     }
@@ -157,7 +157,7 @@ class FallecimientoTest extends TestCase
             ])->has(
                 'fallecimiento.ganado',
                 fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
-                => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
+                => $json->whereAllType(['id' => 'integer', 'numero' => 'integer|null'])
             )
         );
     }
@@ -182,7 +182,7 @@ class FallecimientoTest extends TestCase
                 ])->has(
                     'fallecimiento.ganado',
                     fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
-                    => $json->whereAllType(['id' => 'integer', 'numero' => 'integer'])
+                    => $json->whereAllType(['id' => 'integer', 'numero' => 'integer|null'])
                 )
                 ->etc()
         );

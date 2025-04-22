@@ -120,7 +120,7 @@ class VentaTest extends TestCase
                             fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                             => $json->whereAllType([
                                 'id' => 'integer',
-                                'numero' => 'integer',
+                                'numero' => 'integer|null',
                             ])
                         )
                 )
@@ -153,7 +153,7 @@ class VentaTest extends TestCase
                             fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                             => $json->whereAllType([
                                 'id' => 'integer',
-                                'numero' => 'integer',
+                                'numero' => 'integer|null',
                             ])
                         )
                 )
@@ -204,7 +204,7 @@ class VentaTest extends TestCase
                             fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                             => $json->whereAllType([
                                 'id' => 'integer',
-                                'numero' => 'integer',
+                                'numero' => 'integer|null',
                             ])
                         )
                 )

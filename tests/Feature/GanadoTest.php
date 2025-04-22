@@ -186,7 +186,7 @@ class GanadoTest extends TestCase
                         $json->whereAllType([
                             'id' => 'integer',
                             'nombre' => 'string',
-                            'numero' => 'integer',
+                            'numero' => 'integer|null',
                             'origen' => 'string',
                             'fecha_nacimiento' => 'string',
                             'fecha_ingreso' => 'string|null',
@@ -238,7 +238,7 @@ class GanadoTest extends TestCase
                     $json->whereAllType([
                         'id' => 'integer',
                         'nombre' => 'string',
-                        'numero' => 'integer',
+                        'numero' => 'integer|null',
                         'origen' => 'string',
                         'fecha_nacimiento' => 'string',
                         'fecha_ingreso' => 'string|null',
@@ -294,7 +294,7 @@ class GanadoTest extends TestCase
                     $json->whereAllType([
                         'id' => 'integer',
                         'nombre' => 'string',
-                        'numero' => 'integer',
+                        'numero' => 'integer|null',
                         'fecha_nacimiento' => 'string',
                         'estados' => 'array',
                         'estados.0.id' => 'integer',

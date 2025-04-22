@@ -167,7 +167,7 @@ class ToroTest extends TestCase
                         ->whereAllType([
                             'id' => 'integer',
                             'nombre' => 'string',
-                            'numero' => 'integer',
+                            'numero' => 'integer|null',
                             'origen' => 'string',
                             'fecha_nacimiento' => 'string',
                             'fecha_ingreso' => 'string|null',
@@ -201,7 +201,7 @@ class ToroTest extends TestCase
                         ->whereAllType([
                             'id' => 'integer',
                             'nombre' => 'string',
-                            'numero' => 'integer',
+                            'numero' => 'integer|null',
                             'origen' => 'string',
                             'fecha_nacimiento' => 'string',
                             'fecha_ingreso' => 'string|null',
@@ -237,7 +237,7 @@ class ToroTest extends TestCase
                         ->whereAllType([
                             'id' => 'integer',
                             'nombre' => 'string',
-                            'numero' => 'integer',
+                            'numero' => 'integer|null',
                             'origen' => 'string',
                             'fecha_nacimiento' => 'string',
                             'ganado_id' => 'integer',
@@ -316,7 +316,7 @@ class ToroTest extends TestCase
                         ->whereAllType([
                             'id' => 'integer',
                             'nombre' => 'string',
-                            'numero' => 'integer',
+                            'numero' => 'integer|null',
                             'origen' => 'string',
                             'fecha_nacimiento' => 'string',
                              'fecha_ingreso' => 'string|null',

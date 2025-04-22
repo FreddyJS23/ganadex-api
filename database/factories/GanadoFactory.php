@@ -18,7 +18,7 @@ class GanadoFactory extends Factory
     {
         return [
             'nombre' => fake()->unique()->firstName(),
-            'numero' => fake()->unique()->numberBetween($int = 0, $int = 32767),
+            'numero' =>fake()->boolean() ? fake()->unique()->numberBetween(0, 32767) : null, // 80% de probabilidad de tener un número
             'origen_id' => fake()->randomElement([1,2]),
             'sexo' => fake()->randomElement(['H']),
             'tipo_id' => 4,
