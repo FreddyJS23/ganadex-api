@@ -4,10 +4,9 @@ namespace App\Http\Requests;
 
 use App\Rules\ComprobarTienePesoActual;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
-class StoreVentaRequest extends FormRequest
+class StoreVentaLoteRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,9 +24,9 @@ class StoreVentaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //'precio' => 'required|numeric',
-            'fecha' => 'date_format:Y-m-d',
-            'ganado_id' => [
+            'fecha' => 'required|date_format:Y-m-d',
+            'ganado_ids' => 'required|array',
+            'ganado_ids.*' => [
                 'required', 'numeric', Rule::exists('ganados', 'id')
                     ->where(
                         fn($query) => $query->where('hacienda_id', session('hacienda_id'))
@@ -40,7 +39,6 @@ class StoreVentaRequest extends FormRequest
                         fn($query) => $query->where('hacienda_id', session('hacienda_id'))
                     )
             ],
-
         ];
     }
 }
