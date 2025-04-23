@@ -17,7 +17,8 @@ class RevisionResource extends JsonResource
         return [
             'id' => $this->id,
             'fecha' => $this->fecha,
-            'diagnostico' => $this->tipoRevision->makeHidden('id','created_at','updated_at'),
+            'revision' => $this->tipoRevision->makeHidden('id','created_at','updated_at'),
+            'diagnostico' => $this->diagnostico,
             'tratamiento' => $this->tratamiento,
             'veterinario' => $this->veterinario,
         ];

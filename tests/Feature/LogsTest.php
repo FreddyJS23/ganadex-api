@@ -30,6 +30,7 @@ class LogsTest extends TestCase
     private array $revision = [
         'tratamiento' => 'medicina',
         'fecha' => '2020-10-02',
+        'observacion' => 'bien',
 
     ];
 

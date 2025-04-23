@@ -72,11 +72,13 @@ class EventosTest extends TestCase
     private array $revision = [
         'fecha' => '2020-10-02',
         'tratamiento' => 'medicina',
+        'observacion' => 'test',
     ];
 
     private array $revisionDescarte = [
         'fecha' => '2020-10-02',
         'tratamiento' => 'ninguno',
+        'observacion' => 'test',
     ];
 
     private array $venta = [

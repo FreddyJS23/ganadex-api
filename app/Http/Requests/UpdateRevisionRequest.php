@@ -24,6 +24,7 @@ class UpdateRevisionRequest extends FormRequest
         return [
             'tratamiento' => 'required|min:3,|max:255',
             'fecha' => 'date_format:Y-m-d',
+            'diagnostico' => 'nullable|string|max:255',
         ];
     }
 }

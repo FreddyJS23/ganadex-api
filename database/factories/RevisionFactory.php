@@ -19,7 +19,8 @@ class RevisionFactory extends Factory
     {
         return [
             'tipo_revision_id' => TipoRevision::factory(),
-            'tratamiento' =>  fake()->word(),
+            'tratamiento' =>fake()->boolean() ?  fake()->word() : null,
+            'diagnostico' => fake()->boolean() ?  fake()->word() : null,
             'fecha' => fake()->date()
         ];
     }

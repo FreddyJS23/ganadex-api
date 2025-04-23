@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->date('fecha');
             $table->string('tipo_revision_id');
-            $table->string('tratamiento');
+            $table->string('diagnostico')->nullable();
+            $table->string('tratamiento')->nullable();
             $table->foreignId('ganado_id')->constrained()->cascadeOnDelete();
             $table->foreignId('personal_id')->constrained()->cascadeOnDelete();
             $table->timestamps();

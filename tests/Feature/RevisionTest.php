@@ -8,6 +8,7 @@ use App\Models\Ganado;
 use App\Models\Personal;
 use App\Models\Revision;
 use App\Models\Servicio;
+use App\Models\TipoRevision;
 use App\Models\Toro;
 use App\Models\User;
 use App\Models\UsuarioVeterinario;
@@ -26,7 +27,8 @@ class RevisionTest extends TestCase
     private array $revision = [
         'tratamiento' => 'medicina',
         'fecha' => '2020-10-02',
-
+        'diagnostico' => 'Diagnóstico inicial',
+        'observacion' => 'Observación rutina',
     ];
 
     private int $cantidad_revision = 10;
@@ -43,6 +45,7 @@ class RevisionTest extends TestCase
     private $userVeterinario;
     private string $url;
     private $hacienda;
+    private $tipoRevision;
 
     protected function setUp(): void
     {
@@ -58,6 +61,8 @@ class RevisionTest extends TestCase
         $this->estadoFallecido = Estado::find(5);
         $this->estadoPendienteServicio = Estado::find(7);
         $this-> estadoPendienteRevision = Estado::find(6);
+
+        $this->tipoRevision = TipoRevision::factory()->create(['id'=>100]);
 
         $this->user
             = User::factory()->hasConfiguracion()->create();
@@ -105,6 +110,7 @@ class RevisionTest extends TestCase
     }
     public static function ErrorInputProvider(): array
     {
+
         return [
 
             'caso de insertar datos erróneos' => [
@@ -123,6 +129,50 @@ class RevisionTest extends TestCase
                     'personal_id' => 2,
                 ], ['tipo_revision_id', 'personal_id']
             ],
+            'caso de hacer una revision gestación sin observación' => [
+                [
+                    'tipo_revision_id' => 1,
+                    'tratamiento' => 'medicina',
+                    'fecha' => '2020-10-02',
+                ], ['observacion']
+            ],
+            'caso de hacer una revision descarte sin observación' => [
+                [
+                    'tipo_revision_id' => 2,
+                    'tratamiento' => 'medicina',
+                    'fecha' => '2020-10-02',
+                ], ['observacion']
+            ],
+            'caso de hacer una revision rutina sin observación' => [
+                [
+                    'tipo_revision_id' => 3,
+                    'tratamiento' => 'medicina',
+                    'fecha' => '2020-10-02',
+                ], ['observacion']
+            ],
+            'caso de hacer una revision aborto sin observación' => [
+                [
+                    'tipo_revision_id' => 4,
+                    'tratamiento' => 'medicina',
+                    'fecha' => '2020-10-02',
+                ], ['observacion']
+            ],
+            'caso de hacer una revision aborto sin observación' => [
+                [
+                    'tipo_revision_id' => 4,
+                    'tratamiento' => 'medicina',
+                    'fecha' => '2020-10-02',
+                ], ['observacion']
+            ],
+            //las revisiones dle usuario serán medicas, por ende necesitan tratamiento
+            'caso de hacer una revision creada por el usuario sin tratamiento' => [
+                [
+                    'tipo_revision_id' => 100,
+                    'personal_id' => 2,
+                    'fecha' => '2020-10-02',
+                ], ['tratamiento']
+            ],
+
         ];
     }
 
@@ -147,9 +197,18 @@ class RevisionTest extends TestCase
                     $json->whereAllType([
                         'id' => 'integer',
                         'fecha' => 'string',
-                        'diagnostico' => 'array|string',
-                        'tratamiento' => 'string',
+                        'diagnostico' => 'string|null',
+                        'tratamiento' => 'string|null',
+                        'revision'=>'array'
                     ])->has(
+                        'revision',
+                        fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
+                        =>$json->whereAllType([
+                            'codigo' => 'string|null',
+                        'tipo' => 'string'])
+                    )
+
+                    ->has(
                         'veterinario',
                         fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                         =>$json->whereAllType([
@@ -174,9 +233,16 @@ class RevisionTest extends TestCase
                     $json->whereAllType([
                         'id' => 'integer',
                         'fecha' => 'string',
-                        'diagnostico' => 'array|string',
-                        'tratamiento' => 'string',
+                        'diagnostico' => 'string|null',
+                        'tratamiento' => 'string|null',
+                        'revision'=>'array'
                     ])->has(
+                        'revision',
+                        fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
+                        =>$json->whereAllType([
+                            'codigo' => 'string|null',
+                        'tipo' => 'string'])
+                    )->has(
                         'veterinario',
                         fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                         => $json->whereAllType([
@@ -201,9 +267,16 @@ class RevisionTest extends TestCase
                     $json->whereAllType([
                         'id' => 'integer',
                         'fecha' => 'string',
-                        'diagnostico' => 'array|string',
-                        'tratamiento' => 'string',
+                        'diagnostico' => 'string|null',
+                        'tratamiento' => 'string|null',
+                        'revision'=>'array'
                     ])->has(
+                        'revision',
+                        fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
+                        =>$json->whereAllType([
+                            'codigo' => 'string|null',
+                        'tipo' => 'string'])
+                    )->has(
                         'veterinario',
                         fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                         => $json->whereAllType([
@@ -243,7 +316,7 @@ class RevisionTest extends TestCase
 
 
         $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])
-        ->postJson(route('revision.store', ['ganado' => $ganadoNoRequisito->id]), ['tipo_revision_id' => 1,'tratamiento' => 'medicina', 'fecha' => '2020-10-02','personal_id' => $this->veterinario->id]);
+        ->postJson(route('revision.store', ['ganado' => $ganadoNoRequisito->id]), ['tipo_revision_id' => 1,'tratamiento' => 'medicina', 'fecha' => '2020-10-02','diagnostico' => 'Diagnóstico inicial','personal_id' => $this->veterinario->id]);
 
         $response->assertStatus(422)
             ->assertJson(
@@ -262,7 +335,7 @@ class RevisionTest extends TestCase
         ->create();
 
         $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])
-        ->postJson(route('revision.store', ['ganado' => $ganadoNoRequisito->id]), ['tipo_revision_id' => 1,'tratamiento' => 'medicina', 'fecha' => '2020-10-02','personal_id' => $this->veterinario->id]);
+        ->postJson(route('revision.store', ['ganado' => $ganadoNoRequisito->id]), ['tipo_revision_id' => 1,'tratamiento' => 'medicina', 'fecha' => '2020-10-02','diagnostico' => 'Diagnóstico inicial','personal_id' => $this->veterinario->id]);
 
         $response->assertStatus(422)
             ->assertJson(
@@ -283,7 +356,7 @@ class RevisionTest extends TestCase
         ->create();
 
         $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])
-        ->postJson(route('revision.store', ['ganado' => $ganadoNoRequisito->id]), ['tipo_revision_id' => 3,'tratamiento' => 'medicina', 'fecha' => '2020-10-02','personal_id' => $this->veterinario->id]);
+        ->postJson(route('revision.store', ['ganado' => $ganadoNoRequisito->id]), ['tipo_revision_id' => 3,'tratamiento' => 'medicina', 'fecha' => '2020-10-02','diagnostico' => 'Diagnóstico inicial','personal_id' => $this->veterinario->id]);
 
         $response->assertStatus(422)
             ->assertJson(
@@ -323,7 +396,7 @@ class RevisionTest extends TestCase
 
 
         $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])
-        ->postJson(route('revision.store', ['ganado' => $ganado->id]), ['tipo_revision_id' => 1,'tratamiento' => 'medicina', 'fecha' => '2020-10-02','personal_id' => $this->veterinario->id]);
+        ->postJson(route('revision.store', ['ganado' => $ganado->id]), ['tipo_revision_id' => 1,'tratamiento' => 'medicina', 'fecha' => '2020-10-02','diagnostico' => 'Diagnóstico inicial','personal_id' => $this->veterinario->id]);
 
         $response->assertStatus(422)
             ->assertJson(
@@ -350,9 +423,17 @@ class RevisionTest extends TestCase
                     $json->whereAllType([
                         'id' => 'integer',
                         'fecha' => 'string',
-                        'diagnostico' => 'array|string',
-                        'tratamiento' => 'string',
+                        'diagnostico' => 'string|null',
+                        'tratamiento' => 'string|null',
+                        'revision'=>'array'
                     ])->has(
+                        'revision',
+                        fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
+                        =>$json->whereAllType([
+                            'codigo' => 'string|null',
+                        'tipo' => 'string'])
+                    )
+                    ->has(
                         'veterinario',
                         fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                         => $json->whereAllType([
@@ -376,8 +457,9 @@ class RevisionTest extends TestCase
                 fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'revision',
                     fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
-                    $json->where('diagnostico.tipo', 'Rutina')
+                    $json->where('revision.tipo', 'Rutina')
                     ->where('tratamiento', $this->revision['tratamiento'])
+                    ->where('diagnostico', $this->revision['diagnostico'])
                     ->has(
                         'veterinario',
                         fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
@@ -453,14 +535,13 @@ class RevisionTest extends TestCase
                 fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has('todas_revisiones', 15 , fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
                     'id' => 'integer',
                     'numero' => 'integer|null',
-                    'diagnostico' => 'array|string',
                     'ultima_revision' => 'string',
                     'proxima_revision' => 'string|null',
                     'total_revisiones' => 'integer'
                 ])
                 ->where('pendiente', false)
                 ->where('estado', 'Sano')
-                ->has('diagnostico',fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson=>
+                ->has('revision',fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson=>
                     $json->whereAllType([
                         'tipo' => 'string',
                         'codigo' => 'string|null',

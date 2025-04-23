@@ -27,16 +27,50 @@ class StoreRevisionRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-            'tipo_revision_id' => ['required', 'numeric', Rule::exists('tipo_revisions', 'id'), new ValidacionTipoRevision()],
-            'tratamiento' => 'required|min:3,|max:255',
+            'tipo_revision_id' => [
+                'required',
+                'numeric',
+                Rule::exists('tipo_revisions', 'id'),
+                new ValidacionTipoRevision()
+            ],
+            'tratamiento' => [
+                Rule::requiredIf(fn() => $this->requiresTratamiento()),
+                'min:3',
+                'max:255'
+            ],
             'fecha' => 'date_format:Y-m-d',
+            'observacion' => [
+                Rule::requiredIf(fn() => $this->requiresObservacion()),
+                'nullable',
+                'string',
+                'max:255'
+            ],
         ];
 
-        /* para evitar problema con la validacion de comprabacionVeterinario
-        se agrega el campo solo si es un admin */
-        $userAdmin = $this->user()->hasRole('admin');
-        if ($userAdmin) {
-            return $rules = array_merge($rules, ['personal_id' => ['required', new ComprobarVeterianario()]]);
-        } else return $rules;
+        // Agregar validación de personal_id solo si el usuario es admin
+        if ($this->user()->hasRole('admin')) {
+            $rules['personal_id'] = ['required', new ComprobarVeterianario()];
+        }
+
+        return $rules;
+    }
+
+    /**
+     * Determina si se requiere tratamiento.
+     */
+    private function requiresTratamiento(): bool
+    {
+        // Las siguientes revisiones no necesitan un tratamiento
+        // 1: gestación, 2: descarte, 4: rutina
+        return !in_array($this->tipo_revision_id, [1, 2, 4]);
+    }
+
+    /**
+     * Determina si se requiere observación.
+     */
+    private function requiresObservacion(): bool
+    {
+        // Las siguientes revisiones necesitan una observación
+        return in_array($this->tipo_revision_id, [1, 2, 3, 4]);
     }
 }

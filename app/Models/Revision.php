@@ -20,6 +20,7 @@ class Revision extends Model
         'tratamiento',
         'fecha',
         'personal_id',
+        'diagnostico',
     ];
 
     protected $casts=[

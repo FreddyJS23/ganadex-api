@@ -66,11 +66,13 @@ class LogsOyentesEventosTest extends TestCase
     private array $revision = [
         'fecha' => '2020-10-02',
         'tratamiento' => 'medicina',
+        'observacion' => 'bien',
     ];
 
     private array $revisionDescarte = [
         'fecha' => '2020-10-02',
         'tratamiento' => 'ninguno',
+        'observacion' => 'bien',
     ];
 
     private array $venta = [
