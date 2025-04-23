@@ -21,13 +21,13 @@ class VacunasResource extends JsonResource
             'dosis_recomendada_anual' => $this->dosis_recomendada_anual,
             'tipo_vacuna' => $this->tipo_vacuna,
             'aplicable_a_todos' => $this->aplicable_a_todos,
-            'tipos_ganado' => $this->tiposGanado->map(function ($tipoGanado) {
+            'tipos_ganado' =>count($this->tiposGanado) > 0 ? $this->tiposGanado->map(function ($tipoGanado) {
                 return [
                     'id' => $tipoGanado->id,
                     'tipo' => $tipoGanado->tipo,
                     'sexo' => $tipoGanado->pivot->sexo,
                 ];
-            }),
+            }) : null,
         ];
     }
 }

@@ -21,9 +21,20 @@ class VacunasTest extends TestCase
         'tipo_vacuna' => 'medica',
         'aplicable_a_todos' => false,
         'tipo_ganados' => [
-            ['id' => 1, 'sexo' => 'H'],
-            ['id' => 2, 'sexo' => 'M']
+            ['ganado_tipo_id' => 1, 'sexo' => 'M'],
+            ['ganado_tipo_id' => 2, 'sexo' => 'M'],
+            ['ganado_tipo_id' => 3, 'sexo' => 'M'],
+            ['ganado_tipo_id' => 4, 'sexo' => 'M'],
+            ['ganado_tipo_id' => 1, 'sexo' => 'H'],
+            ['ganado_tipo_id' => 2, 'sexo' => 'H'],
         ]
+    ];
+    private array $vacunaAplicableTodos = [
+        'nombre' => 'vacuna',
+        'intervalo_dosis' => 33,
+        'dosis_recomendada_anual' => 2,
+        'tipo_vacuna' => 'medica',
+        'aplicable_a_todos' => true,
     ];
 
     private int $cantidad_vacunas = 10;
@@ -55,10 +66,10 @@ class VacunasTest extends TestCase
                     'tipo_vacuna' => 'invalid',
                     'aplicable_a_todos' => 'invalid',
                     'tipo_ganados' => [
-                        ['id' => 999, 'sexo' => 'invalid']
+                        ['ganado_tipo_id' => 999, 'sexo' => 'invalid']
                     ]
                 ],
-                ['nombre', 'intervalo_dosis', 'dosis_recomendada_anual', 'tipo_vacuna', 'aplicable_a_todos', 'tipo_ganados.0.id', 'tipo_ganados.0.sexo']
+                ['nombre', 'intervalo_dosis', 'dosis_recomendada_anual', 'tipo_vacuna', 'aplicable_a_todos', 'tipo_ganados.0.ganado_tipo_id', 'tipo_ganados.0.sexo']
             ],
             'caso de no insertar datos requeridos' => [
                 [],
@@ -91,7 +102,7 @@ class VacunasTest extends TestCase
                         'dosis_recomendada_anual' => 'integer',
                         'tipo_vacuna' => 'string',
                         'aplicable_a_todos' => 'boolean',
-                        'tipos_ganado' => 'array'
+                        'tipos_ganado' => 'array|null'
                     ])
                 )
                 //tipo vacuna Leptospirosis aplicable a tipo ganado novillo y adulto
@@ -103,7 +114,7 @@ class VacunasTest extends TestCase
                         'tipo' => 'string',
                         'sexo' => 'string'
                     ])
-                    )
+                )
         );
     }
 
@@ -126,6 +137,30 @@ class VacunasTest extends TestCase
                     'tipo_vacuna' => 'string',
                     'aplicable_a_todos' => 'boolean',
                     'tipos_ganado' => 'array'
+                ])
+                    ->has('tipos_ganado', 6, fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
+                    $json->whereAllType(['id' => 'integer', 'tipo' => 'string', 'sexo' => 'string']))
+            )
+        );
+    }
+    public function test_creacion_vacuna_aplicable_a_todos(): void
+    {
+
+        $response = $this->actingAs($this->user)->postJson(route('vacunas.store'), $this->vacunaAplicableTodos);
+
+        $response->assertStatus(201)->assertJson(
+            fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
+            $json->has(
+                'vacuna',
+                fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
+                $json->whereAllType([
+                    'id' => 'integer',
+                    'nombre' => 'string',
+                    'intervalo_dosis' => 'integer',
+                    'dosis_recomendada_anual' => 'integer',
+                    'tipo_vacuna' => 'string',
+                    'aplicable_a_todos' => 'boolean',
+                    'tipos_ganado' => 'null'
                 ])
             )
         );
@@ -152,7 +187,7 @@ class VacunasTest extends TestCase
                     'dosis_recomendada_anual' => 'integer',
                     'tipo_vacuna' => 'string',
                     'aplicable_a_todos' => 'boolean',
-                    'tipos_ganado' => 'array'
+                    'tipos_ganado' => 'array|null'
                 ])
             )
         );

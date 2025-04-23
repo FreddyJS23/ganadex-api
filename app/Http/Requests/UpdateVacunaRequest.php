@@ -28,8 +28,8 @@ class UpdateVacunaRequest extends FormRequest
             'dosis_recomendada_anual' => 'nullable|integer|min:0',
             'tipo_vacuna' => ['required', Rule::in(['medica', 'plan_sanitario'])],
             'aplicable_a_todos' => 'boolean',
-            'tipo_ganados' => 'array',
-            'tipo_ganados.*.id' => 'required|exists:ganado_tipos,id',
+            'tipo_ganados' => [Rule::requiredIf(!$this->aplicable_a_todos)],
+            'tipo_ganados.*.ganado_tipo_id' => 'required|exists:ganado_tipos,id',
             'tipo_ganados.*.sexo' => ['required', Rule::in(['H', 'M'])],
         ];
     }
