@@ -56,4 +56,14 @@ class Vacuna extends Model
                     ->withPivot('sexo')
                     ->withTimestamps();
     }
+
+    /**
+     * Get all of the revisiones for the Vacuna
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function revisiones(): HasMany
+    {
+        return $this->hasMany(Revision::class);
+    }
 }

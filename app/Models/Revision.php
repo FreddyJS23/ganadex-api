@@ -53,6 +53,16 @@ class Revision extends Model
         return $this->belongsTo(TipoRevision::class);
     }
 
+    /**
+     * Get the vacuna that owns the Revision
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function vacuna(): BelongsTo
+    {
+        return $this->belongsTo(Vacuna::class);
+    }
+
     /* activar logs de actividades */
     use LogsActivity;
 

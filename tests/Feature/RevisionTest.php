@@ -29,6 +29,7 @@ class RevisionTest extends TestCase
         'fecha' => '2020-10-02',
         'diagnostico' => 'Diagnóstico inicial',
         'observacion' => 'Observación rutina',
+        'vacuna_id' => 1,
     ];
 
     private int $cantidad_revision = 10;
@@ -199,7 +200,8 @@ class RevisionTest extends TestCase
                         'fecha' => 'string',
                         'diagnostico' => 'string|null',
                         'tratamiento' => 'string|null',
-                        'revision'=>'array'
+                        'revision'=>'array',
+                        'vacuna' => 'array|null',
                     ])->has(
                         'revision',
                         fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
@@ -235,14 +237,23 @@ class RevisionTest extends TestCase
                         'fecha' => 'string',
                         'diagnostico' => 'string|null',
                         'tratamiento' => 'string|null',
-                        'revision'=>'array'
+                        'revision'=>'array',
+                        'vacuna' => 'array|null',
                     ])->has(
                         'revision',
                         fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                         =>$json->whereAllType([
                             'codigo' => 'string|null',
                         'tipo' => 'string'])
-                    )->has(
+                    )
+                    ->has(
+                        'vacuna',
+                        fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
+                        =>$json->whereAllType([
+                            'id' => 'integer',
+                        'nombre' => 'string'])
+                    )
+                    ->has(
                         'veterinario',
                         fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                         => $json->whereAllType([
@@ -269,8 +280,17 @@ class RevisionTest extends TestCase
                         'fecha' => 'string',
                         'diagnostico' => 'string|null',
                         'tratamiento' => 'string|null',
-                        'revision'=>'array'
-                    ])->has(
+                        'revision'=>'array',
+                        'vacuna' => 'array|null',
+                    ])
+                    ->has(
+                        'vacuna',
+                        fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
+                        =>$json->whereAllType([
+                            'id' => 'integer',
+                        'nombre' => 'string'])
+                    )
+                    ->has(
                         'revision',
                         fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                         =>$json->whereAllType([
@@ -425,7 +445,8 @@ class RevisionTest extends TestCase
                         'fecha' => 'string',
                         'diagnostico' => 'string|null',
                         'tratamiento' => 'string|null',
-                        'revision'=>'array'
+                        'revision'=>'array',
+                        'vacuna' => 'array|null',
                     ])->has(
                         'revision',
                         fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson

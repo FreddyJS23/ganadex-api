@@ -47,6 +47,7 @@ class RevisionController extends Controller
         $revision = new Revision();
         $revision->fill($request->except(['personal_id']));
         $revision->personal_id=$this->veterinarioOperacion($request);
+        $revision->vacuna_id = $request->vacuna_id;
         $revision->ganado()->associate($ganado)->save();
 
 

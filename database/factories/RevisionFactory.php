@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\TipoRevision;
+use App\Models\Vacuna;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -21,7 +22,8 @@ class RevisionFactory extends Factory
             'tipo_revision_id' => TipoRevision::factory(),
             'tratamiento' =>fake()->boolean() ?  fake()->word() : null,
             'diagnostico' => fake()->boolean() ?  fake()->word() : null,
-            'fecha' => fake()->date()
+            'fecha' => fake()->date(),
+            'vacuna_id' => fake()->boolean() ? Vacuna::factory() : null,
         ];
     }
 }
