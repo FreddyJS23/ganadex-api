@@ -29,7 +29,7 @@ services:
       environment:
         MYSQL_DATABASE: ${DB_DATABASE:-laravel}
         MYSQL_USER: ${DB_USERNAME:-root}
-        MYSQL_ROOT_PASSWORD: root #no debe dejar la clave por defecto,debe cambiarla
+        MYSQL_ROOT_PASSWORD: root #no debe dejar la clave por defecto,en producción debe cambiarse o usar un variable de entorno
         SERVICE_NAME: mysql
       volumes:
         - mysql_ganadex:/var/lib/mysql
@@ -46,7 +46,7 @@ services:
       APP_URL: http://nginx_laravel
       SESSION_DOMAIN: ganadex_frontend
       SANCTUM_STATEFUL_DOMAINS: ganadex_frontend
-      DB
+      DB_PASSWORD: root
     ports:
       - "9000:9000"
       #se ejecuta un clear de la config para volve a generar la config, ya que en la contruccion no estan estas variables
