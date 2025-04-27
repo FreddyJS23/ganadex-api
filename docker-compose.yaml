@@ -20,16 +20,16 @@ services:
       - mysql
   #database
   mysql:
-      image: mariadb:10.4.8
+      image: mariadb:10.5
       restart: unless-stopped
       container_name: mysql
       tty: true
       ports:
         - "3307:3306"
       environment:
-        MYSQL_DATABASE: ${DB_DATABASE:-laravel}
-        MYSQL_USER: ${DB_USERNAME:-root}
-        MYSQL_ROOT_PASSWORD: root #no debe dejar la clave por defecto,en producción debe cambiarse o usar un variable de entorno
+        MARIADB_DATABASE: ${DB_DATABASE:-laravel}
+        MARIADB_USER: ${DB_USERNAME:-root}
+        MARIADB_ROOT_PASSWORD: root #no debe dejar la clave por defecto,en producción debe cambiarse o usar un variable de entorno
         SERVICE_NAME: mysql
       volumes:
         - mysql_ganadex:/var/lib/mysql
