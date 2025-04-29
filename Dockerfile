@@ -37,9 +37,14 @@ COPY composer.json composer.lock ./
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
 # Permisos para el usuario www-data
-RUN mkdir -p /var/www/app/storage/framework/{cache,sessions,views} /var/www/app/storage/logs /var/www/app/bootstrap/cache && \
-    chown -R www-data:www-data /var/www/app/storage /var/www/app/bootstrap/cache && \
-    chmod -R 775 /var/www/app/storage /var/www/app/bootstrap/cache
+RUN chown -R www-data:www-data /var/www/app \
+    && chmod -R 775 /var/www/app/storage \
+    && chmod -R 775 /var/www/app/bootstrap/cache
+
+RUN chown -R www-data:www-data /var/www/app/vendor \
+&& chmod -R 775 /var/www/app/vendor
+
+VOLUME ["/var/www/app/storage/app"]
 
 # Comandos Artisan para Laravel en producción
 RUN php artisan view:clear && \

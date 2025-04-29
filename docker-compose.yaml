@@ -41,6 +41,8 @@ services:
       dockerfile: Dockerfile
     env_file:
       - ./.env
+    volumes:
+      - ./storage/app:/var/www/app/storage/app
     environment:
       DB_HOST: mysql  #los host frecuentemente son las mismo el nombre del servicio
       APP_URL: http://nginx_laravel
