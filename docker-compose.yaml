@@ -42,7 +42,7 @@ services:
     env_file:
       - ./.env
     volumes:
-      - ./storage/app:/var/www/app/storage/app
+      - laravel_storage:/var/www/app/storage/app
     environment:
       DB_HOST: mysql  #los host frecuentemente son las mismo el nombre del servicio
       APP_URL: http://nginx_laravel
@@ -64,3 +64,4 @@ services:
 
 volumes:
   mysql_ganadex:
+  laravel_storage:
