@@ -50,6 +50,10 @@ class StoreRevisionRequest extends FormRequest
                 'numeric',
                 Rule::exists('vacunas', 'id')
             ],
+            'dosis' => [
+                'nullable',
+                'numeric',
+            ],
         ];
 
         // Agregar validación de personal_id solo si el usuario es admin

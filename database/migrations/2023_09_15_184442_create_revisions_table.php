@@ -20,6 +20,7 @@ return new class extends Migration
             $table->foreignId('ganado_id')->constrained()->cascadeOnDelete();
             $table->foreignId('personal_id')->constrained()->cascadeOnDelete();
             $table->foreignId('vacuna_id')->nullable()->constrained()->cascadeOnDelete();
+            $table->integer('dosis')->nullable();
             $table->timestamps();
         });
     }

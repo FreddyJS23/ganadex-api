@@ -24,6 +24,7 @@ class RevisionFactory extends Factory
             'diagnostico' => fake()->boolean() ?  fake()->word() : null,
             'fecha' => fake()->date(),
             'vacuna_id' => fake()->boolean() ? Vacuna::factory() : null,
+            'dosis' => fake()->boolean() ? fake()->numberBetween(1, 100) : null,
         ];
     }
 }

@@ -30,6 +30,6 @@ class CreateTipoGanadoVacunaTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('tipo_ganado_vacuna');
+        Schema::dropIfExists('ganado_tipo_vacuna');
     }
 }

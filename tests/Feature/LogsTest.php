@@ -31,7 +31,7 @@ class LogsTest extends TestCase
         'tratamiento' => 'medicina',
         'fecha' => '2020-10-02',
         'observacion' => 'bien',
-
+        'dosis' => 30,
     ];
 
     private array $servicio = [
