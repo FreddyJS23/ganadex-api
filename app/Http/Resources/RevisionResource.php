@@ -22,6 +22,7 @@ class RevisionResource extends JsonResource
             'tratamiento' => $this->tratamiento,
             'veterinario' => $this->veterinario,
             'vacuna' => $this->vacuna ? $this->vacuna->only('id', 'nombre') : null,
+            'dosis' => $this->dosis ? $this->dosis . 'ml' : null,
         ];
     }
 }

@@ -30,6 +30,7 @@ class RevisionTest extends TestCase
         'diagnostico' => 'Diagnóstico inicial',
         'observacion' => 'Observación rutina',
         'vacuna_id' => 1,
+        'dosis' => 50,
     ];
 
     private int $cantidad_revision = 10;
@@ -202,6 +203,7 @@ class RevisionTest extends TestCase
                         'tratamiento' => 'string|null',
                         'revision'=>'array',
                         'vacuna' => 'array|null',
+                        'dosis' => 'string|null',
                     ])->has(
                         'revision',
                         fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
@@ -239,6 +241,7 @@ class RevisionTest extends TestCase
                         'tratamiento' => 'string|null',
                         'revision'=>'array',
                         'vacuna' => 'array|null',
+                        'dosis'=> 'string',
                     ])->has(
                         'revision',
                         fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
@@ -282,6 +285,7 @@ class RevisionTest extends TestCase
                         'tratamiento' => 'string|null',
                         'revision'=>'array',
                         'vacuna' => 'array|null',
+                        'dosis' => 'string',
                     ])
                     ->has(
                         'vacuna',
@@ -447,6 +451,7 @@ class RevisionTest extends TestCase
                         'tratamiento' => 'string|null',
                         'revision'=>'array',
                         'vacuna' => 'array|null',
+                        'dosis' => 'string|null',
                     ])->has(
                         'revision',
                         fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson

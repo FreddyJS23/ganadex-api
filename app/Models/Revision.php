@@ -21,10 +21,12 @@ class Revision extends Model
         'fecha',
         'personal_id',
         'diagnostico',
+        'dosis',
     ];
 
-    protected $casts=[
-        'fecha' =>Fecha::class,
+    protected $casts = [
+        'fecha' => Fecha::class,
+        'dosis' => 'integer',
     ];
 
 
