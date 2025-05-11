@@ -36,9 +36,7 @@ class ToroController extends Controller
         $toros = Toro::where('hacienda_id', session('hacienda_id'))
             ->with(
                 [
-                'ganado' => function (Builder $query) {
-                    $query->doesntHave('ganadoDescarte');
-                },
+                'ganado',
                 'padreEnPartos' => function (Builder $query) {
                     $query->orderBy('fecha', 'desc');
                 },
@@ -60,8 +58,10 @@ class ToroController extends Controller
 
                     $toro->efectividad = $toro->servicios->count() >= 1 ? $efectividad($toro->servicios->count()) : null;
                 } elseif ($toro->padreEnPartos->count() >= 2) {
-                    $fechaInicio = $toro->padreEnPartos[1]->fecha;
-                    $fechaFin = $toro->padreEnPartos[0]->fecha;
+
+                    //se debe  usar raw ya que el modelo tiene un cast para las fechas en formar d-m-Y, pero para la query se usa el formato Y-m-d
+                    $fechaInicio = $toro->padreEnpartos[1]->getRawOriginal("fecha");
+                    $fechaFin = $toro->padreEnpartos[0]->getRawOriginal("fecha");
 
                     $toro->fechaInicio = $fechaInicio;
                     $toro->fechaFin = $fechaFin;
@@ -77,6 +77,7 @@ class ToroController extends Controller
                 return $toro;
             }
         );
+        //return response()->json(['toros' => json_encode($toros->toArray())], 200);
 
         return new ToroCollection($toros);
     }
@@ -276,8 +277,9 @@ class ToroController extends Controller
 
             $toro->efectividad = $efectividad($toro->servicios->count());
         } elseif ($toro->padreEnPartos->count() >= 2) {
-            $fechaInicio = $toro->padreEnPartos[1]->fecha;
-            $fechaFin = $toro->padreEnPartos[0]->fecha;
+             //se debe  usar raw ya que el modelo tiene un cast para las fechas en formar d-m-Y, pero para la query se usa el formato Y-m-d
+             $fechaInicio = $toro->padreEnpartos[1]->getRawOriginal("fecha");
+             $fechaFin = $toro->padreEnpartos[0]->getRawOriginal("fecha");
 
             $toro->fechaInicio = $fechaInicio;
             $toro->fechaFin = $fechaFin;
