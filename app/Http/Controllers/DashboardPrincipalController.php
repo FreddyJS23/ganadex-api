@@ -55,7 +55,7 @@ class DashboardPrincipalController extends Controller
 
         $totalGanadoDescarte = GanadoDescarte::where('hacienda_id', session('hacienda_id'))->count();
         $totalGanadoDescarte = collect(
-            [[  'tipo' => 'descarte',
+            [[  'tipo' => 'Descarte',
             'ganado_count' => $totalGanadoDescarte]]
         );
 
