@@ -54,6 +54,7 @@ class StoreRevisionRequest extends FormRequest
                 'nullable',
                 'numeric',
             ],
+            'proxima'=>'date_format:Y-m-d|nullable'
         ];
 
         // Agregar validación de personal_id solo si el usuario es admin

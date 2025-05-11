@@ -34,8 +34,11 @@ class RevisionController extends Controller
                 ['tipoRevision',
                 'veterinario' => function (Builder $query) {
                     $query->select('personals.id', 'nombre');
-                }]
-            )->get()
+                },'ganado.evento'
+                ]
+            )
+            ->orderBy('fecha','desc')
+            ->get()
         );
     }
 
@@ -45,11 +48,20 @@ class RevisionController extends Controller
     public function store(StoreRevisionRequest $request, Ganado $ganado)
     {
         $revision = new Revision();
-        $revision->fill($request->except(['personal_id']));
+        $revision->fill($request->except(['personal_id','proxima']));
         $revision->personal_id=$this->veterinarioOperacion($request);
         $revision->vacuna_id = $request->vacuna_id;
         $revision->ganado()->associate($ganado)->save();
 
+        if($request->proxima){
+
+           if($ganado->evento){
+                $ganado->evento->prox_revision = $request->proxima;
+                $ganado->evento->save();
+            }else{
+                $ganado->evento()->create(['prox_revision' => $request->proxima]);
+            }
+        }
 
          RevisionPrenada::dispatchIf($revision->tipo_revision_id == 1, $revision);
 
@@ -62,7 +74,8 @@ class RevisionController extends Controller
                 $revision->load(
                     ['veterinario' => function (Builder $query) {
                         $query->select('personals.id', 'nombre');
-                    }]
+                    },'ganado.evento'
+                    ]
                 )
             )],
             201
@@ -79,7 +92,8 @@ class RevisionController extends Controller
                 $revision->load(
                     ['veterinario' => function (Builder $query) {
                         $query->select('personals.id', 'nombre');
-                    }]
+                    },'ganado.evento'
+                    ]
                 )
             )]
         );
@@ -98,7 +112,8 @@ class RevisionController extends Controller
                 $revision->load(
                     ['veterinario' => function (Builder $query) {
                         $query->select('personals.id', 'nombre');
-                    }]
+                    },'ganado.evento'
+                    ]
                 )
             )],
             200
