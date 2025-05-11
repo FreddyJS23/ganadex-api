@@ -12,6 +12,7 @@ use App\Models\TipoRevision;
 use App\Models\Toro;
 use App\Models\User;
 use App\Models\UsuarioVeterinario;
+use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -27,6 +28,7 @@ class RevisionTest extends TestCase
     private array $revision = [
         'tratamiento' => 'medicina',
         'fecha' => '2020-10-02',
+        'proxima' => '2025-01-02',
         'diagnostico' => 'Diagnóstico inicial',
         'observacion' => 'Observación rutina',
         'vacuna_id' => 1,
@@ -84,7 +86,7 @@ class RevisionTest extends TestCase
             $this->ganado
             = Ganado::factory()
             ->hasPeso(1)
-            ->hasEvento(1)
+            ->hasEvento(1,['prox_revision'=>null])
             ->hasAttached($this->estado)
             ->for($this->hacienda)
             ->create();
@@ -204,6 +206,7 @@ class RevisionTest extends TestCase
                         'revision'=>'array',
                         'vacuna' => 'array|null',
                         'dosis' => 'string|null',
+                        'proxima' => 'string|null',
                     ])->has(
                         'revision',
                         fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
@@ -242,7 +245,9 @@ class RevisionTest extends TestCase
                         'revision'=>'array',
                         'vacuna' => 'array|null',
                         'dosis'=> 'string',
-                    ])->has(
+                    ])
+                    ->where('proxima', Carbon::parse($this->revision['proxima'])->format('d-m-Y'))
+                    ->has(
                         'revision',
                         fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                         =>$json->whereAllType([
@@ -286,6 +291,7 @@ class RevisionTest extends TestCase
                         'revision'=>'array',
                         'vacuna' => 'array|null',
                         'dosis' => 'string',
+                        'proxima' => 'string',
                     ])
                     ->has(
                         'vacuna',
@@ -452,6 +458,7 @@ class RevisionTest extends TestCase
                         'revision'=>'array',
                         'vacuna' => 'array|null',
                         'dosis' => 'string|null',
+                        'proxima' => 'string|null',
                     ])->has(
                         'revision',
                         fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
@@ -511,7 +518,7 @@ class RevisionTest extends TestCase
         $response->assertStatus(200)->assertJson(['revisionID' => $idToDelete]);
     }
 
-    public function test_obtener_revisiones_de_todas_las_vacas(): void
+    public function test_obtener_revisiones_de_todas_las_vacas_y_chequear_proxima_revision(): void
     {
         //creacion ganado fallecido
         Ganado::factory()
