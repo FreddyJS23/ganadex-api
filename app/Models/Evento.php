@@ -11,6 +11,10 @@ class Evento extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'prox_revision',
+    ];
+
     /**
      * Get the ganado that owns the Evento
      *
