@@ -27,6 +27,6 @@ Route::middleware('auth:sanctum')->group(
         Route::get('/reportes/venta_ganado', [ReportsPdfController::class, 'resumenVentaGanadoAnual'])->name('reportes.ventaGanado');
         Route::get('/reportes/causas_fallecimientos', [ReportsPdfController::class, 'resumenCausasFAllecimientos'])->name('reportes.fallecimientos');
         Route::post('/reportes/natalidad', [ReportsPdfController::class, 'resumenNatalidad'])->name('reportes.natalidad');
-        Route::get('/reportes/nota_venta', [ReportsPdfController::class, 'facturaVentaGanado'])->name('reportes.facturaVentaGanado');
+        Route::get('/reportes/nota_venta/{id?}', [ReportsPdfController::class, 'facturaVentaGanado'])->name('reportes.facturaVentaGanado');
     }
 );
