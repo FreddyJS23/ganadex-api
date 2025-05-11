@@ -213,7 +213,7 @@
     <footer class="footer">
             <p> <span style="font-style: italic ">Reporte hacienda </span>
 
-                <b>{{ $nombreHacienda }}</b>
+                <b>"{{ $nombreHacienda }}"</b>
 
             </p>
 
