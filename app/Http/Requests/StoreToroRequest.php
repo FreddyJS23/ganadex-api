@@ -36,7 +36,11 @@ class StoreToroRequest extends FormRequest
                 fn($value, $attrubute) => Rule::exists('estados', 'id')
             ),
             //campos para registrar ganado vendido
-            'fecha_venta' => ['date_format:Y-m-d', Rule::requiredIf(fn () => in_array(5, $this->estado_id))],
+            'fecha_venta' => [
+                'date_format:Y-m-d',
+                Rule::requiredIf(fn () => in_array(5, $this->estado_id)),
+                'after_or_equal:fecha_nacimiento'
+            ],
             'precio' => ['numeric', Rule::requiredIf(fn () => in_array(5, $this->estado_id))],
             'comprador_id' => [
                  Rule::requiredIf(fn () => in_array(5, $this->estado_id)),
@@ -46,7 +50,11 @@ class StoreToroRequest extends FormRequest
                     )
             ],
             //campos para registrar ganado muerto
-            'fecha_fallecimiento' => ['date_format:Y-m-d', Rule::requiredIf(fn () => in_array(2, $this->estado_id))],
+            'fecha_fallecimiento' => [
+                'date_format:Y-m-d',
+                Rule::requiredIf(fn () => in_array(2, $this->estado_id)),
+                'after_or_equal:fecha_nacimiento'
+            ],
             'causas_fallecimiento_id' => [Rule::requiredIf(fn () => in_array(2, $this->estado_id)), 'numeric', Rule::exists('causas_fallecimientos', 'id') ],
             'descripcion' => ['string','nullable','max:255', Rule::requiredIf(fn () => in_array(2, $this->estado_id))],
             //campos vacunacion
