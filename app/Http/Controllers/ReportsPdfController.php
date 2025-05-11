@@ -14,6 +14,7 @@ use App\Models\Vacuna;
 use App\Models\Venta;
 use App\Models\VentaLeche;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use DateTime;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Query\JoinClause;
@@ -514,6 +515,10 @@ END as ultima_dosis
     public function resumenNatalidad(Request $request)
     {
 
+      /*  //descomentar para acceder a la ruta manualmente desde el navegador y debuguear
+       //incustruar id para debug
+        session(['hacienda_id' => 1]); */
+
         $regexYear = "/^[2][0-9][0-9][0-9]$/";
 
         $year = preg_match($regexYear, $request->query('year')) ? $request->query('year') : now()->format('Y');
@@ -555,17 +560,28 @@ END as ultima_dosis
         'year' => $year
         ];
 
+      /*  //descomentar para acceder a la ruta manualmente desde el navegador y debuguear
+      $nombreHacienda=$this->obtenerNombreHacienda();
+        $dataPdf['nombreHacienda']=$nombreHacienda;
+        return view(VistasReporte::natalidad->value,$dataPdf); */
+
+
         return $this->generarPdf(VistasReporte::natalidad,$dataPdf,"Resumen natalidad año $year");
     }
 
-    public function facturaVentaGanado()
+    public function facturaVentaGanado(?int  $id = null)
     {
 
-
-        $ventaGanado = Venta::where('hacienda_id', session('hacienda_id'))
+        if($id){
+            $ventaGanado = Venta::where('hacienda_id', session('hacienda_id'))
+            ->with(['ganado' => ['peso'],'comprador'])
+            ->findOrFail($id);
+        }else{
+            $ventaGanado = Venta::where('hacienda_id', session('hacienda_id'))
             ->with(['ganado' => ['peso'],'comprador'])
             ->orderBy('fecha', 'desc')
             ->first();
+        }
 
         $ganado = $ventaGanado->ganado;
 
@@ -613,9 +629,9 @@ END as ultima_dosis
             $nombreVacuna = $vacuna['vacuna'];
             if (!array_key_exists($nombreVacuna, $vacunas)) {
                 $vacunas = array_merge($vacunas, [$nombreVacuna => []]);
-                array_push($vacunas[$nombreVacuna], $vacuna['fecha']);
+                array_push($vacunas[$nombreVacuna], Carbon::parse($vacuna['fecha'])->format('d-m-Y'));
             } else {
-                array_push($vacunas[$nombreVacuna], $vacuna['fecha']);
+                array_push($vacunas[$nombreVacuna], Carbon::parse($vacuna['fecha'])->format('d-m-Y'));
             }
         }
 
