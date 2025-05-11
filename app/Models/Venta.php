@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\Fecha;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -16,6 +17,9 @@ class Venta extends Model
         'ganado_id',
         'comprador_id',
         'hacienda_id'
+    ];
+    protected $casts = [
+        'fecha' => Fecha::class,
     ];
 
     /**
