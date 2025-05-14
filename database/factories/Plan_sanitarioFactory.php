@@ -24,7 +24,7 @@ class Plan_sanitarioFactory extends Factory
             'fecha_inicio' => fake()->dateTimeThisYear()->format('y-m-d'),
             'fecha_fin' => fake()->dateTimeThisYear()->format('y-m-d'),
             'prox_dosis' => fake()->dateTimeThisYear()->format('y-m-d'),
-            'vacuna_id' => 1,
+            'vacuna_id' => rand(1,8),
             'vacunados' => rand(1, 100),
             'ganado_vacunado' =>determinar_genero_tipo_ganado($vacuna),
         ];
