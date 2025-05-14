@@ -122,7 +122,7 @@ class PlanSanitarioTest extends TestCase
     {
         /* planes sanitarios en el cual su proxima dosis es menor a la fecha actual, por ende deben aplicarse */
         Plan_sanitario::factory()
-        ->count(3)
+        ->count(30)
         ->for($this->hacienda)
         ->create(['prox_dosis' => now()->subDays(random_int(10,100))]);
 
