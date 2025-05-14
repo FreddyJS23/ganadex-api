@@ -92,7 +92,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('/pajuela_toros', PajuelaToroController::class);
     Route::apiResource('/fallecimientos', FallecimientoController::class);
     Route::apiResource('/plan_sanitario', PlanSanitarioController::class);
-    Route::get('/planes_sanitarios_pendientes',[PlanSanitarioController::class,'planesSanitarioPendientes'])->name('plan_sanitario.pendientes');
     Route::apiResource('/notificaciones', NotificacionController::class)->only(['index', 'destroy'])->parameters(['notificaciones' => 'notificacion']);;
     Route::get('/borrar_notificaciones', [NotificacionController::class, 'destroyAll'])->name('notificaciones.destroyAll');
     Route::apiResource('/hacienda', HaciendaController::class);
@@ -151,6 +150,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     //rutas de peticiones de datos dashboard jornadas vacunacion
     Route::get('/dashboard_planes_sanitario/proximos_planes_sanitario', [DashboardPlanesSanitario::class, 'proximosPlanesSanitario'])->name('dashboardPlanesSanitario.proximosPlanesSanitario');
+    Route::get('/planes_sanitarios_pendientes',[PlanSanitarioController::class,'planesSanitarioPendientes'])->name('plan_sanitario.pendientes');
 
     Route::get('/check_session_activa', checkSesionActivaUsuario::class)->name('checkSession');
 
