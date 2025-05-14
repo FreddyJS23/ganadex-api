@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Leche;
+use App\Rules\FechaPesajeLeche;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreLecheRequest extends FormRequest
@@ -23,8 +25,7 @@ class StoreLecheRequest extends FormRequest
     {
         return [
             'peso_leche' => 'required|max_digits:6|numeric',
-            'fecha' => 'date_format:Y-m-d',
-
+            'fecha' => ['date_format:Y-m-d',new FechaPesajeLeche],
         ];
     }
 }
