@@ -21,6 +21,7 @@ class PlanSanitarioResource extends JsonResource
             'vacuna' => $this->vacuna->nombre,
             'vacunados' => $this->vacunados,
             'ganado_vacunado' => $this->ganado_vacunado,
+            'prox_dosis' => $this->prox_dosis,
         ];
     }
 }
