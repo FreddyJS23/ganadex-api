@@ -74,11 +74,24 @@ class PlanSanitarioController extends Controller
 
     public function planesSanitarioPendientes()
     {
+        /* traer planes sanitarios pendientes, agrupados por vacuna y consultando el plan
+        mas reciente para cada vacuna*/
+        $planes = Plan_sanitario::where('hacienda_id', session('hacienda_id'))
+            ->whereIn('id', function ($query) {
+                $query->selectRaw('MAX(id)')
+                    ->from('plan_sanitarios as ps')
+                    ->where('hacienda_id', session('hacienda_id'))
+                    //filtrar para obtener el plan mas reciente
+                    ->whereRaw('fecha_inicio =
+                    (SELECT MAX(fecha_inicio) FROM plan_sanitarios WHERE vacuna_id = ps.vacuna_id AND hacienda_id = ps.hacienda_id)')
+                    ->where('prox_dosis', '<=', now()->format('Y-m-d'))
+                    ->groupBy('vacuna_id');
+            })
+            ->orderBy('fecha_inicio', 'desc')
+            ->get();
+
         return new PlanSanitarioCollection(
-            Plan_sanitario::where('hacienda_id', session('hacienda_id'))
-                ->orderBy('fecha_inicio', 'desc')
-                ->where('prox_dosis','<=',now()->format('Y-m-d'))
-                ->get()
+            $planes
         );
     }
 
