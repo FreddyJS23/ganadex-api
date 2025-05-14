@@ -194,7 +194,15 @@ class DemostracionSeeder extends Seeder
                 Parto::factory()
                     ->for($ganados[$i])
                      //se usa el state en lugar de for para asegurarse de que cada parto tenga una cria distinta, con for una misma cria pertenececira a todos los partos
-                    ->has(PartoCria::factory()->state(['ganado_id'=>Ganado::factory()->for($hacienda)->hasPeso(1)->hasAttached($estadoSano)]))
+                    ->has(PartoCria::factory()
+                        ->state(['ganado_id'
+                                =>Ganado::factory()
+                                ->for($hacienda)->hasPeso(1)
+                                ->hasAttached($estadoSano)
+                                ->hasEvento(['prox_revision' => null, 'prox_parto' => null, 'prox_secado' => null])
+                            ]
+                        )
+                    )
                     //alternar un parto con monta y otro con inseminacion
                     ->for($i % 2 == 0 ? $toros[rand(0, $elementos - 1)] : $pajuelaToros[rand(0, $elementos - 1)], 'partoable')
                     ->create(['personal_id' => $veterinario]);
