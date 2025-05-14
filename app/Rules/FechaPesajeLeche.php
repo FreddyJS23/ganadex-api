@@ -24,8 +24,6 @@ class FechaPesajeLeche implements ValidationRule
 
         $fechaNacimiento = Carbon::parse($ganado->fecha_nacimiento);
 
-        dd($fechaNacimiento,$fecha);
-
         //verificar si ya tiene un registro para el mes y el año
         //ya que los pesajes son uno al mes
         $leche = Leche::where('ganado_id', $idGanado)
