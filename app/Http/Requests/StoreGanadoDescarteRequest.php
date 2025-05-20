@@ -41,7 +41,6 @@ class StoreGanadoDescarteRequest extends FormRequest
                 Rule::requiredIf(fn () => in_array(5, $this->estado_id)),
                 'after_or_equal:fecha_nacimiento'
             ],
-            'precio' => ['numeric', Rule::requiredIf(fn () => in_array(5, $this->estado_id))],
             'comprador_id' => [
                  Rule::requiredIf(fn () => in_array(5, $this->estado_id)),
                 'numeric', Rule::exists('compradors', 'id')

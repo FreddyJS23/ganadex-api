@@ -78,10 +78,8 @@ class GanadoController extends Controller
                         $request->only($this->estado)['estado_id'][0] == 5 && $ganado->venta()->create(
                             [
                             'fecha' => $request->input('fecha_venta'),
-                            'precio' => $request->input('precio'),
                             'comprador_id' => $request->input('comprador_id'),
                             'hacienda_id' => session('hacienda_id')
-
                             ]
                         );
 
