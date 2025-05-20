@@ -18,6 +18,9 @@ class Logout extends Controller
 
         $request->session()->regenerateToken();
 
+        activity('Cierre de sesión')->log('Cierre de sesión');
+
+
         return response()->json(['status' => true], 200);
     }
 }

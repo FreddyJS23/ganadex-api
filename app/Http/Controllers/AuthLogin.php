@@ -29,6 +29,7 @@ class AuthLogin extends Controller
 
         //intentar autenticar
         if (!Auth::attempt($request->only(['usuario', 'password']))) {
+            activity('Contraseña incorrecta al iniciar sesión')->log('Contraseña incorrecta al iniciar sesión');
             return response()->json(['message' => 'invalid password'], 401);
         }
 
