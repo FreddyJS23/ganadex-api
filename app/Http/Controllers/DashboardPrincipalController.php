@@ -25,7 +25,11 @@ class DashboardPrincipalController extends Controller
     public function totalGanadoTipo()
     {
 
-        $totalGanadoPorTiposMacho = GanadoTipo::withCount(
+        $totalGanadoPorTiposMacho = GanadoTipo::whereHas('ganado', function (Builder $query) {
+            $query->whereHas('estados', function (Builder $query) {
+                $query->whereNotIn('estado', ['vendido', 'fallecido']);
+            });
+        })->withCount(
             ['ganado' => function (Builder $query) {
                 $query->where('sexo', 'M')
                     ->where('hacienda_id', session('hacienda_id'))
@@ -35,7 +39,11 @@ class DashboardPrincipalController extends Controller
             }]
         )->get();
 
-        $totalGanadoPorTiposHembra = GanadoTipo::withCount(
+        $totalGanadoPorTiposHembra = GanadoTipo::whereHas('ganado', function (Builder $query) {
+            $query->whereHas('estados', function (Builder $query) {
+                $query->whereNotIn('estado', ['vendido', 'fallecido']);
+            });
+        })->withCount(
             ['ganado' => function (Builder $query) {
                 $query->where('sexo', 'H')
                     ->where('hacienda_id', session('hacienda_id'))
@@ -53,7 +61,15 @@ class DashboardPrincipalController extends Controller
             }
         );
 
-        $totalGanadoDescarte = GanadoDescarte::where('hacienda_id', session('hacienda_id'))->count();
+        $totalGanadoDescarte = GanadoDescarte::whereHas('ganado', function (Builder $query) {
+            $query->whereHas('estados', function (Builder $query) {
+                $query->whereNotIn('estado', ['vendido', 'fallecido']);
+            });
+        })
+        ->with('ganado')
+        ->where('hacienda_id', session('hacienda_id'))
+        ->count();
+
         $totalGanadoDescarte = collect(
             [[  'tipo' => 'Descarte',
             'ganado_count' => $totalGanadoDescarte]]

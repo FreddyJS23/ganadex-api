@@ -27,12 +27,17 @@ class DashboardTest extends TestCase
 
     private int $cantidad_elementos = 50;
     private Collection $estado;
+    private $estadoSano;
+    private $estadoVendido;
 
     protected function setUp(): void
     {
         $this->needsHaciendaSetUp();
 
         $this->estado = Estado::all();
+
+        $this->estadoSano = $this->estado->where('estado', 'sano')->first();
+        $this->estadoVendido = $this->estado->where('estado', 'vendido')->first();
     }
 
     private function generarGanado(): Collection
@@ -40,7 +45,7 @@ class DashboardTest extends TestCase
         GanadoDescarte::factory()
             ->count(10)
             ->for($this->hacienda)
-            ->forGanado(['hacienda_id' => $this->hacienda->id, 'sexo' => 'M', 'tipo_id' => 4])
+            ->for(Ganado::factory(['hacienda_id' => $this->hacienda->id, 'sexo' => 'M', 'tipo_id' => 4])->hasAttached($this->estadoSano))
             ->create();
 
         return Ganado::factory()
@@ -134,6 +139,7 @@ class DashboardTest extends TestCase
             ->setUpRequest()
             ->getJson(route('dashboardPrincipal.totalGanadoTipo'))
             ->assertStatus(200)
+            ->dd()
             ->assertJson(fn(AssertableJson $json): AssertableJson => $json
                 ->whereType(
                     'total_tipos_ganado',
@@ -152,7 +158,7 @@ class DashboardTest extends TestCase
                     'total_tipos_ganado.5.Maute' => 'integer',
                     'total_tipos_ganado.6.Novillo' => 'integer',
                     'total_tipos_ganado.7.Adulto' => 'integer',
-                    'total_tipos_ganado.8.descarte' => 'integer',
+                    'total_tipos_ganado.8.Descarte' => 'integer',
                 ]));
     }
 
