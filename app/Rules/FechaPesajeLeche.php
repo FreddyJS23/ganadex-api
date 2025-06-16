@@ -34,7 +34,8 @@ class FechaPesajeLeche implements ValidationRule
         if($leche != null){
         $fail('Esta vaca ya tiene un pesaje de leche para este mes');
     }
-    else if($fecha > $fechaNacimiento){
+    //Registrar una fecha de pesaje de leche superior a la de nacimiento
+    else if($fechaNacimiento > $fecha){
         $fail('La fecha ingresada no es válida');
     }
     }
