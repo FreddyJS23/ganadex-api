@@ -217,7 +217,7 @@ class PesajeLecheTest extends TestCase
                 fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has('todos_pesaje_leche.1', fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
                     'id' => 'integer',
                     'nombre' => 'string',
-                    'numero' => 'integer',
+                    'numero' => 'integer|null',
                     'ultimo_pesaje' => 'string|null',
                     'pesaje_este_mes' => 'boolean',
                 ]))

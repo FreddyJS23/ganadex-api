@@ -194,6 +194,7 @@ class GanadoTest extends TestCase
                             'estados.0.id' => 'integer',
                             'estados.0.estado' => 'string',
                             'fallecimiento' => 'array|null',
+                            'venta' => 'array|null',
 
                         ])
                             ->where('sexo', fn (string $sexo) => Str::contains($sexo, ['M', 'H']))
@@ -246,6 +247,7 @@ class GanadoTest extends TestCase
                         'estados.0.id' => 'integer',
                         'estados.0.estado' => 'string',
                         'fallecimiento' => 'array|null',
+                        'venta' => 'array|null',
 
                     ])
                         ->where('sexo', fn (string $sexo) => Str::contains($sexo, ['M', 'H']))
@@ -304,6 +306,7 @@ class GanadoTest extends TestCase
                         'pesos' => 'array|null',
                         'eventos' => 'array|null',
                         'fallecimiento' => 'array|null',
+                        'venta' => 'array|null',
 
                     ])
                     ->where('origen', 'Externo')

@@ -109,6 +109,7 @@ class PlanSanitarioTest extends TestCase
                         'id' => 'integer',
                         'fecha_inicio' => 'string',
                         'fecha_fin' => 'string',
+                        'prox_dosis' => 'string',
                         'vacuna' => 'string',
                         'vacunados' => 'integer',
                         'ganado_vacunado' => 'string',
@@ -124,7 +125,7 @@ class PlanSanitarioTest extends TestCase
         Plan_sanitario::factory()
         ->count(30)
         ->for($this->hacienda)
-        ->create(['prox_dosis' => now()->subDays(random_int(10,100))]);
+        ->create(['prox_dosis' => now()->subDays(random_int(10,100)),'vacuna_id'=>1]);
 
         /* planes sanitarios en el cual su proxima dosis es mayor a la fecha actual, por ende estan proximos a aplicarse */
         Plan_sanitario::factory()
@@ -139,7 +140,8 @@ class PlanSanitarioTest extends TestCase
             $json->whereType('planes_sanitario', 'array')
                 ->has(
                     'planes_sanitario',
-                    3,
+                    //ya que se coloca una vacuna para planes sanitarios pendientes, solo debe haber un tipo de vacuna pendiente
+                    1,
                     fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                     => $json->whereAllType([
                         'id' => 'integer',
@@ -147,6 +149,7 @@ class PlanSanitarioTest extends TestCase
                         'fecha_fin' => 'string',
                         'vacuna' => 'string',
                         'vacunados' => 'integer',
+                        'prox_dosis' => 'string',
                         'ganado_vacunado' => 'string',
                     ])
                 )

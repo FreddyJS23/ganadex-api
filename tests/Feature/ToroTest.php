@@ -182,6 +182,7 @@ class ToroTest extends TestCase
                             'padre_en_partos' => 'integer',
                             'servicios' => 'integer|null',
                             'fallecimiento' => 'array|null',
+                            'venta' => 'array|null',
 
 
                         ])
@@ -216,6 +217,7 @@ class ToroTest extends TestCase
                             'padre_en_partos' => 'integer|null',
                             'servicios' => 'integer|null',
                             'fallecimiento' => 'array|null',
+                            'venta' => 'array|null',
 
                         ])
                         ->where('sexo', 'M')
@@ -253,6 +255,7 @@ class ToroTest extends TestCase
                             'sexo' => 'string',
                             'tipo' => 'string',
                             'fallecimiento' => 'array|null',
+                            'venta' => 'array|null',
 
                         ])
                     ->where('origen', 'Externo')
@@ -331,6 +334,7 @@ class ToroTest extends TestCase
                             'padre_en_partos' => 'integer',
                             'servicios' => 'integer|null',
                             'fallecimiento' => 'array|null',
+                            'venta' => 'array|null',
 
                         ])
                         ->where('sexo', 'M')

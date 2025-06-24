@@ -172,6 +172,7 @@ class GanadoDescarteTest extends TestCase
                             'estados' => 'array',
                             'pesos' => 'array|null',
                             'fallecimiento' => 'array|null',
+                            'venta' => 'array|null',
                         ])
                         ->where('sexo', 'M')
                         ->where('tipo', fn (string $tipoGanado) => Str::contains($tipoGanado, ['Becerro', 'Maute','Novillo','Adulto']))
@@ -202,6 +203,7 @@ class GanadoDescarteTest extends TestCase
                             'estados' => 'array',
                             'pesos' => 'array|null',
                             'fallecimiento' => 'array|null',
+                            'venta' => 'array|null',
 
                         ])
                         ->where('sexo', 'M')
@@ -237,6 +239,7 @@ class GanadoDescarteTest extends TestCase
                             'sexo' => 'string',
                             'tipo' => 'string',
                             'fallecimiento' => 'array|null',
+                            'venta' => 'array|null',
 
                         ])
                         ->where('origen', 'Externo')
@@ -318,6 +321,7 @@ class GanadoDescarteTest extends TestCase
                             'estados' => 'array',
                             'pesos' => 'array|null',
                             'fallecimiento' => 'array|null',
+                            'venta' => 'array|null',
 
                         ])
                     ->where('tipo', fn (string $tipoGanado) => Str::contains($tipoGanado, ['Becerro', 'Maute','Novillo','Adulto']))
@@ -353,6 +357,7 @@ class GanadoDescarteTest extends TestCase
                             'estados' => 'array',
                             'pesos' => 'array|null',
                             'fallecimiento' => 'array|null',
+                            'venta' => 'array|null',
 
                         ])
                         ->where('sexo', 'M')
