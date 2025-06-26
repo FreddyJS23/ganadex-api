@@ -24,7 +24,7 @@ class StoreLecheRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'peso_leche' => 'required|max_digits:6|numeric',
+            'peso_leche' => 'required|between:0.1,100|decimal:0,2',
             'fecha' => ['date_format:Y-m-d',new FechaPesajeLeche],
         ];
     }

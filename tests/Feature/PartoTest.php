@@ -272,7 +272,7 @@ class PartoTest extends TestCase
                         'crias' => 'array',
                         'crias.0.id' => 'integer',
                         'crias.0.nombre' => 'string',
-                        'crias.0.numero' => 'integer',
+                        'crias.0.numero' => 'integer|null',
                         'crias.0.sexo' => 'string',
                         'crias.0.origen' => 'string',
                         'crias.0.fecha_nacimiento' => 'string',
@@ -385,7 +385,7 @@ class PartoTest extends TestCase
                         'crias' => 'array',
                         'crias.0.id' => 'integer',
                         'crias.0.nombre' => 'string',
-                        'crias.0.numero' => 'integer',
+                        'crias.0.numero' => 'integer|null',
                         'crias.0.sexo' => 'string',
                         'crias.0.origen' => 'string',
                         'crias.0.fecha_nacimiento' => 'string',
@@ -420,7 +420,7 @@ class PartoTest extends TestCase
                         'crias' => 'array',
                         'crias.0.id' => 'integer',
                         'crias.0.nombre' => 'string',
-                        'crias.0.numero' => 'integer',
+                        'crias.0.numero' => 'integer|null',
                         'crias.0.sexo' => 'string',
                         'crias.0.origen' => 'string',
                         'crias.0.fecha_nacimiento' => 'string',
@@ -512,7 +512,7 @@ class PartoTest extends TestCase
                         'crias' => 'array',
                         'crias.0.id' => 'integer',
                         'crias.0.nombre' => 'string',
-                        'crias.0.numero' => 'integer',
+                        'crias.0.numero' => 'integer|null',
                         'crias.0.sexo' => 'string',
                         'crias.0.origen' => 'string',
                         'crias.0.fecha_nacimiento' => 'string',
@@ -685,7 +685,7 @@ class PartoTest extends TestCase
                         'crias' => 'array',
                         'crias.0.id' => 'integer',
                         'crias.0.nombre' => 'string',
-                        'crias.0.numero' => 'integer',
+                        'crias.0.numero' => 'integer|null',
                         'crias.0.sexo' => 'string',
                         'crias.0.origen' => 'string',
                         'crias.0.fecha_nacimiento' => 'string',
@@ -721,7 +721,7 @@ class PartoTest extends TestCase
                         'crias' => 'array',
                         'crias.0.id' => 'integer',
                         'crias.0.nombre' => 'string',
-                        'crias.0.numero' => 'integer',
+                        'crias.0.numero' => 'integer|null',
                         'crias.0.sexo' => 'string',
                         'crias.0.origen' => 'string',
                         'crias.0.fecha_nacimiento' => 'string',
@@ -760,7 +760,7 @@ class PartoTest extends TestCase
                         'crias' => 'array',
                         'crias.0.id' => 'integer',
                         'crias.0.nombre' => 'string',
-                        'crias.0.numero' => 'integer',
+                        'crias.0.numero' => 'integer|null',
                         'crias.0.sexo' => 'string',
                         'crias.0.origen' => 'string',
                         'crias.0.fecha_nacimiento' => 'string',
@@ -946,7 +946,7 @@ class PartoTest extends TestCase
                 //27 ya que se contabiliza las dos vacas que se crean en setUp
                 $json->has('todos_partos',27)
                     ->has(
-                    'todos_partos.2',
+                    'todos_partos.3',
                     fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
                         'id' => 'integer',
                         'numero' => 'integer|null',
@@ -971,7 +971,7 @@ class PartoTest extends TestCase
                     )
                 )
                 ->has(
-                    'todos_partos.11',
+                    'todos_partos.13',
                     fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
                         'id' => 'integer',
                         'numero' => 'integer|null',

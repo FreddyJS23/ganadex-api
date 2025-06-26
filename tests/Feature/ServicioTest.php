@@ -766,7 +766,7 @@ class ServicioTest extends TestCase
                 ])
                 ->where('estado',fn(string $estado) => Str::contains($estado,['Sano','Fallecido','Vendido']))
                 )
-                ->has('todos_servicios.1', fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
+                ->has('todos_servicios.8', fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
                     'pajuela_toro' => 'array|null',
                 ])
                 ->where('estado',fn(string $estado) => Str::contains($estado,['Sano','Fallecido','Vendido']))
