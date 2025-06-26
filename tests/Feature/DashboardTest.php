@@ -139,7 +139,6 @@ class DashboardTest extends TestCase
             ->setUpRequest()
             ->getJson(route('dashboardPrincipal.totalGanadoTipo'))
             ->assertStatus(200)
-            ->dd()
             ->assertJson(fn(AssertableJson $json): AssertableJson => $json
                 ->whereType(
                     'total_tipos_ganado',
@@ -205,7 +204,7 @@ class DashboardTest extends TestCase
                     ->has(
                         'top_vacas_productoras.0',
                         fn(AssertableJson $json): AssertableJson => $json
-                            ->whereAllType(['peso_leche' => 'integer'])
+                            ->whereAllType(['peso_leche' => 'string'])
                             ->has(
                                 'ganado',
                                 fn(AssertableJson $json): AssertableJson => $json
@@ -235,7 +234,7 @@ class DashboardTest extends TestCase
                     ->has(
                         'top_vacas_menos_productoras.0',
                         fn(AssertableJson $json): AssertableJson => $json
-                            ->whereAllType(['peso_leche' => 'integer'])
+                            ->whereAllType(['peso_leche' => 'string'])
                             ->has(
                                 'ganado',
                                 fn(AssertableJson $json): AssertableJson => $json

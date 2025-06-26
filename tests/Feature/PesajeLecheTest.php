@@ -18,7 +18,7 @@ class PesajeLecheTest extends TestCase
     use RefreshDatabase;
 
     private array $pesoLeche = [
-        'peso_leche' => '30',
+        'peso_leche' => '99.99',
         'fecha' => '2020-10-02',
 
 
@@ -121,7 +121,7 @@ class PesajeLecheTest extends TestCase
                     $this->cantidad_pesoLeche,
                     fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
                         'id' => 'integer',
-                        'pesaje' => 'integer',
+                        'pesaje' => 'string',
                         'fecha' => 'string',
                     ])
                 )
@@ -162,7 +162,7 @@ class PesajeLecheTest extends TestCase
                     'pesaje_leche',
                     fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
                         'id' => 'integer',
-                        'pesaje' => 'integer',
+                        'pesaje' => 'string',
                         'fecha' => 'string',
                     ])
                 )

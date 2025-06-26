@@ -450,7 +450,7 @@ class GanadoTest extends TestCase
                         'mejor' => 'array|null',
                         'peor' => 'array|null',
                         'promedio' => 'string|null',
-                        'produccion_acumulada' => 'integer|null',
+                        'produccion_acumulada' => 'double|null',
                         'dias_produccion' => 'integer|null',
                     ])
                     ->where('estado', 'En producción')
