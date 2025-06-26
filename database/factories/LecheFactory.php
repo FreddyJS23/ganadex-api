@@ -17,7 +17,7 @@ class LecheFactory extends Factory
     public function definition(): array
     {
         return [
-            'peso_leche' => fake()->numberBetween(10, 40),
+            'peso_leche' => fake()->randomFloat(2,0.1,10),
             'fecha' => fake()->dateTimeThisYear()->format('y-m-d')
         ];
     }
