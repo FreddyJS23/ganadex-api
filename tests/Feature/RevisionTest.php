@@ -35,6 +35,15 @@ class RevisionTest extends TestCase
         'dosis' => 50,
     ];
 
+    private array $revision_emergencia = [
+        'tipo_revision_id' => 1,
+        'fecha' => '2020-10-02',
+        'proxima' => '2025-01-02',
+        'observacion' => 'Observación rutina',
+        'servicio_desconocido' => true,
+        'dias_feto' => 70,
+    ];
+
     private int $cantidad_revision = 10;
 
     private $user;
@@ -55,6 +64,28 @@ class RevisionTest extends TestCase
     {
         parent::setUp();
 
+        $this->user
+        = User::factory()->hasConfiguracion()->create();
+
+        $this->user->assignRole('admin');
+
+        $this->hacienda
+        = Hacienda::factory()
+        ->for($this->user)
+        ->create();
+
+        $ganadoFactory=Ganado::factory(['hacienda_id' => $this->hacienda->id, 'sexo' => 'M', 'tipo_id' => 4])
+        ->hasVacunaciones(3, ['hacienda_id' => $this->hacienda->id]);
+
+        $toro = Toro::factory()
+        ->for($this->hacienda)
+        ->state(['ganado_id'=>$ganadoFactory])
+        ->create();
+
+
+        //asignar toro a revision gestacion de emergencia
+        $this->revision_emergencia['toro_id'] = $toro->id;
+
         //tipo de revision rutina
         $this->revision=$this->revision + ['tipo_revision_id' => 4];
 
@@ -68,15 +99,7 @@ class RevisionTest extends TestCase
 
         $this->tipoRevision = TipoRevision::factory()->create(['id'=>100]);
 
-        $this->user
-            = User::factory()->hasConfiguracion()->create();
 
-        $this->user->assignRole('admin');
-
-            $this->hacienda
-            = Hacienda::factory()
-            ->for($this->user)
-            ->create();
 
         $this->veterinario
         = Personal::factory()
@@ -260,6 +283,46 @@ class RevisionTest extends TestCase
                         =>$json->whereAllType([
                             'id' => 'integer',
                         'nombre' => 'string'])
+                    )
+                    ->has(
+                        'veterinario',
+                        fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
+                        => $json->whereAllType([
+                            'id' => 'integer',
+                            'nombre' => 'string'
+                        ])
+                    )
+                )
+            );
+    }
+
+
+    public function test_creacion_revision_gestacion_con_servicio_desconocido(): void
+    {
+
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson($this->url, $this->revision_emergencia + ['personal_id' => $this->veterinario->id]);
+
+        $response->assertStatus(201)
+            ->assertJson(
+                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
+                    'revision',
+                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
+                    $json->whereAllType([
+                        'id' => 'integer',
+                        'fecha' => 'string',
+                        'diagnostico' => 'string|null',
+                        'tratamiento' => 'string|null',
+                        'revision'=>'array',
+                        'vacuna' => 'array|null',
+                        'dosis'=> 'null',
+                    ])
+                    ->where('proxima', Carbon::parse($this->revision['proxima'])->format('d-m-Y'))
+                    ->has(
+                        'revision',
+                        fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
+                        =>$json->whereAllType([
+                            'codigo' => 'string|null',
+                        'tipo' => 'string'])
                     )
                     ->has(
                         'veterinario',

@@ -11,7 +11,10 @@ use App\Http\Resources\RevisionCollection;
 use App\Http\Resources\RevisionResource;
 use App\Models\Ganado;
 use App\Models\Revision;
+use App\Models\Servicio;
+use App\Models\Toro;
 use App\Traits\GuardarVeterinarioOperacionSegunRol;
+use Carbon\Carbon;
 use DateTime;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
@@ -47,8 +50,23 @@ class RevisionController extends Controller
      */
     public function store(StoreRevisionRequest $request, Ganado $ganado)
     {
+        $diasFeto = $request->input('dias_feto');
+
+        /* si la vaca esta en gestacion y no se tuvo un control del servicio, se creara un servicio monta de emergencia */
+        if($request->servicio_desconocido){
+
+            $toro = Toro::find($request->input('toro_id'));
+            $servicio = new Servicio();
+            $servicio->tipo='monta';
+            $servicio->ganado()->associate($ganado);
+            $fechaActual = Carbon::now();
+            $servicio->fecha = $fechaActual->subDays($diasFeto)->format('Y-m-d');
+            $servicio->servicioable()->associate($toro);
+            $servicio->observacion='Servicio no registrado';
+            $servicio->save();
+        }
         $revision = new Revision();
-        $revision->fill($request->except(['personal_id','proxima']));
+        $revision->fill($request->except(['personal_id','proxima','servicio_desconocido','dias_feto','toro_id']));
         $revision->personal_id=$this->veterinarioOperacion($request);
         $revision->vacuna_id = $request->vacuna_id;
         $revision->ganado()->associate($ganado)->save();
