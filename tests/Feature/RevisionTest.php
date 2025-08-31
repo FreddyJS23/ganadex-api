@@ -2,28 +2,37 @@
 
 namespace Tests\Feature;
 
-use App\Models\Estado;
-use App\Models\Hacienda;
 use App\Models\Ganado;
 use App\Models\Personal;
 use App\Models\Revision;
 use App\Models\Servicio;
 use App\Models\TipoRevision;
 use App\Models\Toro;
-use App\Models\User;
-use App\Models\UsuarioVeterinario;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Testing\Fluent\AssertableJson;
+use Tests\Feature\Common\NeedsEstado;
+use Tests\Feature\Common\NeedsGanado;
+use Tests\Feature\Common\NeedsSetupRequest;
+use Tests\Feature\Common\NeedsToro;
+use Tests\Feature\Common\NeedsVeterinario;
 use Tests\TestCase;
 
 class RevisionTest extends TestCase
 {
-    use RefreshDatabase;
+
+    use NeedsSetupRequest,
+    NeedsEstado,
+    NeedsVeterinario,
+    NeedsGanado,
+    NeedsToro
+    {
+        NeedsEstado::setUp as needsEstadoSetUp;
+        NeedsVeterinario::setUp as needsVeterinarioSetUp;
+        NeedsToro::setUp as needsToroSetUp;
+    }
+
 
     private array $revision = [
         'tratamiento' => 'medicina',
@@ -46,65 +55,27 @@ class RevisionTest extends TestCase
 
     private int $cantidad_revision = 10;
 
-    private $user;
-    private $ganado;
-    private $estado;
-    private $estadoSano;
-    private $estadoVendido;
-    private $estadoFallecido;
-    private $estadoPendienteServicio;
-    private $estadoPendienteRevision;
-    private $veterinario;
-    private $userVeterinario;
     private string $url;
-    private $hacienda;
     private $tipoRevision;
 
     protected function setUp(): void
     {
-        parent::setUp();
 
-        $this->user
-        = User::factory()->hasConfiguracion()->create();
-
-        $this->user->assignRole('admin');
-
-        $this->hacienda
-        = Hacienda::factory()
-        ->for($this->user)
-        ->create();
-
-        $ganadoFactory=Ganado::factory(['hacienda_id' => $this->hacienda->id, 'sexo' => 'M', 'tipo_id' => 4])
-        ->hasVacunaciones(3, ['hacienda_id' => $this->hacienda->id]);
-
-        $toro = Toro::factory()
-        ->for($this->hacienda)
-        ->state(['ganado_id'=>$ganadoFactory])
-        ->create();
-
+        $this->needsHaciendaSetUp();
+        $this->needsEstadoSetUp();
+        $this->needsToroSetUp();
+        $this->needsVeterinarioSetUp();
+        $this->needsUsuarioVeterinarioSetUp();
 
         //asignar toro a revision gestacion de emergencia
-        $this->revision_emergencia['toro_id'] = $toro->id;
+        $this->revision_emergencia['toro_id'] = $this->toro->id;
 
         //tipo de revision rutina
         $this->revision=$this->revision + ['tipo_revision_id' => 4];
 
-        $this->estado = Estado::all();
-
-        $this->estadoSano = Estado::find(1);
-        $this->estadoVendido = Estado::find(2);
-        $this->estadoFallecido = Estado::find(5);
-        $this->estadoPendienteServicio = Estado::find(7);
-        $this-> estadoPendienteRevision = Estado::find(6);
 
         $this->tipoRevision = TipoRevision::factory()->create(['id'=>100]);
 
-
-
-        $this->veterinario
-        = Personal::factory()
-            ->for($this->user)->hasAttached($this->hacienda)
-            ->create(['cargo_id' => 2]);
 
             $this->ganado
             = Ganado::factory()
@@ -114,16 +85,6 @@ class RevisionTest extends TestCase
             ->for($this->hacienda)
             ->create();
 
-            $this->userVeterinario
-            = User::factory()
-            ->create(['usuario' => 'veterinario']);
-
-            $this->userVeterinario->assignRole('veterinario');
-
-            UsuarioVeterinario::factory()
-            ->for(Personal::factory()->hasAttached($this->hacienda)->for($this->user)->create(['nombre'=>'usuarioVeterinario','cargo_id' => 2]), 'veterinario')
-            ->create(['admin_id' => $this->user->id,
-            'user_id' => $this->userVeterinario->id]);
 
         $this->url = sprintf('api/ganado/%s/revision', $this->ganado->id);
     }
@@ -213,7 +174,7 @@ class RevisionTest extends TestCase
     {
         $this->generarRevision();
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson($this->url);
+        $response = $this->setUpRequest()->getJson($this->url);
 
         $response->assertStatus(200)
             ->assertJson(
@@ -243,7 +204,8 @@ class RevisionTest extends TestCase
                         fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                         =>$json->whereAllType([
                             'id' => 'integer',
-                        'nombre' => 'string'])
+                            'nombre' => 'string'
+                        ])
                     )
                 )
             );
@@ -253,7 +215,7 @@ class RevisionTest extends TestCase
     public function test_creacion_revision(): void
     {
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson($this->url, $this->revision + ['personal_id' => $this->veterinario->id]);
+        $response = $this->setUpRequest()->postJson($this->url, $this->revision + ['personal_id' => $this->veterinario->id]);
 
         $response->assertStatus(201)
             ->assertJson(
@@ -300,7 +262,7 @@ class RevisionTest extends TestCase
     public function test_creacion_revision_gestacion_con_servicio_desconocido(): void
     {
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson($this->url, $this->revision_emergencia + ['personal_id' => $this->veterinario->id]);
+        $response = $this->setUpRequest()->postJson($this->url, $this->revision_emergencia + ['personal_id' => $this->veterinario->id]);
 
         $response->assertStatus(201)
             ->assertJson(
@@ -339,7 +301,7 @@ class RevisionTest extends TestCase
     public function test_creacion_revision_usuario_veterinario(): void
     {
 
-        $response = $this->actingAs($this->userVeterinario)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson($this->url, $this->revision + ['personal_id' => $this->veterinario->id]);
+        $response = $this->setUpRequest(true)->postJson($this->url, $this->revision + ['personal_id' => $this->veterinario->id]);
 
         $response->assertStatus(201)
             ->assertJson(
@@ -408,7 +370,7 @@ class RevisionTest extends TestCase
 
 
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])
+        $response = $this->setUpRequest()
         ->postJson(route('revision.store', ['ganado' => $ganadoNoRequisito->id]), ['tipo_revision_id' => 1,'tratamiento' => 'medicina', 'fecha' => '2020-10-02','diagnostico' => 'Diagnóstico inicial','personal_id' => $this->veterinario->id]);
 
         $response->assertStatus(422)
@@ -427,7 +389,7 @@ class RevisionTest extends TestCase
         ->for($this->hacienda)
         ->create();
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])
+        $response = $this->setUpRequest()
         ->postJson(route('revision.store', ['ganado' => $ganadoNoRequisito->id]), ['tipo_revision_id' => 1,'tratamiento' => 'medicina', 'fecha' => '2020-10-02','diagnostico' => 'Diagnóstico inicial','personal_id' => $this->veterinario->id]);
 
         $response->assertStatus(422)
@@ -448,7 +410,7 @@ class RevisionTest extends TestCase
         ->for($this->hacienda)
         ->create();
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])
+        $response = $this->setUpRequest()
         ->postJson(route('revision.store', ['ganado' => $ganadoNoRequisito->id]), ['tipo_revision_id' => 3,'tratamiento' => 'medicina', 'fecha' => '2020-10-02','diagnostico' => 'Diagnóstico inicial','personal_id' => $this->veterinario->id]);
 
         $response->assertStatus(422)
@@ -488,7 +450,7 @@ class RevisionTest extends TestCase
             ->create(['personal_id' => $this->veterinario]);
 
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])
+        $response = $this->setUpRequest()
         ->postJson(route('revision.store', ['ganado' => $ganado->id]), ['tipo_revision_id' => 1,'tratamiento' => 'medicina', 'fecha' => '2020-10-02','diagnostico' => 'Diagnóstico inicial','personal_id' => $this->veterinario->id]);
 
         $response->assertStatus(422)
@@ -506,7 +468,7 @@ class RevisionTest extends TestCase
 
         $idRandom = random_int(0, $this->cantidad_revision - 1);
         $idRevision = $revisiones[$idRandom]->id;
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf($this->url . '/%s', $idRevision));
+        $response = $this->setUpRequest()->getJson(sprintf($this->url . '/%s', $idRevision));
 
         $response->assertStatus(200)
             ->assertJson(
@@ -546,7 +508,7 @@ class RevisionTest extends TestCase
         $idRandom = random_int(0, $this->cantidad_revision - 1);
         $idRevisionEditar = $revisiones[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf($this->url . '/%s', $idRevisionEditar), $this->revision);
+        $response = $this->setUpRequest()->putJson(sprintf($this->url . '/%s', $idRevisionEditar), $this->revision);
 
         $response->assertStatus(200)
             ->assertJson(
@@ -576,7 +538,7 @@ class RevisionTest extends TestCase
         $idToDelete = $revisiones[$idRandom]->id;
 
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->deleteJson(sprintf($this->url . '/%s', $idToDelete));
+        $response = $this->setUpRequest()->deleteJson(sprintf($this->url . '/%s', $idToDelete));
 
         $response->assertStatus(200)->assertJson(['revisionID' => $idToDelete]);
     }
@@ -624,7 +586,7 @@ class RevisionTest extends TestCase
             ->create();
 
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('todasRevisiones'));
+        $response = $this->setUpRequest()->getJson(route('todasRevisiones'));
         $response->assertStatus(200)
             ->assertJson(
                 //15 ya que 14 son los generados para este test, y 1 viene del setUp
@@ -667,7 +629,7 @@ class RevisionTest extends TestCase
             ]);
         ;
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson($this->url, $revision);
+        $response = $this->setUpRequest()->postJson($this->url, $revision);
 
         $response->assertStatus(422)->assertInvalid($errores);
     }
