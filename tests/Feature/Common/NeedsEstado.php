@@ -9,9 +9,20 @@ trait NeedsEstado
 {
     /** @var Collection<int, Estado> */
     private Collection $estado;
+    private Estado $estadoSano;
+    private Estado $estadoVendido;
+    private Estado $estadoFallecido;
+    private Estado $estadoPendienteServicio;
+    private Estado $estadoPendienteRevision;
 
     protected function setUp(): void
     {
         $this->estado = Estado::all();
+        $this->estadoSano = Estado::find(1);
+        $this->estadoVendido = Estado::find(2);
+        $this->estadoFallecido = Estado::find(5);
+        $this->estadoPendienteServicio = Estado::find(7);
+        $this->estadoPendienteRevision = Estado::find(6);
+
     }
 }
