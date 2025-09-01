@@ -15,6 +15,14 @@ trait NeedsSetupRequest
             NeedsUsuarioVeterinario::setUp as needsUsuarioVeterinarioSetUp;
             NeedsHacienda::getSessionInitializationArray as needsHaciendaGetSessionInitializationArray;
         }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->needsHaciendaSetUp();
+        $this->needsUsuarioVeterinarioSetUp();
+    }
+
 /**
  * Este método se utiliza para establecer la sesión de un usuario en función del parámetro $userIsVeterinario
  * @param bool $userIsVeterinario, Indica si la sesión debe ser de un usuario veterinario o no

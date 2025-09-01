@@ -6,27 +6,26 @@ use App\Models\Estado;
 use App\Models\Fallecimiento;
 use App\Models\Ganado;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\Fluent\AssertableJson;
-use Tests\Feature\Common\NeedsHacienda;
+use Tests\Feature\Common\NeedsEstado;
+use Tests\Feature\Common\NeedsSetupRequest;
 use Tests\TestCase;
 
 class DashboardFallecimientosTest extends TestCase
 {
-    use RefreshDatabase;
-
-    use NeedsHacienda {
-        setUp as needsHaciendaSetUp;
+    use NeedsSetupRequest,
+    NeedsEstado{
+        NeedsEstado::setUp as needsEstadoSetUp;
+        NeedsSetupRequest::setUp as needsSetupRequestSetUp;
     }
 
+
     private int $cantidad_fallecimientos = 50;
-    private Collection $estado;
 
     protected function setUp(): void
     {
-        $this->needsHaciendaSetUp();
-
-        $this->estado = Estado::all();
+        $this->needsSetupRequestSetUp();
+        $this->needsEstadoSetUp();
     }
 
     private function generarFallecimiento(): Collection
@@ -37,14 +36,6 @@ class DashboardFallecimientosTest extends TestCase
             ->create();
     }
 
-    private function setUpRequest(): static
-    {
-        $this
-            ->actingAs($this->user)
-            ->withSession($this->getSessionInitializationArray());
-
-        return $this;
-    }
 
     public function test_causas_de_muertes_mas_frecuentes(): void
     {

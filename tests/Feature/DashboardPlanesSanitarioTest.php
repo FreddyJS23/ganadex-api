@@ -4,15 +4,20 @@ namespace Tests\Feature;
 
 use App\Models\Plan_sanitario;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\Fluent\AssertableJson;
-use Tests\Feature\Common\NeedsHacienda;
+use Tests\Feature\Common\NeedsSetupRequest;
 use Tests\TestCase;
 
 class DashboardPlanesSanitarioTest extends TestCase
 {
-    use RefreshDatabase;
-    use NeedsHacienda;
+    use NeedsSetupRequest{
+        setUp as needsSetupRequestSetUp;
+    }
+
+    protected function setUp(): void
+    {
+        $this->needsSetupRequestSetUp();
+    }
 
     private int $cantidad_plaSanitario = 10;
 
@@ -24,14 +29,6 @@ class DashboardPlanesSanitarioTest extends TestCase
             ->create(['prox_dosis' => now()->addDays(random_int(10,100))]);
     }
 
-    private function setUpRequest(): static
-    {
-        $this
-            ->actingAs($this->user)
-            ->withSession($this->getSessionInitializationArray());
-
-        return $this;
-    }
 
     public function test_proximas_planes_sanitario(): void
     {

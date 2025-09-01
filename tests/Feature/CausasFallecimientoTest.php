@@ -4,15 +4,21 @@ namespace Tests\Feature;
 
 use App\Models\CausasFallecimiento;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\Fluent\AssertableJson;
-use Tests\Feature\Common\NeedsUser;
+use Tests\Feature\Common\NeedsSetupRequest;
 use Tests\TestCase;
 
 class CausasFallecimientoTest extends TestCase
 {
-    use RefreshDatabase;
-    use NeedsUser;
+    use NeedsSetupRequest{
+        setUp as needsSetupRequestSetUp;
+    }
+
+    protected function setUp(): void
+    {
+        $this->needsSetupRequestSetUp();
+    }
+
 
     private array $causa_fallecimiento = ['causa' => 'enferma'];
     private array $causa_fallecimiento_actualizado = ['causa' => 'envenenada'];
@@ -41,14 +47,6 @@ class CausasFallecimientoTest extends TestCase
         ];
     }
 
-    private function setUpRequest(): static
-    {
-        $this
-            ->actingAs($this->user)
-            ->withSession($this->getSessionInitializationArray());
-
-        return $this;
-    }
 
     public function test_obtener_causas_fallecimientos(): void
     {

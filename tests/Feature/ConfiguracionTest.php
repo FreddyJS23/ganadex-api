@@ -3,15 +3,20 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\Fluent\AssertableJson;
-use Tests\Feature\Common\NeedsUser;
+use Tests\Feature\Common\NeedsSetupRequest;
 use Tests\TestCase;
 
 class ConfiguracionTest extends TestCase
 {
-    use RefreshDatabase;
-    use NeedsUser;
+    use NeedsSetupRequest{
+        setUp as needsSetupRequestSetUp;
+    }
+
+    protected function setUp(): void
+    {
+        $this->needsSetupRequestSetUp();
+    }
 
     private array $configuracion = [
         'dias_diferencia_vacuna' => 10,
@@ -42,7 +47,7 @@ class ConfiguracionTest extends TestCase
     public function test_obtener_configuracion(): void
     {
         $this
-            ->actingAs($this->user)
+            ->setUpRequest()
             ->getJson('api/configuracion')
             ->assertStatus(200)
             ->assertJson(

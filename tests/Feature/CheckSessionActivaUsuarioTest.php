@@ -2,19 +2,25 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\Feature\Common\NeedsUser;
+use Tests\Feature\Common\NeedsSetupRequest;
 use Tests\TestCase;
 
 class CheckSessionActivaUsuarioTest extends TestCase
 {
-    use RefreshDatabase;
-    use NeedsUser;
+    use NeedsSetupRequest{
+        setUp as needsSetupRequestSetUp;
+    }
+
+    protected function setUp(): void
+    {
+        $this->needsSetupRequestSetUp();
+    }
+
 
     public function test_comprobar_tiene_sesion_activa(): void
     {
         $this
-            ->actingAs($this->user)
+            ->setUpRequest()
             ->getJson(route('checkSession'))
             ->assertStatus(200);
     }

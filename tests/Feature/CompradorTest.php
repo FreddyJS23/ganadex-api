@@ -4,15 +4,24 @@ namespace Tests\Feature;
 
 use App\Models\Comprador;
 use App\Models\Hacienda;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\Feature\Common\NeedsComprador;
+use Tests\Feature\Common\NeedsSetupRequest;
 use Tests\TestCase;
 
 class CompradorTest extends TestCase
 {
-    use RefreshDatabase;
-    use NeedsComprador;
+    use NeedsComprador,
+    NeedsSetupRequest{
+        NeedsSetupRequest::setUp as needsSetupRequestSetUp;
+        NeedsComprador::setUp as needsCompradorSetUp;
+
+    }
+
+    protected function setUp(): void
+    {
+        $this->needsSetupRequestSetUp();
+    }
 
     public static function ErrorInputProvider(): array
     {
@@ -36,14 +45,6 @@ class CompradorTest extends TestCase
         ];
     }
 
-    private function setUpRequest(): static
-    {
-        $this
-            ->actingAs($this->user)
-            ->withSession($this->getSessionInitializationArray());
-
-        return $this;
-    }
 
     public function test_obtener_compradores(): void
     {
