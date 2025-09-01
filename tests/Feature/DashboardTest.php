@@ -2,138 +2,40 @@
 
 namespace Tests\Feature;
 
-use App\Models\Estado;
-use App\Models\Ganado;
-use App\Models\GanadoDescarte;
-use App\Models\Insumo;
-use App\Models\Leche;
-use App\Models\Personal;
-use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Factories\Sequence;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+
 use Illuminate\Support\Collection as SupportCollection;
 use Illuminate\Testing\Fluent\AssertableJson;
-use Tests\Feature\Common\NeedsHacienda;
+use Tests\Feature\Common\NeedsEstado;
+use Tests\Feature\Common\NeedsGanado;
+use Tests\Feature\Common\NeedsGanadoDescarte;
+use Tests\Feature\Common\NeedsPersonal;
+use Tests\Feature\Common\NeedsSetupRequest;
 use Tests\TestCase;
 
 class DashboardTest extends TestCase
 {
-    use RefreshDatabase;
-
-    use NeedsHacienda {
-        setUp as needsHaciendaSetUp;
+    use NeedsSetupRequest,
+        NeedsPersonal,
+        NeedsGanado,
+        NeedsEstado,
+        NeedsGanadoDescarte {
+        NeedsSetupRequest::setUp as needsSetupRequestSetUp;
+        NeedsEstado::setUp as needsEstadoSetUp;
     }
 
     private int $cantidad_elementos = 50;
-    private Collection $estado;
-    private $estadoSano;
-    private $estadoVendido;
 
     protected function setUp(): void
     {
-        $this->needsHaciendaSetUp();
-
-        $this->estado = Estado::all();
-
-        $this->estadoSano = $this->estado->where('estado', 'sano')->first();
-        $this->estadoVendido = $this->estado->where('estado', 'vendido')->first();
+        $this->needsSetupRequestSetUp();
+        $this->needsEstadoSetUp();
     }
 
-    private function generarGanado(): Collection
-    {
-        GanadoDescarte::factory()
-            ->count(10)
-            ->for($this->hacienda)
-            ->for(Ganado::factory(['hacienda_id' => $this->hacienda->id, 'sexo' => 'M', 'tipo_id' => 4])->hasAttached($this->estadoSano))
-            ->create();
-
-        return Ganado::factory()
-            ->count($this->cantidad_elementos)
-            ->hasPeso(1)
-            ->hasEvento(1)
-            ->hasAttached($this->estado)
-            ->has(
-                Leche::factory()->for($this->hacienda)->state(
-                    fn(array $attributes, Ganado $ganado): array => [
-                        'ganado_id' => $ganado->id,
-                        'fecha' => Carbon::now()->format('Y-m-d')
-                    ]
-                ),
-                'pesajes_leche'
-            )
-            ->state(new Sequence(fn(): array => ['tipo_id' => random_int(1, 4)]))
-            ->for($this->hacienda)
-            ->create();
-    }
-
-    //generar una fecha de produccion lactea
-    private function mesesPesajeAnual(int $año): string
-    {
-        $mes = random_int(0, 11);
-        $fechaInicial = Carbon::create($año, 1, 20);
-        $fechaConMesAñadido = $fechaInicial->addMonths($mes)->format('Y-m-d');
-
-        return $mes == 0 ? $fechaInicial->format('Y-m-d') : $fechaConMesAñadido;
-    }
-
-    private function generarGanadoPesajeLecheAnual(int $año): Collection
-    {
-        return Ganado::factory()
-            ->count($this->cantidad_elementos)
-            ->hasPeso(1)
-            ->hasEvento(1)
-            ->hasAttached($this->estado)
-            /* habra veces que se repita una fecha, por ende se crea 50 elementos ganado,
-            con 12 elementos de produccion lactea que serian la cantidad de meses que existen,
-            asi siempre todos los meses estaran cubiertos por lo menos una vez */
-            ->has(
-                Leche::factory()
-                    ->for($this->hacienda)
-                    ->count(12)
-                    ->state(
-                        fn(array $attributes, Ganado $ganado): array => [
-                            'ganado_id' => $ganado->id
-                        ]
-                    )
-                    ->sequence(fn(): array => [
-                        'fecha' => $this->mesesPesajeAnual($año)
-                    ]),
-                'pesajes_leche'
-            )
-            ->for($this->hacienda)
-            ->create();
-    }
-
-    private function generarPersonal(): Collection
-    {
-        return Personal::factory()
-            ->count($this->cantidad_elementos)
-            ->hasAttached($this->hacienda)
-            ->for($this->user)
-            ->create();
-    }
-
-    private function generarInsumos(): Collection
-    {
-        return Insumo::factory()
-            ->count($this->cantidad_elementos)
-            ->for($this->hacienda)
-            ->create();
-    }
-
-    private function setUpRequest(): static
-    {
-        $this
-            ->actingAs($this->user)
-            ->withSession($this->getSessionInitializationArray());
-
-        return $this;
-    }
 
     public function test_total_ganado_por_tipo(): void
     {
-        $this->generarGanado();
+        $this->generarGanadoConPesajesLeche();
+        $this->generarGanadoDescartes();
 
         $this
             ->setUpRequest()
@@ -163,18 +65,19 @@ class DashboardTest extends TestCase
 
     public function test_total_personal(): void
     {
-        $this->generarPersonal();
+        $this->generarPersonal($this->cantidad_elementos);
 
         $this
             ->setUpRequest()
             ->getJson(route('dashboardPrincipal.totalPersonal'))
             ->assertStatus(200)
-            ->assertJson(['total_personal' => $this->cantidad_elementos]);
+            //+1 porque un veterinario se esta creando en el setUp de NeedsVeterinario
+            ->assertJson(['total_personal' => $this->cantidad_elementos + 1 ]);
     }
 
     public function test_total_vacas_en_gestacion(): void
     {
-        $this->generarGanado();
+        $this->generarGanados();
 
         $this
             ->setUpRequest()
@@ -188,7 +91,7 @@ class DashboardTest extends TestCase
 
     public function test_ranking_top_3_vacas_mas_productoras(): void
     {
-        $this->generarGanado();
+        $this->generarGanadoConPesajesLeche();
 
         $this
             ->setUpRequest()
@@ -219,7 +122,7 @@ class DashboardTest extends TestCase
 
     public function test_ranking_top_3_vacas_menos_productoras(): void
     {
-        $this->generarGanado();
+        $this->generarGanadoConPesajesLeche();
 
         $this->setUpRequest()
             ->getJson(route('dashboardPrincipal.topVacasMenosProductoras'))
@@ -249,7 +152,7 @@ class DashboardTest extends TestCase
 
     public function test_total_vacas_en_ordeño(): void
     {
-        $this->generarGanado();
+        $this->generarGanados();
 
         $this
             ->setUpRequest()
@@ -261,7 +164,7 @@ class DashboardTest extends TestCase
 
     public function test_total_vacas_pendientes_de_revision(): void
     {
-        $this->generarGanado();
+        $this->generarGanados();
 
         $this
             ->setUpRequest()
@@ -273,7 +176,7 @@ class DashboardTest extends TestCase
 
     public function test_total_novillas_pendientes_de_servicio_o_monta(): void
     {
-        $this->generarGanado();
+        $this->generarGanados();
 
         $this
             ->setUpRequest()

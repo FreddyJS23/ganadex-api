@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\Feature\Common\NeedsEstado;
 use Tests\Feature\Common\NeedsGanado;
+use Tests\Feature\Common\NeedsPersonal;
 use Tests\Feature\Common\NeedsSetupRequest;
 use Tests\Feature\Common\NeedsToro;
 use Tests\Feature\Common\NeedsVeterinario;
@@ -24,12 +25,12 @@ class RevisionTest extends TestCase
 
     use NeedsSetupRequest,
     NeedsEstado,
-    NeedsVeterinario,
+    NeedsPersonal,
     NeedsGanado,
     NeedsToro
     {
         NeedsEstado::setUp as needsEstadoSetUp;
-        NeedsVeterinario::setUp as needsVeterinarioSetUp;
+        NeedsPersonal::setUp as needsVeterinarioSetUp;
         NeedsToro::setUp as needsToroSetUp;
     }
 
