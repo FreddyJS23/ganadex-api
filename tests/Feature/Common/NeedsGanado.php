@@ -21,29 +21,74 @@ trait NeedsGanado
     private function setUp(): void
     {
         $this->ganado
-        = Ganado::factory()
-        ->hasPeso(1)
-        ->hasEvento(1)
-        ->hasAttached($this->estado)
-        ->for($this->hacienda)
-        ->create();
+            = Ganado::factory()
+            ->hasPeso(1)
+            ->hasEvento([
+                'prox_revision' => null,
+                'prox_parto' => null,
+                'prox_secado' => null
+            ])
+            ->hasAttached($this->estadoSano)
+            ->for($this->hacienda)
+            ->create();
     }
 
 
     /**
      * Este método genera una colección de objetos Ganado con un tamaño de $this->cantidad_ganado
+     *  @param int $cantidad
+     *  @param Estado | null $estado Por defecto asigna todos los estados
+     *  @param bool $eventosNull Crear eventos con fechas nulas
+     *  @param int | null $tipoId Tipo de ganado
+     *  @param bool | null $hembras Crear ganados hembras
+     *  @param bool | null $machos Crear ganados machos
      * @return Collection<Ganado>
      */
-    private function generarGanados(int $cantidad= 0): Collection
-    {
-        return Ganado::factory()
+    private function generarGanados(
+        int $cantidad = 0,
+        Estado | null $estado = null,
+        $eventosNull = false,
+        bool  $eventosLejanos = false,
+        int | null $tipoId = null,
+        bool | null $hembras = null,
+        bool | null $machos = null
+    ): Collection {
+
+        $ganados = Ganado::factory()
             ->count($cantidad ?? $this->cantidad_ganado)
             ->hasPeso(1)
-            ->hasEvento(1)
-            ->hasAttached($this->estado)
-            ->hasVacunaciones(3, ['hacienda_id' => $this->hacienda->id])
-            ->for($this->hacienda)
-            ->create();
+            ->hasAttached($estado ?? $this->estado)
+            ->hasVacunaciones(3, ['hacienda_id' => $this->hacienda->id]);
+
+        if ($eventosNull) {
+            $ganados=$ganados->hasEvento([
+                'prox_revision' => null,
+                'prox_parto' => null,
+                'prox_secado' => null
+            ]);
+        }elseif ($eventosLejanos) {
+            $ganados=$ganados->hasEvento([
+                'prox_revision' => now()->addDays(30)->format('Y-m-d'),
+                'prox_parto' => now()->addDays(30)->format('Y-m-d'),
+                'prox_secado' => now()->addDays(30)->format('Y-m-d'),
+            ]);
+        }
+        else $ganados=$ganados->hasEvento();;
+
+
+        if ($tipoId) {
+            $ganados->state(new Sequence(fn(): array => ['tipo_id' => $tipoId]));
+        }
+
+        if ($hembras) {
+            $ganados->state(new Sequence(fn(): array => ['sexo' => 'H']));
+        }
+
+        if ($machos) {
+            $ganados->state(new Sequence(fn(): array => ['sexo' => 'H']));
+        }
+
+        return $ganados->for($this->hacienda)->create();
     }
 
     /**
