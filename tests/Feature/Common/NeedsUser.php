@@ -20,7 +20,7 @@ trait NeedsUser
     {
         return [
             'peso_servicio' => $this->user->configuracion->peso_servicio,
-            'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,
+            'dias_evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,
             'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna
         ];
     }
