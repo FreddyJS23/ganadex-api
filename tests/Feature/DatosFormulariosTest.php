@@ -2,41 +2,34 @@
 
 namespace Tests\Feature;
 
-use App\Models\Cargo;
-use App\Models\Comprador;
-use App\Models\Ganado;
 use App\Models\Hacienda;
-use App\Models\Leche;
 use App\Models\Personal;
 use App\Models\UsuarioVeterinario;
-use App\Models\Vacuna;
-use App\Models\Venta;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Collection as SupportCollection;
 use Illuminate\Testing\Fluent\AssertableJson;
+use Tests\Feature\Common\cargosPersonal;
 use Tests\Feature\Common\NeedsEstado;
-use Tests\Feature\Common\NeedsHacienda;
+use Tests\Feature\Common\NeedsGanado;
+use Tests\Feature\Common\NeedsLeche;
+use Tests\Feature\Common\NeedsPersonal;
+use Tests\Feature\Common\NeedsSetupRequest;
+use Tests\Feature\Common\NeedsVacuna;
+use Tests\Feature\Common\NeedsVentaGanado;
 use Tests\TestCase;
 
-enum cargosPersonal: int{
-    case obrero = 1;
-    case veterinario = 2;
-}
 
 class DatosFormulariosTest extends TestCase
 {
-    use RefreshDatabase;
-
-    use NeedsHacienda {
-        NeedsHacienda::setUp as needsHaciendaSetUp;
-    }
-
-    use NeedsEstado {
-        NeedsEstado::setUp as needsEstadoSetUp;
-    }
-
-    private int $cantidad_ganado = 50;
+    use NeedsSetupRequest,
+        NeedsEstado,
+        NeedsGanado,
+        NeedsVentaGanado,
+        NeedsLeche,
+        NeedsVacuna,
+        NeedsPersonal{
+            NeedsSetupRequest::setUp as needsSetupRequestSetUp;
+            NeedsEstado::setUp as needsEstadoSetUp;
+        }
 
     protected function setUp(): void
     {
@@ -44,38 +37,10 @@ class DatosFormulariosTest extends TestCase
         $this->needsEstadoSetUp();
     }
 
-    private function generarGanado(): Collection
-    {
-        return Ganado::factory()
-            ->count($this->cantidad_ganado)
-            ->hasPeso(1)
-            ->hasEvento(1)
-            ->hasAttached($this->estado)
-            ->for($this->hacienda)
-            ->create();
-    }
-
-    private function generarPersonal(CargosPersonal $cargoPersonal): Collection
-    {
-        return Personal::factory()
-            ->count(10)
-            ->for($this->user)
-            ->hasAttached($this->hacienda)
-            ->create(['cargo_id' => $cargoPersonal->value]);
-    }
-
-    private function setUpRequest(): static
-    {
-        $this
-            ->actingAs($this->user)
-            ->withSession($this->getSessionInitializationArray());
-
-        return $this;
-    }
 
     public function test_obtener_novillas_que_se_pueden_servir(): void
     {
-        $this->generarGanado();
+        $this->generarGanados(50);
 
         $this
             ->setUpRequest()
@@ -101,18 +66,7 @@ class DatosFormulariosTest extends TestCase
 
     public function test_obtener_años_de_ventas_de_ganados(): void
     {
-        Venta::factory()
-            ->count(10)
-            ->for($this->hacienda)
-            ->for(
-                Ganado::factory()
-                    ->for($this->hacienda)
-                    ->hasPeso(1)
-                    ->hasAttached($this->estado)
-                    ->create()
-            )
-            ->for(Comprador::factory()->for($this->hacienda)->create())
-            ->create();
+        $this->generarVentas();
 
         $this
             ->setUpRequest()
@@ -132,17 +86,7 @@ class DatosFormulariosTest extends TestCase
 
     public function test_obtener_años_de_produccion_de_leches(): void
     {
-        Leche::factory()
-            ->count(10)
-            ->for(
-                Ganado::factory()
-                    ->for($this->hacienda)
-                    ->hasPeso(1)
-                    ->hasAttached($this->estado)
-                    ->create()
-            )
-            ->for($this->hacienda)
-            ->create();
+    $this->generarLeche();
 
         $this
             ->setUpRequest()
@@ -162,9 +106,7 @@ class DatosFormulariosTest extends TestCase
 
     public function test_obtener_vacunas_disponibles(): void
     {
-        Vacuna::factory()
-            ->count(10)
-            ->create();
+        $this->generarVacunas();
 
         $this
             ->setUpRequest()
@@ -198,7 +140,7 @@ class DatosFormulariosTest extends TestCase
 
     public function test_obtener_numero_disponible_en_DB(): void
     {
-        $this->generarGanado();
+        $this->generarGanados(50);
 
         $this
             ->setUpRequest()
@@ -244,7 +186,7 @@ class DatosFormulariosTest extends TestCase
 
     public function test_obtener_veterinarios_select(): void
     {
-        $this->generarPersonal(CargosPersonal::veterinario);
+        $this->generarPersonal(10,cargosPersonal::veterinario);
 
         $otraHacienda = Hacienda::factory()
         ->for($this->user)
@@ -276,7 +218,7 @@ class DatosFormulariosTest extends TestCase
 
     public function test_obtener_veterinarios_hacienda_actual_select(): void
     {
-        $this->generarPersonal(CargosPersonal::veterinario);
+        $this->generarPersonal(10,CargosPersonal::veterinario);
 
         $otraHacienda = Hacienda::factory()
         ->for($this->user)
@@ -306,7 +248,7 @@ class DatosFormulariosTest extends TestCase
 
     public function test_obtener_obreros_select(): void
     {
-        $this->generarPersonal(CargosPersonal::obrero);
+        $this->generarPersonal(10,CargosPersonal::obrero);
 
         $this
             ->setUpRequest()

@@ -5,6 +5,11 @@ namespace Tests\Feature\Common;
 use App\Models\Personal;
 use Illuminate\Database\Eloquent\Collection;
 
+enum cargosPersonal: int{
+    case obrero = 1;
+    case veterinario = 2;
+}
+
 trait NeedsPersonal
 {
     private Personal $veterinario;
@@ -19,12 +24,12 @@ trait NeedsPersonal
             ->create(['cargo_id' => 2]);
     }
 
-    private function generarPersonal(int $cantidad_elementos= 0): Collection
+    private function generarPersonal(int $cantidad_elementos= 0,CargosPersonal $cargoPersonal=CargosPersonal::obrero): Collection
     {
         return Personal::factory()
             ->count($cantidad_elementos ?? $this->cantidad_personal)
             ->hasAttached($this->hacienda)
             ->for($this->user)
-            ->create();
+            ->create(['cargo_id' => $cargoPersonal->value]);
     }
 }

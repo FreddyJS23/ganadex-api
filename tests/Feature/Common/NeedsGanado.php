@@ -22,10 +22,10 @@ trait NeedsGanado
      * Este método genera una colección de objetos Ganado con un tamaño de $this->cantidad_ganado
      * @return Collection<Ganado>
      */
-    private function generarGanados(): Collection
+    private function generarGanados(int $cantidad= 0): Collection
     {
         return Ganado::factory()
-            ->count($this->cantidad_ganado)
+            ->count($cantidad ?? $this->cantidad_ganado)
             ->hasPeso(1)
             ->hasEvento(1)
             ->hasAttached($this->estado)

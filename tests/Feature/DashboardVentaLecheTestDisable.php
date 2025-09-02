@@ -8,29 +8,29 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\Feature\Common\NeedsHacienda;
+use Tests\Feature\Common\NeedsSetupRequest;
+use Tests\Feature\Common\NeedsVentaLeche;
 use Tests\TestCase;
 
 class DashboardVentaLecheTest extends TestCase
 {
-    use RefreshDatabase;
-    use NeedsHacienda;
-
-    private int $cantidad_ventaLeche = 100;
-
-    private function generarVentaLeche(): Collection
-    {
-        return VentaLeche::factory()
-            ->count($this->cantidad_ventaLeche)
-            ->for(Precio::factory()->for($this->hacienda))
-            ->for($this->hacienda)
-            ->create();
+    use NeedsSetupRequest,
+        NeedsVentaLeche{
+        setUp as needsSetupRequestSetUp;
     }
+
+    protected function setUp(): void
+    {
+        $this->needsSetupRequestSetUp();
+    }
+
 
     public function test_obtener_precio_actual(): void
     {
         $this->generarVentaLeche();
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id, 'peso_servicio' => $this->user->configuracion->peso_servicio, 'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion, 'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('dashboardVentaLeche.precioActual'));
+        $response = $this->setUpRequest()
+        ->getJson(route('dashboardVentaLeche.precioActual'));
 
         $response->assertStatus(200)->assertJson(fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType(['precio_actual' => 'double']));
     }
@@ -39,7 +39,8 @@ class DashboardVentaLecheTest extends TestCase
     {
         $this->generarVentaLeche();
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id, 'peso_servicio' => $this->user->configuracion->peso_servicio, 'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion, 'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('dashboardVentaLeche.variacionPrecio'));
+        $response = $this->setUpRequest()
+        ->getJson(route('dashboardVentaLeche.variacionPrecio'));
 
         $response->assertStatus(200)->assertJson(fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType(['variacion' => 'integer']));
     }
@@ -50,7 +51,8 @@ class DashboardVentaLecheTest extends TestCase
 
         $this->generarVentaLeche();
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id, 'peso_servicio' => $this->user->configuracion->peso_servicio, 'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion, 'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('dashboardVentaLeche.variacionPrecio'));
+        $response = $this->setUpRequest()
+            ->getJson(route('dashboardVentaLeche.variacionPrecio'));
 
         $response->assertStatus(200)
             ->assertJson(
@@ -63,7 +65,8 @@ class DashboardVentaLecheTest extends TestCase
     {
         $this->generarVentaLeche();
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id, 'peso_servicio' => $this->user->configuracion->peso_servicio, 'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion, 'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('dashboardVentaLeche.gananciasDelMes'));
+        $response = $this->setUpRequest()
+            ->getJson(route('dashboardVentaLeche.gananciasDelMes'));
 
         $response->assertStatus(200)
             ->assertJson(
@@ -81,7 +84,8 @@ class DashboardVentaLecheTest extends TestCase
 
         $this->generarVentaLeche();
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id, 'peso_servicio' => $this->user->configuracion->peso_servicio, 'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion, 'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('dashboardVentaLeche.ventasDelMes'));
+        $response = $this->setUpRequest()
+        ->getJson(route('dashboardVentaLeche.ventasDelMes'));
 
         $response->assertStatus(200)->assertJson(
             fn(AssertableJSon $json): \Illuminate\Testing\Fluent\AssertableJson =>
@@ -99,7 +103,8 @@ class DashboardVentaLecheTest extends TestCase
     {
         $this->generarVentaLeche();
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id, 'peso_servicio' => $this->user->configuracion->peso_servicio, 'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion, 'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('dashboardVentaLeche.balanceMensual'));
+        $response = $this->setUpRequest()
+        ->getJson(route('dashboardVentaLeche.balanceMensual'));
 
         $response->assertStatus(200)->assertJson(
             fn(AssertableJSon $json): \Illuminate\Testing\Fluent\AssertableJson =>
@@ -114,7 +119,8 @@ class DashboardVentaLecheTest extends TestCase
             ->for($this->user)
             ->create(['fecha' => now()->addMonth()->format('Y-m-d')]);
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id, 'peso_servicio' => $this->user->configuracion->peso_servicio, 'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion, 'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('dashboardVentaLeche.balanceMensual', ['month' => now()->addMonth()->format('m')]));
+        $response = $this->setUpRequest()
+        ->getJson(route('dashboardVentaLeche.balanceMensual', ['month' => now()->addMonth()->format('m')]));
 
         $response->assertStatus(200)->assertJson(
             fn(AssertableJSon $json): \Illuminate\Testing\Fluent\AssertableJson =>

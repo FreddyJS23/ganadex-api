@@ -10,58 +10,28 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\Feature\Common\NeedsEstado;
 use Tests\Feature\Common\NeedsHacienda;
+use Tests\Feature\Common\NeedsSetupRequest;
+use Tests\Feature\Common\NeedsVentaGanado;
 use Tests\TestCase;
 
 class DashboardVentaGanadoTest extends TestCase
 {
-    use RefreshDatabase;
-
-    use NeedsHacienda {
-        NeedsHacienda::setUp as needsHaciendaSetUp;
-    }
-
-    use NeedsEstado {
+    use NeedsSetupRequest,
+        NeedsEstado,
+        NeedsVentaGanado {
+        NeedsSetupRequest::setUp as needsSetupRequestSetUp;
         NeedsEstado::setUp as needsEstadoSetUp;
     }
+
 
     private int $cantidad_ventas = 10;
 
     protected function setUp(): void
     {
-        $this->needsHaciendaSetUp();
+        $this->needsSetupRequestSetUp();
         $this->needsEstadoSetUp();
     }
 
-    private function generarVentas(): Collection
-    {
-        $compradores = Comprador::factory()
-            ->for($this->hacienda)
-            ->count(5)
-            ->create();
-
-        return Venta::factory()
-            ->count($this->cantidad_ventas)
-            ->for($this->hacienda)
-            ->for(Ganado::factory()
-                ->for($this->hacienda)
-                ->hasPeso(1)
-                ->hasAttached($this->estado)->create())
-            ->sequence(
-                ['comprador_id' => $compradores->random()->id],
-                ['comprador_id' => $compradores->random()->id],
-                ['comprador_id' => $compradores->random()->id],
-            )
-            ->create();
-    }
-
-    private function setUpRequest(): static
-    {
-        $this
-            ->actingAs($this->user)
-            ->withSession($this->getSessionInitializationArray());
-
-        return $this;
-    }
 
     public function test_obtener_mejor_comprador(): void
     {
