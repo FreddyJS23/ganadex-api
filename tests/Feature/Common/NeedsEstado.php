@@ -15,6 +15,8 @@ trait NeedsEstado
     private Estado $estadoPendienteServicio;
     private Estado $estadoPendienteRevision;
     private Estado $estadoPendientePesajeLeche;
+    private Estado $estadoPendienteCapar;
+    private Estado $estadoPendienteNumeracion;
 
     protected function setUp(): void
     {
@@ -24,6 +26,8 @@ trait NeedsEstado
         $this->estadoFallecido = Estado::find(5);
         $this->estadoPendienteServicio = Estado::find(7);
         $this->estadoPendienteRevision = Estado::find(6);
+        $this->estadoPendienteNumeracion = Estado::find(9);
+        $this->estadoPendienteCapar = Estado::find(10);
         $this->estadoPendientePesajeLeche = Estado::find(11);
 
     }

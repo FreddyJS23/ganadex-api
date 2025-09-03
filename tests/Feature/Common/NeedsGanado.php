@@ -18,7 +18,7 @@ trait NeedsGanado
 
     private Ganado  $ganado;
 
-    private function setUp(): void
+    protected function setUp(): void
     {
         $this->ganado
             = Ganado::factory()
@@ -45,7 +45,7 @@ trait NeedsGanado
      * @return Collection<Ganado>
      */
     private function generarGanados(
-        int $cantidad = 0,
+        int | null $cantidad = null,
         Estado | null $estado = null,
         $eventosNull = false,
         bool  $eventosLejanos = false,
@@ -54,11 +54,13 @@ trait NeedsGanado
         bool | null $machos = null
     ): Collection {
 
+
         $ganados = Ganado::factory()
             ->count($cantidad ?? $this->cantidad_ganado)
             ->hasPeso(1)
             ->hasAttached($estado ?? $this->estado)
             ->hasVacunaciones(3, ['hacienda_id' => $this->hacienda->id]);
+
 
         if ($eventosNull) {
             $ganados=$ganados->hasEvento([

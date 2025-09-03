@@ -7,41 +7,33 @@ use App\Models\Ganado;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Collection;
 use Illuminate\Testing\Fluent\AssertableJson;
+use Tests\Feature\Common\NeedsEstado;
 use Tests\Feature\Common\NeedsHacienda;
 use Tests\Feature\Common\NeedsGanado;
+use Tests\Feature\Common\NeedsSetupRequest;
 use Tests\TestCase;
 
 class CaparCriaTest extends TestCase
 {
-    use RefreshDatabase;
-    use NeedsGanado;
-    use NeedsHacienda;
+    use NeedsSetupRequest,
+        NeedsGanado,
+        NeedsEstado
+        {
+            NeedsSetupRequest::setUp as needsSetupRequestSetUp;
+            NeedsGanado::setUp as needsGanadoSetUp;
+            NeedsEstado::setUp as needsEstadoSetUp;
+        }
 
-    private function generarGanado(): Collection
+        protected function setUp(): void
     {
-        $this->estado = Estado::where('estado', 'pendiente_capar')->get();
-
-        return Ganado::factory()
-            ->count($this->cantidad_ganado)
-            ->hasPeso(1)
-            ->hasEvento(1)
-            ->hasAttached($this->estado)
-            ->for($this->hacienda)
-            ->create();
-    }
-
-    private function setUpRequest(): static
-    {
-        $this
-            ->actingAs($this->user)
-            ->withSession($this->getSessionInitializationArray());
-
-        return $this;
+        $this->needsSetupRequestSetUp();
+        $this->needsEstadoSetUp();
+        $this->needsGanadoSetUp();
     }
 
     public function test_obtener_crias_pendientes_capar(): void
     {
-        $this->generarGanado();
+        $this->generarGanados(estado: $this->estadoPendienteCapar);
 
         $this
             ->setUpRequest()
@@ -55,7 +47,7 @@ class CaparCriaTest extends TestCase
 
     public function test_capar_cria(): void
     {
-        $criasGanado = $this->generarGanado();
+        $criasGanado = $this->generarGanados(estado: $this->estadoPendienteCapar);
         $idRandom = random_int(0, $this->cantidad_ganado - 1);
         $idCria = $criasGanado[$idRandom]->id;
 
