@@ -2,32 +2,17 @@
 
 namespace Tests\Feature;
 
-use App\Events\FallecimientoGanado;
 use App\Models\CausasFallecimiento;
 use App\Models\Comprador;
 use App\Models\Estado;
-use App\Models\Fallecimiento;
-use App\Models\Hacienda;
 use App\Models\Ganado;
 use App\Models\Leche;
 use App\Models\Parto;
-use App\Models\PartoCria;
-use App\Models\Personal;
 use App\Models\RespuestasSeguridad;
-use App\Models\TiposNotifiacion;
 use App\Models\Toro;
-use App\Models\User;
-use Illuminate\Auth\Events\Login;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
-use Illuminate\Support\Str;
-use Spatie\Activitylog\Models\Activity;
 use Tests\Feature\Common\NeedsEstado;
 use Tests\Feature\Common\NeedsGanado;
 use Tests\Feature\Common\NeedsPersonal;
