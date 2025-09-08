@@ -18,21 +18,6 @@ trait NeedsGanado
 
     private Ganado  $ganado;
 
-    protected function setUp(): void
-    {
-        $this->ganado
-            = Ganado::factory()
-            ->hasPeso(1)
-            ->hasEvento([
-                'prox_revision' => null,
-                'prox_parto' => null,
-                'prox_secado' => null
-            ])
-            ->hasAttached($this->estadoSano)
-            ->for($this->hacienda)
-            ->create();
-    }
-
 
     /**
      * Este método genera una colección de objetos Ganado con un tamaño de $this->cantidad_ganado
@@ -91,6 +76,30 @@ trait NeedsGanado
         }
 
         return $ganados->for($this->hacienda)->create();
+    }
+
+/**
+     * Este método genera un objeto Ganado.
+     * @param Estado $estado
+     * @return Ganado
+     */
+    private function generarGanado(Estado | null $estado = null): Ganado
+    {
+        return $this->ganado
+        = Ganado::factory()
+        ->hasPeso(1)
+        ->hasEvento([
+            'prox_revision' => null,
+            'prox_parto' => null,
+            'prox_secado' => null
+        ])
+        ->hasAttached($estado ??$this->estadoSano)
+        ->for($this->hacienda)
+        ->create([
+            'nombre' => 'test',
+            'numero' => 392,
+            'origen_id' => 1,
+            'sexo' => 'H',]);
     }
 
     /**

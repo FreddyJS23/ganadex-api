@@ -2,17 +2,18 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
 use App\Models\Vacuna;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
+use Tests\Feature\Common\NeedsSetupRequest;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
 
 class VacunasTest extends TestCase
 {
-    use RefreshDatabase;
+    use NeedsSetupRequest {
+    NeedsSetupRequest::setUp as needsSetupRequestSetUp;
+
+}
 
     private array $vacuna = [
         'nombre' => 'vacuna',
@@ -39,14 +40,10 @@ class VacunasTest extends TestCase
 
     private int $cantidad_vacunas = 10;
 
-    private $user;
 
     protected function setUp(): void
     {
-        parent::setUp();
-
-        $this->user
-            = User::factory()->hasConfiguracion()->create();
+        $this->needsSetupRequestSetUp();
     }
 
     private function generarVacunas(): Collection

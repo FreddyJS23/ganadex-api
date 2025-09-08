@@ -3,6 +3,7 @@
 namespace Tests\Feature\Common;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 trait NeedsUser
 {
@@ -12,7 +13,7 @@ trait NeedsUser
     {
         parent::setUp();
 
-        $this->user  = User::factory()->hasConfiguracion()->create();
+        $this->user  = User::factory()->hasConfiguracion()->create(['usuario' => 'admin', 'password' => Hash::make('admin')]);
         $this->user->assignRole('admin');
     }
 

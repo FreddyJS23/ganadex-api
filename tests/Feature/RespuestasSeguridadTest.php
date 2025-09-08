@@ -2,22 +2,20 @@
 
 namespace Tests\Feature;
 
-use App\Models\Hacienda;
 use App\Models\RespuestasSeguridad;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
+use Tests\Feature\Common\NeedsSetupRequest;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
 
 class RespuestasSeguridadTest extends TestCase
 {
-    use RefreshDatabase;
+    use NeedsSetupRequest {
+        NeedsSetupRequest::setUp as needsSetupRequestSetUp;
+    }
 
-    private $user;
-    private $hacienda;
     private $cantidad_repuestasSeguridad = 10;
+
     private array $respuestasSeguridad = [
         'pregunta_seguridad_id' => 1,
         'respuesta' => 'mascota',
@@ -30,17 +28,7 @@ class RespuestasSeguridadTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
-        $this->user
-            = User::factory()->hasConfiguracion()->create();
-
-        $this->hacienda
-            = Hacienda::factory()
-            ->for($this->user)
-            ->create();
-
-        $this->user->assignRole('admin');
+        $this->needsSetupRequestSetUp();
     }
 
 
@@ -49,14 +37,8 @@ class RespuestasSeguridadTest extends TestCase
         return RespuestasSeguridad::factory()
             ->count($count)
             ->for($this->user)
-            ->create(['updated_at'=>now()->subDays(10)]);
+            ->create(['updated_at' => now()->subDays(10)]);
     }
-
-    private function cambiarRol(User $user): void
-    {
-        $user->syncRoles('veterinario');
-    }
-
 
     public static function ErrorInputProvider(): array
     {
@@ -117,7 +99,7 @@ class RespuestasSeguridadTest extends TestCase
     }
 
 
-     public function test_creacion_preguntas_seguridad_del_usuario_administrador(): void
+    public function test_creacion_preguntas_seguridad_del_usuario_administrador(): void
     {
 
         $response = $this->actingAs($this->user)->postJson(route('respuestas_seguridad.store'), $this->respuestasSeguridad);
@@ -129,11 +111,11 @@ class RespuestasSeguridadTest extends TestCase
             );
     }
 
-     public function test_creacion_preguntas_seguridad_y_el_usuario_todavia_no_tiene_preguntas_seguridad_minimas(): void
+    public function test_creacion_preguntas_seguridad_y_el_usuario_todavia_no_tiene_preguntas_seguridad_minimas(): void
     {
         /* se hace manualmente y no con el generador para simular el comportamiento real */
         /* el minimo de preguntas de seguridad es 3 */
-         $this->actingAs($this->user)->postJson(route('respuestas_seguridad.store'), $this->respuestasSeguridad);
+        $this->actingAs($this->user)->postJson(route('respuestas_seguridad.store'), $this->respuestasSeguridad);
         $this->actingAs($this->user)->postJson(route('respuestas_seguridad.store'), $this->respuestasSeguridad);
 
         $response = $this->actingAs($this->user)->getJson(route('usuario.show', ['user' => $this->user->id]));
@@ -180,10 +162,10 @@ class RespuestasSeguridadTest extends TestCase
         $response->assertStatus(200)
             ->assertJson(
                 fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
-                    ->has('respuesta_seguridad',fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
-                    $json->where('pregunta_seguridad_id',$this->nuevaRespuestaSeguridad['pregunta_seguridad_id'])
-                    ->where('updated_at',now()->format('d-m-Y'))
-                    ->etc())
+                    ->has('respuesta_seguridad', fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
+                    $json->where('pregunta_seguridad_id', $this->nuevaRespuestaSeguridad['pregunta_seguridad_id'])
+                        ->where('updated_at', now()->format('d-m-Y'))
+                        ->etc())
             );
     }
 
@@ -238,10 +220,10 @@ class RespuestasSeguridadTest extends TestCase
         $response->assertStatus(200)
             ->assertJson(
                 fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
-                    ->has('respuesta_seguridad',fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
-                    $json->where('pregunta_seguridad_id',$this->nuevaRespuestaSeguridad['pregunta_seguridad_id'])
-                    ->where('updated_at',now()->format('d-m-Y'))
-                    ->etc())
+                    ->has('respuesta_seguridad', fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
+                    $json->where('pregunta_seguridad_id', $this->nuevaRespuestaSeguridad['pregunta_seguridad_id'])
+                        ->where('updated_at', now()->format('d-m-Y'))
+                        ->etc())
             );
     }
 
@@ -258,7 +240,7 @@ class RespuestasSeguridadTest extends TestCase
     }
 
 
-     public function test_eliminar_respuesta_seguridad(): void
+    public function test_eliminar_respuesta_seguridad(): void
     {
         $repuestasSeguridad = $this->generarRespuestasSeguridad();
         $idRandom = random_int(0, $repuestasSeguridad->count() - 1);

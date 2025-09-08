@@ -7,41 +7,29 @@ use App\Models\Personal;
 use App\Models\User;
 use App\Models\UsuarioVeterinario;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
+use Tests\Feature\Common\NeedsSetupRequest;
 use Illuminate\Testing\Fluent\AssertableJson;
+use Tests\Feature\Common\NeedsUsuarioVeterinario;
 use Tests\TestCase;
 
 class UsuarioVeterinarioTest extends TestCase
 {
-    use RefreshDatabase;
+    use NeedsSetupRequest,
+    NeedsUsuarioVeterinario {
+    NeedsSetupRequest::setUp as needsSetupRequestSetUp;
+    NeedsSetupRequest::needsUsuarioVeterinarioSetUp as needsUsuarioVeterinarioSetUp;
+}
 
-    private array $usuarioVeterinario;
-    private $user;
-    private $hacienda;
     private $personal;
-
 
     protected function setUp(): void
     {
-        parent::setUp();
-
-        $this->user
-            = User::factory()->hasConfiguracion()->create();
-
-        $this->user->assignRole('admin');
-
-        $this->hacienda
-            = Hacienda::factory()
-            ->for($this->user)
-            ->create();
+        $this->needsSetupRequestSetUp();
 
         $this->personal
-            = Personal::factory()
-            ->for($this->user)->hasAttached($this->hacienda)
-            ->create(['cargo_id' => 2])->id;
-
-        $this->usuarioVeterinario = ['personal_id' => $this->personal];
+        = Personal::factory()
+        ->for($this->user)->hasAttached($this->hacienda)
+        ->create(['cargo_id' => 2])->id;
     }
 
     public static function ErrorInputProvider(): array
@@ -75,12 +63,13 @@ class UsuarioVeterinarioTest extends TestCase
     {
         $this->usuariosVeterinarios();
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('usuarios_veterinarios.index'));
+        $response = $this->setUpRequest()->getJson(route('usuarios_veterinarios.index'));
         $response->assertStatus(200)
             ->assertJson(
                 fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'usuarios_veterinarios',
-                    10,
+                    //+1 porque se crea el usuario veterinario en setUp
+                    10 + 1,
                     fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
                         'id' => 'integer',
                         'usuario' => 'string',
@@ -95,7 +84,7 @@ class UsuarioVeterinarioTest extends TestCase
 
     public function test_creacion_usuario_veterinario(): void
     {
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(route('usuarios_veterinarios.store'), ['personal_id' => $this->personal]);
+        $response = $this->setUpRequest()->postJson(route('usuarios_veterinarios.store'), ['personal_id' => $this->personal]);
 
         $response->assertStatus(201)->assertJson(
             fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
@@ -120,7 +109,7 @@ class UsuarioVeterinarioTest extends TestCase
         ->hasAttached($this->hacienda)
         ->create(['nombre' => 'sdsdsfdsfjijwiwwjkhkjbjhkgiggyg','cargo_id' => 2])->id;
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(route('usuarios_veterinarios.store'), ['personal_id' => $this->personal]);
+        $response = $this->setUpRequest()->postJson(route('usuarios_veterinarios.store'), ['personal_id' => $this->personal]);
 
         $response->assertStatus(201)->assertJson(
             fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
@@ -139,7 +128,7 @@ class UsuarioVeterinarioTest extends TestCase
         ->hasAttached($this->hacienda)
         ->create(['nombre' => 's','cargo_id' => 2])->id;
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(route('usuarios_veterinarios.store'), ['personal_id' => $this->personal]);
+        $response = $this->setUpRequest()->postJson(route('usuarios_veterinarios.store'), ['personal_id' => $this->personal]);
 
         $response->assertStatus(201)->assertJson(
             fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
@@ -157,7 +146,7 @@ class UsuarioVeterinarioTest extends TestCase
         $idRandom = random_int(0, 9);
         $idToDelete = $usuarioVeterinario[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->deleteJson(route('usuarios_veterinarios.destroy', ['usuarios_veterinario' => $idToDelete]));
+        $response = $this->setUpRequest()->deleteJson(route('usuarios_veterinarios.destroy', ['usuarios_veterinario' => $idToDelete]));
 
         $response->assertStatus(200)->assertJson(['usuarioVeterinarioID' => $idToDelete]);
     }
@@ -182,7 +171,7 @@ class UsuarioVeterinarioTest extends TestCase
         $this->usuariosVeterinarios();
 
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])
+        $response = $this->setUpRequest()
             ->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->deleteJson(route('usuarios_veterinarios.destroy', ['usuarios_veterinario' => $idToDelete]));
 
         $response->assertStatus(403);
@@ -193,7 +182,7 @@ class UsuarioVeterinarioTest extends TestCase
     {
         $this->user->syncRoles('veterinario');
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(route('usuarios_veterinarios.store'), ['personal_id' => $this->personal]);
+        $response = $this->setUpRequest()->postJson(route('usuarios_veterinarios.store'), ['personal_id' => $this->personal]);
 
         $response->assertStatus(403);
     }
@@ -202,7 +191,7 @@ class UsuarioVeterinarioTest extends TestCase
     {
         $this->user->syncRoles('veterinario');
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('usuarios_veterinarios.index'));
+        $response = $this->setUpRequest()->getJson(route('usuarios_veterinarios.index'));
 
         $response->assertStatus(403);
     }
@@ -213,7 +202,7 @@ class UsuarioVeterinarioTest extends TestCase
     public function test_error_validacion_registro_usuario_veterinario(array $usuarioVeterinario, array $errores): void
     {
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(route('usuarios_veterinarios.store'), $usuarioVeterinario);
+        $response = $this->setUpRequest()->postJson(route('usuarios_veterinarios.store'), $usuarioVeterinario);
 
         $response->assertStatus(422)->assertInvalid($errores);
     }

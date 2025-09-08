@@ -11,55 +11,41 @@ use App\Models\Personal;
 use App\Models\Toro;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Feature\Common\NeedsEstado;
+use Tests\Feature\Common\NeedsGanado;
+use Tests\Feature\Common\NeedsPersonal;
+use Tests\Feature\Common\NeedsSetupRequest;
+use Tests\Feature\Common\NeedsToro;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
 
 class ResumenesAnualesTest extends TestCase
 {
-    use RefreshDatabase;
+    use NeedsSetupRequest,
+        NeedsPersonal,
+        NeedsGanado,
+        NeedsEstado,
+        NeedsToro {
+        NeedsSetupRequest::setUp as needsSetupRequestSetUp;
+        NeedsEstado::setUp as needsEstadoSetUp;
+        NeedsToro::setUp as needsToroSetUp;
+        NeedsPersonal::setUp as needsPersonalSetUp;
+    }
 
-    private $user;
     private $ganadoServicioMonta;
-    private $toro;
-    private $veterinario;
-    private $estado;
-    private $hacienda;
+
 
     protected function setUp(): void
     {
-        parent::setUp();
-
-        $this->estado = Estado::all();
-
-        $this->user
-            = User::factory()->hasConfiguracion()->create();
-
-
-
-        $this->hacienda
-            = Hacienda::factory()
-            ->for($this->user)
-            ->create();
+        $this->needsSetupRequestSetUp();
+        $this->needsEstadoSetUp();
+        $this->needsToroSetUp();
+        $this->generarGanado();
+        $this->needsPersonalSetUp();
 
         $this->ganadoServicioMonta
-            = Ganado::factory()
-            ->hasPeso(1)
-            ->hasEvento(1)
-            ->hasAttached($this->estado)
-            ->for($this->hacienda)
-            ->create();
-
-        $this->toro = Toro::factory()
-            ->for($this->hacienda)
-            ->for(Ganado::factory()->for($this->hacienda)->create(['sexo' => 'M']))->create();
-
-
-        $this->veterinario
-            = Personal::factory()
-            ->for($this->user)->hasAttached($this->hacienda)
-            ->create(['cargo_id' => 2]);
+            = $this->ganado;
     }
 
 
@@ -69,26 +55,26 @@ class ResumenesAnualesTest extends TestCase
         Parto::factory()
             ->count(10)
             ->for($this->ganadoServicioMonta)
-             //se usa el state en lugar de for para asegurarse de que cada parto tenga una cria distinta, con for una misma cria pertenececira a todos los partos
-            ->has(PartoCria::factory()->state(['ganado_id'=>Ganado::factory()->for($this->hacienda)->hasAttached($this->estado)->create(['fecha_nacimiento' => now()->format('Y-m-d')])]))
+            //se usa el state en lugar de for para asegurarse de que cada parto tenga una cria distinta, con for una misma cria pertenececira a todos los partos
+            ->has(PartoCria::factory()->state(['ganado_id' => Ganado::factory()->for($this->hacienda)->hasAttached($this->estado)->create(['fecha_nacimiento' => now()->format('Y-m-d')])]))
             ->for($this->toro, 'partoable')
             ->create(['personal_id' => $this->veterinario]);
 
-            //partos un año anterior al actual
+        //partos un año anterior al actual
         Parto::factory()
             ->count(10)
             ->for($this->ganadoServicioMonta)
             //se usa el state en lugar de for para asegurarse de que cada parto tenga una cria distinta, con for una misma cria pertenececira a todos los partos
-            ->has(PartoCria::factory()->state(['ganado_id'=>Ganado::factory()->for($this->hacienda)->hasAttached($this->estado)->create(['fecha_nacimiento' => now()->subYear()->format('Y-m-d')])]))
+            ->has(PartoCria::factory()->state(['ganado_id' => Ganado::factory()->for($this->hacienda)->hasAttached($this->estado)->create(['fecha_nacimiento' => now()->subYear()->format('Y-m-d')])]))
             ->for($this->toro, 'partoable')
             ->create(['personal_id' => $this->veterinario]);
 
-            //partos dos años anterior al actualk
+        //partos dos años anterior al actualk
         return Parto::factory()
             ->count(10)
             ->for($this->ganadoServicioMonta)
-           //se usa el state en lugar de for para asegurarse de que cada parto tenga una cria distinta, con for una misma cria pertenececira a todos los partos
-           ->has(PartoCria::factory()->state(['ganado_id'=>Ganado::factory()->for($this->hacienda)->hasAttached($this->estado)->create(['fecha_nacimiento' => now()->subYear(2)->format('Y-m-d')])]))
+            //se usa el state en lugar de for para asegurarse de que cada parto tenga una cria distinta, con for una misma cria pertenececira a todos los partos
+            ->has(PartoCria::factory()->state(['ganado_id' => Ganado::factory()->for($this->hacienda)->hasAttached($this->estado)->create(['fecha_nacimiento' => now()->subYear(2)->format('Y-m-d')])]))
             ->for($this->toro, 'partoable')
             ->create(['personal_id' => $this->veterinario]);
     }

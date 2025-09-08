@@ -24,7 +24,7 @@ trait NeedsPersonal
             ->create(['cargo_id' => 2]);
     }
 
-    private function generarPersonal(int $cantidad_elementos= 0,CargosPersonal $cargoPersonal=CargosPersonal::obrero): Collection
+    private function generarPersonal(int | null $cantidad_elementos= null,CargosPersonal $cargoPersonal=CargosPersonal::obrero): Collection
     {
         return Personal::factory()
             ->count($cantidad_elementos ?? $this->cantidad_personal)

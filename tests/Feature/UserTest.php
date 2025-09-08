@@ -2,45 +2,31 @@
 
 namespace Tests\Feature;
 
-use App\Models\Hacienda;
-use App\Models\Personal;
 use App\Models\User;
-use App\Models\UsuarioVeterinario;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
+use Tests\Feature\Common\NeedsSetupRequest;
+use Tests\Feature\Common\NeedsToro;
 use Illuminate\Testing\Fluent\AssertableJson;
+use Tests\Feature\Common\NeedsUsuarioVeterinario;
 use Tests\TestCase;
 
 class UserTest extends TestCase
 {
-    use RefreshDatabase;
+    use NeedsSetupRequest,
+        NeedsUsuarioVeterinario {
+        NeedsSetupRequest::setUp as needsSetupRequestSetUp;
+        NeedsUsuarioVeterinario::setUp as needsUsuarioVeterinarioSetUp;
+    }
 
     private array $usuario = [
         'usuario' => 'test',
         'password' => '12345678'
     ];
 
-    private $hacienda;
-    private $user;
 
     protected function setUp(): void
     {
-        parent::setUp();
-
-        $this->user
-            = User::factory()->hasConfiguracion()->create();
-
-            $this->hacienda
-            = Hacienda::factory()
-            ->for($this->user)
-            ->create();
-
-        $this->user->assignRole('admin');
-
-        UsuarioVeterinario::factory()
-        ->count(10)
-        ->for(Personal::factory()->for($this->user)->create(['cargo_id' => 2]), 'veterinario')
-        ->create(['admin_id' => $this->user->id]);
+        $this->needsSetupRequestSetUp();
+        $this->needsUsuarioVeterinarioSetUp();
     }
 
     public static function ErrorInputProvider(): array
@@ -51,7 +37,8 @@ class UserTest extends TestCase
                     'usuario' => 'test',
                     'password' => '12345678',
 
-                ], ['usuario']
+                ],
+                ['usuario']
             ],
             'caso de insertar datos erróneos' => [
                 [
@@ -61,7 +48,8 @@ class UserTest extends TestCase
                 ['usuario', 'password']
             ],
             'caso de no insertar datos requeridos' => [
-                [], ['usuario', 'password']
+                [],
+                ['usuario', 'password']
             ],
         ];
     }
@@ -86,22 +74,22 @@ class UserTest extends TestCase
 
         $response = $this->actingAs($this->user)->getJson(route('usuario.show', ['user' => $this->user->id]));
         $response->assertStatus(200)
-           ->assertJson(
-               fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
-                   'user',
-                   fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
-                   $json->whereAllType([
-                       'id' => 'integer',
-                       'usuario' => 'string',
-                       'email' => 'string',
-                       'rol' => 'string',
-                       'haciendas' => 'array',
-                       'fecha_creacion' => 'string',
-                       'configuracion' => 'array',
-                       'tiene_preguntas_seguridad' => 'boolean',
-                   ])
-               )
-           );
+            ->assertJson(
+                fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
+                    'user',
+                    fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
+                    $json->whereAllType([
+                        'id' => 'integer',
+                        'usuario' => 'string',
+                        'email' => 'string',
+                        'rol' => 'string',
+                        'haciendas' => 'array',
+                        'fecha_creacion' => 'string',
+                        'configuracion' => 'array',
+                        'tiene_preguntas_seguridad' => 'boolean',
+                    ])
+                )
+            );
     }
 
     public function test_obtener_usuario_veterinario(): void
@@ -111,9 +99,9 @@ class UserTest extends TestCase
         $response = $this->actingAs($this->user)->getJson(route('usuario.show', ['user' => $this->user->id]));
         $response->assertStatus(200)
             ->assertJson(
-                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
+                fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'user',
-                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
+                    fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                     $json->whereAllType([
                         'id' => 'integer',
                         'usuario' => 'string',
@@ -142,9 +130,9 @@ class UserTest extends TestCase
 
         $response = $this->actingAs($this->user)->putJson(route('usuario.update', ['user' => $this->user->id]), $this->usuario);
 
-        $response->assertStatus(422)->assertJson(fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
+        $response->assertStatus(422)->assertJson(fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
         $json->hasAll(['errors.usuario'])
-        ->etc());
+            ->etc());
     }
 
     public function test_actualizar_usuario_conservando_campos_unicos(): void

@@ -11,6 +11,7 @@ trait NeedsEstado
     private Collection $estado;
     private Estado $estadoSano;
     private Estado $estadoVendido;
+    private Estado $estadoGestacion;
     private Estado $estadoFallecido;
     private Estado $estadoPendienteServicio;
     private Estado $estadoPendienteRevision;
@@ -23,6 +24,7 @@ trait NeedsEstado
         $this->estado = Estado::all();
         $this->estadoSano = Estado::find(1);
         $this->estadoVendido = Estado::find(2);
+        $this->estadoGestacion = Estado::find(3);
         $this->estadoFallecido = Estado::find(5);
         $this->estadoPendienteServicio = Estado::find(7);
         $this->estadoPendienteRevision = Estado::find(6);

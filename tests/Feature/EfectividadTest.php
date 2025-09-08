@@ -22,7 +22,6 @@ class EfectividadTest extends TestCase
         NeedsServicio,
         NeedsParto {
             NeedsSetupRequest::setUp as needsSetupRequestSetUp;
-            NeedsGanado::setUp as needsGanadoSetUp;
             NeedsEstado::setUp as needsEstadoSetUp;
             NeedsPersonal::setUp as needsPersonalSetUp;
             NeedsToro::setUp as needsToroSetUp;
@@ -34,7 +33,7 @@ class EfectividadTest extends TestCase
     {
         $this->needsSetupRequestSetUp();
         $this->needsEstadoSetUp();
-        $this->needsGanadoSetUp();
+        $this->generarGanado();
         $this->needsPersonalSetUp();
         $this->needsToroSetUp();
 

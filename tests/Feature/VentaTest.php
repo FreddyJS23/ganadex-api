@@ -3,20 +3,22 @@
 namespace Tests\Feature;
 
 use App\Models\Comprador;
-use App\Models\Estado;
 use App\Models\Hacienda;
 use App\Models\Ganado;
-use App\Models\User;
 use App\Models\Venta;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
+use Tests\Feature\Common\NeedsEstado;
+use Tests\Feature\Common\NeedsSetupRequest;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
 
 class VentaTest extends TestCase
 {
-    use RefreshDatabase;
+    use NeedsSetupRequest,
+        NeedsEstado {
+        NeedsSetupRequest::setUp as needsSetupRequestSetUp;
+        NeedsEstado::setUp as needsEstadoSetUp;
+    }
 
     private array $venta = [
         //'precio' => 350,
@@ -26,27 +28,11 @@ class VentaTest extends TestCase
 
     private int $cantidad_ventas = 10;
 
-    private $user;
-    private $estado;
-    private $hacienda;
 
     protected function setUp(): void
     {
-        parent::setUp();
-
-        $this->estado = Estado::all();
-
-
-        $this->user
-            = User::factory()->hasConfiguracion()->create();
-
-        $this->user->assignRole('admin');
-
-
-            $this->hacienda
-            = Hacienda::factory()
-            ->for($this->user)
-            ->create();
+        $this->needsSetupRequestSetUp();
+        $this->needsEstadoSetUp();
     }
 
     private function generarVentas(): Collection
@@ -60,11 +46,6 @@ class VentaTest extends TestCase
     }
 
 
-    private function cambiarRol(User $user): void
-    {
-        $user->syncRoles('veterinario');
-    }
-
 
     public static function ErrorInputProvider(): array
     {
@@ -72,14 +53,16 @@ class VentaTest extends TestCase
 
             'caso de insertar datos erróneos' => [
                 [
-                   // 'precio' => 'te',
+                    // 'precio' => 'te',
                     'ganado_id' => 'te',
                     'comprador_id' => 'te',
 
-                ], [ 'ganado_id', 'comprador_id']
+                ],
+                ['ganado_id', 'comprador_id']
             ],
             'caso de no insertar datos requeridos' => [
-                [], [ 'ganado_id', 'comprador_id']
+                [],
+                ['ganado_id', 'comprador_id']
             ],
             'caso de insertar datos inexistentes' => [
                 [
@@ -87,7 +70,8 @@ class VentaTest extends TestCase
                     'ganado_id' => 0,
                     'comprador_id' => 0,
 
-                ], ['ganado_id', 'comprador_id']
+                ],
+                ['ganado_id', 'comprador_id']
             ],
         ];
     }
@@ -100,14 +84,14 @@ class VentaTest extends TestCase
     {
         $this->generarVentas();
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('ventas.index'));
+        $response = $this->setUpRequest()->getJson(route('ventas.index'));
 
         $response->assertStatus(200)
             ->assertJson(
-                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
+                fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'ventas',
                     $this->cantidad_ventas,
-                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
+                    fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
                         ->whereAllType([
                             'id' => 'integer',
                             'fecha' => 'string',
@@ -117,7 +101,7 @@ class VentaTest extends TestCase
                             'comprador' => 'string',
                         ])->has(
                             'ganado',
-                            fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
+                            fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                             => $json->whereAllType([
                                 'id' => 'integer',
                                 'numero' => 'integer|null',
@@ -134,23 +118,23 @@ class VentaTest extends TestCase
         $comprador = Comprador::factory()->for($this->hacienda)->create();
         $this->venta = $this->venta + ['ganado_id' => $ganado->id, 'comprador_id' => $comprador->id];
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(route('ventas.store'), $this->venta);
+        $response = $this->setUpRequest()->postJson(route('ventas.store'), $this->venta);
 
         $response->assertStatus(201)
             ->assertJson(
-                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
+                fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'venta',
-                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
+                    fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
                         ->whereAllType([
                             'id' => 'integer',
                             'fecha' => 'string',
                             'peso' => 'string',
-                           /*  'precio' => 'integer|double',
+                            /*  'precio' => 'integer|double',
                             'precio_kg' => 'integer|double', */
                             'comprador' => 'string',
                         ])->has(
                             'ganado',
-                            fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
+                            fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                             => $json->whereAllType([
                                 'id' => 'integer',
                                 'numero' => 'integer|null',
@@ -175,7 +159,7 @@ class VentaTest extends TestCase
 
         $response->assertStatus(201)
             ->assertJson(
-                fn (AssertableJson $json) => $json->has('ventas', 3)
+                fn(AssertableJson $json) => $json->has('ventas', 3)
             );
     }
 
@@ -185,23 +169,23 @@ class VentaTest extends TestCase
         $idRandom = random_int(0, $this->cantidad_ventas - 1);
         $idVenta = $venta[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('ventas.show', ['venta' => $idVenta]));
+        $response = $this->setUpRequest()->getJson(route('ventas.show', ['venta' => $idVenta]));
 
         $response->assertStatus(200)
             ->assertJson(
-                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
+                fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'venta',
-                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
+                    fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
                         ->whereAllType([
                             'id' => 'integer',
                             'fecha' => 'string',
                             'peso' => 'string',
-                           /*  'precio' => 'integer|double',
+                            /*  'precio' => 'integer|double',
                             'precio_kg' => 'integer|double', */
                             'comprador' => 'string',
                         ])->has(
                             'ganado',
-                            fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
+                            fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
                             => $json->whereAllType([
                                 'id' => 'integer',
                                 'numero' => 'integer|null',
@@ -222,15 +206,15 @@ class VentaTest extends TestCase
         $comprador = Comprador::factory()->for($this->hacienda)->create();
         $this->venta = $this->venta + ['ganado_id' => $ganado->id, 'comprador_id' => $comprador->id];
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(route('ventas.update', ['venta' => $idVentaEditar]), $this->venta);
+        $response = $this->setUpRequest()->putJson(route('ventas.update', ['venta' => $idVentaEditar]), $this->venta);
 
         $response->assertStatus(200)->assertJson(
-            fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
+            fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
             $json->has(
                 'venta',
-                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
+                fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                 $json->where('ganado.id', $this->venta['ganado_id'])
-                ->etc()
+                    ->etc()
             )
         );
     }
@@ -242,7 +226,7 @@ class VentaTest extends TestCase
         $idToDelete = $venta[$idRandom]->id;
 
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->deleteJson(route('ventas.destroy', ['venta' => $idToDelete]));
+        $response = $this->setUpRequest()->deleteJson(route('ventas.destroy', ['venta' => $idToDelete]));
 
         $response->assertStatus(200)->assertJson(['ventaID' => $idToDelete]);
     }
@@ -253,7 +237,7 @@ class VentaTest extends TestCase
     public function test_error_validacion_registro_venta(array $venta, array $errores): void
     {
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(route('ventas.store'), $venta);
+        $response = $this->setUpRequest()->postJson(route('ventas.store'), $venta);
 
         $response->assertStatus(422)->assertInvalid($errores);
     }
@@ -265,8 +249,8 @@ class VentaTest extends TestCase
         $this->venta = $this->venta + ['ganado_id' => $ganado->id, 'comprador_id' => $comprador->id];
 
         $otroHacienda = Hacienda::factory()
-        ->for($this->user)
-        ->create(['nombre' => 'otro_hacienda']);
+            ->for($this->user)
+            ->create(['nombre' => 'otro_hacienda']);
 
         $ventaOtroHacienda =  Venta::factory()
             ->for($otroHacienda)
@@ -279,7 +263,7 @@ class VentaTest extends TestCase
         $this->generarVentas();
 
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(route('ventas.update', ['venta' => $idVentaOtroHacienda]), $this->venta);
+        $response = $this->setUpRequest()->putJson(route('ventas.update', ['venta' => $idVentaOtroHacienda]), $this->venta);
 
         $response->assertStatus(403);
     }
@@ -288,7 +272,7 @@ class VentaTest extends TestCase
     {
         $this->cambiarRol($this->user);
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(route('ventas.store'), $this->venta);
+        $response = $this->setUpRequest()->postJson(route('ventas.store'), $this->venta);
 
         $response->assertStatus(403);
     }
@@ -301,7 +285,7 @@ class VentaTest extends TestCase
         $idRandom = random_int(0, $this->cantidad_ventas - 1);
         $idVentaEditar = $ventas[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(route('ventas.update', ['venta' => $idVentaEditar]), $this->venta);
+        $response = $this->setUpRequest()->putJson(route('ventas.update', ['venta' => $idVentaEditar]), $this->venta);
 
         $response->assertStatus(403);
     }
@@ -316,7 +300,7 @@ class VentaTest extends TestCase
         $idRandom = random_int(0, $this->cantidad_ventas - 1);
         $idVentaEditar = $ventas[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->deleteJson(route('ventas.destroy', ['venta' => $idVentaEditar]));
+        $response = $this->setUpRequest()->deleteJson(route('ventas.destroy', ['venta' => $idVentaEditar]));
 
         $response->assertStatus(403);
     }

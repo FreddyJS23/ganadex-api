@@ -2,54 +2,38 @@
 
 namespace Tests\Feature;
 
-use App\Models\Hacienda;
 use App\Models\PreguntasSeguridad;
 use App\Models\RespuestasSeguridad;
-use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
+use Tests\Feature\Common\NeedsSetupRequest;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
 
 class PreguntasSeguridadTest extends TestCase
 {
-    use RefreshDatabase;
+    use NeedsSetupRequest {
+        NeedsSetupRequest::setUp as needsSetupRequestSetUp;
+    }
 
-    private $user;
-    private $hacienda;
     private $cantidad_preguntas_seguridad;
 
 
     protected function setUp(): void
     {
-        parent::setUp();
-
-        $this->user
-            = User::factory()->hasConfiguracion()->create();
-
-            $this->hacienda
-            = Hacienda::factory()
-            ->for($this->user)
-            ->create();
-
-            $this->cantidad_preguntas_seguridad = PreguntasSeguridad::count();
-
-        $this->user->assignRole('admin');
+        $this->needsSetupRequestSetUp();
+        $this->cantidad_preguntas_seguridad = PreguntasSeguridad::count();
     }
 
-
-
-      public function test_obtener_preguntas_seguridad_del_sistema(): void
+    public function test_obtener_preguntas_seguridad_del_sistema(): void
     {
 
         $response = $this->actingAs($this->user)->getJson(route('preguntas_seguridad.index'));
 
         $response->assertStatus(200)
             ->assertJson(
-                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
+                fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'preguntas_seguridad',
                     $this->cantidad_preguntas_seguridad,
-                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
+                    fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                     $json->whereAllType([
                         'id' => 'integer',
                         'pregunta' => 'string',
@@ -63,24 +47,24 @@ class PreguntasSeguridadTest extends TestCase
     {
 
         RespuestasSeguridad::factory()
-        ->count(3)
-        ->for($this->user)
-        ->sequence(
-            ['preguntas_seguridad_id'=>1],
-            ['preguntas_seguridad_id'=>2],
-            ['preguntas_seguridad_id'=>3],
+            ->count(3)
+            ->for($this->user)
+            ->sequence(
+                ['preguntas_seguridad_id' => 1],
+                ['preguntas_seguridad_id' => 2],
+                ['preguntas_seguridad_id' => 3],
             )
-        ->create();
+            ->create();
 
 
         $response = $this->actingAs($this->user)->getJson(route('preguntas_seguridad.index'));
 
         $response->assertStatus(200)
             ->assertJson(
-                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
+                fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'preguntas_seguridad',
                     $this->cantidad_preguntas_seguridad - 3,
-                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
+                    fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                     $json->whereAllType([
                         'id' => 'integer',
                         'pregunta' => 'string',
@@ -88,5 +72,4 @@ class PreguntasSeguridadTest extends TestCase
                 )
             );
     }
-
 }

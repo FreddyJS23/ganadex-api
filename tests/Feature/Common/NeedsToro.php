@@ -27,4 +27,17 @@ trait NeedsToro
         ->create();
     }
 
+    private function generarToros(): Collection
+    {
+        $ganadoFactory=Ganado::factory(['hacienda_id' => $this->hacienda->id, 'sexo' => 'M', 'tipo_id' => 4])
+        ->hasVacunaciones(3, ['hacienda_id' => $this->hacienda->id]);
+
+        //usar state para asegurarse de que cada toro tiene una ganado distinta
+        return Toro::factory()
+            ->count(10)
+            ->for($this->hacienda)
+            ->state(['ganado_id'=>$ganadoFactory])
+            ->create();
+    }
+
 }

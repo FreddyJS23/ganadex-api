@@ -20,7 +20,6 @@ class CaparCriaTest extends TestCase
         NeedsEstado
         {
             NeedsSetupRequest::setUp as needsSetupRequestSetUp;
-            NeedsGanado::setUp as needsGanadoSetUp;
             NeedsEstado::setUp as needsEstadoSetUp;
         }
 
@@ -28,7 +27,7 @@ class CaparCriaTest extends TestCase
     {
         $this->needsSetupRequestSetUp();
         $this->needsEstadoSetUp();
-        $this->needsGanadoSetUp();
+        $this->generarGanado();
     }
 
     public function test_obtener_crias_pendientes_capar(): void

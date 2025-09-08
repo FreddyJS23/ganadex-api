@@ -3,16 +3,16 @@
 namespace Tests\Feature;
 
 use App\Models\Precio;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
+use Tests\Feature\Common\NeedsSetupRequest;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
 
 class PrecioTest extends TestCase
 {
-    use RefreshDatabase;
+    use NeedsSetupRequest {
+        NeedsSetupRequest::setUp as needsSetupRequestSetUp;
+    }
 
     private array $precio = [
         'precio' => 30,
@@ -22,14 +22,11 @@ class PrecioTest extends TestCase
 
     private int $cantidad_precio = 10;
 
-    private $user;
+
 
     protected function setUp(): void
     {
-        parent::setUp();
-
-        $this->user
-            = User::factory()->hasConfiguracion()->create();
+        $this->needsSetupRequestSetUp();
     }
 
     private function generarPrecio(): Collection
@@ -45,10 +42,12 @@ class PrecioTest extends TestCase
             'caso de insertar datos erróneos' => [
                 [
                     'precio' => 'd32',
-                ], ['precio']
+                ],
+                ['precio']
             ],
             'caso de no insertar datos requeridos' => [
-                [], ['precio']
+                [],
+                ['precio']
             ],
         ];
     }
@@ -61,14 +60,14 @@ class PrecioTest extends TestCase
     {
         $this->generarPrecio();
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson('api/precio');
+        $response = $this->setUpRequest()->getJson('api/precio');
 
         $response->assertStatus(200)
             ->assertJson(
-                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
+                fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'precios',
                     $this->cantidad_precio,
-                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
+                    fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                     $json->whereAllType([
                         'id' => 'integer',
                         'precio' => 'integer|double',
@@ -82,12 +81,12 @@ class PrecioTest extends TestCase
     public function test_creacion_precio(): void
     {
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson('api/precio', $this->precio);
+        $response = $this->setUpRequest()->postJson('api/precio', $this->precio);
 
         $response->assertStatus(201)->assertJson(
-            fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
+            fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
             $json->first(
-                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
+                fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                 $json->whereAllType([
                     'precio' => 'integer|double',
                     'fecha' => 'string'
@@ -102,7 +101,7 @@ class PrecioTest extends TestCase
      */
     public function test_error_validacion_registro_precio(array $precio, array $errores): void
     {
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson('api/precio', $precio);
+        $response = $this->setUpRequest()->postJson('api/precio', $precio);
 
         $response->assertStatus(422)->assertInvalid($errores);
     }

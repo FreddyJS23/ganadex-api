@@ -34,7 +34,6 @@ class EventosTest extends TestCase
         NeedsPersonal {
         NeedsSetupRequest::setUp as needsSetupRequestSetUp;
         NeedsEstado::setUp as needsEstadoSetUp;
-        NeedsGanado::setUp as needsGanadoSetUp;
         NeedsToro::setUp as needsToroSetUp;
         NeedsPersonal::setUp as needsPersonalSetUp;
 
@@ -54,8 +53,8 @@ class EventosTest extends TestCase
         'observacion' => 'bien',
         'fecha' => '2020-10-02',
         'crias'=>[
-            [ 'nombre' => 'test',
-            'numero' => 33,
+            [ 'nombre' => 'testz',
+            'numero' => 32,
             'peso_nacimiento' => 50,]
         ]
     ];
@@ -97,7 +96,7 @@ class EventosTest extends TestCase
     {
         $this->needsSetupRequestSetUp();
         $this->needsEstadoSetUp();
-        $this->needsGanadoSetUp();
+        $this->generarGanado();
         $this->needsPersonalSetUp();
         $this->needsToroSetUp();
 
@@ -817,7 +816,7 @@ class EventosTest extends TestCase
  $this->setUpRequest()->getJson(route('crear_sesion_hacienda', ['hacienda' => $this->hacienda->id]));
 
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson('api/ganado');
+        $response = $this->setUpRequest()->getJson('api/ganado');
         $response->assertStatus(200)
             ->assertJson(
                 fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>

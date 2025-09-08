@@ -6,14 +6,26 @@ use App\Models\Hacienda;
 use App\Models\Insumo;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
+use Tests\Feature\Common\NeedsEstado;
+use Tests\Feature\Common\NeedsGanado;
+use Tests\Feature\Common\NeedsPersonal;
+use Tests\Feature\Common\NeedsSetupRequest;
+use Tests\Feature\Common\NeedsToro;use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
 
 class InsumoTest extends TestCase
 {
-    use RefreshDatabase;
+     use NeedsSetupRequest,
+    NeedsPersonal,
+    NeedsGanado,
+    NeedsEstado,
+    NeedsToro {
+    NeedsSetupRequest::setUp as needsSetupRequestSetUp;
+    NeedsEstado::setUp as needsEstadoSetUp;
+    NeedsToro::setUp as needsToroSetUp;
+    NeedsPersonal::setUp as needsPersonalSetUp;
+}
 
     private array $insumo = [
         'insumo' => 'vacuna',
@@ -80,7 +92,7 @@ class InsumoTest extends TestCase
     {
         $this->generarInsumo();
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson('api/insumo');
+        $response = $this->setUpRequest()->getJson('api/insumo');
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
             $json->whereType('insumos', 'array')
@@ -102,7 +114,7 @@ class InsumoTest extends TestCase
     public function test_creacion_insumo(): void
     {
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson('api/insumo', $this->insumo);
+        $response = $this->setUpRequest()->postJson('api/insumo', $this->insumo);
 
         $response->assertStatus(201)->assertJson(
             fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
@@ -126,7 +138,7 @@ class InsumoTest extends TestCase
         $idRandom = random_int(0, $this->cantidad_insumo - 1);
         $idInsumo = $insumos[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf('api/insumo/%s', $idInsumo));
+        $response = $this->setUpRequest()->getJson(sprintf('api/insumo/%s', $idInsumo));
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
@@ -148,7 +160,7 @@ class InsumoTest extends TestCase
         $idRandom = random_int(0, $this->cantidad_insumo - 1);
         $idInsumoEditar = $insumos[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/insumo/%s', $idInsumoEditar), $this->insumo);
+        $response = $this->setUpRequest()->putJson(sprintf('api/insumo/%s', $idInsumoEditar), $this->insumo);
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
@@ -171,7 +183,7 @@ class InsumoTest extends TestCase
         $idRandom = random_int(0, $this->cantidad_insumo - 1);
         $idInsumoEditar = $insumo[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/insumo/%s', $idInsumoEditar), $this->insumo);
+        $response = $this->setUpRequest()->putJson(sprintf('api/insumo/%s', $idInsumoEditar), $this->insumo);
 
         $response->assertStatus(422)->assertJson(fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
         $json->hasAll(['errors.insumo'])
@@ -182,7 +194,7 @@ class InsumoTest extends TestCase
     {
         $insumoExistente = Insumo::factory()->for($this->hacienda)->create(['insumo' => 'test']);
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/insumo/%s', $insumoExistente->id), $this->insumo);
+        $response = $this->setUpRequest()->putJson(sprintf('api/insumo/%s', $insumoExistente->id), $this->insumo);
 
         $response->assertStatus(200);
     }
@@ -194,7 +206,7 @@ class InsumoTest extends TestCase
         $idToDelete = $insumos[$idRandom]->id;
 
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->deleteJson(sprintf('api/insumo/%s', $idToDelete));
+        $response = $this->setUpRequest()->deleteJson(sprintf('api/insumo/%s', $idToDelete));
 
         $response->assertStatus(200)->assertJson(['insumoID' => $idToDelete]);
     }
@@ -206,7 +218,7 @@ class InsumoTest extends TestCase
     {
         Insumo::factory()->for($this->hacienda)->create(['insumo' => 'test']);
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson('api/insumo', $insumo);
+        $response = $this->setUpRequest()->postJson('api/insumo', $insumo);
 
         $response->assertStatus(422)->assertInvalid($errores);
     }
@@ -221,7 +233,7 @@ class InsumoTest extends TestCase
 
         $this->generarInsumo();
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/insumo/%s', $idInsumoOtroUsuario), $this->insumo);
+        $response = $this->setUpRequest()->putJson(sprintf('api/insumo/%s', $idInsumoOtroUsuario), $this->insumo);
 
         $response->assertStatus(403);
     }

@@ -2,28 +2,37 @@
 
 namespace Tests\Feature;
 
-use App\Models\Estado;
-use App\Models\Hacienda;
 use App\Models\Ganado;
 use App\Models\PajuelaToro;
 use App\Models\Parto;
 use App\Models\PartoCria;
 use App\Models\Personal;
 use App\Models\Servicio;
-use App\Models\Toro;
-use App\Models\User;
-use App\Models\UsuarioVeterinario;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Support\Facades\DB;
+use Tests\Feature\Common\NeedsEstado;
+use Tests\Feature\Common\NeedsGanado;
+use Tests\Feature\Common\NeedsPersonal;
+use Tests\Feature\Common\NeedsSetupRequest;
+use Tests\Feature\Common\NeedsToro;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Illuminate\Support\Str;
+use Tests\Feature\Common\NeedsUsuarioVeterinario;
 use Tests\TestCase;
 
 class ServicioTest extends TestCase
 {
-    use RefreshDatabase;
+    use NeedsSetupRequest,
+        NeedsGanado,
+        NeedsEstado,
+        NeedsToro,
+        NeedsPersonal,
+        NeedsUsuarioVeterinario {
+        NeedsSetupRequest::setUp as needsSetupRequestSetUp;
+        NeedsEstado::setUp as needsEstadoSetUp;
+        NeedsToro::setUp as needsToroSetUp;
+        NeedsPersonal::setUp as needsPersonalSetUp;
+        NeedsUsuarioVeterinario::setUp as needsUsuarioVeterinarioSetUp;
+    }
 
     private array $servicioMonta = [
         'observacion' => 'bien',
@@ -39,91 +48,37 @@ class ServicioTest extends TestCase
 
     private int $cantidad_servicio = 10;
 
-    private $user;
-    private $ganado;
-    private $veterinario;
-    private $estado;
-    private $estadoSano;
-    private $estadoVendido;
-    private $estadoFallecido;
-    private $estadoPendienteServicio;
-    private $userVeterinario;
-    private $toro;
-    private $pajuelaToro ;
+
+    private $pajuelaToro;
     private string $url;
-    private $hacienda;
+
 
     protected function setUp(): void
     {
-        parent::setUp();
-
-        $this->user
-            = User::factory()->hasConfiguracion()->create();
-
-            $this->user->assignRole('admin');
-
-        $this->estadoSano = Estado::find(1);
-        $this->estadoVendido = Estado::find(2);
-        $this->estadoFallecido = Estado::find(5);
-        $this->estadoPendienteServicio=Estado::find(7);
-
-            $this->hacienda
-            = Hacienda::factory()
-            ->for($this->user)
-            ->create();
-
-        $this->estado = Estado::where('estado','sano')->get();
-
-        $this->veterinario
-        = Personal::factory()
-            ->for($this->user)->hasAttached($this->hacienda)
-            ->create(['cargo_id' => 2]);
-
-        $this->ganado
-            = Ganado::factory()
-            ->hasPeso(1)
-            ->hasEvento(1)
-            ->hasAttached($this->estado)
-            ->for($this->hacienda)
-            ->create();
-
-        $this->toro = Toro::factory()
-            ->for($this->hacienda)
-            ->for(Ganado::factory()->for($this->hacienda)->create(['sexo' => 'M']))->create();
+        $this->needsSetupRequestSetUp();
+        $this->needsEstadoSetUp();
+        $this->needsPersonalSetUp();
+        $this->needsToroSetUp();
+        $this->generarGanado();
 
         $this->pajuelaToro = PajuelaToro::factory()->for($this->hacienda)->create();
 
-        $this->userVeterinario
-        = User::factory()
-        ->create(['usuario' => 'veterinario']);
-
-        $this->userVeterinario->assignRole('veterinario');
-
-        UsuarioVeterinario::factory()
-        ->for(Personal::factory()->for($this->user)->create(['nombre'=>'usuarioVeterinario','cargo_id' => 2]), 'veterinario')
-        ->create(['admin_id' => $this->user->id,
-        'user_id' => $this->userVeterinario->id]);
 
 
         $this->url = sprintf('api/ganado/%s/servicio', $this->ganado->id);
     }
 
-    private function generarServicioMonta(): Collection
+    private function generarServicios(bool $monta = true): Collection
     {
-        return Servicio::factory()
+        $servicios = Servicio::factory()
             ->count($this->cantidad_servicio)
-            ->for($this->ganado)
-            ->for($this->toro, 'servicioable')
-            ->create(['personal_id' => $this->veterinario]);
-    }
+            ->for($this->ganado);
 
-    private function generarServicioInseminacion(): Collection
-    {
-        return Servicio::factory()
-            ->count($this->cantidad_servicio)
-            ->for($this->ganado)
-            ->for($this->pajuelaToro, 'servicioable')
-            ->create(['personal_id' => $this->veterinario]);
+        if ($monta) {
+            $servicios = $servicios->for($this->toro, 'servicioable');
+        } else $servicios = $servicios->for($this->pajuelaToro, 'servicioable');
+
+        return $servicios->create(['personal_id' => $this->veterinario]);
     }
 
 
@@ -137,31 +92,36 @@ class ServicioTest extends TestCase
                     'toro_id' => 0,
                     'tipo' => 'monta',
                     'personal_id' => 0
-                ], ['toro_id','personal_id']
+                ],
+                ['toro_id', 'personal_id']
             ],
             'caso de insertar datos erróneos' => [
                 [
                     'observacion' => 'te',
                     'toro_id' => 'hj',
                     'tipo' => 'nose',
-                ], ['observacion', 'toro_id', 'tipo']
+                ],
+                ['observacion', 'toro_id', 'tipo']
             ],
             'caso de no insertar datos requeridos' => [
-                [], ['observacion', 'tipo']
+                [],
+                ['observacion', 'tipo']
             ],
             'caso de inseminacion, personal debe ser requerido' => [
                 [
                     'observacion' => 'bien',
                     'toro_id' => 0,
                     'tipo' => 'inseminacion',
-                ], ['personal_id', 'toro_id']
+                ],
+                ['personal_id', 'toro_id']
             ],
             'caso de monta, personal puede ser opcional' => [
                 [
                     'observacion' => 'bien',
                     'toro_id' => 0,
                     'tipo' => 'monta',
-                ], ['toro_id']
+                ],
+                ['toro_id']
             ],
 
         ];
@@ -175,22 +135,26 @@ class ServicioTest extends TestCase
                     'observacion' => 'bien',
                     'pajuela_toro_id' => 0,
                     'tipo' => 'monta',
-                ], ['pajuela_toro_id']
+                ],
+                ['pajuela_toro_id']
             ],
             'caso de insertar datos erróneos' => [
                 [
                     'observacion' => 'te',
                     'pajuela_toro_id' => 'hj',
                     'tipo' => 'nose',
-                ], ['observacion', 'pajuela_toro_id', 'tipo']
+                ],
+                ['observacion', 'pajuela_toro_id', 'tipo']
             ],
             'caso de no insertar datos requeridos' => [
-                [], ['observacion', 'tipo']
+                [],
+                ['observacion', 'tipo']
             ],
             'caso de insertar un personal que no sea veterinario' => [
                 [
                     'personal_id' => 2
-                ], ['personal_id']
+                ],
+                ['personal_id']
             ],
         ];
     }
@@ -201,31 +165,31 @@ class ServicioTest extends TestCase
 
     public function test_obtener_servicios_monta(): void
     {
-        $this->generarServicioMonta();
+        $this->generarServicios(true);
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson($this->url);
+        $response = $this->setUpRequest()->getJson($this->url);
 
         $response->assertStatus(200)
             ->assertJson(
-                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
+                fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'servicios',
                     $this->cantidad_servicio,
-                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
+                    fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
                         ->whereAllType([
                             'id' => 'integer',
                             'observacion' => 'string',
                             'fecha' => 'string',
-                        ])->where('tipo', fn (string $tipoServicio)=> Str::contains($tipoServicio, ['Monta', 'Inseminacion']))
-                    ->has(
-                        'toro',
-                        fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
-                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer|null'])
-                    )
-                    ->has(
-                        'veterinario',
-                        fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
-                        => $json->whereAllType(['id' => 'integer', 'nombre' => 'string'])
-                    )
+                        ])->where('tipo', fn(string $tipoServicio) => Str::contains($tipoServicio, ['Monta', 'Inseminacion']))
+                        ->has(
+                            'toro',
+                            fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
+                            => $json->whereAllType(['id' => 'integer', 'numero' => 'integer|null'])
+                        )
+                        ->has(
+                            'veterinario',
+                            fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
+                            => $json->whereAllType(['id' => 'integer', 'nombre' => 'string'])
+                        )
                 )
             );
     }
@@ -234,23 +198,23 @@ class ServicioTest extends TestCase
     public function test_creacion_servicio_monta(): void
     {
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson($this->url, $this->servicioMonta + ['toro_id' => $this->toro->id,'personal_id' => $this->veterinario->id]);
+        $response = $this->setUpRequest()->postJson($this->url, $this->servicioMonta + ['toro_id' => $this->toro->id, 'personal_id' => $this->veterinario->id]);
 
         $response->assertStatus(201)
             ->assertJson(
-                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
+                fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'servicio',
-                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
+                    fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
                         ->whereAllType([
                             'id' => 'integer',
                             'observacion' => 'string',
                             'fecha' => 'string',
-                        ])->where('tipo', fn (string $tipoServicio) => Str::contains($tipoServicio, ['Monta', 'Inseminacion']))
-                    ->has(
-                        'toro',
-                        fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
-                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer|null'])
-                    )->where('veterinario',null)
+                        ])->where('tipo', fn(string $tipoServicio) => Str::contains($tipoServicio, ['Monta', 'Inseminacion']))
+                        ->has(
+                            'toro',
+                            fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
+                            => $json->whereAllType(['id' => 'integer', 'numero' => 'integer|null'])
+                        )->where('veterinario', null)
                 )
             );
     }
@@ -258,59 +222,55 @@ class ServicioTest extends TestCase
 
     public function test_error_creacion_servicio_a_una_vaca_con_estado_gestacion(): void
     {
-        $estadoGestacion = Estado::firstWhere('estado', 'gestacion');
 
-        $ganado=Ganado::factory()
-        ->hasEvento(['prox_revision' => null])
-        ->hasAttached([ $estadoGestacion])
-        ->for($this->hacienda)
-        ->create(['tipo_id' => 3]);
+        $ganado = Ganado::factory()
+            ->hasEvento(['prox_revision' => null])
+            ->hasAttached([$this->estadoGestacion])
+            ->for($this->hacienda)
+            ->create(['tipo_id' => 3]);
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(route('servicio.store',[$ganado->id]), $this->servicioMonta + ['toro_id' => $this->toro->id,'personal_id' => $this->veterinario->id]);
+        $response = $this->setUpRequest()
+        ->postJson(route('servicio.store', [$ganado->id]), $this->servicioMonta + ['toro_id' => $this->toro->id, 'personal_id' => $this->veterinario->id]);
 
         $response->assertStatus(422)->assertJson(['message' => 'La vaca esta en gestación, si ocurrió un aborto registre una revision con con el diagnostico de "aborto"']);
-
     }
 
-/* en caso de que que el ganado tenga muchos estados, por si hay colisiones con los demas estados */
+    /* en caso de que que el ganado tenga muchos estados, por si hay colisiones con los demas estados */
     public function test_error_creacion_servicio_a_una_vaca_con_muchos_estados(): void
     {
-        $estados = Estado::all();
+        $ganado = Ganado::factory()
+            ->hasEvento(['prox_revision' => null])
+            ->hasAttached($this->estado)
+            ->for($this->hacienda)
+            ->create(['tipo_id' => 3]);
 
-        $ganado=Ganado::factory()
-        ->hasEvento(['prox_revision' => null])
-        ->hasAttached($estados)
-        ->for($this->hacienda)
-        ->create(['tipo_id' => 3]);
-
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(route('servicio.store',[$ganado->id]), $this->servicioMonta + ['toro_id' => $this->toro->id,'personal_id' => $this->veterinario->id]);
+        $response = $this->setUpRequest()->postJson(route('servicio.store', [$ganado->id]), $this->servicioMonta + ['toro_id' => $this->toro->id, 'personal_id' => $this->veterinario->id]);
 
         $response->assertStatus(422)->assertJson(['message' => 'La vaca esta en gestación, si ocurrió un aborto registre una revision con con el diagnostico de "aborto"']);
-
     }
 
 
     public function test_creacion_servicio_monta_sin_veterinario(): void
     {
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson($this->url, $this->servicioMonta + ['toro_id' => $this->toro->id]);
+        $response = $this->setUpRequest()->postJson($this->url, $this->servicioMonta + ['toro_id' => $this->toro->id]);
 
         $response->assertStatus(201)
             ->assertJson(
-                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
+                fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'servicio',
-                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
+                    fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
                         ->whereAllType([
                             'id' => 'integer',
                             'observacion' => 'string',
                             'fecha' => 'string',
-                        ])->where('tipo', fn (string $tipoServicio) => Str::contains($tipoServicio, ['Monta', 'Inseminacion']))
-                    ->has(
-                        'toro',
-                        fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
-                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer|null'])
-                    )
-                    ->where('veterinario',null)
+                        ])->where('tipo', fn(string $tipoServicio) => Str::contains($tipoServicio, ['Monta', 'Inseminacion']))
+                        ->has(
+                            'toro',
+                            fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
+                            => $json->whereAllType(['id' => 'integer', 'numero' => 'integer|null'])
+                        )
+                        ->where('veterinario', null)
                 )
             );
     }
@@ -318,23 +278,23 @@ class ServicioTest extends TestCase
     public function test_creacion_servicio_monta_usuario_veterinario(): void
     {
 
-        $response = $this->actingAs($this->userVeterinario)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson($this->url, $this->servicioMonta + ['toro_id' => $this->toro->id]);
+        $response = $this->actingAs($this->userVeterinario)->withSession(['hacienda_id' => $this->hacienda->id, 'peso_servicio' => $this->user->configuracion->peso_servicio, 'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion, 'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson($this->url, $this->servicioMonta + ['toro_id' => $this->toro->id]);
 
         $response->assertStatus(201)
             ->assertJson(
-                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
+                fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'servicio',
-                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
+                    fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
                         ->whereAllType([
                             'id' => 'integer',
                             'observacion' => 'string',
                             'fecha' => 'string',
-                        ])->where('tipo', fn (string $tipoServicio) => Str::contains($tipoServicio, ['Monta', 'Inseminacion']))
-                    ->has(
-                        'toro',
-                        fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
-                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer|null'])
-                    )->where('veterinario',null)
+                        ])->where('tipo', fn(string $tipoServicio) => Str::contains($tipoServicio, ['Monta', 'Inseminacion']))
+                        ->has(
+                            'toro',
+                            fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
+                            => $json->whereAllType(['id' => 'integer', 'numero' => 'integer|null'])
+                        )->where('veterinario', null)
                 )
             );
     }
@@ -342,31 +302,31 @@ class ServicioTest extends TestCase
 
     public function test_obtener_servicio(): void
     {
-        $servicios = $this->generarServicioMonta();
+        $servicios = $this->generarServicios(true);
 
         $idRandom = random_int(0, $this->cantidad_servicio - 1);
         $idservicio = $servicios[$idRandom]->id;
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf($this->url . '/%s', $idservicio));
+        $response = $this->setUpRequest()->getJson(sprintf($this->url . '/%s', $idservicio));
 
         $response->assertStatus(200)
             ->assertJson(
-                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
+                fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'servicio',
-                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
+                    fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
                         ->whereAllType([
                             'id' => 'integer',
                             'observacion' => 'string',
                             'fecha' => 'string',
-                        ])->where('tipo', fn (string $tipoServicio) => Str::contains($tipoServicio, ['Monta', 'Inseminacion']))
-                    ->has(
-                        'toro',
-                        fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
-                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer|null'])
-                    )->has(
-                        'veterinario',
-                        fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
-                        => $json->whereAllType(['id' => 'integer', 'nombre' => 'string'])
-                    )
+                        ])->where('tipo', fn(string $tipoServicio) => Str::contains($tipoServicio, ['Monta', 'Inseminacion']))
+                        ->has(
+                            'toro',
+                            fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
+                            => $json->whereAllType(['id' => 'integer', 'numero' => 'integer|null'])
+                        )->has(
+                            'veterinario',
+                            fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
+                            => $json->whereAllType(['id' => 'integer', 'nombre' => 'string'])
+                        )
                 )
             );
     }
@@ -374,97 +334,97 @@ class ServicioTest extends TestCase
     public function test_obtener_servicio_sin_veterinario(): void
     {
 
-        $servicio=Servicio::factory()
+        $servicio = Servicio::factory()
             ->for($this->ganado)
             ->for($this->toro, 'servicioable')
             ->create();
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf($this->url . '/%s', $servicio->id));
+        $response = $this->setUpRequest()->getJson(sprintf($this->url . '/%s', $servicio->id));
 
         $response->assertStatus(200)
             ->assertJson(
-                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
+                fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'servicio',
-                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
+                    fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
                         ->whereAllType([
                             'id' => 'integer',
                             'observacion' => 'string',
                             'fecha' => 'string',
-                        ])->where('tipo', fn (string $tipoServicio) => Str::contains($tipoServicio, ['Monta', 'Inseminacion']))
-                    ->has(
-                        'toro',
-                        fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
-                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer|null'])
-                    )->where('veterinario',null)
+                        ])->where('tipo', fn(string $tipoServicio) => Str::contains($tipoServicio, ['Monta', 'Inseminacion']))
+                        ->has(
+                            'toro',
+                            fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
+                            => $json->whereAllType(['id' => 'integer', 'numero' => 'integer|null'])
+                        )->where('veterinario', null)
                 )
             );
     }
 
     public function test_obtener_servicio_con_veterinario(): void
     {
-        $servicios = $this->generarServicioMonta();
+        $servicios = $this->generarServicios(true);
 
         $idRandom = random_int(0, $this->cantidad_servicio - 1);
         $idservicio = $servicios[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf($this->url . '/%s', $idservicio));
+        $response = $this->setUpRequest()->getJson(sprintf($this->url . '/%s', $idservicio));
 
         $response->assertStatus(200)
             ->assertJson(
-                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
+                fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'servicio',
-                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
+                    fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
                         ->whereAllType([
                             'id' => 'integer',
                             'observacion' => 'string',
                             'fecha' => 'string',
-                        ])->where('tipo', fn (string $tipoServicio) => Str::contains($tipoServicio, ['Monta', 'Inseminacion']))
-                    ->has(
-                        'toro',
-                        fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
-                        => $json->whereAllType(['id' => 'integer', 'numero' => 'integer|null'])
-                    )->has(
-                        'veterinario',
-                        fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
-                        => $json->whereAllType(['id' => 'integer', 'nombre' => 'string'])
-                    )
+                        ])->where('tipo', fn(string $tipoServicio) => Str::contains($tipoServicio, ['Monta', 'Inseminacion']))
+                        ->has(
+                            'toro',
+                            fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
+                            => $json->whereAllType(['id' => 'integer', 'numero' => 'integer|null'])
+                        )->has(
+                            'veterinario',
+                            fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
+                            => $json->whereAllType(['id' => 'integer', 'nombre' => 'string'])
+                        )
                 )
             );
     }
 
     public function test_actualizar_servicio_monta(): void
     {
-        $servicios = $this->generarServicioMonta();
+        $servicios = $this->generarServicios(true);
         $idRandom = random_int(0, $this->cantidad_servicio - 1);
         $idservicioEditar = $servicios[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf($this->url . '/%s', $idservicioEditar), $this->servicioMonta + ['toro_id' => $this->toro->id]);
+        $response = $this->setUpRequest()->putJson(sprintf($this->url . '/%s', $idservicioEditar), $this->servicioMonta + ['toro_id' => $this->toro->id]);
 
         $response->assertStatus(200)
             ->assertJson(
-                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
+                fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'servicio',
-                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
+                    fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                     $json->where('observacion', $this->servicioMonta['observacion'])
-                    ->where('tipo', ucwords((string) $this->servicioMonta['tipo']))
-                    ->has(
-                        'veterinario',
-                        fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
-                        => $json->whereAllType(['id' => 'integer', 'nombre' => 'string'])
-                    )
-                    ->etc()
+                        ->where('tipo', ucwords((string) $this->servicioMonta['tipo']))
+                        ->has(
+                            'veterinario',
+                            fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
+                            => $json->whereAllType(['id' => 'integer', 'nombre' => 'string'])
+                        )
+                        ->etc()
                 )
             );
     }
 
     public function test_eliminar_servicio_monta(): void
     {
-        $servicios = $this->generarServicioMonta();
+        $servicios = $this->generarServicios(true);
         $idRandom = random_int(0, $this->cantidad_servicio - 1);
         $idToDelete = $servicios[$idRandom]->id;
 
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->deleteJson(sprintf($this->url . '/%s', $idToDelete));
+        $response = $this->setUpRequest()->deleteJson(sprintf($this->url . '/%s', $idToDelete));
 
         $response->assertStatus(200)->assertJson(['servicioID' => $idToDelete]);
     }
@@ -487,10 +447,9 @@ class ServicioTest extends TestCase
                 'fecha_nacimiento' => '2000-02-12',
                 'telefono' => '0424-1234567',
                 'cargo_id' => 1,
-            ]);
-        ;
+            ]);;
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson($this->url, $servicio);
+        $response = $this->setUpRequest()->postJson($this->url, $servicio);
 
         $response->assertStatus(422)->assertInvalid($errores);
     }
@@ -501,31 +460,31 @@ class ServicioTest extends TestCase
 
     public function test_obtener_servicios_inseminacion(): void
     {
-        $this->generarServicioInseminacion();
+        $this->generarServicios(false);
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson($this->url);
+        $response = $this->setUpRequest()->getJson($this->url);
 
         $response->assertStatus(200)
             ->assertJson(
-                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
+                fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'servicios',
                     $this->cantidad_servicio,
-                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
+                    fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
                         ->whereAllType([
                             'id' => 'integer',
                             'observacion' => 'string',
                             'fecha' => 'string',
-                        ])->where('tipo', fn (string $tipoServicio)=> Str::contains($tipoServicio, ['Monta', 'Inseminacion']))
-                    ->has(
-                        'pajuela_toro',
-                        fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
-                        => $json->whereAllType(['id' => 'integer', 'codigo' => 'string'])
-                    )
-                    ->has(
-                        'veterinario',
-                        fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
-                        => $json->whereAllType(['id' => 'integer', 'nombre' => 'string'])
-                    )
+                        ])->where('tipo', fn(string $tipoServicio) => Str::contains($tipoServicio, ['Monta', 'Inseminacion']))
+                        ->has(
+                            'pajuela_toro',
+                            fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
+                            => $json->whereAllType(['id' => 'integer', 'codigo' => 'string'])
+                        )
+                        ->has(
+                            'veterinario',
+                            fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
+                            => $json->whereAllType(['id' => 'integer', 'nombre' => 'string'])
+                        )
                 )
             );
     }
@@ -534,27 +493,28 @@ class ServicioTest extends TestCase
     public function test_creacion_servicio_inseminacion(): void
     {
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson($this->url, $this->servicioInseminacion + ['pajuela_toro_id' => $this->pajuelaToro->id,'personal_id' => $this->veterinario->id]);
+        $response = $this->setUpRequest()
+        ->postJson($this->url, $this->servicioInseminacion + ['pajuela_toro_id' => $this->pajuelaToro->id, 'personal_id' => $this->veterinario->id]);
 
         $response->assertStatus(201)
             ->assertJson(
-                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
+                fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'servicio',
-                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
+                    fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
                         ->whereAllType([
                             'id' => 'integer',
                             'observacion' => 'string',
                             'fecha' => 'string',
-                        ])->where('tipo', fn (string $tipoServicio) => Str::contains($tipoServicio, ['Monta', 'Inseminacion']))
-                    ->has(
-                        'pajuela_toro',
-                        fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
-                        => $json->whereAllType(['id' => 'integer', 'codigo' => 'string'])
-                    )->has(
-                        'veterinario',
-                        fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
-                        => $json->whereAllType(['id' => 'integer', 'nombre' => 'string'])
-                    )
+                        ])->where('tipo', fn(string $tipoServicio) => Str::contains($tipoServicio, ['Monta', 'Inseminacion']))
+                        ->has(
+                            'pajuela_toro',
+                            fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
+                            => $json->whereAllType(['id' => 'integer', 'codigo' => 'string'])
+                        )->has(
+                            'veterinario',
+                            fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
+                            => $json->whereAllType(['id' => 'integer', 'nombre' => 'string'])
+                        )
                 )
             );
     }
@@ -562,67 +522,67 @@ class ServicioTest extends TestCase
 
     public function test_obtener_servicio_inseminacion(): void
     {
-        $servicios = $this->generarServicioInseminacion();
+        $servicios = $this->generarServicios(false);
 
         $idRandom = random_int(0, $this->cantidad_servicio - 1);
         $idservicio = $servicios[$idRandom]->id;
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf($this->url . '/%s', $idservicio));
+        $response = $this->setUpRequest()->getJson(sprintf($this->url . '/%s', $idservicio));
 
         $response->assertStatus(200)
             ->assertJson(
-                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
+                fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'servicio',
-                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
+                    fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
                         ->whereAllType([
                             'id' => 'integer',
                             'observacion' => 'string',
                             'fecha' => 'string',
-                        ])->where('tipo', fn (string $tipoServicio) => Str::contains($tipoServicio, ['Monta', 'Inseminacion']))
-                    ->has(
-                        'pajuela_toro',
-                        fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
-                        => $json->whereAllType(['id' => 'integer', 'codigo' => 'string'])
-                    )->has(
-                        'veterinario',
-                        fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
-                        => $json->whereAllType(['id' => 'integer', 'nombre' => 'string'])
-                    )
+                        ])->where('tipo', fn(string $tipoServicio) => Str::contains($tipoServicio, ['Monta', 'Inseminacion']))
+                        ->has(
+                            'pajuela_toro',
+                            fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
+                            => $json->whereAllType(['id' => 'integer', 'codigo' => 'string'])
+                        )->has(
+                            'veterinario',
+                            fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
+                            => $json->whereAllType(['id' => 'integer', 'nombre' => 'string'])
+                        )
                 )
             );
     }
     public function test_actualizar_servicio_inseminacion(): void
     {
-        $servicios = $this->generarServicioInseminacion();
+        $servicios = $this->generarServicios(false);
         $idRandom = random_int(0, $this->cantidad_servicio - 1);
         $idservicioEditar = $servicios[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf($this->url . '/%s', $idservicioEditar), $this->servicioInseminacion + ['pajuela_toro_id' => $this->pajuelaToro->id]);
+        $response = $this->setUpRequest()->putJson(sprintf($this->url . '/%s', $idservicioEditar), $this->servicioInseminacion + ['pajuela_toro_id' => $this->pajuelaToro->id]);
 
         $response->assertStatus(200)
             ->assertJson(
-                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
+                fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
                     'servicio',
-                    fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
+                    fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                     $json->where('observacion', $this->servicioInseminacion['observacion'])
-                    ->where('tipo', ucwords((string) $this->servicioInseminacion['tipo']))
-                    ->has(
-                        'veterinario',
-                        fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
-                        => $json->whereAllType(['id' => 'integer', 'nombre' => 'string'])
-                    )
-                    ->etc()
+                        ->where('tipo', ucwords((string) $this->servicioInseminacion['tipo']))
+                        ->has(
+                            'veterinario',
+                            fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson
+                            => $json->whereAllType(['id' => 'integer', 'nombre' => 'string'])
+                        )
+                        ->etc()
                 )
             );
     }
 
     public function test_eliminar_servicio_inseminacion(): void
     {
-        $servicios = $this->generarServicioInseminacion();
+        $servicios = $this->generarServicios(false);
         $idRandom = random_int(0, $this->cantidad_servicio - 1);
         $idToDelete = $servicios[$idRandom]->id;
 
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->deleteJson(sprintf($this->url . '/%s', $idToDelete));
+        $response = $this->setUpRequest()->deleteJson(sprintf($this->url . '/%s', $idToDelete));
 
         $response->assertStatus(200)->assertJson(['servicioID' => $idToDelete]);
     }
@@ -646,10 +606,9 @@ class ServicioTest extends TestCase
                 'fecha_nacimiento' => '2000-02-12',
                 'telefono' => '0424-1234567',
                 'cargo_id' => 1,
-            ]);
-        ;
+            ]);;
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson($this->url, $servicio);
+        $response = $this->setUpRequest()->postJson($this->url, $servicio);
 
         $response->assertStatus(422)->assertInvalid($errores);
     }
@@ -663,50 +622,50 @@ class ServicioTest extends TestCase
             ->count(5)
             ->hasPeso(1)
             ->hasServicios(7, ['servicioable_id' => $this->toro->id, 'servicioable_type' => $this->toro->getMorphClass(), 'personal_id' => $this->veterinario->id])
-            ->has(Parto::factory()->has(PartoCria::factory()->state(['ganado_id'=>Ganado::factory()->for($this->hacienda)->hasAttached($this->estado)]))
-            ->state(function (array $attributes, Ganado $ganado): array {
-                $hacienda = $ganado->hacienda;
-                $user=$ganado->hacienda->user->id;
-                $veterinario = Personal::factory()->hasAttached($hacienda)->create(['user_id'=>$user,'cargo_id' => 2]);
+            ->has(Parto::factory()->has(PartoCria::factory()->state(['ganado_id' => Ganado::factory()->for($this->hacienda)->hasAttached($this->estado)]))
+                ->state(function (array $attributes, Ganado $ganado): array {
+                    $hacienda = $ganado->hacienda;
+                    $user = $ganado->hacienda->user->id;
+                    $veterinario = Personal::factory()->hasAttached($hacienda)->create(['user_id' => $user, 'cargo_id' => 2]);
 
-                return ['partoable_id' => $ganado->servicioReciente->servicioable->id,'partoable_type' => $ganado->servicioReciente->servicioable->getMorphClass(), 'personal_id' => $veterinario->id];
-            }))
+                    return ['partoable_id' => $ganado->servicioReciente->servicioable->id, 'partoable_type' => $ganado->servicioReciente->servicioable->getMorphClass(), 'personal_id' => $veterinario->id];
+                }))
             ->hasEvento(1)
             ->hasAttached($this->estadoFallecido)
             ->for($this->hacienda)
             ->create();
 
-            /* partos con monta vendida */
+        /* partos con monta vendida */
         Ganado::factory()
             ->count(5)
             ->hasPeso(1)
             ->hasServicios(7, ['servicioable_id' => $this->toro->id, 'servicioable_type' => $this->toro->getMorphClass(), 'personal_id' => $this->veterinario->id])
-            ->has(Parto::factory()->has(PartoCria::factory()->state(['ganado_id'=>Ganado::factory()->for($this->hacienda)->hasAttached($this->estado)]))
-            ->state(function (array $attributes, Ganado $ganado): array {
-                $hacienda = $ganado->hacienda;
-                $user=$ganado->hacienda->user->id;
-                $veterinario = Personal::factory()->hasAttached($hacienda)->create(['user_id'=>$user,'cargo_id' => 2]);
+            ->has(Parto::factory()->has(PartoCria::factory()->state(['ganado_id' => Ganado::factory()->for($this->hacienda)->hasAttached($this->estado)]))
+                ->state(function (array $attributes, Ganado $ganado): array {
+                    $hacienda = $ganado->hacienda;
+                    $user = $ganado->hacienda->user->id;
+                    $veterinario = Personal::factory()->hasAttached($hacienda)->create(['user_id' => $user, 'cargo_id' => 2]);
 
-                return ['partoable_id' => $ganado->servicioReciente->servicioable->id,'partoable_type' => $ganado->servicioReciente->servicioable->getMorphClass(), 'personal_id' => $veterinario->id];
-            }))
+                    return ['partoable_id' => $ganado->servicioReciente->servicioable->id, 'partoable_type' => $ganado->servicioReciente->servicioable->getMorphClass(), 'personal_id' => $veterinario->id];
+                }))
             ->hasEvento(1)
             ->hasAttached($this->estadoVendido)
             ->for($this->hacienda)
             ->create();
 
-            /* partos con monta sanas */
+        /* partos con monta sanas */
         Ganado::factory()
             ->count(5)
             ->hasPeso(1)
             ->hasServicios(7, ['servicioable_id' => $this->toro->id, 'servicioable_type' => $this->toro->getMorphClass(), 'personal_id' => $this->veterinario->id])
-            ->has(Parto::factory()->has(PartoCria::factory()->state(['ganado_id'=>Ganado::factory()->for($this->hacienda)->hasAttached($this->estado)]))
-            ->state(function (array $attributes, Ganado $ganado): array {
-                $hacienda = $ganado->hacienda;
-                $user=$ganado->hacienda->user->id;
-                $veterinario = Personal::factory()->hasAttached($hacienda)->create(['user_id'=>$user,'cargo_id' => 2]);
+            ->has(Parto::factory()->has(PartoCria::factory()->state(['ganado_id' => Ganado::factory()->for($this->hacienda)->hasAttached($this->estado)]))
+                ->state(function (array $attributes, Ganado $ganado): array {
+                    $hacienda = $ganado->hacienda;
+                    $user = $ganado->hacienda->user->id;
+                    $veterinario = Personal::factory()->hasAttached($hacienda)->create(['user_id' => $user, 'cargo_id' => 2]);
 
-                return ['partoable_id' => $ganado->servicioReciente->servicioable->id,'partoable_type' => $ganado->servicioReciente->servicioable->getMorphClass(), 'personal_id' => $veterinario->id];
-            }))
+                    return ['partoable_id' => $ganado->servicioReciente->servicioable->id, 'partoable_type' => $ganado->servicioReciente->servicioable->getMorphClass(), 'personal_id' => $veterinario->id];
+                }))
             ->hasEvento(1)
             ->hasAttached($this->estadoSano)
             ->for($this->hacienda)
@@ -717,61 +676,65 @@ class ServicioTest extends TestCase
             ->count(5)
             ->hasPeso(1)
             ->hasServicios(7, ['servicioable_id' => $this->pajuelaToro->id, 'servicioable_type' => $this->pajuelaToro->getMorphClass(), 'personal_id' => $this->veterinario->id])
-            ->has(Parto::factory()->has(PartoCria::factory()->state(['ganado_id'=>Ganado::factory()->for($this->hacienda)->hasAttached($this->estado)]))
-            ->state(function (array $attributes, Ganado $ganado): array {
-                $hacienda = $ganado->hacienda;
-                $user=$ganado->hacienda->user->id;
-                $veterinario = Personal::factory()->hasAttached($hacienda)->create(['user_id'=>$user,'cargo_id' => 2]);
+            ->has(Parto::factory()->has(PartoCria::factory()->state(['ganado_id' => Ganado::factory()->for($this->hacienda)->hasAttached($this->estado)]))
+                ->state(function (array $attributes, Ganado $ganado): array {
+                    $hacienda = $ganado->hacienda;
+                    $user = $ganado->hacienda->user->id;
+                    $veterinario = Personal::factory()->hasAttached($hacienda)->create(['user_id' => $user, 'cargo_id' => 2]);
 
-                return ['partoable_id' => $ganado->servicioReciente->servicioable->id,'partoable_type' => $ganado->servicioReciente->servicioable->getMorphClass(), 'personal_id' => $veterinario->id];
-            }))
+                    return ['partoable_id' => $ganado->servicioReciente->servicioable->id, 'partoable_type' => $ganado->servicioReciente->servicioable->getMorphClass(), 'personal_id' => $veterinario->id];
+                }))
             ->hasEvento(1)
             ->hasAttached($this->estado)
             ->for($this->hacienda)
             ->create();
 
-                /* partos con monta sanas y estado pendiente servicio*/
+        /* partos con monta sanas y estado pendiente servicio*/
         Ganado::factory()
-        ->count(5)
-        ->hasPeso(1)
-        ->hasServicios(1, ['servicioable_id' => $this->toro->id, 'servicioable_type' => $this->toro->getMorphClass(), 'personal_id' => $this->veterinario->id])
-        ->has(Parto::factory()->has(PartoCria::factory()->state(['ganado_id'=>Ganado::factory()->for($this->hacienda)->hasAttached($this->estado)]))
-        ->state(function (array $attributes, Ganado $ganado): array {
-            $hacienda = $ganado->hacienda;
-            $user=$ganado->hacienda->user->id;
-            $veterinario = Personal::factory()->hasAttached($hacienda)->create(['user_id'=>$user,'cargo_id' => 2]);
+            ->count(5)
+            ->hasPeso(1)
+            ->hasServicios(1, ['servicioable_id' => $this->toro->id, 'servicioable_type' => $this->toro->getMorphClass(), 'personal_id' => $this->veterinario->id])
+            ->has(Parto::factory()->has(PartoCria::factory()->state(['ganado_id' => Ganado::factory()->for($this->hacienda)->hasAttached($this->estado)]))
+                ->state(function (array $attributes, Ganado $ganado): array {
+                    $hacienda = $ganado->hacienda;
+                    $user = $ganado->hacienda->user->id;
+                    $veterinario = Personal::factory()->hasAttached($hacienda)->create(['user_id' => $user, 'cargo_id' => 2]);
 
-            return ['partoable_id' => $ganado->servicioReciente->servicioable->id,'partoable_type' => $ganado->servicioReciente->servicioable->getMorphClass(), 'personal_id' => $veterinario->id];
-        }))
-        ->hasEvento(1)
-        ->hasAttached([$this->estadoSano,$this->estadoPendienteServicio],)
-        ->for($this->hacienda)
-        ->create();
+                    return ['partoable_id' => $ganado->servicioReciente->servicioable->id, 'partoable_type' => $ganado->servicioReciente->servicioable->getMorphClass(), 'personal_id' => $veterinario->id];
+                }))
+            ->hasEvento(1)
+            ->hasAttached([$this->estadoSano, $this->estadoPendienteServicio],)
+            ->for($this->hacienda)
+            ->create();
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('todasServicios'));
+        $response = $this->setUpRequest()->getJson(route('todasServicios'));
 
         $response->assertStatus(200)
             ->assertJson(
-                fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
+                fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                 //son 26, ya que se esta contando la vaca que se crea en setUp
-                $json->has('todos_servicios',26)
-                ->has('todos_servicios.3', fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
-                    'id' => 'integer',
-                    'numero' => 'integer|null',
-                    'ultimo_servicio' => 'string',
-                    'efectividad' => 'double|integer|null',
-                    'toro' => 'array|null',
-                    'total_servicios' => 'integer',
-                    'pendiente'=>'boolean',
-                ])
-                ->where('estado',fn(string $estado) => Str::contains($estado,['Sano','Fallecido','Vendido']))
-                )
-                ->has('todos_servicios.8', fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
-                    'pajuela_toro' => 'array|null',
-                ])
-                ->where('estado',fn(string $estado) => Str::contains($estado,['Sano','Fallecido','Vendido']))
-                ->etc()
-                )
+                $json->has('todos_servicios', 26)
+                    ->has(
+                        'todos_servicios.3',
+                        fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
+                            'id' => 'integer',
+                            'numero' => 'integer|null',
+                            'ultimo_servicio' => 'string',
+                            'efectividad' => 'double|integer|null',
+                            'toro' => 'array|null',
+                            'total_servicios' => 'integer',
+                            'pendiente' => 'boolean',
+                        ])
+                            ->where('estado', fn(string $estado) => Str::contains($estado, ['Sano', 'Fallecido', 'Vendido']))
+                    )
+                    ->has(
+                        'todos_servicios.8',
+                        fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
+                            'pajuela_toro' => 'array|null',
+                        ])
+                            ->where('estado', fn(string $estado) => Str::contains($estado, ['Sano', 'Fallecido', 'Vendido']))
+                            ->etc()
+                    )
             );
     }
 }

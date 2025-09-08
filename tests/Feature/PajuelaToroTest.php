@@ -4,16 +4,16 @@ namespace Tests\Feature;
 
 use App\Models\Hacienda;
 use App\Models\PajuelaToro;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Testing\Fluent\AssertableJson;
+use Tests\Feature\Common\NeedsSetupRequest;
 use Tests\TestCase;
 
 class PajuelaToroTest extends TestCase
 {
-    use RefreshDatabase;
+    use NeedsSetupRequest {
+        NeedsSetupRequest::setUp as needsSetupRequestSetUp;
+    }
 
     private array $pajuela_toro = [
         'codigo' => '21DDSQ7',
@@ -23,22 +23,10 @@ class PajuelaToroTest extends TestCase
 
     private int $cantidad_pajuelaToro = 10;
 
-    private $user;
-    private $hacienda;
 
     protected function setUp(): void
     {
-        parent::setUp();
-
-        $this->user
-            = User::factory()->hasConfiguracion()->create();
-
-        $this->user->assignRole('admin');
-
-            $this->hacienda
-            = Hacienda::factory()
-            ->for($this->user)
-            ->create();
+        $this->needsSetupRequestSetUp();
     }
 
     private function generarPajuelasToros(): Collection
@@ -47,11 +35,6 @@ class PajuelaToroTest extends TestCase
             ->count($this->cantidad_pajuelaToro)
             ->for($this->hacienda)
             ->create();
-    }
-
-    private function cambiarRol(User $user): void
-    {
-        $user->syncRoles('veterinario');
     }
 
 
@@ -81,7 +64,7 @@ class PajuelaToroTest extends TestCase
     {
         $this->generarPajuelasToros();
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('pajuela_toros.index'));
+        $response = $this->setUpRequest()->getJson(route('pajuela_toros.index'));
         $response->assertStatus(200)
             ->assertJson(
                 fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->has(
@@ -101,7 +84,7 @@ class PajuelaToroTest extends TestCase
     public function test_creacion_pajuela_toro(): void
     {
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(route('pajuela_toros.store'), $this->pajuela_toro);
+        $response = $this->setUpRequest()->postJson(route('pajuela_toros.store'), $this->pajuela_toro);
 
         $response->assertStatus(201)
             ->assertJson(
@@ -124,7 +107,7 @@ class PajuelaToroTest extends TestCase
         $idRandom = random_int(0, $this->cantidad_pajuelaToro - 1);
         $idPajuelaToro = $pajuela_torols[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(route('pajuela_toros.show', ['pajuela_toro' => $idPajuelaToro]));
+        $response = $this->setUpRequest()->getJson(route('pajuela_toros.show', ['pajuela_toro' => $idPajuelaToro]));
 
         $response->assertStatus(200)
             ->assertJson(
@@ -146,7 +129,7 @@ class PajuelaToroTest extends TestCase
         $idRandom = random_int(0, $this->cantidad_pajuelaToro - 1);
         $idPajuelaToroEditar = $pajuela_toro[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(route('pajuela_toros.update', ['pajuela_toro' => $idPajuelaToroEditar]), $this->pajuela_toro);
+        $response = $this->setUpRequest()->putJson(route('pajuela_toros.update', ['pajuela_toro' => $idPajuelaToroEditar]), $this->pajuela_toro);
 
         $response->assertStatus(200)
             ->assertJson(
@@ -169,7 +152,7 @@ class PajuelaToroTest extends TestCase
         $idToDelete = $pajuela_toro[$idRandom]->id;
 
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->deleteJson(route('pajuela_toros.destroy', ['pajuela_toro' => $idToDelete]));
+        $response = $this->setUpRequest()->deleteJson(route('pajuela_toros.destroy', ['pajuela_toro' => $idToDelete]));
 
         $response->assertStatus(200)->assertJson(['pajuela_toroID' => $idToDelete]);
     }
@@ -181,7 +164,7 @@ class PajuelaToroTest extends TestCase
     {
         PajuelaToro::factory()->for($this->hacienda)->create(['codigo' => 28472738]);
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(route('pajuela_toros.store'), $pajuela_toro);
+        $response = $this->setUpRequest()->postJson(route('pajuela_toros.store'), $pajuela_toro);
 
         $response->assertStatus(422)->assertInvalid($errores);
     }
@@ -198,7 +181,7 @@ class PajuelaToroTest extends TestCase
 
         $this->generarPajuelasToros();
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(route('pajuela_toros.update', ['pajuela_toro' => $idPajuelaOtroHacienda]), $this->pajuela_toro);
+        $response = $this->setUpRequest()->putJson(route('pajuela_toros.update', ['pajuela_toro' => $idPajuelaOtroHacienda]), $this->pajuela_toro);
 
         $response->assertStatus(403);
     }
@@ -207,7 +190,7 @@ class PajuelaToroTest extends TestCase
     {
         $this->cambiarRol($this->user);
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson(route('pajuela_toros.store'), $this->pajuela_toro);
+        $response = $this->setUpRequest()->postJson(route('pajuela_toros.store'), $this->pajuela_toro);
 
         $response->assertStatus(403);
     }
@@ -220,7 +203,7 @@ class PajuelaToroTest extends TestCase
         $idRandom = random_int(0, $this->cantidad_pajuelaToro - 1);
         $idPajuelaToroEditar = $pajuelasToro[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(route('pajuela_toros.update', ['pajuela_toro' => $idPajuelaToroEditar]), $this->pajuela_toro);
+        $response = $this->setUpRequest()->putJson(route('pajuela_toros.update', ['pajuela_toro' => $idPajuelaToroEditar]), $this->pajuela_toro);
 
         $response->assertStatus(403);
     }
@@ -234,7 +217,7 @@ class PajuelaToroTest extends TestCase
         $idRandom = random_int(0, $this->cantidad_pajuelaToro - 1);
         $idPajuelaToroEliminar = $pajuelasToro[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->deleteJson(route('pajuela_toros.destroy', ['pajuela_toro' => $idPajuelaToroEliminar]));
+        $response = $this->setUpRequest()->deleteJson(route('pajuela_toros.destroy', ['pajuela_toro' => $idPajuelaToroEliminar]));
 
         $response->assertStatus(403);
     }

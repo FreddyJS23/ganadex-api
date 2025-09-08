@@ -14,11 +14,20 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Collection as SupportCollection;
 use Illuminate\Testing\Fluent\AssertableJson;
+use Tests\Feature\Common\NeedsEstado;
+use Tests\Feature\Common\NeedsGanado;
+use Tests\Feature\Common\NeedsSetupRequest;
 use Tests\TestCase;
 
 class FallecimientoTest extends TestCase
 {
-    use RefreshDatabase;
+    use NeedsSetupRequest,
+        NeedsGanado,
+        NeedsEstado{
+        NeedsSetupRequest::setUp as needsSetupRequestSetUp;
+        NeedsEstado::setUp as needsEstadoSetUp;
+
+    }
 
     private array $fallecimiento = [
         'fecha' => '2020-10-02',
@@ -30,24 +39,13 @@ class FallecimientoTest extends TestCase
     ];
 
     private int $cantidad_fallecimientos = 10;
-    private $estado;
-    private $user;
-    private $hacienda;
     private $causaFallecimiento;
 
     protected function setUp(): void
     {
-        parent::setUp();
-
-        $this->user
-            = User::factory()->hasConfiguracion()->create();
-
-            $this->hacienda
-            = Hacienda::factory()
-            ->for($this->user)
-            ->create();
-
-        $this->estado = Estado::all();
+        $this->needsSetupRequestSetUp();
+        $this->needsEstadoSetUp();
+        $this->generarGanado();
 
         $this->causaFallecimiento = CausasFallecimiento::factory()->create();
     }
@@ -92,7 +90,7 @@ class FallecimientoTest extends TestCase
     {
         $this->generarFallecimiento();
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson('api/fallecimientos');
+        $response = $this->setUpRequest()->getJson('api/fallecimientos');
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
@@ -119,13 +117,8 @@ class FallecimientoTest extends TestCase
 
     public function test_creacion_fallecimiento(): void
     {
-        $ganado = Ganado::factory()
-            ->hasPeso(1)
-            ->hasAttached($this->estado)
-            ->for($this->hacienda)
-            ->create();
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson('api/fallecimientos', $this->fallecimiento + ['ganado_id' => $ganado->id,'causas_fallecimiento_id'=>$this->causaFallecimiento->id]);
+        $response = $this->setUpRequest()->postJson('api/fallecimientos', $this->fallecimiento + ['ganado_id' => $this->ganado->id,'causas_fallecimiento_id'=>$this->causaFallecimiento->id]);
 
         $response->assertStatus(201)->assertJson(
             fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
@@ -147,7 +140,7 @@ class FallecimientoTest extends TestCase
         $idRandom = random_int(0, $this->cantidad_fallecimientos - 1);
         $idfallecimientos = $fallecimientos[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->getJson(sprintf('api/fallecimientos/%s', $idfallecimientos), $this->fallecimiento);
+        $response = $this->setUpRequest()->getJson(sprintf('api/fallecimientos/%s', $idfallecimientos), $this->fallecimiento);
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json->whereAllType([
@@ -168,7 +161,7 @@ class FallecimientoTest extends TestCase
         $idRandom = random_int(0, $this->cantidad_fallecimientos - 1);
         $idfallecimientosEditar = $fallecimientos[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->putJson(sprintf('api/fallecimientos/%s', $idfallecimientosEditar), $this->fallecimientoActualizado + ['causas_fallecimiento_id'=>$this->causaFallecimiento->id]);
+        $response = $this->setUpRequest()->putJson(sprintf('api/fallecimientos/%s', $idfallecimientosEditar), $this->fallecimientoActualizado + ['causas_fallecimiento_id'=>$this->causaFallecimiento->id]);
 
         $response->assertStatus(200)->assertJson(
             fn (AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
@@ -196,7 +189,7 @@ class FallecimientoTest extends TestCase
         $idToDelete = $fallecimientos[$idRandom]->id;
 
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->deleteJson(sprintf('api/fallecimientos/%s', $idToDelete));
+        $response = $this->setUpRequest()->deleteJson(sprintf('api/fallecimientos/%s', $idToDelete));
 
         $response->assertStatus(200)->assertJson(['fallecimientoID' => $idToDelete]);
     }
@@ -206,7 +199,7 @@ class FallecimientoTest extends TestCase
      */
     public function test_error_validacion_registro_fallecimiento(array $fallecimientos, array $errores): void
     {
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->hacienda->id,'peso_servicio' => $this->user->configuracion->peso_servicio,'dias_Evento_notificacion' => $this->user->configuracion->dias_evento_notificacion,'dias_diferencia_vacuna' => $this->user->configuracion->dias_diferencia_vacuna])->postJson('api/fallecimientos', $fallecimientos);
+        $response = $this->setUpRequest()->postJson('api/fallecimientos', $fallecimientos);
 
         $response->assertStatus(422)->assertInvalid($errores);
     }

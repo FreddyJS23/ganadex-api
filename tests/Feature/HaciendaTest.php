@@ -7,18 +7,21 @@ use App\Models\Ganado;
 use App\Models\Hacienda;
 use App\Models\Personal;
 use App\Models\User;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Http\Request;
 use Illuminate\Testing\Fluent\AssertableJson;
+use Tests\Feature\Common\NeedsHacienda;
+use Tests\Feature\Common\NeedsSetupRequest;
 use Tests\TestCase;
 
 class HaciendaTest extends TestCase
 {
-    use RefreshDatabase;
+    use NeedsSetupRequest,
+    NeedsHacienda
+    {
+    NeedsSetupRequest::setUp as needsSetupRequestSetUp;
+    }
 
-    private array $hacienda = [
+
+    private array $crearHacienda = [
         'nombre' => 'hacienda test',
     ];
 
@@ -26,30 +29,16 @@ class HaciendaTest extends TestCase
 
     private int $cantidad_haciendas = 10;
 
-    private $user;
 
     protected function setUp(): void
     {
-        parent::setUp();
+        $this->needsSetupRequestSetUp();
 
-        $this->user
-            = User::factory()->hasConfiguracion()->create();
+        $this->haciendaEnSesion = $this->hacienda;
 
-            $this->user->assignRole('admin');
-
-            $this->haciendaEnSesion
-            = Hacienda::factory()
-            ->for($this->user)
-            ->create(['nombre' => 'hacienda_sesion']);
     }
 
-    private function generarHaciendas(): Collection
-    {
-        return Hacienda::factory()
-            ->count($this->cantidad_haciendas)
-            ->for($this->user)
-            ->create();
-    }
+
     public static function ErrorInputProvider(): array
     {
         return [
@@ -100,7 +89,7 @@ class HaciendaTest extends TestCase
     {
         $this->generarHaciendas();
 
-        $response = $this->actingAs($this->user)->postJson(route('hacienda.store'), $this->hacienda);
+        $response = $this->actingAs($this->user)->postJson(route('hacienda.store'), $this->crearHacienda);
 
         $response->assertStatus(201)->assertJson(
             fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
@@ -122,7 +111,7 @@ class HaciendaTest extends TestCase
         //no se usa truncate ya que da error de contricciones de llaves foraneas
         Hacienda::where('id', '>', 0)->delete();
 
-        $response = $this->actingAs($this->user)->postJson(route('hacienda.store'), $this->hacienda);
+        $response = $this->actingAs($this->user)->postJson(route('hacienda.store'), $this->crearHacienda);
 
         $response->assertStatus(201)->assertJson(
             fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
@@ -144,7 +133,7 @@ class HaciendaTest extends TestCase
         $idRandom = random_int(0, $this->cantidad_haciendas - 1);
         $idHaciendaEditar = $hacienda[$idRandom]->id;
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $idHaciendaEditar])->putJson(route('hacienda.update', ['hacienda' => $idHaciendaEditar]), $this->hacienda);
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $idHaciendaEditar])->putJson(route('hacienda.update', ['hacienda' => $idHaciendaEditar]), $this->crearHacienda);
 
         $response->assertStatus(200)->assertJson(
             fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
@@ -152,7 +141,7 @@ class HaciendaTest extends TestCase
                  'hacienda',
                  fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
                  $json->where('id', $idHaciendaEditar)
-                 ->where('nombre', $this->hacienda['nombre'])
+                 ->where('nombre', $this->crearHacienda['nombre'])
                  ->etc()
              )
         );
@@ -192,9 +181,8 @@ class HaciendaTest extends TestCase
 
     public function test_veterinario_obtiene_hacienda_en_sesion(): void
     {
-        $this->user->syncRoles('veterinario');
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->haciendaEnSesion->id])->getJson(route('verificar_sesion_hacienda'));
+        $response = $this->cambiarRol($this->user)->actingAs($this->user)->withSession(['hacienda_id' => $this->haciendaEnSesion->id])->getJson(route('verificar_sesion_hacienda'));
 
         $response->assertStatus(200)->assertJson(
             fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson =>
@@ -381,7 +369,7 @@ class HaciendaTest extends TestCase
 
         $idhaciendaOtroUsuario = $haciendaOtroUsuario->id;
 
-        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->haciendaEnSesion])->putJson(route('hacienda.update', ['hacienda' => $idhaciendaOtroUsuario]), $this->hacienda);
+        $response = $this->actingAs($this->user)->withSession(['hacienda_id' => $this->haciendaEnSesion])->putJson(route('hacienda.update', ['hacienda' => $idhaciendaOtroUsuario]), $this->crearHacienda);
 
         $response->assertStatus(403);
     }

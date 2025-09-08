@@ -13,7 +13,7 @@ trait NeedsGanadoDescarte
     /** @var Collection<GanadoDescarte> */
     private Collection $ganadoDescartes;
 
-    private GanadoDescarte $ganadoDescarte;
+    private GanadoDescarte $ganado_descarte;
 
 
     private function generarGanadoDescartes(): Collection
@@ -22,11 +22,24 @@ trait NeedsGanadoDescarte
             ->count(10)
             ->for($this->hacienda)
             ->state(
-                ['ganado_id' => Ganado::factory()->hasAttached($this->estado)->hasVacunaciones(
+                ['ganado_id' => Ganado::factory()->hasPeso()->hasAttached($this->estado)->hasVacunaciones(
                     3,
                     ['hacienda_id' => $this->hacienda->id]
                 )->state(['hacienda_id' => $this->hacienda->id, 'sexo' => 'M', 'tipo_id' => 4])]
             )
+            ->create();
+    }
+
+    private function generarGanadoDescarte(): GanadoDescarte
+    {
+        return  $this->ganado_descarte
+            = GanadoDescarte::factory()
+            ->for($this->hacienda)
+            ->for(Ganado::factory()
+                ->hasPeso()
+                ->for($this->hacienda)
+                ->hasAttached($this->estado)
+                ->create(['nombre' => 'descarte', 'numero' => 350]))
             ->create();
     }
 }

@@ -2,59 +2,39 @@
 
 namespace Tests\Feature;
 
-use App\Models\Hacienda;
 use App\Models\Personal;
 use App\Models\User;
 use App\Models\UsuarioVeterinario;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Testing\Fluent\AssertableJson;
+use Tests\Feature\Common\NeedsHacienda;
+use Tests\Feature\Common\NeedsPersonal;
+use Tests\Feature\Common\NeedsSetupRequest;
+use Tests\Feature\Common\NeedsUsuarioVeterinario;
 use Tests\TestCase;
 
 class LoginTest extends TestCase
 {
-    use RefreshDatabase;
+    use NeedsSetupRequest,
+    NeedsPersonal,
+    NeedsHacienda,
+    NeedsUsuarioVeterinario
+    {
+    NeedsSetupRequest::setUp as needsSetupRequestSetUp;
+    NeedsUsuarioVeterinario::setUp as needsUsuarioVeterinarioSetUp;
+    }
+
 
     private $userAdmin;
-    private $userVeterinario;
-    private $hacienda;
 
     protected function setUp(): void
     {
-        parent::setUp();
 
+        $this->needsSetupRequestSetUp();
+        $this->needsUsuarioVeterinarioSetUp();
 
-        $this->userAdmin
-            = User::factory()
-            ->hasConfiguracion()
-            ->create(['usuario' => 'admin', 'password' => Hash::make('admin')]);
+        $this->userAdmin=$this->user;
 
-            $this->userAdmin->assignRole('admin');
-
-            $this->hacienda
-            = Hacienda::factory()
-            ->for($this->userAdmin)
-            ->create();
-
-        $this->userVeterinario
-            = User::factory()
-            ->create(['usuario' => 'veterinario', 'password' => Hash::make('veterinario')]);
-
-            UsuarioVeterinario::factory()
-            ->for(Personal::factory()->for($this->userAdmin)->hasAttached($this->hacienda)->create(['cargo_id' => 2]), 'veterinario')
-            ->create(['admin_id' => $this->userAdmin->id,
-            'user_id' => $this->userVeterinario->id]);
-
-            $this->userVeterinario->assignRole('veterinario');
-    }
-
-    private function generarHaciendas(): Collection
-    {
-        return Hacienda::factory()
-            ->count(10)
-            ->for($this->userAdmin)
-            ->create();
     }
 
     private function userVeterinarioEnVariasHaciendas(): User

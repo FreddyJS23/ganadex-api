@@ -3,18 +3,16 @@
 namespace Tests\Feature;
 
 use App\Models\TipoRevision;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
+use Tests\Feature\Common\NeedsSetupRequest;
 use Illuminate\Testing\Fluent\AssertableJson;
-use Tests\Feature\Common\NeedsUser;
 use Tests\TestCase;
 
 class TipoRevisionTest extends TestCase
 {
-    use RefreshDatabase;
-    use NeedsUser;
+    use NeedsSetupRequest {
+        NeedsSetupRequest::setUp as needsSetupRequestSetUp;
+    }
 
     private array $tipo_revision = [
         'tipo' => 'enferma',
@@ -25,7 +23,12 @@ class TipoRevisionTest extends TestCase
         'codigo' => 'DAX',
     ];
 
-    private int $cantidad_tipoRevision= 10;
+    private int $cantidad_tipoRevision = 10;
+
+    protected function setUp(): void
+    {
+        $this->needsSetupRequestSetUp();
+    }
 
     private function generarTipoRevision(): Collection
     {
@@ -34,10 +37,6 @@ class TipoRevisionTest extends TestCase
             ->create();
     }
 
-    private function cambiarRol(User $user): void
-    {
-        $user->syncRoles('veterinario');
-    }
 
     public static function ErrorInputProvider(): array
     {
@@ -51,19 +50,11 @@ class TipoRevisionTest extends TestCase
             ],
             'caso de no insertar datos requeridos' => [
                 [],
-                ['tipo','codigo']
+                ['tipo', 'codigo']
             ],
         ];
     }
 
-    private function setUpRequest(): static
-    {
-        $this
-            ->actingAs($this->user)
-            ->withSession($this->getSessionInitializationArray());
-
-        return $this;
-    }
 
     public function test_obtener_tipo_revision(): void
     {
@@ -100,9 +91,11 @@ class TipoRevisionTest extends TestCase
                     ->where(
                         key: 'tipo_revision.tipo',
                         expected: $this->tipo_revision['tipo']
-                    )->where(  key: 'tipo_revision.codigo',
-                    expected: $this->tipo_revision['codigo'])
-                ->etc()
+                    )->where(
+                        key: 'tipo_revision.codigo',
+                        expected: $this->tipo_revision['codigo']
+                    )
+                    ->etc()
             );
     }
 
@@ -111,13 +104,13 @@ class TipoRevisionTest extends TestCase
     public function test_actualizar_tipo_revision(): void
     {
 
-        $tipoRevision= $this->generarTipoRevision();
-        $idRandom = random_int(0, $this->cantidad_tipoRevision- 1);
+        $tipoRevision = $this->generarTipoRevision();
+        $idRandom = random_int(0, $this->cantidad_tipoRevision - 1);
         $idTipoRevisionEditar = $tipoRevision[$idRandom]->id;
 
         $this
             ->setUpRequest()
-            ->putJson(route('tipos_revision.update',['tipos_revision'=>$idTipoRevisionEditar]), $this->tipo_revision_actualizado)
+            ->putJson(route('tipos_revision.update', ['tipos_revision' => $idTipoRevisionEditar]), $this->tipo_revision_actualizado)
             ->assertStatus(200)
             ->assertJson(
                 fn(AssertableJson $json): \Illuminate\Testing\Fluent\AssertableJson => $json
@@ -130,18 +123,18 @@ class TipoRevisionTest extends TestCase
     public function test_actualizar_tipo_revision_prederteminadas(): void
     {
         //los tipos de revision predertminadas no se pueden editar, las cuales son:gestacion, descarte y rutina
-        $idRandom = random_int(1,4);
+        $idRandom = random_int(1, 4);
 
         $this
             ->setUpRequest()
-            ->putJson(route('tipos_revision.update',['tipos_revision'=>$idRandom]), $this->tipo_revision_actualizado)
+            ->putJson(route('tipos_revision.update', ['tipos_revision' => $idRandom]), $this->tipo_revision_actualizado)
             ->assertStatus(403);
     }
 
     public function test_eliminar_tipo_revision(): void
     {
         $tipo_revision = $this->generarTipoRevision();
-        $idRandom = random_int(0, $this->cantidad_tipoRevision- 1);
+        $idRandom = random_int(0, $this->cantidad_tipoRevision - 1);
         $idToDelete = $tipo_revision[$idRandom]->id;
 
 
@@ -167,9 +160,9 @@ class TipoRevisionTest extends TestCase
 
     public function test_veterinario_no_autorizado_a_crear_tipo_revision(): void
     {
-        $this->cambiarRol($this->user);
 
         $this
+            ->cambiarRol($this->user)
             ->setUpRequest()
             ->postJson(route('tipos_revision.store'), $this->tipo_revision)
             ->assertStatus(403);
@@ -177,13 +170,13 @@ class TipoRevisionTest extends TestCase
 
     public function test_veterinario_no_autorizado_a_actualizar_tipo_revision(): void
     {
-        $this->cambiarRol($this->user);
 
         $tipo_revision = $this->generarTipoRevision();
-        $idRandom = random_int(0, $this->cantidad_tipoRevision- 1);
+        $idRandom = random_int(0, $this->cantidad_tipoRevision - 1);
         $idtipo_revisionEditar = $tipo_revision[$idRandom]->id;
 
         $this
+            ->cambiarRol($this->user)
             ->setUpRequest()
             ->putJson(
                 uri: route('tipos_revision.update', ['tipos_revision' => $idtipo_revisionEditar]),
@@ -195,13 +188,13 @@ class TipoRevisionTest extends TestCase
 
     public function test_veterinario_no_autorizado_a_eliminar_tipo_revision(): void
     {
-        $this->cambiarRol($this->user);
 
         $tipo_revision = $this->generarTipoRevision();
-        $idRandom = random_int(0, $this->cantidad_tipoRevision- 1);
+        $idRandom = random_int(0, $this->cantidad_tipoRevision - 1);
         $idToDelete = $tipo_revision[$idRandom]->id;
 
         $this
+            ->cambiarRol($this->user)
             ->setUpRequest()
             ->deleteJson(route('tipos_revision.destroy', ['tipos_revision' => $idToDelete]))
             ->assertStatus(403);
